@@ -1,0 +1,375 @@
+<!-- Breadcrumbs -->
+<!-- <div class="top_panel_title top_panel_style_3 title_present breadcrumbs_present scheme_original">
+    <div class="top_panel_title_inner inner-bg6">
+        <div class="content_wrap">
+            <h1 class="page_title">All Meetings</h1> -->
+            <!-- <div class="breadcrumbs">
+                <a class="breadcrumbs_item home" href="index.html">Home</a>
+                <span class="breadcrumbs_delimiter"></span>
+
+                <span class="breadcrumbs_item current">All Meetings</span>
+            </div> -->
+        <!-- </div>
+    </div>
+</div> -->
+<!-- /Breadcrumbs -->
+
+
+<!-- Page Content Wrap -->
+<div
+    class="page body_style_wide body_filled article_style_stretch scheme_original top_panel_show top_panel_above sidebar_hide">
+    <a id="toc_home" class="sc_anchor" title="Home"
+        data-description="<i>Return to Home</i> - <br>navigate to home page of the site" data-icon="icon-home"
+        data-url="index.html" data-separator="yes"></a>
+    <a id="toc_top" class="sc_anchor" title="To Top"
+        data-description="<i>Back to top</i> - <br>scroll to top of the page" data-icon="icon-double-up" data-url=""
+        data-separator="yes"></a>
+    <br>
+    <div class="latest-news-block"
+    style="background-color:#ccc;color: #fb0404;font-family: Ramabhadra,sans-serif!important;font-size:larger;">
+    <div class="latest-news-block-hightlight">
+        <div class="latest-update-block"> <span class="block-2"> News </span>
+            <div style="overflow:hidden">
+                <marquee behavior="scroll" direction="left" scrolldelay="15" scrollamount="1" truespeed="10"
+                    onmouseover="this.stop()" onmouseout="this.start()" style="height:30px; white-space: nowrap">
+                    <div class="tickercontainer">
+                        <span class="ad-blk">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                        <a href="/churchgo">చర్చి పర్మిషన్ గవర్నమెంట్ ఆర్డర్స్</a>
+                        <span
+                            class="photo_gallery-icon">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            &nbsp;</span>
+                        <a href="/techsol">మీ చర్చికి మా టెక్నికల్ సొల్లుషన్స్</a>
+                        <span
+                            class="polls-icon">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                        <a href="/webhelp">వెబ్ సైట్ ఎలా ఉపయోగించాలి</a>
+                        <span
+                            class="polls-icon">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                        <a href="/about">నా గురించి</a>
+                        <span
+                            class="polls-icon">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                        <a href="/about">జోసెఫ్ గారు కలిసిన నాయకులు తో గేలరీ</a>
+                        <span
+                        class="polls-icon">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                    <a href="/ourhelp">మీకు మా సహాయం</a>
+
+                        <span
+                            class="photo_gallery-icon">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                        <a href="/addattacks">క్రైస్తవులపై దాడుల నమోదు</a>
+                        <span
+                            class="photo_gallery-icon">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                        <a href="/survey-news">క్రైస్తవులకి ప్రభుత్వం సేవలు మీద సర్వే</a>
+
+                        <span
+                            class="photo_gallery-icon">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                        <a href="https://forms.gle/uJiLXp74FZmQAkKe7">క్రైస్తవుల కోసం ప్రభుత్వం తరుపున నామినేటెడ్ పోస్ట్
+                            ల లో ఎంతమంది వున్నారో, వారి జీత భత్యాలు తెలుసుకోండి, వారు మీకు ఎలా ఉపయోగ పడుతున్నారో
+                            ఆప్షన్స్ సెలెక్ట్ చేయుటకు ఈ లింక్ క్లిక్ చేయండి</a>
+
+                        <!-- <span class="photo_gallery-icon">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                        <a href="/addattacks">క్రైస్తవులపై దాడుల నమోదు</a> -->
+
+                    </div>
+                </marquee>
+            </div>
+        </div>
+    </div>
+</div>
+
+    
+    <br>
+    <div class="container mt-3" style="padding-bottom: 28px">
+        <h3>ఆంధ్ర రాష్ట్రంలోని జరగబోయే క్రైస్తవ మీటింగ్స్</h3>
+        <div class="row">
+            <div class="card" class="max-w-sm rounded overflow-hidden shadow-lg" style="padding:10px">
+                <form [formGroup]="searchdenomation">
+                    <div class="row">
+                        <div class="col-md-2 mb-4 pb-2">
+                            <div class="form-outline">
+                                <label class="form-label">సెలెక్ట్ కూటముల టైపు</label>
+                                <select class="form-control" formControlName="mettingtype"
+                                    (change)="searchchange($event);">
+                                    <option value="" selected disabled>సెలెక్ట్ కూటముల టైపు </option>
+                                                    <option value="1">VBS</option>
+                                                    <option value="2">ఉజ్జీవ కూటములు</option>
+                                                    <option value="3">సువార్త కూటములు</option>
+                                                    <option value="4">స్వస్థత కూటములు</option>
+                                                    <option value="5">ఉజ్జీవ స్వస్థత కూటములు</option>
+                                                    <option value="6">యూత్ మీటింగ్స్</option>
+                                                    <option value="7">క్రైస్తవ నాయకుల కూటములు</option>
+                                                    <option value="8">స్త్రీల కూటములు</option>
+                                                    <option value="9">పాస్టర్ ఫెలోషిప్ కూటములు</option>
+                                                    <option value="10">క్రైస్తవ పిల్లల కూటములు</option>
+                                                    <option value="11">క్రైస్తవ బుక్స్ ఎక్సిబిషన్</option>
+                                                    <option value="12">క్రైస్తవ సంగీత కూటములు</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-2 mb-4 pb-2">
+                            <div class="form-outline">
+                                <label class="form-label">సెలెక్ట్ డినామినేషన్ మోడల్‌   </label>
+                                <select class="form-control" formControlName="denomation_id"
+                                    style="height:37px;width: 273px;" (change)="searchdenomationdata($event);">
+                                    <option value="" selected disabled>సెలెక్ట్ డినామినేషన్ మోడల్‌     </option>
+                                    <option value="{{item.id}}" *ngFor="let item of denomation">
+                                        {{item.denomation_name}}
+                                    </option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- <div class="col-md-2 mb-4 pb-2">
+                            <div class="form-outline">
+                                <label class="form-label">Speaker1 Name</label>
+                                <select class="form-control" formControlName="speakerone"
+                                    (change)="searchspeak($event);">
+                                    <option value="" selected disabled>Select the Speaker </option>
+                                    <option value="Br Sateesh Kumar Calvary Temple">Br Sateesh Kumar
+                                        Calvary Temple</option>
+                                    <option value="Br.John Wesley,Hosanna Ministries">Br. John
+                                        Wesley,Hosanna Ministries</option>
+                                    <option value="Br.Edward Williams Kuntam">Br. Edward Williams Kuntam
+                                    </option>
+                                    <option value="Dr.John Wesley,Christ Worship Centre">Dr.John
+                                        Wesley,Christ Worship Centre</option>
+                                    <option value="Dr.L.K.Mruthyunjaya">Dr. L.K.Mruthyunjaya</option>
+                                    <option value="Dr.Thomas,Dhahinchu Agni">Dr. Thomas,Dhahinchu Agni
+                                    </option>
+                                    <option value="P J StephenPaul">P J StephenPaul</option>
+                                </select>
+                            </div>
+                        </div> -->
+                        <!--          <div class="col-md-2 mb-4 pb-2">
+                            <label class="form-label" for="church_name">Search Pastor Name </label>
+                            <input class="form-control" type="text" (keyup)="filterPastor($event.target)">
+                        </div>
+
+                        <div class="col-md-2 mb-4 pb-2">
+                            <div class="form-outline">
+                                <label class="form-label">Speaker1</label>
+                                <select class="form-control" formControlName="speakerone"
+                                    (change)="searchspeak($event);">
+                                    <option value="" selected disabled>Select the pastor </option>
+                                    <option *ngFor="let i of pastors" value="{{i.pastorname}}">
+                                        {{i.pastorname }}</option>
+                                </select>
+                            </div>
+                        </div>
+                        -->
+                        <div class="col-md-2 mb-4 pb-2">
+                            <div class="form-outline">
+                                <label class="form-label">Select Ministry </label>
+                                <select class="form-control" formControlName="ministry_id"
+                                    style="height:37px;width: 273px;" (change)="ministry($event);">
+                                    <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
+                                    <option *ngFor="let i of ministryname" value="{{i.id}}">
+                                        {{i.ministryname}}</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-2 mb-4 pb-2">
+                            <div class="form-outline">
+                                <label class="form-label">Date Wise Meetings (If select the date then automatically
+                                    display)</label>
+                                <input type="date" class="form-control" formControlName="startdate" [min]="now"
+                                    (change)="onDateChange($event)">
+                            </div>
+                        </div>
+                        <!--inorder to go to new line div-->
+                        <div></div>
+                        <!--
+                             </div>
+
+                             
+                </form> 
+            </div>
+        </div>
+        <br><br>
+        <div class="row">
+            <div class="card" class="max-w-sm rounded overflow-hidden shadow-lg" style="padding:10px">
+                <form [formGroup]="searchdenomation">
+                    <div class="row"> -->
+
+                        <div class="col-md-2 mb-4 pb-2">
+                            <div class="form-outline">
+                                <label class="form-label">సెలెక్ట్ జిల్లా</label>
+                                <select class="form-control" formControlName="district_id"
+                                    (change)="getconstency($event);" (change)="searchdistric($event);"
+                                    style="height:37px;width: 273px;">
+                                    <option value="" selected disabled>సెలెక్ట్ జిల్లా</option>
+                                    <option value="{{item.id}}" *ngFor="let item of districts">
+                                        {{item.distrct_nm}}
+                                    </option>
+                                </select>
+
+                            </div>
+                        </div>
+                        <div class="col-md-2 mb-4 pb-2">
+                            <div class="form-outline">
+                                <label class="form-label">సెలెక్ట్ నియోజకవర్గం </label>
+                                <select class="form-control" formControlName="constenncy_id"
+                                    (change)="getmandals($event);" (change)="searchconstenct($event);"
+                                    style="height:37px;width: 273px;">
+                                    <option value="" selected disabled>సెలెక్ట్ నియోజకవర్గం </option>
+                                    <option value="{{item.id}}" *ngFor="let item of constituency">
+                                        {{item.const_nm}}
+                                    </option>
+                                </select>
+
+                            </div>
+
+                        </div>
+                        <div class="col-md-2 mb-4 pb-2">
+                            <div class="form-outline">
+                                <label class="form-label"> మండలం/మున్సిపాలిటీ</label>
+                                <select class="form-control" formControlName="mandal_id"
+                                    (change)="gepanchayati($event);" (change)="searchmandals($event);"
+                                    style="height:37px;width: 273px;">
+                                    <option value="" selected disabled>సెలెక్ట్ మండలం / మున్సిపాలిటీ</option>
+                                    <option value="{{item.id}}" *ngFor="let item of mandals">
+                                        {{item.mndl_nm}}
+                                    </option>
+                                </select>
+
+                            </div>
+                        </div>
+                        <div class="col-md-2 mb-4 pb-2">
+                            <div class="form-outline">
+                                <label class="form-label">సెలెక్ట్ పంచాయతీ/వార్డు </label>
+                                <select class="form-control" formControlName="panchayati_id"
+                                    style="height:37px;width: 273px;">
+                                    <option value="" selected disabled>సెలెక్ట్ పంచాయతీ/వార్డు</option>
+                                    <option value="{{item.id}}" *ngFor="let item of panchayati">
+                                        {{item.pnchyt_nm}}
+                                    </option>
+                                </select>
+
+                            </div>
+                        </div>
+
+                        <div class="col-md-2 mb-4 pb-2">
+                            <br>
+                            <button type="submit" (click)="search('1')" class="default-btn  user-all-btn"><b>Search
+                                </b>
+                            </button>
+                        </div>
+                        <div class="col-md-2 mb-4 pb-2">
+                            <br>
+                            <button type="submit" (click)="reset()" class="default-btn  user-all-btn"><b>Reset</b>
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <br><br>
+
+        <div class="row">
+            <div class="col-7">
+                <div class="row">
+                    <div class="col-4" *ngFor="let item of searchevents" style="width:px;">
+                        <div class="card" style="width: 244px;">
+                            <div class="card-header">
+                                <div class="card_image">
+                                    <img *ngIf="item.image == undefined || item.image == null || item.image == '' "
+                                        src="../../../assets/images/no.jpg" style="height: 212px;width:250px;">
+                                    <img src="{{item.image}}" style="width:212px;height:250px;"
+                                        (click)="openimg(item.image,openmodel)" alt="image" alt="Church Images">
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <p> Starting Date :<strong> {{item.startdate | date}}</strong></p>
+                                <p>Ending Date :<strong> {{item.enddate | date}}</strong></p>
+                                <p><b>Type: {{item.eventname}} Meetings </b></p>
+                                <a href="{{item.location}}">
+                                    <img src="assets/images/marker.png" style="width:45px;"></a>&nbsp;&nbsp;
+                                <a href="{{item.youtube}}">
+                                    <img src="assets/images/newicon.png"
+                                        style="width:50px; height: 45px;"></a>&nbsp;&nbsp;
+                                <a href="{{item.facebook}}">
+                                    <img src="assets/images/Facebook.png" style="width:45px;
+                                                                "></a> &nbsp;
+                                <a href="tel:+91{{item.eventcontactnumber}}">
+                                    <img src="assets/images/phone.png" style="width:45px;
+                                                                            "></a>
+
+                                <br><br>
+                                <p *ngIf="item.showMore"><b>టైం & ఇతర సమాచారం: {{item.description}}</b>&nbsp;& &nbsp;<b>కూటములు జరిగే ప్రదేశం : {{item.address}}</b></p>
+                                <a (click)="item.showMore = !item.showMore" *ngIf="!item.showMore"><span
+                                        style="color:rgb(175, 15, 15)"><b> ఎక్కువ సమాచారం చూపించు</b></span></a>
+                                <a (click)="item.showMore = !item.showMore" *ngIf="item.showMore"
+                                    style="color:rgb(175, 15, 15)"><b>తక్కువ చూపించు</b></a>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <br>
+            <div class="col-5">
+                <marquee onmouseover="this.stop();" onmouseout="this.start();" direction="up"
+                    style="scroll-behavior: smooth;">
+                    <div class="container">
+                        <div style="border:solid green">
+                            <article>
+                                <div class="article-wrapper">
+                                    <div class="article-body">
+                                        <h3 style="text-align:center;color: black; padding:2%;">
+                                            Welcome To JBAC.IN
+                                        </h3>
+                                    </div>
+                                </div>
+                            </article>
+                        </div>
+
+                        <!-- <img *ngIf="row.id_proof == undefined || row.id_proof == null || row.id_proof == '' "
+                                        src="https://vsvstemple.com/websiteimages/download.png"
+                                        style="width:80px;height:80px;">
+                                    <img *ngIf="row.id_proof " src="{{row.id_proof}}" style="width:80px;height:80px;"
+                                        (click)="openimg(row.id_proof,openmodel)"> -->
+                        <div *ngFor="let item of adds" style="border:solid green">
+                            <article>
+                                <div class="article-wrapper">
+                                    <div class="article-body">
+
+                                        <img style="height:85%;width:95%;" src="{{item.image}}"
+                                            (click)="openimg(item.image,openmodel)" alt="image" alt="images. ">
+                                        <p style="color: black; padding:2%;">
+                                            -- <b>{{item.description}}</b>
+                                        </p>
+                                    </div>
+                                </div>
+                            </article>
+                        </div>
+                    </div>
+                </marquee>
+            </div>
+        </div>
+    </div>
+
+    <br>
+
+    <!-- //////image popup_code //////////////////////// -->
+    <ng-template #openmodel let-modal>
+        <div class="modal-header">
+            <h5 class="modal-title mt-0 ">Image</h5>
+            <button type="button" class="close" aria-hidden="true" (click)="proofmodalDismis()">×</button>
+        </div>
+
+        <img src={{image}}>
+
+    </ng-template>
+</div>
+<br><br>
+
+<div class="my-overlay" *ngIf="showSpinner">
+    <div class="cusloader"></div>
+    <h5 style="color: white;">Please Wait...</h5>
+</div>
+
+<ng-template #optionTemplate let-item="districts" let-config="config">
+    <i class="fa fa-plus"></i>
+    {{districts.district_nm}}
+    <span class="new badge"></span>
+</ng-template>

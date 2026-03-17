@@ -1,0 +1,495 @@
+<!-- Breadcrumbs -->
+<div class="top_panel_title top_panel_style_3 title_present breadcrumbs_present scheme_original">
+    <div class="top_panel_title_inner inner-bg6">
+        <div class="content_wrap">
+            <!-- <h1 class="page_title">Signup/Register</h1> -->
+            <div class="breadcrumbs">
+                <!-- <a class="breadcrumbs_item home" href="index.html">Home</a> -->
+                <span class="breadcrumbs_delimiter"></span>
+                <!-- <span class="breadcrumbs_item current">Signup/Register</span> -->
+            </div>
+        </div>
+    </div>
+</div>
+<!-- /Breadcrumbs -->
+<div
+    class="page body_style_wide body_filled article_style_stretch scheme_original top_panel_show top_panel_above sidebar_hide">
+    <a id="toc_home" class="sc_anchor" title="Home"
+        data-description="<i>Return to Home</i> - <br>navigate to home page of the site" data-icon="icon-home"
+        data-url="index.html" data-separator="yes"></a>
+    <a id="toc_top" class="sc_anchor" title="To Top"
+        data-description="<i>Back to top</i> - <br>scroll to top of the page" data-icon="icon-double-up" data-url=""
+        data-separator="yes"></a>
+
+
+    <div>
+        <section class="gradient-custom">
+            <div class="container py-5 h-100">
+                <div class="row justify-content-center align-items-center h-100">
+                    <div class="col-12 col-lg-9 col-xl-7">
+                        <div class="card shadow-2-strong card-registration" style="border-radius: 15px;">
+                            <div class="card-body p-4 p-md-5">
+                                <h3 class="mb-4 pb-2 pb-md-0 mb-md-5">Adding Marriages</h3>
+                                <form [formGroup]="addingmarriages">
+                                    <div class="row">
+
+                                        <div class="col-md-6 mb-4 pb-2">
+                                            <div class="form-outline">
+                                                <label class="form-label">Type Of Owner</label>
+                                                <div class="form-check form-check-inline">
+                                                    <input class="form-check-input" type="radio" value="1"
+                                                        (change)="churchchange($event.target)" formControlName="types">
+                                                    <label class="form-check-label">Believer</label>
+                                                </div>
+                                                <div class="form-check form-check-inline">
+                                                    <input class="form-check-input" type="radio" value="2"
+                                                        (change)="churchchange($event.target)" formControlName="types">
+                                                    <label class="form-check-label">Pastor</label>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-6 mb-4" *ngIf="form==1">
+                                            <label class="form-label" for="church_name">Search Believer Name </label>
+                                            <input class="form-control" type="text"
+                                                (keyup)="filterbelivers($event.target)">
+                                        </div>
+
+                                        <div class="col-md-6 mb-4 pb-2" *ngIf="form==1">
+                                            <div class="form-outline">
+                                                <label class="form-label">Believer</label>
+                                                <select class="form-control" formControlName="believer_id"
+                                                    style="height:37px;width: 273px;">
+                                                    <option value="" selected disabled>Select Believer Name</option>
+                                                    <option value="{{item.id}}" *ngFor="let item of bliversdata">
+                                                        {{item.fname}}
+                                                    </option>
+                                                </select>
+
+                                            </div>
+                                        </div>
+
+
+
+                                        <div class="col-md-6 mb-4">
+                                            <div class="form-outline">
+                                                <label class="form-label">Marriage Alliance For</label>
+                                                <div class="form-check form-check-inline">
+                                                    <input class="form-check-input" type="radio" value="self"
+                                                        formControlName="self" />
+                                                    <label class="form-check-label">Self</label>
+                                                </div>
+                                                <div class="form-check form-check-inline">
+                                                    <input class="form-check-input" type="radio" value="others"
+                                                        formControlName="self" />
+                                                    <label class="form-check-label">Others</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 mb-4">
+                                            <div class="form-outline">
+                                                <label class="form-label" for="pattern_name">Denomation / Church Pattren
+                                                </label>
+                                                <select class="form-control" formControlName="denomation_id">
+                                                    <option value="" selected disabled>Select the Denomation </option>
+                                                    <option *ngFor="let i of denomation" value="{{i.id}}">
+                                                        {{i.denomation_name}}</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 mb-4">
+                                            <div class="form-outline">
+                                                <label class="form-label">Ministry </label>
+                                                <select class="form-control" formControlName="ministry_id">
+                                                    <option value="" selected disabled>Select the Ministry </option>
+                                                    <option *ngFor="let i of ministryname" value="{{i.id}}">
+                                                        {{i.ministryname}}</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 mb-4">
+                                            <div class="form-outline">
+                                                <label class="form-label">Caste<span
+                                                        style="color:red; -webkit-text-stroke-width:thick;">*</span></label>
+                                                <select class="form-control" formControlName="caste"
+                                                    [ngClass]="{'is-invalid': submitted && m['caste'].errors }">
+                                                    <option value="" selected disabled>Select the Caste </option>
+                                                    <option value="SC">No Caste</option>
+                                                    <option value="SC">SC</option>
+                                                    <option value="ST">ST</option>
+                                                    <option value="BC">BC - A</option>
+                                                    <option value="BC">BC - B</option>
+                                                    <option value="BC">BC - C</option>
+                                                    <option value="BC">BC - D</option>
+                                                    <option value="BC">BC - E</option>
+                                                    <option value="OC">OC </option>
+                                                </select>
+                                                <div *ngIf="submitted && m['caste'].errors" class="invalid-feedback">
+                                                    <div *ngIf="m['caste'].errors['required']">Caste is required
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 mb-4">
+                                            <div class="form-outline">
+                                                <label class="form-label">Sub Caste Name</label>
+                                                <input type="text" formControlName="subcaste" class="form-control"
+                                                    placeholder="Enter Sub Caste Name" />
+
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 mb-4">
+                                            <div class="form-outline">
+                                                <label class="form-label">Gender<span
+                                                        style="color:red; -webkit-text-stroke-width:thick;">*</span></label>
+                                                <select class="form-control" formControlName="gender"
+                                                    [ngClass]="{'is-invalid': submitted && m['gender'].errors }">
+                                                    <option value="" selected disabled>Select the Gender </option>
+                                                    <option value="male">Male</option>
+                                                    <option value="female">Female</option>
+                                                    <option value="Transgender">Transgender</option>
+                                                </select>
+                                                <div *ngIf="submitted && m['gender'].errors" class="invalid-feedback">
+                                                    <div *ngIf="m['gender'].errors['required']">Gender is required
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 mb-4">
+                                            <div class="form-outline">
+                                                <label class="form-label">Status</label>
+                                                <div class="form-check form-check-inline">
+                                                    <input class="form-check-input" type="radio" name="status"
+                                                        value="single" formControlName="status" />
+                                                    <label class="form-check-label" for="femaleGender">Single</label>
+                                                </div>
+                                                <div class="form-check form-check-inline">
+                                                    <input class="form-check-input" type="radio" name="status"
+                                                        value="married" formControlName="status" />
+                                                    <label class="form-check-label" for="maleGender">Married</label>
+                                                </div>
+                                                <div class="form-check form-check-inline">
+                                                    <input class="form-check-input" type="radio" name="status"
+                                                        value="divorced" formControlName="status" />
+                                                    <label class="form-check-label" for="maleGender">Divorced</label>
+                                                </div>
+
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 mb-4">
+                                            <div class="form-outline">
+                                                <label class="form-label">Name<span
+                                                        style="color:red; -webkit-text-stroke-width:thick;">*</span></label>
+                                                <input type="text" formControlName="name" class="form-control"
+                                                    placeholder="Name"
+                                                    [ngClass]="{'is-invalid': submitted && m['name'].errors }" />
+                                                <div *ngIf="submitted && m['name'].errors" class="invalid-feedback">
+                                                    <div *ngIf="m['name'].errors['required']">Name is required
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 mb-4">
+                                            <div class="form-outline">
+                                                <label class="form-label">Image</label>
+                                                <input type="file" formControlName="image"
+                                                    (change)="onImageChange($event)" class="form-control" />
+
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 mb-4 pb-2">
+                                            <div class="form-outline">
+                                                <label class="form-label">Spiritual Status</label>
+                                                <select class="form-control" formControlName="spirti"
+                                                    style="height:37px;width: 273px;">
+                                                    <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
+                                                    <option value="practicingchristian">Practicing Christian</option>
+                                                    <option value="nominalchristian">Nominal Christian</option>
+                                                    <option value="festivalchristian">Festival Christian</option>
+                                                    <option value="justbelievingjesus">Just Believing Jesus</option>
+                                                </select>
+
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 mb-4">
+                                            <div class="form-outline">
+                                                <label class="form-label">Date Of Birth<span
+                                                        style="color:red; -webkit-text-stroke-width:thick;">*</span></label>
+                                                <input type="date" formControlName="dob" class="form-control"
+                                                    [ngClass]="{'is-invalid': submitted && m['dob'].errors }"
+                                                    placeholder="Name" />
+                                                <div *ngIf="submitted && m['dob'].errors" class="invalid-feedback">
+                                                    <div *ngIf="m['dob'].errors['required']">Date of Birth is required
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 mb-4">
+                                            <div class="form-outline">
+                                                <label class="form-label">Work Status<span
+                                                        style="color:red; -webkit-text-stroke-width:thick;">*</span></label>
+                                                <input type="text" formControlName="work" class="form-control"
+                                                    placeholder="Work Status"
+                                                    [ngClass]="{'is-invalid': submitted && m['work'].errors }" />
+                                                <div *ngIf="submitted && m['work'].errors" class="invalid-feedback">
+                                                    <div *ngIf="m['work'].errors['required']">Work Status is required
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 mb-4">
+                                            <div class="form-outline">
+                                                <label class="form-label">Phonenumber<span
+                                                        style="color:red; -webkit-text-stroke-width:thick;">*</span></label>
+                                                <input type="text" formControlName="phonenumber" class="form-control"
+                                                    maxlength="10" minlength="10" (keypress)="numericOnly($event)"
+                                                    placeholder="Enter Your Phonenumber"
+                                                    [ngClass]="{'is-invalid': submitted && m['phonenumber'].errors }" />
+                                                <div *ngIf="submitted && m['phonenumber'].errors"
+                                                    class="invalid-feedback">
+                                                    <div *ngIf="m['phonenumber'].errors['required']">Phone number is
+                                                        required
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 mb-4">
+                                            <div class="form-outline">
+                                                <label class="form-label">Description</label>
+                                                <input type="text" formControlName="description" class="form-control"
+                                                    placeholder="Enter Your Description" />
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 mb-4">
+                                            <div class="form-outline">
+                                                <label class="form-label">Height</label>
+                                                <input type="text" formControlName="height" class="form-control"
+                                                    placeholder="Enter Your Height" />
+
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 mb-4">
+                                            <div class="form-outline">
+                                                <label class="form-label">Color</label>
+                                                <input type="text" formControlName="color" class="form-control"
+                                                    placeholder="Enter Your Color" />
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                    <br>
+                                    <div class="card shadow-2-strong card-registration" style="border-radius: 15px;">
+                                        <p>&nbsp;&nbsp; Address</p>
+                                        <div class="row">
+                                            <div class="col-md-6 mb-4">
+                                                <div class="form-outline">
+                                                    <label class="form-label">Location</label>
+                                                    <input type="text" formControlName="location" class="form-control"
+                                                        placeholder="Enter Your Location" />
+
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6 mb-4">
+                                                <div class="form-outline">
+                                                    <label class="form-label">Address<span
+                                                            style="color:red; -webkit-text-stroke-width:thick;">*</span></label>
+                                                    <input type="text" formControlName="address" class="form-control"
+                                                        placeholder="Enter Your Address"
+                                                        style="height:37px;width: 263px;"
+                                                        [ngClass]="{'is-invalid': submitted && m['address'].errors }" />
+                                                    <div *ngIf="submitted && m['address'].errors"
+                                                        class="invalid-feedback">
+                                                        <div *ngIf="m['address'].errors['required']">Address is required
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <br>
+                                        <div class="row">
+                                            <div class="col-md-6 mb-4 pb-2">
+                                                <div class="form-outline">
+                                                    <label class="form-label">Select Districts <span
+                                                            style="color:red; -webkit-text-stroke-width:thick;">*</span></label>
+                                                    <select class="form-control" formControlName="districtname"
+                                                        [ngClass]="{'is-invalid': submitted && m['districtname'].errors }"
+                                                        (change)="getconstency($event);"
+                                                        style="height:37px;width: 273px;">
+                                                        <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
+                                                        <option value="{{item.id}}" *ngFor="let item of districts">
+                                                            {{item.distrct_nm}}
+                                                        </option>
+                                                    </select>
+                                                    <div *ngIf="submitted && m['districtname'].errors"
+                                                        class="invalid-feedback">
+                                                        <div *ngIf="m['districtname'].errors['required']">District is
+                                                            required
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6 mb-4 pb-2">
+                                                <div class="form-outline">
+                                                    <label class="form-label">నియోజకవర్గం ఎంచుకోండి <span
+                                                            style="color:red; -webkit-text-stroke-width:thick;">*</span></label>
+                                                    <select class="form-control" formControlName="constituencyname"
+                                                        [ngClass]="{'is-invalid': submitted && m['constituencyname'].errors }"
+                                                        (change)="getmandals($event);"
+                                                        style="height:37px;width: 273px;">
+                                                        <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
+                                                        <option value="{{item.id}}" *ngFor="let item of constituency">
+                                                            {{item.const_nm}}
+                                                        </option>
+                                                    </select>
+                                                    <div *ngIf="submitted && m['constituencyname'].errors"
+                                                        class="invalid-feedback">
+                                                        <div *ngIf="m['constituencyname'].errors['required']">
+                                                            Constituency
+                                                            is required
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <br>
+                                        <div class="row">
+                                            <div class="col-md-6 mb-4 pb-2">
+                                                <div class="form-outline">
+                                                    <label class="form-label">Select Mandal <span
+                                                            style="color:red; -webkit-text-stroke-width:thick;">*</span></label>
+                                                    <select class="form-control" formControlName="mandals"
+                                                        [ngClass]="{'is-invalid': submitted && m['mandals'].errors }"
+                                                        (change)="gepanchayati($event);"
+                                                        style="height:37px;width: 273px;">
+                                                        <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
+                                                        <option value="{{item.id}}" *ngFor="let item of mandals">
+                                                            {{item.mndl_nm}}
+                                                        </option>
+                                                    </select>
+                                                    <div *ngIf="submitted && m['mandals'].errors"
+                                                        class="invalid-feedback">
+                                                        <div *ngIf="m['mandals'].errors['required']">Mandal is required
+                                                        </div>
+                                                    </div>
+
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6 mb-4 pb-2">
+                                                <div class="form-outline">
+                                                    <label class="form-label">పంచాయతీ ఎంచుకోండి <span
+                                                            style="color:red; -webkit-text-stroke-width:thick;">*</span></label>
+                                                    <select class="form-control" formControlName="village_name"
+                                                        [ngClass]="{'is-invalid': submitted && m['village_name'].errors }"
+                                                        style="height:37px;width: 273px;">
+                                                        <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
+                                                        <option value="{{item.id}}" *ngFor="let item of panchayati">
+                                                            {{item.pnchyt_nm}}
+                                                        </option>
+                                                    </select>
+                                                    <div *ngIf="submitted && m['village_name'].errors"
+                                                        class="invalid-feedback">
+                                                        <div *ngIf="m['village_name'].errors['required']">Mandal is
+                                                            required
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <br>
+                                        <div class="row">
+                                            <div class="col-md-6 mb-4">
+                                                <div class="form-outline">
+                                                    <label class="form-label">Wealth </label>
+                                                    <input type="text" formControlName="whealth" class="form-control"
+                                                        placeholder="Enter Your Whealth " />
+
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6 mb-4 pb-2" *ngIf="form==2">
+                                                <div class="form-outline">
+                                                    <label class="form-label">Pastor</label>
+                                                    <select class="form-control" formControlName="pastor_id"
+                                                        style="height:37px;width: 273px;"
+                                                        (click)="pastorfilterdropdown()">
+                                                        <option value="" selected disabled>Select pastor Name
+                                                        </option>
+                                                        <option value="{{item.id}}" *ngFor="let item of pastoras">
+                                                            {{item.pastorname}}
+                                                        </option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <br>
+                                    </div>
+                                    <br>
+                                    <div class="col-md-6 mb-4 pb-2">
+                                        <div class="form-outline">
+                                            <label class="form-label">Terms And Conditions<span
+                                                    style="color:red; -webkit-text-stroke-width:thick;">*</span></label>
+                                            <div class="form-check form-check-inline">
+                                                <input class="form-check-input" type="checkbox" value="YES"
+                                                    formControlName="term" checked
+                                                    [ngClass]="{'is-invalid': submitted && m['term'].errors }" />
+                                                <label class="form-check-label">YES</label>
+                                                <div *ngIf="submitted && m['term'].errors" class="invalid-feedback">
+                                                    <div *ngIf="m['term'].errors['required']">Terms And
+                                                        Conditions
+                                                        is required
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </form>
+
+                                <div class="row">
+                                    <div class="col-md-2 mb-4 pb-2">
+                                    </div>
+                                    <div class="col-md-2 mb-4 pb-2">
+                                    </div>
+                                    <div class="col-md-2 mb-4 pb-2">
+                                        <button type="submit" class="default-btn  user-all-btn"
+                                            (click)="postmarriages()">Register
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+</div>
+<!-- /Header Mobile -->
+
+<br><br>
+
+<ng-template #serviceadding let-modal>
+
+
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card-body" style=" padding: 44px;">
+                <div class="mb-3">
+                    <marquee>
+                        <h4 class="modal-title mt-0" style="color: blue;">Add service Type</h4>
+                    </marquee>
+                    <h5>Service Name</h5>
+                    <input type="text" class="form-control" [(ngModel)]="ProofValue" placeholder="Enter service Name" />
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-light" (click)="modalDismiss()">Close</button>
+                    <button type="submit" class="btn btn-primary" (click)="addNewSubmit()">Submit</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</ng-template>
+
+
+<div class="my-overlay" *ngIf="showSpinner">
+    <div class="cusloader"></div>
+    <h5 style="color: white;">Please Wait...</h5>
+</div>

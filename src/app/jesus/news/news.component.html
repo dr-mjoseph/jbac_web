@@ -1,0 +1,234 @@
+<!-- Breadcrumbs -->
+<div class="top_panel_title top_panel_style_3 title_present breadcrumbs_present scheme_original">
+    <div class="top_panel_title_inner inner-bg6">
+        <div class="content_wrap">
+            <h1 class="page_title"></h1>
+            <!-- <div class="breadcrumbs">
+                <a class="breadcrumbs_item home" href="index.html">Home</a>
+                <span class="breadcrumbs_delimiter"></span>
+                <span class="breadcrumbs_item current">Signup/Register</span>
+            </div>  -->
+        </div>
+    </div>
+</div>
+<!-- /Breadcrumbs -->
+
+<div
+    class="page body_style_wide body_filled article_style_stretch scheme_original top_panel_show top_panel_above sidebar_hide">
+    <a id="toc_home" class="sc_anchor" title="Home"
+        data-description="<i>Return to Home</i> - <br>navigate to home page of the site" data-icon="icon-home"
+        data-url="index.html" data-separator="yes"></a>
+    <a id="toc_top" class="sc_anchor" title="To Top"
+        data-description="<i>Back to top</i> - <br>scroll to top of the page" data-icon="icon-double-up" data-url=""
+        data-separator="yes"></a>
+    <br>
+<!-- scroll begin -->
+<div class="latest-news-block" style="background-color:#ccc;color: #fb0404;font-family: Ramabhadra,sans-serif!important;font-size:larger;">
+    <div class="latest-news-block-hightlight">
+        <div class="latest-update-block"> <span class="block-2"> News </span>
+            <div style="overflow:hidden">
+                <marquee behavior="scroll" direction="left" scrolldelay="15" scrollamount="1" truespeed="10"
+                    onmouseover="this.stop()" onmouseout="this.start()" style="height:30px; white-space: nowrap">
+                    <div class="tickercontainer">
+                        <span
+                            class="ad-blk">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                        <a href="/churchgo">చర్చి పర్మిషన్ గవర్నమెంట్ ఆర్డర్స్</a>
+                        <span
+                            class="photo_gallery-icon">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            &nbsp;</span>
+                        <a href="/techsol">మీ చర్చికి మా టెక్నికల్ సొల్లుషన్స్</a>
+                        <span
+                            class="polls-icon">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                        <a href="/webhelp">వెబ్ సైట్ ఎలా ఉపయోగించాలి</a>
+                            <span class="photo_gallery-icon">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                        <a href="/addattacks">క్రైస్తవులపై దాడుల నమోదు</a>
+                        <span class="photo_gallery-icon">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                        <a href="/survey-news">క్రైస్తవులకి ప్రభుత్వం సేవలు మీద సర్వే</a>
+
+                        <span class="photo_gallery-icon">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                        <a href="https://forms.gle/uJiLXp74FZmQAkKe7">క్రైస్తవుల కోసం ప్రభుత్వం తరుపున నామినేటెడ్ పోస్ట్ ల లో ఎంతమంది వున్నారో, వారి జీత భత్యాలు తెలుసుకోండి, వారు మీకు ఎలా ఉపయోగ పడుతున్నారో ఆప్షన్స్ సెలెక్ట్ చేయుటకు ఈ లింక్ క్లిక్ చేయండి</a>
+
+                        <!-- <span class="photo_gallery-icon">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                        <a href="/addattacks">క్రైస్తవులపై దాడుల నమోదు</a> -->
+
+                    </div>
+                </marquee>
+            </div>
+        </div>
+    </div>
+</div> 
+<!-- scroll end -->
+    <section class="gradient-custom">
+        <div class="container py-5 h-100">
+            <div class="row justify-content-center align-items-center h-100">
+                <div class="col-12 ">
+                    <div class="card shadow-2-strong card-registration" style="border-radius: 15px;">
+                        <div class="card-body p-4 p-md-5">
+                            <h3 class="mb-4 pb-2 pb-md-0 mb-md-5">Update News</h3>
+                            <form [formGroup]="addingnews">
+                                <div class="row">
+                                    <div class="col-lg-3 ">
+                                        <label for="formFile" class="form-label"> న్యూస్ కు సంబందించిన ఫోటో అప్లోడ్<span
+                                                style="color:red; -webkit-text-stroke-width:thick;"></span>
+                                        </label>
+                                        <input class="image" type="file" id="formFile" accept="image/x-png,image/jpeg"
+                                            formControlName="image" (change)="onImageChange($event)"
+                                            [ngClass]="{'is-invalid': submitted && h['image'].errors }" />
+                                        <img *ngIf="imagesData.length" src="{{imagesData[0].reviewimg}}" alt=""
+                                            height="100px" width="100px">
+                                        <!-- <div *ngIf="submitted && h['image'].errors" class="invalid-feedback">
+                                            <div *ngIf="h['image'].errors['required']">Image is
+                                                required </div>
+                                        </div> -->
+                                    </div>
+                                    <div class="col-lg-3">
+                                        <div class="form-outline">
+                                            <label class="form-label"> న్యూస్ గురించి వివరణ (ఏ పేపర్)<span
+                                                    style="color:red; -webkit-text-stroke-width:thick;">*</span></label>
+                                            <input type="text" formControlName="description" class="form-control"
+                                                placeholder="Select Description"
+                                                [ngClass]="{'is-invalid': submitted && h['description'].errors }" />
+
+                                            <!-- <div *ngIf="submitted && h['description'].errors" class="invalid-feedback">
+                                                <div *ngIf="h['description'].errors['required']">న్యూస్ గురించి వివరణ (ఏ పేపర్)</div>
+                                            </div> -->
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-3">
+                                        <div class="form-outline">
+                                            <label class="form-label">సెలెక్ట్ న్యూస్ ఏ కేటగిరీ క్రింద వస్తుంది<span
+                                                    style="color:red; -webkit-text-stroke-width:thick;">*</span></label>
+                                            <select class="form-control" formControlName="news"
+                                                [ngClass]="{'is-invalid': submitted && h['news'].errors }">
+                                                <option value="" selected disabled>కేటగిరీ ఎంచుకోండి </option>
+                                                <option value="క్రైస్తవుల మీద దాడులు">క్రైస్తవుల మీద దాడులు సంబంధించిన న్యూస్</option>
+                                                <option value=" గౌరవ వేతనం, ప్రభుత్వ పథకాలు సంబంధించిన న్యూస్"> గౌరవ వేతనం, ప్రభుత్వ పథకాలు సంబంధించిన న్యూస్</option>
+                                                <option value="క్రైస్తవులకు సంబంధించిన న్యూస్">క్రైస్తవులకు సంబంధించిన న్యూస్ </option>
+                                                <option value="జనరల్ న్యూస్">జనరల్ న్యూస్</option>
+                                                <option value="దళిత్ క్రిస్టియన్స్ షెడ్యూల్ కాస్ట్ స్టేటస్ న్యూస్">దళిత్ క్రిస్టియన్స్ షెడ్యూల్ కాస్ట్ స్టేటస్ న్యూస్</option>
+                                                <option value="చదువుకి సంబంధించి">చదువుకి సంబంధించి </option>
+                                                <option value="ట్రైనింగ్ కి సంబంధించి">ట్రైనింగ్ కి సంబంధించి </option>
+                                                <option value="ఉద్యోగాలకు సంబంధించి">ఉద్యోగాలకు సంబంధించి </option>
+                                                <option value="ఆరోగ్యం కి సంబంధించి">ఆరోగ్యం కి సంబంధించి </option>
+                                                <option value="సమాజం లోని సమస్యలు కి సంబంధించి న్యూస్">సమాజం లోని సమస్యలు కి సంబంధించి న్యూస్ </option>
+                                                <option value="డా|| జోసెఫ్ గారి వార్తలు">డా|| జోసెఫ్ గారి వార్తలు</option>
+                                                        
+                                            </select>
+                                            <div *ngIf="submitted && h['news'].errors" class="invalid-feedback">
+                                                <div *ngIf="h['news'].errors['required']">న్యూస్ కేటగిరీ తప్పనిసరి </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-3 ">
+                                        <br>
+                                        <button type="submit" class="default-btn  user-all-btn" (click)="postnews()"
+                                            style="text-justify: auto; text-size-adjust: 5px;">సబ్మిట్   </button>
+                                    </div>
+                                </div>
+                                <br>
+                            </form> <br>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <section class="gradient-custom">
+        <div class="container py-5 h-100">
+            <div class="row">
+                <div class="col-lg-8">
+                    <div class="row">
+                        <div class="row pt-45">
+                            <div class="col-lg-4"
+                                *ngFor="let item of searchnews | paginate: { itemsPerPage: 9, currentPage: page }">
+                                <div class="flex justify-center items-center h-screen">
+                                    <div class="main">
+                                        <ul class="cards">
+                                            <li class="cards_item">
+                                                <div class="card" tabindex="0">
+                                                    <a routerLink="/subnews/{{item.id}}">
+                                                        <img *ngIf="item.image == undefined || item.image == null || item.image == '' "
+                                                            src="../../../assets/images/no.jpg"
+                                                            style="height:263px;width:250px;">
+                                                        <img src="{{item.image}}" style="width:263px;height:250px;"
+                                                            alt="image" alt="Church Images"></a>
+
+                                                    <div class="card_content">
+
+                                                        <div class="card_text">
+                                                            <!-- <p>Description :<strong> {{item.description}}</strong></p> -->
+                                                            <p>Description: <strong>
+                                                                {{ showFullDescription ? item.description : (item.description | slice:0:100) }}
+                                                                {{ item.description.length > 100 && !showFullDescription ? '...' : '' }}
+                                                            </strong></p>
+                                                            <p *ngIf="item.description.length > 100">
+                                                                <button (click)="toggleDescription()">
+                                                                    {{ showFullDescription ? 'Read Less' : 'Read More' }}
+                                                                </button>
+                                                            </p>
+                                                            &nbsp;
+                                                            <p>Type of Help :<strong> {{item.news}}</strong></p>
+                                                        </div>
+                                                    </div>
+
+                                                </div>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="col-lg-4">
+                    <marquee onmouseover="this.stop();" onmouseout="this.start();" direction="up"
+                        style="scroll-behavior: smooth;">
+                        <div class="container">
+                            <div style="border:solid green">
+                                <article>
+                                    <div class="article-wrapper">
+                                        <div class="article-body">
+                                            <h3 style="text-align:center;color: black; padding:2%;">
+                                                Welcome To JBAC.IN
+                                            </h3>
+                                        </div>
+                                    </div>
+                                </article>
+                            </div>
+                            <div *ngFor="let item of adds" style="border:solid green;margin-bottom: 2%;">
+                                <article>
+                                    <div class="article-wrapper">
+                                        <div class="article-body">
+                                            <img style="height:85%;width:100%;" src="{{item.image}}"
+                                                (click)="openimg(item.image,openmodel)" alt="image" alt="images. ">
+                                            <p style="color: black; padding:2%;">
+                                                -- <b>{{item.description}}</b>
+                                            </p>
+                                        </div>
+                                    </div>
+                                </article>
+                            </div>
+                        </div>
+                    </marquee>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+<br><br>
+<!-- //////image popup_code //////////////////////// -->
+<ng-template #openmodel let-modal>
+    <div class="modal-header">
+        <h5 class="modal-title mt-0 ">Image</h5>
+        <button type="button" class="close" aria-hidden="true" (click)="proofmodalDismis()">×</button>
+    </div>
+
+    <img src={{image}}>
+
+</ng-template>
+<div class="my-overlay" *ngIf="showSpinner">
+    <div class="cusloader"></div>
+    <h5 style="color: white;">ప్రాసెస్ అవుతుంది, కొంచెం ఆగండి...</h5>
+</div> 

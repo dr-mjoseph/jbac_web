@@ -1,0 +1,214 @@
+<!-- Breadcrumbs -->
+<div class="top_panel_title top_panel_style_3 title_present breadcrumbs_present scheme_original">
+    <div class="top_panel_title_inner inner-bg6">
+        <div class="content_wrap">
+            <!-- <h1 class="page_title">Signup/Register</h1> -->
+            <!-- <div class="breadcrumbs">
+                <a class="breadcrumbs_item home" href="index.html">Home</a>
+                <span class="breadcrumbs_delimiter"></span>
+                <span class="breadcrumbs_item current">Signup/Register</span>
+            </div> -->
+        </div>
+    </div>
+</div>
+<!-- /Breadcrumbs -->
+
+
+
+<div
+    class="page body_style_wide body_filled article_style_stretch scheme_original top_panel_show top_panel_above sidebar_hide">
+    <a id="toc_home" class="sc_anchor" title="Home"
+        data-description="<i>Return to Home</i> - <br>navigate to home page of the site" data-icon="icon-home"
+        data-url="index.html" data-separator="yes"></a>
+    <a id="toc_top" class="sc_anchor" title="To Top"
+        data-description="<i>Back to top</i> - <br>scroll to top of the page" data-icon="icon-double-up" data-url=""
+        data-separator="yes"></a>
+    <br>
+    <div class="latest-news-block" style="background-color:#ccc">
+        <div class="latest-news-block-hightlight">
+            <div class="latest-update-block"> <span class="block-2"> Updates </span>
+                <div style="overflow:hidden">
+                    <marquee behavior="scroll" direction="left" scrolldelay="15" scrollamount="1" truespeed="10"
+                        onmouseover="this.stop()" onmouseout="this.start()" style="height:30px; white-space: nowrap">
+
+                        <div class="tickercontainer">
+                            <span
+                                class="ad-blk">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Ads:</span>
+                            <a href="https://jbac.in">jbac.in
+                                Updates</a>
+
+                            <span
+                                class="photo_gallery-icon">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Photo
+                                Gallery:&nbsp;</span>
+                            <a href="/gallery">Update Gallery</a>
+
+
+                            <span
+                                class="polls-icon">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Poll:&nbsp;</span>
+                            <a href="/church_timings">Are You Search
+                                Church Timings</a>
+                        </div>
+                    </marquee>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <section class="gradient-custom">
+        <div class="container py-5 h-100">
+            <div class="row justify-content-center align-items-center h-100">
+                <div class="col-12">
+                    <div class="card" style="border-radius: 15px;">
+                        <div class="card-body">
+                            <h3 class="mb-4">Looking For Help</h3>
+                            <form [formGroup]="addinghelp">
+                                <div class="row">
+                                    <div class="col-lg-3">
+                                        <label for="formFile" class="form-label"> Image Upload<span
+                                                style="color:red; -webkit-text-stroke-width:thick;">*</span>
+                                        </label>
+                                        <input class="image" type="file" id="formFile" accept="image/x-png,image/jpeg"
+                                            formControlName="image" (change)="onImageChange($event)" />
+                                        <img *ngIf="imagesData.length" src="{{imagesData[0].reviewimg}}" alt=""
+                                            height="100px" width="100px">
+                                    </div>
+                                    <div class="col-lg-3">
+                                        <div class="form-outline">
+                                            <label class="form-label"> Description<span
+                                                    style="color:red; -webkit-text-stroke-width:thick;">*</span></label>
+                                            <input type="text" formControlName="description" class="form-control"
+                                                placeholder="Select Description" />
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-3">
+                                        <div class="form-outline">
+                                            <label class="form-label">Which Type Help <span
+                                                    style="color:red; -webkit-text-stroke-width:thick;">*</span></label>
+                                            <select class="form-control" formControlName="help">
+                                                <option value="" selected disabled>Select the Help </option>
+                                                <option value="CommunitySupport Help">Community Support Help</option>
+                                                <option value="Education Help">Education Help</option>
+                                                <option value="Financial Help">Financial Help
+                                                </option>
+                                                <option value="ForChurchConstruction Help">For Church Construction Help
+                                                </option>
+                                                <option value="Legal Help">Legal Help</option>
+                                                <option value="Medical Help">Medical Help</option>
+                                                <option value="PoliceDepartmental Help">Police Departmental Help
+                                                </option>
+                                                <option value="Political Help">Political Help</option>
+
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-3">
+                                        <br>
+                                        <button type="submit" class="default-btn  user-all-btn" (click)="postmeetings()"
+                                            style="text-justify: auto; text-size-adjust: 5px;">Submit
+                                        </button>
+                                    </div>
+                                </div>
+                                <br>
+                            </form>
+                            <br>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <br>
+
+    <section class="gradient-custom">
+        <div class="container py-5 h-100">
+            <div class="row">
+                <div class="col-lg-8">
+                    <div class="row">
+                        <div class="col-lg-4" *ngFor="let item of searchevents" style="border:solid blue">
+                            <div class="flex justify-center items-center h-screen">
+                                <div class="main">
+                                    <ul class="cards">
+                                        <li class="cards_item">
+                                            <div class="card" tabindex="0">
+                                                <div class="card" style="width: 244px;">
+                                                    <div class="card-header">
+                                                        <div class="card_image">
+                                                            <img *ngIf="item.image == undefined || item.image == null || item.image == '' "
+                                                                src="../../../assets/images/no.jpg"
+                                                                style="height: 212px;width:250px;">
+                                                            <img src="{{item.image}}" style="width:212px;height:250px;"
+                                                                (click)="openimg(item.image,openmodel)" alt="image"
+                                                                alt="Church Images">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                &nbsp;
+                                                <div class="card_content">
+                                                    <!-- <h2 class="card_title">{{item.eventname}}  &#x2022;</h2> -->
+                                                    <div class="card_text">
+                                                        <p>Description :<strong> {{item.description}}</strong></p>
+                                                        <p>Type of Help :<strong> {{item.help}}</strong></p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <marquee onmouseover="this.stop();" onmouseout="this.start();" direction="up"
+                        style="scroll-behavior: smooth;">
+                        <div class="container">
+                            <div style="border:solid green">
+                                <article>
+                                    <div class="article-wrapper">
+                                        <div class="article-body">
+                                            <h3 style="text-align:center;color: black; padding:2%;">
+                                                Welcome To JBAC.IN
+                                            </h3>
+                                        </div>
+                                    </div>
+                                </article>
+                            </div>
+                            <div *ngFor="let item of adds" style="border:solid green">
+                                <article>
+                                    <div class="article-wrapper">
+                                        <div class="article-body">
+                                            <img style="height:85%;width:100%;" src="{{item.image}}"
+                                                (click)="openimg(item.image,openmodel)" alt="image" alt="images. ">
+                                            <p style="color: black; padding:2%;">
+                                                -- <b>{{item.description}}</b>
+                                            </p>
+                                        </div>
+                                    </div>
+                                </article>
+                            </div>
+                        </div>
+                    </marquee>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+
+<!-- //////image popup_code //////////////////////// -->
+<ng-template #openmodel let-modal>
+    <div class="modal-header">
+        <h5 class="modal-title mt-0 ">Image</h5>
+        <button type="button" class="close" aria-hidden="true" (click)="proofmodalDismis()">×</button>
+    </div>
+
+    <img src={{image}}>
+
+</ng-template>
+
+<div class="my-overlay" *ngIf="showSpinner">
+    <div class="cusloader"></div>
+    <h5 style="color: white;">Please Wait...</h5>
+</div>
+
+<br>
+<br>

@@ -1,0 +1,445 @@
+<!-- Breadcrumbs -->
+<!-- <div class="top_panel_title top_panel_style_3 title_present breadcrumbs_present scheme_original">
+    <div class="top_panel_title_inner inner-bg6">
+        <div class="content_wrap">
+             <h1 class="page_title">Signup/Register</h1> 
+            <div class="breadcrumbs">
+                <a class="breadcrumbs_item home" href="index.html">Home</a> 
+                <span class="breadcrumbs_delimiter"></span>
+                <span class="breadcrumbs_item current">Signup/Register</span> 
+            </div>
+        </div>
+    </div>
+</div> -->
+<!-- /Breadcrumbs -->
+<div
+    class="page body_style_wide body_filled article_style_stretch scheme_original top_panel_show top_panel_above sidebar_hide">
+    <a id="toc_home" class="sc_anchor" title="Home"
+        data-description="<i>Return to Home</i> - <br>navigate to home page of the site" data-icon="icon-home"
+        data-url="index.html" data-separator="yes"></a>
+    <a id="toc_top" class="sc_anchor" title="To Top"
+        data-description="<i>Back to top</i> - <br>scroll to top of the page" data-icon="icon-double-up" data-url=""
+        data-separator="yes"></a>
+
+
+    <div
+        style="background-color:#ccc;color: #f80404;font-family: Ramabhadra,sans-serif!important;font-size:larger;text-align:left;">
+        <section class="gradient-custom">
+            <div class="container py-5 h-100">
+                <div class="row justify-content-center align-items-center h-100">
+                    <div class="col-12 col-lg-9 col-xl-7">
+                        <div class="card shadow-2-strong card-registration" style="border-radius: 15px;">
+                            <div class="card-body p-4 p-md-5">
+                                <h3 class="mb-4 pb-2 pb-md-0 mb-md-5"
+                                    style="background-color:#ccc;color: #f80404;font-family: Ramabhadra,sans-serif!important;font-size:larger;text-align:center;">
+                                    <u>రూతు క్రైస్తవ ఏజెన్సీ సర్వీసెస్ ద్వారా <br>ఆంధ్ర, తెలంగాణా రాష్ట్రాల క్రైస్తవుల
+                                        ఇళ్లలో పని చేయుటకొరకు <br> హెల్పర్స్ / పనిమనిషి ఉద్యోగాల కొరకు ఉచిత నమోదు<br> <span
+                                        style="color:rgb(0, 0, 255); -webkit-text-stroke-width:thick;">
+                                        *</span>
+                                        మార్క్ వున్నా ఫీల్డ్స్ అన్ని తప్పనిసరిగా ఫిల్ చేయాలి</u>
+                                </h3>
+                                <form [formGroup]="jobsadding">
+
+                                    <div class="row">
+                                        <div class="col-md-6 mb-4">
+                                            <div class="form-outline">
+                                                <label class="form-label">పేరు (ఇంటి పేరుతో సహా)<span
+                                                        style="color:rgb(0, 0, 255); -webkit-text-stroke-width:thick;">
+                                                        *</span></label>
+                                                <input type="text" formControlName="jobname" class="form-control"
+                                                    [ngClass]="{'is-invalid': submitted && a['jobname'].errors }"
+                                                    placeholder="ఇక్కడ క్లిక్ చేసి రాయండి" />
+                                                <div *ngIf="submitted && a['jobname'].errors" class="invalid-feedback">
+                                                    <div *ngIf="a['jobname'].errors['required']">పేరు నమోదు చేయండి
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 mb-4">
+                                            <div class="form-outline">
+                                                <label class="form-label">ఫోన్ నెంబర్ (పది అంకెలు)<span
+                                                        style="color:rgb(0, 0, 255); -webkit-text-stroke-width:thick;">
+                                                        *</span></label>
+                                                <input type="text" formControlName="number1" class="form-control"
+                                                    placeholder="ఇక్కడ క్లిక్ చేసి ఎంటర్ చేయండి" maxlength="10"
+                                                    minlength="10" (keypress)="numericOnly($event)"
+                                                    [ngClass]="{'is-invalid': submitted && a['number1'].errors }" />
+                                                <div *ngIf="submitted && a['number1'].errors" class="invalid-feedback">
+                                                    <div *ngIf="a['number1'].errors['required']">ఫోన్ నెంబర్ ఎంటర్
+                                                        చేయండి</div>
+                                                    <div *ngIf="a['number1'].errors['minlength']">ఫోన్ నెంబర్, 10
+                                                        డిజిట్స్ లేదు</div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    </div>
+
+                                    <br>
+                                    <div class="row">
+                                        <div class="col-md-6 mb-4">
+                                            <div class="form-outline">
+                                                <label class="form-label">వయసు ఎన్ని సంవత్సరాలు<span
+                                                        style="color:rgb(0, 0, 255); -webkit-text-stroke-width:thick;"> *</span>
+                                                </label>
+                                                <input type="text" formControlName="location" class="form-control"
+                                                    placeholder="ఇక్కడ క్లిక్ చేసి ఎంటర్ చేయండి" />
+                                                <div *ngIf="submitted && a['location'].errors" class="invalid-feedback">
+                                                    <div *ngIf="a['location'].errors['required']">ఎంత వయసు ఎంటర్ చేయండి
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 mb-4">
+                                            <div class="form-outline">
+                                                <label class="form-label">ఎంత జీతం కావాలి<span
+                                                        style="color:rgb(0, 0, 255); -webkit-text-stroke-width:thick;">
+                                                        *</span></label>
+                                                <input type="text" formControlName="salary" class="form-control"
+                                                    placeholder="ఇక్కడ క్లిక్ చేసి ఎంటర్ చేయండి" />
+                                                <div *ngIf="submitted && a['salary'].errors" class="invalid-feedback">
+                                                    <div *ngIf="a['salary'].errors['required']">ఎంత జీతం ఆశిస్తున్నారో
+                                                        ఎంటర్ చేయండి
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+
+                                    </div>
+                                    <br>
+                                    <div class="row">
+                                        <div class="col-md-6 mb-4">
+                                            <div class="form-outline">
+                                                <label class="form-label">ఎటువంటి అనుభవం వుంది </label>
+
+                                                <select class="form-control" formControlName="experience_t">
+                                                    <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి సెలెక్ట్ చేయండి
+                                                    </option>
+                                                    <option value="అనుభవం-లేదు">అనుభవం లేదు</option>
+                                                    <option value="వంట అనుభవం">వంట అనుభవం వుంది</option>
+                                                    <option value="ఇల్లు శుభ్రం">ఇల్లు శుభ్రం అనుభవం వుంది</option>
+                                                    <option value="పిల్లలను చూడడం">పిల్లలను చూడడం అనుభవం వుంది</option>
+                                                    <option value="పైన అన్ని చేయగలను">పైన అన్ని చేయగలను</option>
+                                                    <option value="పైన వాటిలో లేదు వేరే వాటిలో వున్నది">పైన వాటిలో లేదు
+                                                        వేరే వాటిలో వున్నది
+                                                    </option>
+                                                </select>
+                                                <!-- <div *ngIf="submitted && a['google_location'].errors"
+                                                     class="invalid-feedback">
+                                                     <div *ngIf="a['google_location'].errors['required']">అనుభవం టైపు సెలెక్ట్ చేయండి
+                                                     </div>
+                                                 </div> -->
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 mb-4">
+                                            <div class="form-outline">
+                                                <label class="form-label">పని అనుభవం ఎంత</label>
+                                                <select class="form-control" formControlName="experience">
+                                                    <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి సెలెక్ట్ చేయండి
+                                                    </option>
+                                                    <option value="అనుభవం లేదు">అనుభవం లేదు</option>
+                                                    <option value='1 సంవత్సరం'>1 సంవత్సరం</option>
+                                                    <option value="2 సంవత్సరాలు">2 సంవత్సరాలు</option>
+                                                    <option value="3 సంవత్సరాలు">3 సంవత్సరాలు</option>
+                                                    <option value="4 సంవత్సరాలు">4 సంవత్సరాలు</option>
+                                                    <option value="5 సంవత్సరాలు కంటె ఎక్కువ">5 సంవత్సరాలు కంటె ఎక్కువ
+                                                    </option>
+                                                </select>
+                                                <!-- <div *ngIf="submitted && a['experience'].errors"
+                                                    class="invalid-feedback">
+                                                    <div *ngIf="a['experience'].errors['required']">పని అనుభవం సెలెక్ట్ చేయండి
+                                                    </div>
+                                                </div> -->
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <br>
+
+
+                                    <div class="row">
+
+                                        <div class="col-md-6 mb-4">
+                                            <div class="form-outline">
+                                                <label class="form-label">ఏమి చదివారు</label>
+                                                <select class="form-control" formControlName="qualification"
+                                                    style="height:37px;width: 273px;">
+                                                    <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి సెలెక్ట్ చేయండి
+                                                    </option>
+                                                    <option value="చదువుకోలేదు">చదువుకోలేదు</option>
+                                                    <option value="చదవగలను">చదవగలను</option>
+                                                    <option value="2 వ తరగతి">2 వ తరగతి</option>
+                                                    <option value="3 వ తరగతి">3 వ తరగతి</option>
+                                                    <option value="4 వ తరగతి">4 వ తరగతి</option>
+                                                    <option value="5 వ తరగతి">5 వ తరగతి</option>
+                                                    <option value="6 వ తరగతి">6 వ తరగతి</option>
+                                                    <option value="7 వ తరగతి">7 వ తరగతి</option>
+                                                    <option value="8 వ తరగతి">8 వ తరగతి</option>
+                                                    <option value="9 వ తరగతి">9 వ తరగతి</option>
+                                                    <option value="10 వ తరగతి">10 వ తరగతి</option>
+                                                    <option value="ఇంటర్">ఇంటర్</option>
+                                                    <option value="డిగ్రీ">డిగ్రీ</option>
+                                                    <option value="ఇతరమైనది">ఇతరమైనది</option>
+
+                                                </select>
+                                                <!-- <div *ngIf="submitted && a['qualification'].errors"
+                                                    class="invalid-feedback">
+                                                    <div *ngIf="a['qualification'].errors['required']">ఇక్కడ క్లిక్ చేసి సెలెక్ట్ చేయండి
+                                                    </div>
+                                                </div>    -->
+
+                                            </div>
+                                        </div>
+
+
+                                        <!-- <div class="col-md-6 mb-4">
+                                            <label for="formFile" class="form-label"> Image Upload
+                                            </label>
+                                            <input class="image" type="file" id="formFile"
+                                                accept="image/x-png,image/jpeg" formControlName="image"
+                                                (change)="onImageChange($event)" />
+                                            <img *ngIf="imagesData.length" src="{{imagesData[0].reviewimg}}" alt=""
+                                                height="100px" width="100px">
+
+                                        </div> -->
+                                        <div class="col-md-6 mb-4">
+                                            <div class="form-outline">
+                                                <label class="form-label">ఇంకా ఏమైనా ఉంటె మీ గురుంచి, మీ ఆరోగ్యం
+                                                    రాయండి</label>
+                                                <textarea type="text" formControlName="description" class="form-control"
+                                                    placeholder="ఇక్కడ క్లిక్ చేసి ఎంటర్ రాయండి"></textarea>
+                                                <!-- <div *ngIf="submitted && a['description'].errors"
+                                                    class="invalid-feedback">
+                                                    <div *ngIf="a['description'].errors['required']">Job Description is
+                                                        required
+                                                    </div>
+                                                </div> -->
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                    <br>
+                                    <!-- <div class="row">
+                                    
+                                        <div class="col-md-6 mb-4">
+                                            <div class="form-outline">
+                                                <label class="form-label">Contact Number2 </label>
+                                                <input type="text" formControlName="number2" class="form-control"
+                                                    placeholder="Enter Contact Number" maxlength="10" minlength="10"
+                                                    (keypress)="numericOnly($event)" />
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <br> -->
+                                    <!-- <div class="row">
+                                        <div class="col-md-6 mb-4">
+                                            <div class="form-outline">
+                                                <label class="form-label">YouTube </label>
+                                                <input type="text" formControlName="youtube" class="form-control"
+                                                    placeholder="Enter  youtube" />
+
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 mb-4">
+                                            <div class="form-outline">
+                                                <label class="form-label">FaceBook </label>
+                                                <input type="text" formControlName="facebook" class="form-control"
+                                                    placeholder="Enter Facebook" />
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <br> -->
+                                    <div class="card shadow-2-strong card-registration" style="border-radius: 15px;">
+                                        <h3
+                                            style="background-color:#ccc;color: #fb0404;font-family: Ramabhadra,sans-serif!important;font-size:larger;text-align: center;">
+                                            మీ అడ్రస్<br>ముందు జిల్లా సెలెక్ట్ చేసి
+                                            నియోజకవర్గము తరువాత మండలం, పంచాయితీ సెలెక్ట్ చేయాలి</h3>
+                                        <div class="row">
+                                            <div class="col-md-6 mb-4 pb-2">
+                                                <div class="form-outline">
+                                                    <label class="form-label">1) జిల్లా <span
+                                                            style="color:rgb(0, 0, 255); -webkit-text-stroke-width:thick;">
+                                                            *</span></label>
+                                                    <select class="form-control" formControlName="districtname"
+                                                        [ngClass]="{'is-invalid': submitted && a['districtname'].errors }"
+                                                        (change)="getconstency($event);"
+                                                        style="height:37px;width: 273px;">
+                                                        <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి సెలెక్ట్
+                                                            చేయండి</option>
+                                                        <option value="{{item.id}}" *ngFor="let item of districts">
+                                                            {{item.distrct_nm}}
+                                                        </option>
+                                                    </select>
+                                                    <div *ngIf="submitted && a['districtname'].errors"
+                                                        class="invalid-feedback">
+                                                        <div *ngIf="a['districtname'].errors['required']">జిల్లా
+                                                            సెలెక్ట్ చేయండి
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6 mb-4 pb-2">
+                                                <div class="form-outline">
+                                                    <label class="form-label">2) నియోజకవర్గం <span
+                                                            style="color:rgb(0, 0, 255); -webkit-text-stroke-width:thick;">
+                                                            *</span></label>
+                                                    <select class="form-control" formControlName="constituencyname"
+                                                        [ngClass]="{'is-invalid': submitted && a['constituencyname'].errors }"
+                                                        (change)="getmandals($event);"
+                                                        style="height:37px;width: 273px;">
+                                                        <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి సెలెక్ట్
+                                                            చేయండి</option>
+                                                        <option value="{{item.id}}" *ngFor="let item of constituency">
+                                                            {{item.const_nm}}
+                                                        </option>
+                                                    </select>
+                                                    <div *ngIf="submitted && a['constituencyname'].errors"
+                                                        class="invalid-feedback">
+                                                        <div *ngIf="a['constituencyname'].errors['required']">
+                                                            నియోజకవర్గం సెలెక్ట్ చేయండి
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <br>
+                                        <div class="row">
+                                            <div class="col-md-6 mb-4 pb-2">
+                                                <div class="form-outline">
+                                                    <label class="form-label">3) మండలం / మున్సిపాలిటీ <span
+                                                            style="color:rgb(0, 0, 255); -webkit-text-stroke-width:thick;">
+                                                            *</span></label>
+                                                    <select class="form-control" formControlName="mandals"
+                                                        [ngClass]="{'is-invalid': submitted && a['mandals'].errors }"
+                                                        (change)="gepanchayati($event);"
+                                                        style="height:37px;width: 273px;">
+                                                        <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి సెలెక్ట్
+                                                            చేయండి</option>
+                                                        <option value="{{item.id}}" *ngFor="let item of mandals">
+                                                            {{item.mndl_nm}}
+                                                        </option>
+                                                    </select>
+                                                    <div *ngIf="submitted && a['mandals'].errors"
+                                                        class="invalid-feedback">
+                                                        <div *ngIf="a['mandals'].errors['required']">మండలం /
+                                                            మున్సిపాలిటీ సెలెక్ట్ చేయండి
+                                                        </div>
+                                                    </div>
+
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6 mb-4 pb-2">
+                                                <div class="form-outline">
+                                                    <label class="form-label">4). పంచాయితీ / వార్డ్ నంబర్ <span
+                                                            style="color:rgb(0, 0, 255); -webkit-text-stroke-width:thick;">
+                                                            *</span></label>
+                                                    <select class="form-control" formControlName="village_name"
+                                                        [ngClass]="{'is-invalid': submitted && a['village_name'].errors }"
+                                                        style="height:37px;width: 273px;">
+                                                        <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి సెలెక్ట్
+                                                            చేయండి</option>
+                                                        <option value="{{item.id}}" *ngFor="let item of panchayati">
+                                                            {{item.pnchyt_nm}}
+                                                        </option>
+                                                    </select>
+                                                    <div *ngIf="submitted && a['village_name'].errors"
+                                                        class="invalid-feedback">
+                                                        <div *ngIf="a['village_name'].errors['required']"> పంచాయితీ /
+                                                            వార్డ్ నంబర్ సెలెక్ట్ చేయండి
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <br>
+                                        <div class="row">
+
+                                            <div class="col-md-6 mb-4">
+                                                <div class="form-outline">
+                                                    <label class="form-label">ఇంటి నెంబర్ & వీధి పేరు </label>
+                                                    <textarea type="text" formControlName="google_location"
+                                                        class="form-control"
+                                                        placeholder="ఇక్కడ క్లిక్ చేసి ఎంటర్ రాయండి"></textarea>
+                                                    <!-- <div *ngIf="submitted && a['description'].errors"
+                                                            class="invalid-feedback">
+                                                            <div *ngIf="a['description'].errors['required']">Job Description is
+                                                                required
+                                                            </div>
+                                                        </div> -->
+                                                </div>
+                                            </div>
+                                            <!-- <div class="col-md-6 mb-4 pb-2">
+                                                <div class="form-outline">
+                                                    <label class="form-label">Terms And Conditions<span
+                                                            style="color:red; -webkit-text-stroke-width:thick;">*</span></label>
+                                                    <div class="form-check form-check-inline">
+                                                        <input class="form-check-input" type="checkbox" value="YES"
+                                                            formControlName="term" checked
+                                                            [ngClass]="{'is-invalid': submitted && a['term'].errors }" />
+                                                        <label class="form-check-label">YES</label>
+                                                        <div *ngIf="submitted && a['term'].errors"
+                                                            class="invalid-feedback">
+                                                            <div *ngIf="a['term'].errors['required']">Terms And
+                                                                Conditions is required
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div> -->
+                                        </div>
+                                        <br>
+                                    </div>
+                                    <br>
+                                </form>
+
+                                <div class="row">
+                                    <div class="col-md-2 mb-4 pb-2">
+                                    </div>
+
+                                    <div class="col-md-2 mb-4 pb-2">
+                                        <button type="submit" class="default-btn  user-all-btn"
+                                            (click)="postjobs()">రిజిస్టర్
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+</div>
+
+<!-- /Header Mobile -->
+
+<br>
+
+<ng-template #serviceadding let-modal>
+
+
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card-body" style=" padding: 44px;">
+                <div class="mb-3">
+                    <marquee>
+                        <h4 class="modal-title mt-0" style="color: blue;">Add service Type</h4>
+                    </marquee>
+                    <h5>Service Name</h5>
+                    <input type="text" class="form-control" [(ngModel)]="ProofValue" placeholder="Enter service Name" />
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-light" (click)="modalDismiss()">Close</button>
+                    <button type="submit" class="btn btn-primary" (click)="addNewSubmit()">Submit</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</ng-template>
+
+<div class="my-overlay" *ngIf="showSpinner">
+    <div class="cusloader"></div>
+    <h5 style="color: white;">ప్రాసెస్ అవుతుంది, కొంచెం ఆగండి...</h5>
+</div>

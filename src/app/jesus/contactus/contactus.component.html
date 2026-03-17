@@ -1,0 +1,116 @@
+<div class="top_panel_title top_panel_style_3 title_present breadcrumbs_present scheme_original">
+    <div class="top_panel_title_inner inner-bg6">
+        <div class="content_wrap">
+            <h1 class="page_title">Contact US</h1>
+            <!-- <div class="breadcrumbs">
+                <a class="breadcrumbs_item home" href="index.html">Home</a>
+                <span class="breadcrumbs_delimiter"></span>
+                <span class="breadcrumbs_item current">Church Timings</span>
+            </div> -->
+        </div>
+    </div>
+</div>
+
+<!-- /Breadcrumbs -->
+<br>
+<div
+    class="page body_style_wide body_filled article_style_stretch scheme_original top_panel_show top_panel_above sidebar_hide">
+    <a id="toc_home" class="sc_anchor" title="Home"
+        data-description="<i>Return to Home</i> - <br>navigate to home page of the site" data-icon="icon-home"
+        data-url="index.html" data-separator="yes"></a>
+    <a id="toc_top" class="sc_anchor" title="To Top"
+        data-description="<i>Back to top</i> - <br>scroll to top of the page" data-icon="icon-double-up" data-url=""
+        data-separator="yes"></a>
+    <br>
+    <div class="row pad">
+        <div class="col-lg-4">
+            <div class="contact-card">
+                <i class="flaticon-position"></i>
+                <h3 style="text-align: center;"><b><u>నా చిరునామా</u></b></h3>
+                <br>
+                <h4> <b>ప్రొఫెసర్ డాక్టర్ జోసఫ్ పి. మోసిగంటి, B.Tech, M.Tech, Ph.D
+                    ఫౌండర్ & చైర్మన్, జీసస్ బిలీవర్స్ అసోసియేషన్ కౌన్సిల్ (JBAC).<br>
+                    డైరెక్టర్, సెయింట్ మేరీస్ గ్రూప్ ఆఫ్ ఇంజినీరింగ్ కాలేజెస్ చేబ్రోలు, గుంటూరు </b></h4>
+                  <h4> Phone : 7075482182, email: mjosephp7@gmail.com</h4>
+          
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="contact-card">
+                <i class="flaticon-email"></i>
+                <h3 style="text-align: center;"><b><u>Socal Media Accounts</u></b></h3>
+                <br>
+                <h4 style="color: rgb(49, 182, 140);"> Twitter : &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span
+                        style="color:brown;font-weight: bold;">@Mjosephp7</span>
+                </h4>
+                <h4 style="color: rgb(49, 182, 140);">Instagram : &nbsp;&nbsp;<span
+                        style="color:brown;font-weight: bold;">Josephpmosiganti</span>
+                </h4>
+                <h4 style="color: rgb(49, 182, 140);">FaceBook: &nbsp;&nbsp;&nbsp; <span
+                        style="color:brown;font-weight: bold;">Joseph P.Mosiganti</span>
+                </h4>
+                <h4 style="color: rgb(49, 182, 140);">YouTube : &nbsp;&nbsp;&nbsp; <span
+                        style="color:brown;font-weight: bold;">Dr.JOSEPHPRAKASH MOSIGANTI7</span>
+                </h4>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="contact-card">
+                <h3 style="text-align: center;"><b><u>Socal Media Accounts</u></b></h3>
+                <br>
+                <i class="glyphicon glyphicon-cloud"></i>
+                <h3><a href="mailto:Apicc77@gmail.Com">Email : <b>Apicc77@gmail.com</b></a></h3>
+                <h3><a href="tel:+(91)– 7075482182">Phone Number : <b>7075482182</b></a></h3>
+            </div>
+        </div>
+    </div>
+    <!-- </div> -->
+
+
+
+    <div class="contact-map">
+        <div class="container-fluid m-0 p-0">
+            <iframe
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d61055.24895384206!2d82.20603310838911!3d16.976859105544236!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3a3827ddaf59b4f7%3A0x92f8ddb9c89a4803!2sKakinada%2C%20Andhra%20Pradesh!5e0!3m2!1sen!2sin!4v1685187758567!5m2!1sen!2sin"
+                width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy"
+                referrerpolicy="no-referrer-when-downgrade" width="600" height="450" style="border:0;"
+                allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+            <div class="formbold-main-wrapper">
+                <div class="contact-wrap">
+                    <div class="contact-form" style="padding:25px; ">
+                        <form [formGroup]="contactform">
+                            <div class="formbold-form-title">
+                                <h2 class="">Contact US</h2>
+                            </div>
+
+                            <div class="formbold-input-flex">
+                                <div>
+                                    <label for="firstname">Name </label>
+                                    <input type="text" formControlName="name" class="form-control" />
+                                </div>
+                                <div>
+                                    <label for="email"> Email </label>
+                                    <input type="email" formControlName="e_mail" class="form-control" />
+                                </div>
+                            </div>
+                            <div class="formbold-input-flex">
+                                <div>
+                                    <label for="phone"> Subject </label>
+                                    <input type="text" formControlName="subject" class="form-control" />
+                                </div>
+                                <div class="formbold-mb-3">
+                                    <label for="address"> Description </label>
+                                    <input type="text" formControlName="message" class="form-control" />
+                                </div>
+                            </div>
+                            <button class="formbold-btn" style="margin-left:20px;"
+                                (click)="submitcontact()">Submit</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<br><br>

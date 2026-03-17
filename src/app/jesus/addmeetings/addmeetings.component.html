@@ -1,0 +1,521 @@
+<!-- Breadcrumbs -->
+<div class="latest-news-block"
+    style="background-color:#ccc;color: #fb0404;font-family: Ramabhadra,sans-serif!important;font-size:larger;">
+    <div class="latest-news-block-hightlight">
+        <div class="latest-update-block"> <span class="block-2"> News </span>
+            <div style="overflow:hidden">
+                <marquee behavior="scroll" direction="left" scrolldelay="15" scrollamount="1" truespeed="10"
+                    onmouseover="this.stop()" onmouseout="this.start()" style="height:30px; white-space: nowrap">
+                    <div class="tickercontainer">
+                        <span class="ad-blk">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                        <a href="/churchgo">చర్చి పర్మిషన్ గవర్నమెంట్ ఆర్డర్స్</a>
+                        <span
+                            class="photo_gallery-icon">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            &nbsp;</span>
+                        <a href="/techsol">మీ చర్చికి మా టెక్నికల్ సొల్లుషన్స్</a>
+                        <span
+                            class="polls-icon">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                        <a href="/webhelp">వెబ్ సైట్ ఎలా ఉపయోగించాలి</a>
+                        <span
+                            class="polls-icon">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                        <a href="/about">నా గురించి</a>
+                        <span
+                            class="polls-icon">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                        <a href="/about">జోసెఫ్ గారు కలిసిన నాయకులు తో గేలరీ</a>
+                        <span
+                        class="polls-icon">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                    <a href="/ourhelp">మీకు మా సహాయం</a>
+
+                        <span
+                            class="photo_gallery-icon">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                        <a href="/addattacks">క్రైస్తవులపై దాడుల నమోదు</a>
+                        <span
+                            class="photo_gallery-icon">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                        <a href="/survey-news">క్రైస్తవులకి ప్రభుత్వం సేవలు మీద సర్వే</a>
+
+                        <span
+                            class="photo_gallery-icon">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                        <a href="https://forms.gle/uJiLXp74FZmQAkKe7">క్రైస్తవుల కోసం ప్రభుత్వం తరుపున నామినేటెడ్ పోస్ట్
+                            ల లో ఎంతమంది వున్నారో, వారి జీత భత్యాలు తెలుసుకోండి, వారు మీకు ఎలా ఉపయోగ పడుతున్నారో
+                            ఆప్షన్స్ సెలెక్ట్ చేయుటకు ఈ లింక్ క్లిక్ చేయండి</a>
+
+                        <!-- <span class="photo_gallery-icon">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                        <a href="/addattacks">క్రైస్తవులపై దాడుల నమోదు</a> -->
+
+                    </div>
+                </marquee>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- /Breadcrumbs -->
+<div
+    class="page body_style_wide body_filled article_style_stretch scheme_original top_panel_show top_panel_above sidebar_hide">
+    <a id="toc_home" class="sc_anchor" title="Home"
+        data-description="<i>Return to Home</i> - <br>navigate to home page of the site" data-icon="icon-home"
+        data-url="index.html" data-separator="yes"></a>
+    <a id="toc_top" class="sc_anchor" title="To Top"
+        data-description="<i>Back to top</i> - <br>scroll to top of the page" data-icon="icon-double-up" data-url=""
+        data-separator="yes"></a>
+
+
+    <div>
+        <section class="gradient-custom">
+            <div class="container py-5 h-100">
+                <div class="row justify-content-center align-items-center h-100">
+                    <div class="col-12 col-lg-9 col-xl-7">
+                        <div class="card shadow-2-strong card-registration" style="border-radius: 15px;font-size: 18px;font-family: cursive;font-family: Ramabhadra,sans-serif !important;">
+                            <div class="card-body p-4 p-md-5">
+                                <h3 class="mb-4 pb-2 pb-md-0 mb-md-5" style="border-radius: 15px;text-align:center ;color: #fb0404;font-size: 20px;font-family: cursive;font-family: Ramabhadra,sans-serif !important;"><u>క్రైస్తవ మీటింగ్స్ సమాచారం సబ్మిట్ చేయండి (* మార్క్ వున్నవి కంపల్సరీ ఫిల్ చేయాలి)</u></h3>
+                                <form [formGroup]="addingmeetings">
+                                    <!-- -->
+                                    
+                                    <div class="row">
+                                        <div class="col-md-6 mb-4 pb-2">
+                                            <div class="form-outline">
+                                                <label class="form-label">కూటముల టైపు<span
+                                                        style="color:red; -webkit-text-stroke-width:thick;">*</span></label>
+                                                <select class="form-control" formControlName="mettingtype"
+                                                    [ngClass]="{'is-invalid': submitted && t['mettingtype'].errors }">
+                                                    <option value="" selected disabled>సెలెక్ట్ కూటముల టైపు </option>
+
+                                                    <option value="1">VBS</option>
+                                                    <option value="2">ఉజ్జీవ కూటములు</option>
+                                                    <option value="3">సువార్త కూటములు</option>
+                                                    <option value="4">స్వస్థత కూటములు</option>
+                                                    <option value="5">ఉజ్జీవ స్వస్థత కూటములు</option>
+                                                    <option value="6">యూత్ మీటింగ్స్</option>
+                                                    <option value="7">క్రైస్తవ నాయకుల కూటములు</option>
+                                                    <option value="8">స్త్రీల కూటములు</option>
+                                                    <option value="9">పాస్టర్ ఫెలోషిప్ కూటములు</option>
+                                                    <option value="10">క్రైస్తవ పిల్లల కూటములు</option>
+                                                    <option value="11">క్రైస్తవ బుక్స్ ఎక్సిబిషన్</option>
+                                                    <option value="12">క్రైస్తవ సంగీత కూటములు</option>
+                                                </select>
+                                                <div *ngIf="submitted && t['mettingtype'].errors"
+                                                    class="invalid-feedback">
+                                                    <div *ngIf="t['mettingtype'].errors['required']">సెలెక్ట్ కూటముల టైపు</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 mb-4 pb-2">
+                                            <div class="form-outline">
+                                                <label class="form-label">సెలెక్ట్ డినామినేషన్ మోడల్‌          <span
+                                                        style="color:red; -webkit-text-stroke-width:thick;">*</span></label>
+                                                <select class="form-control" formControlName="denomation"
+                                                    style="height:37px;width: 273px;">
+                                                    <option value="" selected disabled> సెలెక్ట్ డినామినేషన్ మోడల్‌                        </option>
+                                                    <option value="{{item.id}}" *ngFor="let item of denomation">
+                                                        {{item.denomation_name}}
+                                                    </option>
+                                                </select>
+
+                                            </div>
+                                        </div>
+                                      
+                                        <!-- <div class="col-md-6 mb-4">
+                                            <div class="form-outline">
+                                                <label class="form-label">సెలెక్ట్  మీ మినిస్ట్రీ పేరు</label>
+                                                <select class="form-control" formControlName="ministry_id"
+                                                    style="height:37px;width: 273px;">
+                                                    <option value="" selected disabled> సెలెక్ట్  మీ మినిస్ట్రీ పేరు </option>
+                                                    <option value="{{i.id}}" *ngFor="let i of ministryname" >
+                                                        {{i.ministryname}}</option>
+    
+                                                </select>
+                                            </div>
+                                        </div> -->
+                                    </div>
+                                   <br>
+
+                                    <div class="row">
+                                        <div class="col-md-6 mb-4">
+                                            <div class="form-outline">
+                                                <label class="form-label">కూటముల ప్రారంభ తేదీ
+                                                    <span
+                                                        style="color:red; -webkit-text-stroke-width:thick;">*</span></label>
+                                                <input type="date" formControlName="fromdate" class="form-control"
+                                                    [min]="now"
+                                                    [ngClass]="{'is-invalid': submitted && t['fromdate'].errors }" />
+                                                <div *ngIf="submitted && t['fromdate'].errors" class="invalid-feedback">
+                                                    <div *ngIf="t['fromdate'].errors['required']">కూటముల ప్రారంభ తేదీ</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 mb-4">
+                                            <div class="form-outline">
+                                                <label class="form-label">కూటముల చివరి తేదీ<span
+                                                        style="color:red; -webkit-text-stroke-width:thick;">*</span></label>
+                                                <input type="date" formControlName="todate" class="form-control"
+                                                    [min]="now"
+                                                    [ngClass]="{'is-invalid': submitted && t['todate'].errors }" />
+                                                <div *ngIf="submitted && t['todate'].errors" class="invalid-feedback">
+                                                    <div *ngIf="t['todate'].errors['required']">కూటముల చివరి తేదీ 
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+
+                                    <br>
+                                    <div class="row">
+                                        <div class="col-md-6 mb-4">
+                                            <label for="formFile" class="form-label">అప్‌లోడ్ కూటముల పోస్టర్‌ని <span
+                                                    style="color:red; -webkit-text-stroke-width:thick;">*</span>
+                                            </label>
+                                            <input class="image" type="file" id="formFile"
+                                                accept="image/x-png,image/jpeg" formControlName="image"
+                                                (change)="onImageChange($event)"
+                                                [ngClass]="{'is-invalid': submitted && t['image'].errors }" />
+                                            <img *ngIf="imagesData.length" src="{{imagesData[0].reviewimg}}" alt=""
+                                                height="100px" width="100px">
+                                            <div *ngIf="submitted && t['image'].errors" class="invalid-feedback">
+                                                <div *ngIf="t['image'].errors['required']">అప్‌లోడ్ కూటముల పోస్టర్‌ని</div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 mb-4">
+                                            <div class="form-outline">
+                                                <label class="form-label">కూటముల సమయాలు & ఇతర సమాచారం<span
+                                                        style="color:red; -webkit-text-stroke-width:thick;">*</span></label>
+                                                <input type="text" formControlName="description" class="form-control"
+                                                    placeholder="కూటముల సమయాలు & ఇతర సమాచారం"
+                                                    [ngClass]="{'is-invalid': submitted && t['description'].errors }" />
+                                                <div *ngIf="submitted && t['description'].errors"
+                                                    class="invalid-feedback">
+                                                    <div *ngIf="t['description'].errors['required']">కూటముల సమయాలు & ఇతర సమాచారం </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <br>
+                                    <!-- phone number name start -->
+                                     <div class="row">
+                                        <div class="col-md-6 mb-4">
+                                            <div class="form-outline">
+                                                <label class="form-label">మీటింగ్ ఆర్గనైజర్ పేరు<span
+                                                        style="color:red; -webkit-text-stroke-width:thick;">*</span></label>
+                                                <input type="text" formControlName="orgname" class="form-control" placeholder="పేరు ఎంటర్ చేయండి"
+                                                    [min]="now"
+                                                    [ngClass]="{'is-invalid': submitted && t['orgname'].errors }" />
+                                                <div *ngIf="submitted && t['orgname'].errors" class="invalid-feedback">
+                                                    <div *ngIf="t['orgname'].errors['required']">మీ పేరు ఎంటర్ చేయండి
+                                                        </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 mb-4">
+                                            <div class="form-outline">
+                                                <label class="form-label">మీటింగ్ హాజరు అయ్యే వారి సంఖ్య ఎంత ఉండవచ్చు (నంబర్)<span
+                                                        style="color:red; -webkit-text-stroke-width:thick;">*</span></label>
+                                                <input type="text" formControlName="meetsize" class="form-control" placeholder="మీటింగ్ హాజరు అయ్యే వారి సంఖ్య"
+                                                    
+                                                    (keypress)="numericOnly($event)"
+                                                    [ngClass]="{'is-invalid': submitted && t['meetsize'].errors }" />
+                                                <div *ngIf="submitted && t['meetsize'].errors" class="invalid-feedback">
+                                                    <div *ngIf="t['meetsize'].errors['required']">మీటింగ్ హాజరు అయ్యే వారి సంఖ్య ఎంటర్ చేయండి
+                                                    </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                    <br>
+                                        <div class="row">
+                                         <div class="col-md-6 mb-4">
+                                            <div class="form-outline">
+                                                <label class="form-label">మీటింగ్ ఆర్గనైజర్ ఫోన్ నెంబర్ (పబ్లిక్ కు చూపించ బడదు)<span
+                                                        style="color:red; -webkit-text-stroke-width:thick;">*</span></label>
+                                                <input type="text" formControlName="orgphone" class="form-control"
+                                                    placeholder="మీ ఫోన్ నెంబర్ ఎంటర్ చేయండి" maxlength="10" minlength="10"
+                                                    (keypress)="numericOnly($event)"
+                                                    [ngClass]="{'is-invalid': submitted && t['orgphone'].errors }" />
+                                                <div *ngIf="submitted && t['orgphone'].errors" class="invalid-feedback">
+                                                    <div *ngIf="t['orgphone'].errors['required']">మీ ఫోన్ నెంబర్ ఎంటర్ చేయండి
+                                                    </div>
+                                                    <div *ngIf="t['orgphone'].errors['maxLength']">పది నంబర్లు
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div> 
+                                        <div class="col-md-6 mb-4">
+                                            <div class="form-outline">
+                                                <label class="form-label">మీటింగ్ కోసం సంప్రదించే ఫోన్ (పబ్లిక్ కు చూపించ బడును)<span
+                                                        style="color:red; -webkit-text-stroke-width:thick;">*</span></label>
+                                                <input type="text" formControlName="evntphone" class="form-control"
+                                                    placeholder="మీటింగ్ కోసం సంప్రదించే ఫోన్" maxlength="10" minlength="10"
+                                                    (keypress)="numericOnly($event)"
+                                                    [ngClass]="{'is-invalid': submitted && e['evntphone'].errors }" />
+                                                <div *ngIf="submitted && e['evntphone'].errors" class="invalid-feedback">
+                                                    <div *ngIf="e['evntphone'].errors['required']">మీ ఫోన్ నెంబర్ ఎంటర్ చేయండి
+                                                    </div>
+                                                    <div *ngIf="e['evntphone'].errors['maxLength']">పది నంబర్లు
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div> 
+<!-- phone number name end -->
+<br>
+                                    <div class="row">
+                                        <div class="col-md-6 mb-4">
+                                            <div class="form-outline">
+                                                <label class="form-label">మీ యూ ట్యూబ్ ఛానెల్ లింక్</label>
+                                                <input type="text" formControlName="youtube" class="form-control"
+                                                    placeholder="మీ యూ ట్యూబ్ ఛానెల్"
+                                                    [ngClass]="{'is-invalid': submitted && t['youtube'].errors }" />
+                                                <div *ngIf="submitted && t['youtube'].errors" class="invalid-feedback">
+                                                    <div *ngIf="t['youtube'].errors['required']">మీ యూ ట్యూబ్ ఛానెల్ లింక్ </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 mb-4">
+                                            <div class="form-outline">
+                                                <label class="form-label">మీ ఫేస్ బుక్-లింక్    </label>
+                                                <input type="text" formControlName="facebook" class="form-control"
+                                                    placeholder="మీ ఫేస్ బుక్-లింక్"
+                                                    [ngClass]="{'is-invalid': submitted && t['facebook'].errors }" />
+                                                <div *ngIf="submitted && t['facebook'].errors" class="invalid-feedback">
+                                                    <div *ngIf="t['facebook'].errors['required']">మీ ఫేస్ బుక్-లింక్ </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <br>
+                                    <div class="card shadow-2-strong card-registration" style="border-radius: 15px;">
+                                        <p>&nbsp;&nbsp;<u><b>కూటముల అడ్రసు</b></u></p>
+                                        <div class="row">
+                                            <div class="col-md-6 mb-4 pb-2">
+                                                <div class="form-outline">
+                                                    <label class="form-label">1). సెలెక్ట్ జిల్లా <span
+                                                            style="color:red; -webkit-text-stroke-width:thick;">*</span></label>
+                                                    <select class="form-control" formControlName="districtname"
+                                                        (change)="getconstency($event);"
+                                                        [ngClass]="{'is-invalid': submitted && t['districtname'].errors }"
+                                                        style="height:37px;width: 273px;">
+                                                        <option value="" selected disabled>సెలెక్ట్ జిల్లా</option>
+                                                        <option value="{{item.id}}" *ngFor="let item of districts">
+                                                            {{item.distrct_nm}}
+                                                        </option>
+                                                    </select>
+                                                    <div *ngIf="submitted && t['districtname'].errors"
+                                                        class="invalid-feedback">
+                                                        <div *ngIf="t['districtname'].errors['required']">సెలెక్ట్ జిల్లా </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6 mb-4 pb-2">
+                                                <div class="form-outline">
+                                                    <label class="form-label">2). సెలెక్ట్ నియోజకవర్గం <span
+                                                            style="color:red; -webkit-text-stroke-width:thick;">*</span>
+                                                    </label>
+                                                    <select class="form-control" formControlName="constituencyname"
+                                                        (change)="getmandals($event);" style="height:37px;width: 273px;"
+                                                        [ngClass]="{'is-invalid': submitted && t['constituencyname'].errors }">
+                                                        <option value="" selected disabled>సెలెక్ట్ నియోజకవర్గం</option>
+                                                        <option value="{{item.id}}" *ngFor="let item of constituency">
+                                                            {{item.const_nm}}
+                                                        </option>
+                                                    </select>
+                                                    <div *ngIf="submitted && t['constituencyname'].errors"
+                                                        class="invalid-feedback">
+                                                        <div *ngIf="t['constituencyname'].errors['required']">సెలెక్ట్ నియోజకవర్గం </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <br>
+
+                                        <div class="row">
+                                            <div class="col-md-6 mb-4 pb-2">
+                                                <div class="form-outline">
+                                                    <label class="form-label">3). సెలెక్ట్ మండలం / మున్సిపాలిటీ
+                                                        <span
+                                                            style="color:red; -webkit-text-stroke-width:thick;">*</span>
+                                                    </label>
+                                                    <select class="form-control" formControlName="mandals"
+                                                        (change)="gepanchayati($event);"
+                                                        style="height:37px;width: 273px;"
+                                                        [ngClass]="{'is-invalid': submitted && t['mandals'].errors }">
+                                                        <option value="" selected disabled>సెలెక్ట్ మండలం / మున్సిపాలిటీ</option>
+                                                        <option value="{{item.id}}" *ngFor="let item of mandals">
+                                                            {{item.mndl_nm}}
+                                                        </option>
+                                                    </select>
+                                                    <div *ngIf="submitted && t['mandals'].errors"
+                                                        class="invalid-feedback">
+                                                        <div *ngIf="t['mandals'].errors['required']">సెలెక్ట్ మండలం / మున్సిపాలిటీ </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6 mb-4 pb-2">
+                                                <div class="form-outline">
+                                                    <label class="form-label">4). సెలెక్ట్ పంచాయతీ/వార్డు                                                        <span
+                                                            style="color:red; -webkit-text-stroke-width:thick;">*</span></label>
+                                                    <select class="form-control" formControlName="village_name"
+                                                        [ngClass]="{'is-invalid': submitted && t['mandals'].errors }"
+                                                        style="height:37px;width: 273px;">
+                                                        <option value="" selected disabled>సెలెక్ట్ పంచాయతీ/వార్డు</option>
+                                                        <option value="{{item.id}}" *ngFor="let item of panchayati">
+                                                            {{item.pnchyt_nm}}
+                                                        </option>
+                                                    </select>
+                                                    <div *ngIf="submitted && t['village_name'].errors"
+                                                        class="invalid-feedback">
+                                                        <div *ngIf="t['village_name'].errors['required']">సెలెక్ట్ పంచాయతీ/వార్డు </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <br>
+                                        
+                                        <div class="row">
+
+                                            <div class="col-md-6 mb-4 pb-2">
+                                                <div class="form-outline">
+                                                    <label class="form-label">కూటములు జరిగే ప్రదేశం స్ట్రీట్ పేరు / ల్యాండ్ మార్క్ <span
+                                                            style="color:red; -webkit-text-stroke-width:thick;">*</span></label>
+                                                    <textarea type="text" formControlName="address" class="form-control"
+                                                        placeholder="కూటములు జరిగే ప్రదేశం స్ట్రీట్ పేరు / ల్యాండ్ మార్క్"
+                                                        [ngClass]="{'is-invalid': submitted && t['address'].errors }"></textarea>
+                                                    <div *ngIf="submitted && t['address'].errors"
+                                                        class="invalid-feedback">
+                                                        <div *ngIf="t['address'].errors['required']">కూటములు జరిగే ప్రదేశం స్ట్రీట్ పేరు / ల్యాండ్ మార్క్
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        <!-- </div>
+                                        <br>
+
+                                        <div class="row"> -->
+                                            <div class="col-md-6 mb-4 pb-2">
+                                                <div class="form-outline">
+                                                    <label class="form-label">కూటముల గూగుల్ లొకేషన్</label>
+                                                    <input type="text" formControlName="location" class="form-control"
+                                                        placeholder="కూటముల గూగుల్ లొకేషన్"
+                                                        [ngClass]="{'is-invalid': submitted && t['location'].errors }" />
+                                                    <div *ngIf="submitted && t['location'].errors"
+                                                        class="invalid-feedback">
+                                                        <div *ngIf="t['location'].errors['required']">కూటముల గూగుల్ లొకేషన్ </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                        <br>
+                                        
+                                        
+<!--                                         
+                                        <div class="row">
+
+                                            <div class="col-md-6 mb-4">
+                                                <div class="form-outline">
+                                                    <label class="form-label" for="pastor_name">Speaker-1 for Meetings</label>
+                                                    <select class="form-control" formControlName="speakerone"
+                                                        style="height:37px;width: 263px;" (click)="pastorspeakers()">
+                                                        <option value="" selected disabled>Select the pastor </option>
+                                                        <option *ngFor="let i of getpastoras" value="{{i.pastorname}}">
+                                                            {{i.pastorname }}</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6 mb-4">
+                                                <div class="form-outline">
+                                                    <label class="form-label" for="pastor_name">Speaker-2 for Meetings</label>
+                                                    <select class="form-control" formControlName="speakertwo"
+                                                        style="height:37px;width: 263px;">
+                                                        <option value="" selected disabled>Select the pastor </option>
+                                                        <option *ngFor="let i of getpastoras" value="{{i.pastorname}}">
+                                                            {{i.pastorname }}</option>
+                                                    </select>
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <br>
+                                        <div class="row">
+
+                                            <div class="col-md-6 mb-4">
+                                                <div class="form-outline">
+                                                    <label class="form-label" for="pastor_name">Speaker-3 for Meetings</label>
+                                                    <select class="form-control" formControlName="speakerthree"
+                                                        style="height:37px;width: 263px;">
+                                                        <option value="" selected disabled>Select the pastor </option>
+                                                        <option *ngFor="let i of getpastoras" value="{{i.pastorname}}">
+                                                            {{i.pastorname }}</option>
+                                                    </select>
+
+                                                </div>
+                                            </div>
+
+
+                                            <div class="col-md-6 mb-4">
+                                                <div class="form-outline">
+                                                    <label class="form-label" for="pastor_name">Speaker-4 for Meetings</label>
+                                                    <select class="form-control" formControlName="speakerfour"
+                                                        style="height:37px;width: 263px;">
+                                                        <option value="" selected disabled>Select the pastor </option>
+                                                        <option *ngFor="let i of getpastoras" value="{{i.pastorname}}">
+                                                            {{i.pastorname }}</option>
+                                                    </select>
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <br> -->
+                                    </div>
+
+                                    <br>
+                                </form>
+                                <br>
+                                <div class="row">
+                                    <div class="col-md-2 mb-4 pb-2">
+                                    </div>
+                                    <div class="col-md-2 mb-4 pb-2">
+                                    </div>
+                                    <div class="col-md-2 mb-4 pb-2">
+                                        <button type="submit" class="default-btn  user-all-btn"
+                                            (click)="postmeetings()">Submit
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+</div>
+<!-- /Header Mobile -->
+
+<br><br>
+
+<ng-template #serviceadding let-modal>
+
+
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card-body" style=" padding: 44px;">
+                <div class="mb-3">
+                    <marquee>
+                        <h4 class="modal-title mt-0" style="color: blue;">Add service Type</h4>
+                    </marquee>
+                    <h5>Service Name</h5>
+                    <input type="text" class="form-control" [(ngModel)]="ProofValue" placeholder="Enter service Name" />
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-light" (click)="modalDismiss()">Close</button>
+                    <button type="submit" class="btn btn-primary" (click)="addNewSubmit()">సబ్మిట్ / Submit</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</ng-template>
+
+
+<div class="my-overlay" *ngIf="showSpinner">
+    <div class="cusloader"></div>
+    <h5 style="color: white;">ప్రాసెస్ అవుతుంది, కొంచెం ఆగండి...</h5>
+</div>

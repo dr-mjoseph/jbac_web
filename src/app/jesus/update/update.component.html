@@ -1,0 +1,2594 @@
+<!-- Breadcrumbs -->
+<div class="top_panel_title top_panel_style_3 title_present breadcrumbs_present scheme_original">
+    <div class="top_panel_title_inner inner-bg6">
+        <div class="content_wrap">
+            <div class="breadcrumbs">
+                <span class="breadcrumbs_delimiter"></span>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- /Breadcrumbs -->
+
+<br><br>
+<div
+    class="page body_style_wide body_filled article_style_stretch scheme_original top_panel_show top_panel_above sidebar_hide">
+    <a id="toc_home" class="sc_anchor" title="Home"
+        data-description="<i>Return to Home</i> - <br>navigate to home page of the site" data-icon="icon-home"
+        data-url="index.html" data-separator="yes"></a>
+    <a id="toc_top" class="sc_anchor" title="To Top"
+        data-description="<i>Back to top</i> - <br>scroll to top of the page" data-icon="icon-double-up" data-url=""
+        data-separator="yes"></a>
+    <section class="gradient-custom" *ngIf="categoryid==1">
+        <div class="container py-5 h-100">
+            <h2 style="text-align: center;">{{category}} login </h2>
+            <div class="row justify-content-center align-items-center h-100">
+                <div class="col-12 col-lg-9 col-xl-7">
+                    <div class="card shadow-2-strong card-registration" style="border-radius: 15px;">
+                        <div class="card-body p-4 p-md-5">
+                            <h3 class="mb-4 pb-2 pb-md-0 mb-md-5"> Profile Details : </h3>
+                            <form [formGroup]="beliverform">
+                                <div class="row">
+                                    <div class="col-md-6 mb-4">
+                                        <div class="form-outline">
+                                            <label class="form-label">Name</label>
+                                            <input type="text" formControlName="fname" class="form-control"
+                                                placeholder="ఇక్కడ క్లిక్ చేసి నమోదు చేయండి">
+
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 mb-4">
+                                        <div class="form-outline">
+                                            <label class="form-label">WhatsApp Number</label>
+                                            <input type="text" formControlName="whatsapp" class="form-control"
+                                                placeholder="Enter WhatsApp Number" maxlength="10" minlength="10"
+                                                (keypress)="numericOnly($event)">
+                                        </div>
+                                    </div>
+                                </div>
+                                <br>
+                                <div class="row">
+                                    <div class="col-md-6 mb-4">
+                                        <div class="form-outline">
+                                            <label for="birthdayDate" class="form-label">Date Of Birth</label>
+                                            <input type="date" formControlName="dob" class="form-control" [max]="now" />
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 mb-4 pb-2">
+                                        <div class="form-outline">
+                                            <label class="form-label">Gender</label>
+                                            <select class="form-control" formControlName="gender"
+                                                style="height:37px;width: 273px;">
+                                                <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
+                                                <option value="Male">Male</option>
+                                                <option value="Female">Female</option>
+                                                <option value="Transgender">Transgender</option>
+                                            </select>
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <br>
+                                <div class="row">
+                                    <div class="col-md-6 mb-4 pb-2">
+                                        <div class="form-outline">
+                                            <label class="form-label">Email</label>
+                                            <input type="email" formControlName="email" class="form-control"
+                                                placeholder="Enter Your Mail" />
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 mb-4 pb-2">
+                                        <div class="form-outline">
+                                            <label class="form-label">Phone Number</label>
+                                            <input type="text" formControlName="mobile_number" class="form-control"
+                                                maxlength="10" minlength="10" (keypress)="numericOnly($event)"
+                                                placeholder="Enter Your Mobile Number" />
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <br>
+                                <div class="row">
+                                    <div class="col-md-6 mb-4">
+                                        <div class="form-outline">
+                                            <label class="form-label">Status</label>
+                                            <div class="form-check form-check-inline">
+                                                <input class="form-check-input" type="radio" name="status"
+                                                    value="single" formControlName="status" checked />
+                                                <label class="form-check-label" for="femaleGender">Single</label>
+                                            </div>
+
+                                            <div class="form-check form-check-inline">
+                                                <input class="form-check-input" type="radio" name="status"
+                                                    value="divorced" formControlName="status" />
+                                                <label class="form-check-label" for="maleGender">Divorced</label>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 mb-4 pb-2">
+                                        <div class="form-outline">
+                                            <label class="form-label">Monthly Income</label>
+                                            <input type="text" formControlName="income" class="form-control"
+                                                (keypress)="numericOnly($event)"
+                                                placeholder="Enter Your Monthly Income" />
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6 mb-4 pb-2">
+                                        <div class="form-outline">
+                                            <label class="form-label">మీ కులం</label>
+                                            <select class="form-control" formControlName="caste"
+                                                style="height:37px;width: 273px;">
+                                                <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
+                                                <option value="OC">OC</option>
+                                                <option value="BC">BC</option>
+                                                <option value="SC">SC</option>
+                                                <option value="ST">ST</option>
+                                            </select>
+
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 mb-4 pb-2">
+                                        <div class="form-outline">
+                                            <label class="form-label">Sub Caste</label>
+                                            <input type="text" formControlName="subcaste" class="form-control"
+                                                placeholder="Enter Your Sub Caste" />
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6 mb-4 pb-2">
+                                        <div class="form-outline">
+                                            <label class="form-label">క్రైస్తవ సమాజం & దేవుని కొరకు ఏమి చేయగలరో విపులంగా రాయండి</label>
+                                            <input type="text" formControlName="nativeplace" class="form-control"
+                                                placeholder="ఇక్కడ క్లిక్ చేసి నమోదు చేయండి" />
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6 mb-4 pb-2">
+                                        <div class="form-outline">
+                                            <label class="form-label">Talent</label>
+                                            <select class="form-control" formControlName="talent"
+                                                style="height:37px;width: 273px;">
+                                                <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
+                                                <option value="Speaker">Speaker</option>
+                                                <option value="Writer">Writer</option>
+                                                <option value="Singer">Singer</option>
+                                                <option value="Others">Others</option>
+                                            </select>
+
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 mb-4 pb-2">
+                                        <div class="form-outline">
+                                            <label class="form-label">Education</label>
+                                            <select class="form-control" formControlName="education"
+                                                style="height:37px;width: 273px;">
+                                                <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
+                                                <option value="1-5">1-5</option>
+                                                <option value="6-10">6-10</option>
+                                                <option value="Inter">Inter</option>
+                                                <option value="Degree">Degree</option>
+                                                <option value="PG">PG</option>
+                                                <option value="PHD">PHD</option>
+                                            </select>
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6 mb-4 pb-2">
+                                        <div class="form-outline">
+                                            <label class="form-label">Designation</label>
+                                            <select class="form-control" formControlName="designation"
+                                                style="height:37px;width: 273px;">
+                                                <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
+                                                <option value="Private executive">Private executive</option>
+                                                <option value="Government executive">Government executive</option>
+                                                <option value="Clerk">Clerk</option>
+                                                <option value="Labour">Labour</option>
+                                                <option value="Teacher">Teacher</option>
+                                                <option value="Doctor">Doctor</option>
+                                                <option value="Landlord">Landlord</option>
+                                                <option value="Farmer">Farmer</option>
+                                                <option value="Engineer">Engineer</option>
+                                                <option value="Driver">Driver</option>
+                                                <option value="Helper">Helper</option>
+                                                <option value="Financier">Financier</option>
+                                                <option value="Business owner">Business owner</option>
+                                                <option value="Other">Other</option>
+                                            </select>
+
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 mb-4 pb-2">
+                                        <div class="form-outline">
+                                            <label class="form-label">Department</label>
+                                            <select class="form-control" formControlName="dpartment"
+                                                style="height:37px;width: 273px;">
+                                                <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
+                                                <option value="Real estate">Real estate</option>
+                                                <option value="Construction">Construction</option>
+                                                <option value="Education">Education</option>
+                                                <option value="Police">Police</option>
+                                                <option value="Advocate">Advocate </option>
+                                                <option value="School">School</option>
+                                                <option value="College">College</option>
+                                                <option value="Cultivation">Cultivation</option>
+                                                <option value="Paper media">Paper media</option>
+                                                <option value="Electronic media">Electronic media</option>
+                                                <option value="Social media">Social media</option>
+                                                <option value="Other">Other</option>
+                                            </select>
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <br>
+                                <div class="card shadow-2-strong card-registration" style="border-radius: 15px;">
+                                    <p>&nbsp;&nbsp; Address</p>
+                                    <div class="row">
+                                        <div class="col-md-6 mb-4 pb-2">
+                                            <div class="form-outline">
+                                                <label class="form-label">Select Districts
+                                                </label>
+                                                <select class="form-control" formControlName="districts"
+                                                    (change)="getconstency($event);" style="height:37px;width: 273px;">
+                                                    <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
+                                                    <option value="{{item.id}}" *ngFor="let item of districts">
+                                                        {{item.distrct_nm}}
+                                                    </option>
+                                                </select>
+
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 mb-4 pb-2">
+                                            <div class="form-outline">
+                                                <label class="form-label">నియోజకవర్గం ఎంచుకోండి </label>
+                                                <select class="form-control" formControlName="constituencyname"
+                                                    (change)="getmandals($event);" style="height:37px;width: 273px;">
+                                                    <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
+                                                    <option value="{{item.id}}" *ngFor="let item of constituency">
+                                                        {{item.const_nm}}
+                                                    </option>
+                                                </select>
+
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <br>
+                                    <div class="row">
+                                        <div class="col-md-6 mb-4 pb-2">
+                                            <div class="form-outline">
+                                                <label class="form-label">మండలం ఎంచుకోండి
+                                                </label>
+                                                <select class="form-control" formControlName="mandals"
+                                                    (change)="gepanchayati($event);" style="height:37px;width: 273px;">
+                                                    <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
+                                                    <option value="{{item.id}}" *ngFor="let item of mandals">
+                                                        {{item.mndl_nm}}
+                                                    </option>
+                                                </select>
+
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 mb-4 pb-2">
+                                            <div class="form-outline">
+                                                <label class="form-label">పంచాయతీ ఎంచుకోండి
+                                                </label>
+                                                <select class="form-control" formControlName="panchayati"
+                                                    style="height:37px;width: 273px;">
+                                                    <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
+                                                    <option value="{{item.id}}" *ngFor="let item of panchayati">
+                                                        {{item.pnchyt_nm}}
+                                                    </option>
+                                                </select>
+
+                                            </div>
+                                        </div>
+                                    </div>
+
+
+                                    <br>
+                                    <div class="row">
+                                        <div class="col-md-6 mb-4 pb-2">
+                                            <div class="form-outline">
+                                                <label class="form-label">గ్రామం పేరు / స్ట్రీట్ పేరు</label>
+                                                <input type="text" formControlName="villagename" class="form-control"
+                                                    placeholder="ఇక్కడ క్లిక్ చేసి నమోదు చేయండి" />
+
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 mb-4 pb-2">
+                                            <div class="form-outline">
+                                                <label class="form-label">Ward Number</label>
+                                                <input type="text" class="form-control" formControlName="wardnumber"
+                                                    style="height:37px;width: 273px;" placeholder="Enter Ward Number">
+
+                                            </div>
+                                        </div>
+                                        <br>
+                                    </div>
+                                    <br>
+                                    <div class="row">
+                                        <div class="col-md-6 mb-4 pb-2">
+                                            <div class="form-outline">
+                                                <label class="form-label">మీ స్థానిక చిరునామా నమోదు చేయండి/House Number</label>
+                                                <input type="text" formControlName="ward" class="form-control"
+                                                    placeholder="Enter Your Street Name" />
+
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 mb-4">
+                                            <div class="form-outline">
+                                                <label class="form-label">Living From</label>
+                                                <div class="form-check form-check-inline">
+                                                    <input class="form-check-input" type="radio" value="NRI"
+                                                        formControlName="nri" checked />
+                                                    <label class="form-check-label">Non Resident in AP</label>
+                                                </div>
+                                                <div class="form-check form-check-inline">
+                                                    <input class="form-check-input" type="radio" value="Non NRI"
+                                                        formControlName="nri" />
+                                                    <label class="form-check-label">Resident in AP</label>
+                                                </div>
+
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <br>
+                                </div>
+                                <br>
+                                <div class="row">
+                                    <div class="col-md-6 mb-4 pb-2">
+                                        <div class="form-outline">
+                                            <label class="form-label">మీరు కోటిమంది క్రైస్తవ సమాజానికి ఏదైనా లెవెల్ లో లీడర్ గా వుండడం ఇష్టమా ?</label>
+                                            <div class="form-check form-check-inline">
+                                                <input class="form-check-input" type="radio" value="YES"
+                                                    (change)="onradioleadertyperajkumar($event)"
+                                                    formControlName="leadership" checked />
+                                                <label class="form-check-label">YES</label>
+                                            </div>
+                                            <div class="form-check form-check-inline">
+                                                <input class="form-check-input" type="radio" value="NO"
+                                                    (change)="onradioleadertyperajkumar($event)"
+                                                    formControlName="leadership" checked />
+                                                <label class="form-check-label">NO</label>
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+                                    <div class="col-md-6 mb-4 pb-2" *ngIf="wingtypesystem">
+                                        <div class="form-outline">
+                                            <label class="form-label">లీడర్ కేటగిరి</label>
+
+                                            <div class="form-check form-check-inline">
+                                                <input class="form-check-input" type="radio" value="1"
+                                                    (change)="onradioleadertype($event.target)"
+                                                    formControlName="leadertype" checked />General
+
+                                            </div>
+                                            <div class="form-check form-check-inline">
+                                                <input class="form-check-input" type="radio" value="2"
+                                                    (change)="onradioleadertype($event.target)"
+                                                    formControlName="leadertype" checked />Wing
+
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 mb-4 pb-2" *ngIf="leadtype">
+                                        <div class="form-outline">
+                                            <label class="form-label">మీరు చేయగలిగిన జనరల్ లీడర్ షిప్ లెవెల్ ఎంచుకోండి  </label>
+                                            <select class="form-control" formControlName="generaltype"
+                                                (change)="onsubward($event)" style="height:37px;width: 273px;">
+                                                <option value="">ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
+                                                <option value="1">District</option>
+                                                <option value="2">constituency</option>
+                                                <option value="3">Mandal</option>
+                                                <option value="4">Village</option>
+                                                <option value="5">Ward</option>
+                                                <option value="6">Sub Ward </option>
+                                            </select>
+
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 mb-4 pb-2">
+                                        <div class="form-outline">
+                                            <label class="form-label">Subward Name
+                                            </label>
+                                            <input type="text" formControlName="subward" class="form-control"
+                                                placeholder="Enter Your Subward" />
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 mb-4 pb-2" *ngIf="wingtype">
+                                        <div class="form-outline">
+                                            <label class="form-label">వింగ్  లీడర్ కేటగిరి</label>
+                                            <select class="form-control" formControlName="wingtype"
+                                                style="height:37px;width: 273px;">
+                                                <option value="" selected disabled>Select Wing Leadership
+                                                </option>
+                                                <option value="{{item.id}}" *ngFor="let item of wings">
+                                                    {{item.position}}
+                                                </option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6 mb-4 pb-2" *ngIf="wingtypes">
+                                        <div class="form-outline">
+                                            <label class="form-label">Wing లీడర్ కేటగిరి
+                                            </label>
+                                            <select class="form-control" formControlName="wingtypes"
+                                                style="height:37px;width: 273px;">
+                                                <option value="">Select Wing Leadership</option>
+                                                <option value="Driver">Driver</option>
+                                                <option value="Socialmedia">Social media</option>
+                                                <option value="Papermedia">Paper media</option>
+                                                <option value="MeadiaReporters">Meadia Reporters</option>
+                                            </select>
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <br>
+
+                                <div class="row">
+                                    <div class="col-md-6 mb-4">
+                                        <div class="form-outline">
+                                            <label class="form-label" for="pattern_name">Denomation / Church
+                                                Pattren
+                                            </label>
+                                            <select class="form-control" formControlName="denomination_id">
+                                                <option value="" selected disabled>Select the Denomation
+                                                </option>
+                                                <option *ngFor="let i of denomation" value="{{i.id}}">
+                                                    {{i.denomation_name}}</option>
+                                            </select>
+
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 mb-4 pb-2">
+                                        <div class="form-outline">
+                                            <label class="form-label">Hobbies</label>
+                                            <select class="form-control" formControlName="hobbies"
+                                                style="height:37px;width: 273px;">
+                                                <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
+                                                <option value="Singing">Singing</option>
+                                                <option value="Designing">Designing</option>
+                                                <option value="Writer">Writer</option>
+                                                <option value="readingbooks">Reading Books</option>
+                                                <option value="servingpeople">Serving people</option>
+                                                <option value="music">Music</option>
+                                            </select>
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <br>
+                                <div class="row">
+                                    <div class="col-md-6 mb-4 pb-2">
+                                        <div class="form-outline">
+                                            <label class="form-label">Spiritual Status</label>
+                                            <select class="form-control" formControlName="spirti"
+                                                style="height:37px;width: 273px;">
+                                                <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
+                                                <option value="practicingchristian">Practicing Christian</option>
+                                                <option value="nominalchristian">Nominal Christian</option>
+                                                <option value="festivalchristian">Festival Christian</option>
+                                                <option value="justbelievingjesus">Just Believing Jesus</option>
+                                            </select>
+
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 mb-4 pb-2">
+                                        <div class="form-outline">
+                                            <label class="form-label">జీవిత లక్ష్యం</label>
+                                            <input type="text" formControlName="lifegoal" class="form-control"
+                                                placeholder="ఇక్కడ క్లిక్ చేసి నమోదు చేయండి" />
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <br>
+                                <div class="row">
+
+                                    <!-- <div class="col-md-6 mb-4">
+                                        <label class="form-label" for="church_name">Search Church Name</label>
+                                        <input class="form-control" type="text" (keyup)="filterChurch($event.target)">
+                                    </div> -->
+
+                                    <div class="col-md-6 mb-4 pb-2">
+                                        <div class="form-outline">
+                                            <label class="form-label">Select Church</label>
+                                            <select class="form-control" formControlName="church"
+                                                style="height:37px;width: 273px;" (click)="churchfilter()">
+                                                <option value="" selected disabled>Select Church Name</option>
+                                                <option value="{{item.id}}" *ngFor="let item of getchurchstudentfilter">
+                                                    {{item.church_name}}
+                                                </option>
+                                            </select>
+
+                                        </div>
+                                    </div>
+
+
+                                    <div class="col-md-6 mb-4 pb-2">
+                                        <div class="form-outline">
+                                            <label class="form-label">Select Pastor
+                                            </label>
+                                            <select class="form-control" formControlName="pastor"
+                                                style="height:37px;width: 273px;" (click)="pastorfilter()">
+                                                <option value="" selected disabled>Select Your Pastor</option>
+                                                <option value="{{item.id}}" *ngFor="let item of getpastorassciationas">
+                                                    {{item.pastorname}}
+                                                </option>
+                                            </select>
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <br>
+                                <div class="row">
+                                    <div class="col-md-6 mb-4 pb-2">
+                                        <div class="form-outline">
+                                            <label class="form-label">మీ యూట్యూబ్ ఛానల్</label>
+                                            <input type="text" formControlName="youtube" class="form-control"
+                                                placeholder="Enter Your YoutubeChannel" />
+
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 mb-4">
+                                        <div class="form-outline">
+                                            <label class="form-label" for="lastName">About Yourself</label>
+                                            <input type="text" formControlName="lname" class="form-control"
+                                                placeholder="Enter About Yourself" />
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <br>
+                                <div class="row">
+                                    <div class="col-md-6 mb-4 pb-2">
+                                        <div class="form-outline">
+                                            <label class="form-label">For God</label>
+                                            <select class="form-control" formControlName="god"
+                                                style="height:37px;width: 273px;">
+                                                <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
+                                                <option value="Singing">Singing</option>
+                                                <option value="Music">Music</option>
+                                                <option value="Dance">Dance</option>
+
+                                            </select>
+
+                                        </div>
+                                    </div>
+
+                                    <br>
+                                </div>
+                                <br>
+                                <div class="row">
+                                    <div class="col-md-2 mb-4 pb-2">
+                                    </div>
+                                    <div class="col-md-2 mb-4 pb-2">
+                                    </div>
+                                    <div class="col-md-2 mb-4 pb-2">
+                                        <button type="submit" (click)="editbeliver()"
+                                            class="default-btn  user-all-btn">Update
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                            <br>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <section class="gradient-custom" *ngIf="categoryid==2">
+        <div class="container py-5 h-100">
+            <h2 style="text-align: center;">{{category}} login </h2>
+            <div class="row justify-content-center align-items-center h-100">
+                <div class="col-12 col-lg-9 col-xl-7">
+                    <div class="card shadow-2-strong card-registration" style="border-radius: 15px;">
+                        <div class="card-body p-4 p-md-5">
+                            <h3 class="mb-4 pb-2 pb-md-0 mb-md-5"> Profile Details : </h3>
+                            <form [formGroup]="studentform">
+                                <div class="row">
+                                    <div class="col-md-6 mb-4">
+                                        <div class="form-outline">
+                                            <label class="form-label">Student Name</label>
+                                            <input type="text" formControlName="studentname" class="form-control"
+                                                placeholder="ఇక్కడ క్లిక్ చేసి నమోదు చేయండి" />
+
+
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 mb-4">
+                                        <div class="form-outline">
+                                            <label class="form-label">Student Number</label>
+                                            <input type="text" formControlName="number" class="form-control"
+                                                placeholder="Enter Your Number" maxlength="10" minlength="10"
+                                                (keypress)="numericOnly($event)" />
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <br>
+                                <div class="row">
+                                    <div class="col-md-6 mb-4 pb-2">
+                                        <div class="form-outline">
+                                            <label class="form-label">Education</label>
+                                            <select class="form-control" formControlName="study"
+                                                style="height:37px;width: 273px;">
+                                                <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
+                                                <option value="1-5">1-5</option>
+                                                <option value="6-10">6-10</option>
+                                                <option value="Inter">Inter</option>
+                                                <option value="Degree">Degree</option>
+                                                <option value="PG">PG</option>
+                                                <option value="PHD">PHD</option>
+                                            </select>
+
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 mb-4 pb-2">
+                                        <div class="form-outline">
+                                            <label class="form-label">Father Name</label>
+                                            <input type="text" formControlName="fathername" class="form-control"
+                                                placeholder="Enter Your Father Name" />
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <br>
+                                <div class="row">
+                                    <div class="col-md-6 mb-4">
+                                        <div class="form-outline">
+                                            <label for="birthdayDate" class="form-label">College/School Name</label>
+                                            <input type="text" formControlName="schname" class="form-control"
+                                                placeholder="Enter Your College/School Name" />
+
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 mb-4">
+                                        <div class="form-outline">
+                                            <label for="birthdayDate" class="form-label">About yourself</label>
+                                            <input type="text" formControlName="aboutyourself" class="form-control"
+                                                placeholder="Enter Your About" />
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <br>
+
+                                <div class="row">
+                                    <div class="col-md-6 mb-4 pb-2">
+                                        <div class="form-outline">
+                                            <label class="form-label">మీ కులం</label>
+                                            <select class="form-control" formControlName="caste"
+                                                style="height:37px;width: 273px;">
+                                                <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
+                                                <option value="OC">OC</option>
+                                                <option value="BC">BC</option>
+                                                <option value="SC">SC</option>
+                                                <option value="ST">ST</option>
+                                            </select>
+
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 mb-4 pb-2">
+                                        <div class="form-outline">
+                                            <label class="form-label">Sub Caste</label>
+                                            <input type="text" formControlName="subcaste" class="form-control"
+                                                placeholder="Enter Your Sub Caste" />
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <br>
+                                <div class="row">
+                                    <div class="col-md-6 mb-4 pb-2">
+                                        <div class="form-outline">
+                                            <label class="form-label">Talent</label>
+                                            <select class="form-control" formControlName="talent"
+                                                style="height:37px;width: 273px;">
+                                                <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
+                                                <option value="Speaker">Speaker</option>
+                                                <option value="Writer">Writer</option>
+                                                <option value="Singer">Singer</option>
+                                                <option value="Others">Others</option>
+                                            </select>
+
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 mb-4">
+                                        <div class="form-outline">
+                                            <label class="form-label">Student Number</label>
+                                            <input type="text" formControlName="whatsappnumber" class="form-control"
+                                                placeholder="Enter Your Number" maxlength="10" minlength="10"
+                                                (keypress)="numericOnly($event)" />
+
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <br>
+                                <div class="row">
+                                    <div class="col-md-6 mb-4 pb-2">
+                                        <div class="form-outline">
+                                            <label class="form-label">క్రైస్తవ సమాజం & దేవుని కొరకు ఏమి చేయగలరో విపులంగా రాయండి</label>
+                                            <input type="text" formControlName="nativeplace" class="form-control"
+                                                placeholder="ఇక్కడ క్లిక్ చేసి నమోదు చేయండి" />
+
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 mb-4">
+                                        <div class="form-outline">
+                                            <label for="birthdayDate" class="form-label">Date Of Birth</label>
+                                            <input type="date" formControlName="dob" class="form-control" [max]="now" />
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <br>
+
+
+                                <div class="card shadow-2-strong card-registration" style="border-radius: 15px;">
+                                    <p> &nbsp;&nbsp; College/School Address</p>
+                                    <div class="row">
+                                        <div class="col-md-6 mb-4 pb-2">
+                                            <div class="form-outline">
+                                                <label class="form-label">Select Districts
+                                                </label>
+                                                <select class="form-control" formControlName="district_id"
+                                                    (change)="getconstency($event);" style="height:37px;width: 273px;">
+                                                    <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
+                                                    <option value="{{item.id}}" *ngFor="let item of districts">
+                                                        {{item.distrct_nm}}
+                                                    </option>
+                                                </select>
+
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 mb-4 pb-2">
+                                            <div class="form-outline">
+                                                <label class="form-label">నియోజకవర్గం ఎంచుకోండి
+                                                </label>
+                                                <select class="form-control" formControlName="constituency_id"
+                                                    (change)="getmandals($event);" style="height:37px;width: 273px;">
+                                                    <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
+                                                    <option value="{{item.id}}" *ngFor="let item of constituency">
+                                                        {{item.const_nm}}
+                                                    </option>
+                                                </select>
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <br>
+                                    <div class="row">
+                                        <div class="col-md-6 mb-4 pb-2">
+                                            <div class="form-outline">
+                                                <label class="form-label">మండలం ఎంచుకోండి </label>
+                                                <select class="form-control" formControlName="mandal_id"
+                                                    (change)="gepanchayati($event);" style="height:37px;width: 273px;">
+                                                    <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
+                                                    <option value="{{item.id}}" *ngFor="let item of mandals">
+                                                        {{item.mndl_nm}}
+                                                    </option>
+                                                </select>
+
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 mb-4 pb-2">
+                                            <div class="form-outline">
+                                                <label class="form-label">పంచాయతీ ఎంచుకోండి</label>
+                                                <select class="form-control" formControlName="village_id"
+                                                    style="height:37px;width: 273px;">
+                                                    <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
+                                                    <option value="{{item.id}}" *ngFor="let item of panchayati">
+                                                        {{item.pnchyt_nm}}
+                                                    </option>
+                                                </select>
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <br>
+                                </div>
+                                <br>
+                                <div class="card shadow-2-strong card-registration" style="border-radius: 15px;">
+                                    <p>&nbsp;&nbsp; Residential Address</p>
+                                    <div class="row">
+
+                                        <div class="col-md-6 mb-4 pb-2">
+                                            <div class="form-outline">
+                                                <label class="form-label">Select Districts
+                                                </label>
+                                                <select class="form-control" formControlName="resdistricts"
+                                                    (change)="getconstency($event);" style="height:37px;width: 273px;">
+                                                    <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
+                                                    <option value="{{item.id}}" *ngFor="let item of districts">
+                                                        {{item.distrct_nm}}
+                                                    </option>
+                                                </select>
+
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 mb-4 pb-2">
+                                            <div class="form-outline">
+                                                <label class="form-label">నియోజకవర్గం ఎంచుకోండి </label>
+                                                <select class="form-control" formControlName="resconstituencyname"
+                                                    (change)="getmandals($event);" style="height:37px;width: 273px;">
+                                                    <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
+                                                    <option value="{{item.id}}" *ngFor="let item of constituency">
+                                                        {{item.const_nm}}
+                                                    </option>
+                                                </select>
+
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <br>
+                                    <div class="row">
+                                        <div class="col-md-6 mb-4 pb-2">
+                                            <div class="form-outline">
+                                                <label class="form-label">మండలం ఎంచుకోండి
+                                                </label>
+                                                <select class="form-control" formControlName="resmandals"
+                                                    (change)="gepanchayati($event);" style="height:37px;width: 273px;">
+                                                    <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
+                                                    <option value="{{item.id}}" *ngFor="let item of mandals">
+                                                        {{item.mndl_nm}}
+                                                    </option>
+                                                </select>
+
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 mb-4 pb-2">
+                                            <div class="form-outline">
+                                                <label class="form-label">పంచాయతీ ఎంచుకోండి
+                                                </label>
+                                                <select class="form-control" formControlName="respanchayati"
+                                                    style="height:37px;width: 273px;">
+                                                    <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
+                                                    <option value="{{item.id}}" *ngFor="let item of panchayati">
+                                                        {{item.pnchyt_nm}}
+                                                    </option>
+                                                </select>
+
+                                            </div>
+                                        </div>
+                                    </div>
+
+
+                                    <br>
+                                    <div class="row">
+                                        <div class="col-md-6 mb-4 pb-2">
+                                            <div class="form-outline">
+                                                <label class="form-label">గ్రామం పేరు / స్ట్రీట్ పేరు</label>
+                                                <input type="text" formControlName="villagename" class="form-control"
+                                                    placeholder="ఇక్కడ క్లిక్ చేసి నమోదు చేయండి" />
+
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 mb-4 pb-2">
+                                            <div class="form-outline">
+                                                <label class="form-label">Ward Number</label>
+                                                <input type="text" class="form-control" formControlName="wardnumber"
+                                                    style="height:37px;width: 273px;" placeholder="Enter Ward Number">
+
+                                            </div>
+                                        </div>
+                                        <br>
+                                    </div>
+                                    <br>
+                                    <div class="row">
+                                        <div class="col-md-6 mb-4 pb-2">
+                                            <div class="form-outline">
+                                                <label class="form-label">మీ స్థానిక చిరునామా నమోదు చేయండి/House Number</label>
+                                                <input type="text" formControlName="ward" class="form-control"
+                                                    placeholder="Enter Your Street Name" />
+
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 mb-4">
+                                            <div class="form-outline">
+                                                <label class="form-label">Living From</label>
+                                                <div class="form-check form-check-inline">
+                                                    <input class="form-check-input" type="radio" value="NRI"
+                                                        formControlName="nri" checked />
+                                                    <label class="form-check-label">Non Resident in AP</label>
+                                                </div>
+                                                <div class="form-check form-check-inline">
+                                                    <input class="form-check-input" type="radio" value="Non NRI"
+                                                        formControlName="nri" />
+                                                    <label class="form-check-label">Resident in AP</label>
+                                                </div>
+
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <br>
+                                </div>
+                                <br>
+                                <div class="row">
+                                    <div class="col-md-6 mb-4">
+                                        <div class="form-outline">
+                                            <label class="form-label" for="pattern_name">Denomation / Church
+                                                Pattren
+                                            </label>
+                                            <select class="form-control" formControlName="denomination_id">
+                                                <option value="" selected disabled>Select the Denomation
+                                                </option>
+                                                <option *ngFor="let i of denomation" value="{{i.id}}">
+                                                    {{i.denomation_name}}</option>
+                                            </select>
+
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 mb-4 pb-2">
+                                        <div class="form-outline">
+                                            <label class="form-label">Hobbies</label>
+                                            <select class="form-control" formControlName="hobbies"
+                                                style="height:37px;width: 273px;">
+                                                <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
+                                                <option value="Singing">Singing</option>
+                                                <option value="Designing">Designing</option>
+                                                <option value="Writer">Writer</option>
+                                                <option value="readingbooks">Reading Books</option>
+                                                <option value="servingpeople">Serving people</option>
+                                                <option value="music">Music</option>
+                                            </select>
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <br>
+                                <div class="row">
+                                    <div class="col-md-6 mb-4 pb-2">
+                                        <div class="form-outline">
+                                            <label class="form-label">Spiritual Status</label>
+                                            <select class="form-control" formControlName="spirti"
+                                                style="height:37px;width: 273px;">
+                                                <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
+                                                <option value="practicingchristian">Practicing Christian</option>
+                                                <option value="nominalchristian">Nominal Christian</option>
+                                                <option value="festivalchristian">Festival Christian</option>
+                                                <option value="justbelievingjesus">Just Believing Jesus</option>
+                                            </select>
+
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 mb-4 pb-2">
+                                        <div class="form-outline">
+                                            <label class="form-label">జీవిత లక్ష్యం</label>
+                                            <input type="text" formControlName="lifegoal" class="form-control"
+                                                placeholder="ఇక్కడ క్లిక్ చేసి నమోదు చేయండి" />
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <br>
+                                <div class="row">
+
+                                    <div class="col-md-6 mb-4 pb-2">
+                                        <div class="form-outline">
+                                            <label class="form-label">Select Church</label>
+                                            <select class="form-control" formControlName="church"
+                                                style="height:37px;width: 273px;" (click)="studentchurch()">
+                                                <option value="" selected disabled>Select Church Name</option>
+                                                <option value="{{item.id}}" *ngFor="let item of getchurchstudent">
+                                                    {{item.church_name}}
+                                                </option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6 mb-4 pb-2">
+                                        <div class="form-outline">
+                                            <label class="form-label">Select Pastor
+                                            </label>
+                                            <select class="form-control" formControlName="pastor"
+                                                style="height:37px;width: 273px;" (click)="studentpastor()">
+                                                <option value="" selected disabled>Select Your Pastor</option>
+                                                <option value="{{item.id}}" *ngFor="let item of getstudentpastor">
+                                                    {{item.pastorname}}
+                                                </option>
+                                            </select>
+
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 mb-4 pb-2">
+                                        <div class="form-outline">
+                                            <label class="form-label">మీరు కోటిమంది క్రైస్తవ సమాజానికి ఏదైనా లెవెల్ లో లీడర్ గా వుండడం ఇష్టమా ?</label>
+                                            <div class="form-check form-check-inline">
+                                                <input class="form-check-input" type="radio" value="YES"
+                                                    (change)="onradioleadertyperajkumar($event)"
+                                                    formControlName="leadership" checked />
+                                                <label class="form-check-label">YES</label>
+                                            </div>
+                                            <div class="form-check form-check-inline">
+                                                <input class="form-check-input" type="radio" value="NO"
+                                                    (change)="onradioleadertyperajkumar($event)"
+                                                    formControlName="leadership" checked />
+                                                <label class="form-check-label">NO</label>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 mb-4 pb-2" *ngIf="wingtypesystem">
+                                        <div class="form-outline">
+                                            <label class="form-label">లీడర్ కేటగిరి</label>
+                                            <div class="form-check form-check-inline">
+                                                <input class="form-check-input" type="radio" value="1"
+                                                    (change)="onradioleadertype($event.target)"
+                                                    formControlName="leadertype" checked />General
+
+                                            </div>
+                                            <div class="form-check form-check-inline">
+                                                <input class="form-check-input" type="radio" value="2"
+                                                    (change)="onradioleadertype($event.target)"
+                                                    formControlName="leadertype" checked />Wing
+
+                                            </div>
+
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6 mb-4 pb-2" *ngIf="leadtype">
+                                        <div class="form-outline">
+                                            <label class="form-label">మీరు చేయగలిగిన జనరల్ లీడర్ షిప్ లెవెల్ ఎంచుకోండి 
+                                            </label>
+                                            <select class="form-control" formControlName="generaltype"
+                                                style="height:37px;width: 273px;">
+                                                <option value="">ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
+                                                <option value="1">District</option>
+                                                <option value="2">constituency</option>
+                                                <option value="3">Mandal</option>
+                                                <option value="4">Village</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 mb-4 pb-2" *ngIf="wingtype">
+                                        <div class="form-outline">
+                                            <label class="form-label">వింగ్  లీడర్ కేటగిరి</label>
+                                            <select class="form-control" formControlName="wingtype"
+                                                style="height:37px;width: 273px;">
+                                                <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
+                                                <option value="{{item.id}}" *ngFor="let item of wings">
+                                                    {{item.position}}
+                                                </option>
+                                            </select>
+
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 mb-4 pb-2" *ngIf="wingtypes">
+                                        <div class="form-outline">
+                                            <label class="form-label">Wing లీడర్ కేటగిరి
+                                            </label>
+                                            <select class="form-control" formControlName="wingtypes"
+                                                style="height:37px;width: 273px;">
+                                                <option value="">Select Wing Leadership</option>
+                                                <option value="Driver">Driver</option>
+                                                <option value="Socialmedia">Social media</option>
+                                                <option value="Papermedia">Paper media</option>
+                                                <option value="MeadiaReporters">Meadia Reporters</option>
+                                            </select>
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <br>
+                                <div class="row">
+                                    <div class="col-md-6 mb-4 pb-2">
+                                        <div class="form-outline">
+                                            <label class="form-label">Student Orphon ?</label>
+                                            <div class="form-check form-check-inline">
+                                                <input class="form-check-input" type="radio" value="YES"
+                                                    (change)="onparent($event.target)" formControlName="mother"
+                                                    checked />
+                                                <label class="form-check-label">YES</label>
+                                            </div>
+                                            <div class="form-check form-check-inline">
+                                                <input class="form-check-input" type="radio" value="NO"
+                                                    (change)="onparent($event.target)" formControlName="mother"
+                                                    checked />
+                                                <label class="form-check-label">NO</label>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 mb-4" *ngIf="father">
+                                        <div class="form-outline">
+                                            <label for="birthdayDate" class="form-label">Father or Mother Name
+                                            </label>
+                                            <input type="text" formControlName="orphon" class="form-control"
+                                                placeholder="Enter Your father or mother name " />
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <br>
+                                <div class="row">
+                                    <div class="col-md-6 mb-4 pb-2">
+                                        <div class="form-outline">
+                                            <label class="form-label">For God</label>
+                                            <select class="form-control" formControlName="god"
+                                                style="height:37px;width: 273px;">
+                                                <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
+                                                <option value="Singing">Singing</option>
+                                                <option value="Music">Music</option>
+                                                <option value="Dance">Dance</option>
+
+                                            </select>
+
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 mb-4 pb-2">
+                                        <div class="form-outline">
+                                            <label class="form-label">Terms And Conditions</label>
+                                            <div class="form-check form-check-inline">
+                                                <input class="form-check-input" type="checkbox" value="YES"
+                                                    formControlName="term" checked />
+                                                <label class="form-check-label">YES</label>
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <br>
+                                </div>
+                                <br>
+                                <div class="row">
+                                    <div class="col-md-6 mb-4 pb-2">
+                                        <div class="form-outline">
+                                            <label class="form-label">Password</label>
+                                            <input type="password" formControlName="password" class="form-control"
+                                                placeholder="ఇక్కడ క్లిక్ చేసి నమోదు చేయండి" maxlength="16" minlength="6" />
+
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <br>
+                                <div class="row">
+                                    <div class="col-md-2 mb-4 pb-2">
+                                    </div>
+                                    <div class="col-md-2 mb-4 pb-2">
+                                    </div>
+                                    <div class="col-md-2 mb-4 pb-2">
+                                        <button type="submit" (click)="editstudent()"
+                                            class="default-btn  user-all-btn">Update
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                            <br>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <section class="gradient-custom" *ngIf="categoryid==7">
+        <div class="container py-5 h-100">
+            <h2 style="text-align: center;">{{category}} login </h2>
+            <div class="row justify-content-center align-items-center h-100">
+                <div class="col-12 col-lg-9 col-xl-7">
+                    <div class="card shadow-2-strong card-registration" style="border-radius: 15px;">
+                        <div class="card-body p-4 p-md-5">
+                            <h3 class="mb-4 pb-2 pb-md-0 mb-md-5"> Profile Details : </h3>
+                            <form [formGroup]="pastorsassociations">
+                                <div class="row">
+                                    <div class="col-md-6 mb-4">
+                                        <div class="form-outline">
+                                            <label class="form-label">Pastor Association Name </label>
+                                            <input type="text" formControlName="pa_name" class="form-control" required
+                                                placeholder="Enter Your PA Name" />
+
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6 mb-4">
+                                        <div class="form-outline">
+                                            <label class="form-label" for="pastor_name">Head Name</label>
+                                            <select class="form-control" formControlName="pastor_id"
+                                                (click)="pastorassociation()">
+                                                <option value="" selected disabled>Select the pastor </option>
+                                                <option *ngFor="let i of getpastorassociat" value="{{i.id}}">
+                                                    {{i.pastorname }}</option>
+                                            </select>
+
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 mb-4 pb-2">
+                                        <div class="form-outline">
+                                            <label class="form-label">Pastors Association level</label>
+                                            <select class="form-control" formControlName="level"
+                                                style="height:37px;width: 273px;">
+                                                <option value="" selected disabled>Leadership Level</option>
+                                                <option value="1">InterNational</option>
+                                                <option value="2">National</option>
+                                                <option value="3">State </option>
+                                                <option value="4">District</option>
+                                                <option value="5">constituency</option>
+                                                <option value="6">Mandal</option>
+
+                                            </select>
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <br>
+                                <div class="row">
+                                    <div class="col-md-6 mb-4 pb-2">
+                                        <div class="form-outline">
+                                            <label class="form-label">Contact Number</label>
+                                            <input type="text" formControlName="phonenumber" class="form-control"
+                                                placeholder="Enter Your Contact Number" maxlength="10" minlength="10"
+                                                (keypress)="numericOnly($event)" />
+
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 mb-4 pb-2">
+                                        <div class="form-outline">
+                                            <label class="form-label">Whatsapp Number </label>
+                                            <input type="text" formControlName="whatsapp_number" class="form-control"
+                                                placeholder="Enter Your Whatsapp Number" maxlength="10" minlength="10"
+                                                (keypress)="numericOnly($event)" />
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <br>
+                                <div class="row">
+                                    <div class="col-md-6 mb-4">
+                                        <div class="form-outline">
+                                            <label class="form-label">Total Leaders </label>
+                                            <input type="text" formControlName="totalleadrs" class="form-control"
+                                                placeholder="Enter Your Total Church Members" />
+
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 mb-4 pb-2">
+                                        <div class="form-outline">
+                                            <label class="form-label">మీ స్థానిక చిరునామా నమోదు చేయండి</label>
+                                            <input type="text" formControlName="address" class="form-control"
+                                                placeholder="Enter Your Street Name" />
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <br>
+                                <div class="card shadow-2-strong card-registration" style="border-radius: 15px;">
+                                    <p>&nbsp;&nbsp; Address</p>
+                                    <div class="row">
+                                        <div class="col-md-6 mb-4 pb-2">
+                                            <div class="form-outline">
+                                                <label class="form-label">Select District</label>
+                                                <select class="form-control" formControlName="district_id"
+                                                    (change)="getconstency($event);" style="height:37px;width: 273px;">
+                                                    <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
+                                                    <option value="{{item.id}}" *ngFor="let item of districts">
+                                                        {{item.distrct_nm}}
+                                                    </option>
+                                                </select>
+
+                                            </div>
+
+                                        </div>
+                                        <div class="col-md-6 mb-4 pb-2">
+                                            <div class="form-outline">
+                                                <label class="form-label">నియోజకవర్గం ఎంచుకోండి
+                                                </label>
+                                                <select class="form-control" formControlName="constituency_id"
+                                                    (change)="getmandals($event);" style="height:37px;width: 273px;">
+                                                    <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
+                                                    <option value="{{item.id}}" *ngFor="let item of constituency">
+                                                        {{item.const_nm}}
+                                                    </option>
+                                                </select>
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <br>
+                                    <div class="row">
+                                        <div class="col-md-6 mb-4 pb-2">
+                                            <div class="form-outline">
+                                                <label class="form-label">Select Mandal
+                                                </label>
+                                                <select class="form-control" formControlName="mandal_id"
+                                                    (change)="gepanchayati($event);" style="height:37px;width: 273px;">
+                                                    <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
+                                                    <option value="{{item.id}}" *ngFor="let item of mandals">
+                                                        {{item.mndl_nm}}
+                                                    </option>
+                                                </select>
+
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 mb-4 pb-2">
+                                            <div class="form-outline">
+                                                <label class="form-label">పంచాయతీ ఎంచుకోండి
+                                                </label>
+                                                <select class="form-control" formControlName="village_id"
+                                                    style="height:37px;width: 273px;">
+                                                    <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
+                                                    <option value="{{item.id}}" *ngFor="let item of panchayati">
+                                                        {{item.pnchyt_nm}}
+                                                    </option>
+                                                </select>
+
+                                            </div>
+                                        </div>
+                                        <br>
+                                    </div>
+                                    <br>
+                                </div>
+                                <br>
+                                <div class="row">
+                                    <div class="col-md-6 mb-4">
+                                        <div class="form-outline">
+                                            <label class="form-label">Website</label>
+                                            <input type="text" formControlName="website" class="form-control" required
+                                                placeholder="Enter website" />
+
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 mb-4">
+                                        <div class="form-outline">
+                                            <label class="form-label">Working Areas</label>
+                                            <input type="text" formControlName="workingareas" class="form-control"
+                                                required placeholder="Enter Your Working Areas" />
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <br>
+                                <div class="row">
+                                    <div class="col-md-6 mb-4">
+                                        <div class="form-outline">
+                                            <label class="form-label">Description</label>
+                                            <input type="text" formControlName="description" class="form-control"
+                                                required placeholder="Enter Description" />
+
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-2 mb-4 pb-2">
+                                        <div class="form-outline">
+                                            <label class="form-label"></label> &nbsp;
+                                            <button type="submit" (click)="editindepastororgainsation()"
+                                                class="default-btn  user-all-btn">Update
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                </div>
+
+
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="gradient-custom" *ngIf="categoryid==4">
+        <div class="container py-5 h-100">
+            <h2 style="text-align: center;">{{category}} login </h2>
+            <div class="row justify-content-center align-items-center h-100">
+                <div class="col-12 col-lg-9 col-xl-7">
+                    <div class="card shadow-2-strong card-registration" style="border-radius: 15px;">
+                        <div class="card-body p-4 p-md-5">
+                            <h3 class="mb-4 pb-2 pb-md-0 mb-md-5"> సేవకుల వివరాలు (మీకు తగిన
+                                సమాచారం ఇవ్వటం కొరకు) </h3>
+                            <form [formGroup]="pastorform">
+                                <div class="row">
+                                    <div class="col-md-6 mb-4">
+                                        <div class="form-outline">
+                                            <label class="form-label">మీ పేరు(ఇంటి పేరు తో సహా)</label>
+                                            <input type="text" formControlName="pastorname" class="form-control"
+                                                placeholder="ఇక్కడ క్లిక్ చేసి ఎంటర్ చేయండి" />
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 mb-4">
+                                        <div class="form-outline">
+                                            <label class="form-label">Phone Number</label>
+                                            <input type="text" formControlName="phonenumber" class="form-control"
+                                                minlength="10" maxlength="10" placeholder="ఇక్కడ క్లిక్ చేసి ఎంటర్ చేయండి"
+                                                readonly />
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 mb-4">
+                                        <div class="form-outline">
+                                            <label class="form-label">Date Of Birth</label>
+                                            <input type="date" formControlName="dob" class="form-control" [max]="now"
+                                                placeholder="ఇక్కడ క్లిక్ చేసి ఎంటర్ చేయండి" />
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 mb-4">
+                                        <div class="form-outline">
+                                            <label class="form-label">Description</label>
+                                            <input type="text" formControlName="about_desp" class="form-control"
+                                                placeholder="Enter Your Description" />
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6 mb-4 pb-2">
+                                        <div class="form-outline">
+                                            <label class="form-label">Gender</label>
+                                            <select class="form-control" formControlName="gender"
+                                                style="height:37px;width: 273px;">
+                                                <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
+                                                <option value="Male">Male</option>
+                                                <option value="Female">Female</option>
+                                                <option value="Transgender">Transgender</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 mb-4 pb-2">
+                                        <div class="form-outline">
+                                            <label class="form-label">Designation</label>
+                                            <select class="form-control" formControlName="designation"
+                                                style="height:37px;width: 273px;">
+                                                <option value="" selected disabled>Select Designation</option>
+                                                <option value="Evangilist">Evangilist</option>
+                                                <option value="pastor">Pastor</option>
+                                                    <option value="buspastor">Business & Pastor</option>
+                                                    <option value="jobpastor">Job & Pastor</option>
+                                                    <option value="Srpastor">Senior Pastor</option>
+                                                    <option value="Rev">Rev</option>
+                                                    <option value="Bishop">Bishop</option>
+                                                    <option value="Archbishop">Arch Bishop</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 mb-4">
+                                        <div class="form-outline">
+                                            <label class="form-label">Status</label>
+                                            <div class="form-check form-check-inline">
+                                                <input class="form-check-input" type="radio" name="staus" value="single"
+                                                    formControlName="staus" checked>
+                                                <label class="form-check-label" for="femaleGender">Single</label>
+                                            </div>
+                                            <div class="form-check form-check-inline">
+                                                <input class="form-check-input" type="radio" name="staus"
+                                                    value="married" formControlName="staus">
+                                                <label class="form-check-label" for="maleGender">Married</label>
+                                            </div>
+                                            <div class="form-check form-check-inline">
+                                                <input class="form-check-input" type="radio" name="staus"
+                                                    value="Divorced" formControlName="staus">
+                                                <label class="form-check-label" for="maleGender">Divorced</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 mb-4 pb-2">
+                                        <div class="form-outline">
+                                            <label class="form-label">మీ కులం</label>
+                                            <select class="form-control" formControlName="caste"
+                                                style="height:37px;width: 273px;">
+                                                <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
+                                                <option value="OC">OC</option>
+                                                <option value="BC">BC-A</option>
+                                                <option value="BC">BC-B</option>
+                                                <option value="BC">BC-C</option>
+                                                <option value="BC">BC-D</option>
+                                                <option value="BC">BC-E</option>
+                                                <option value="SC">SC</option>
+                                                <option value="ST">ST</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 mb-4 pb-2">
+                                        <div class="form-outline">
+                                            <label class="form-label">క్రైస్తవ సమాజం & దేవుని కొరకు ఏమి చేయగలరో విపులంగా రాయండి</label>
+                                            <input type="text" formControlName="nativeplace" class="form-control"
+                                                placeholder="ఇక్కడ క్లిక్ చేసి నమోదు చేయండి">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 mb-4 pb-2">
+                                        <div class="form-outline">
+                                            <label class="form-label">Talent</label>
+                                            <select class="form-control" formControlName="talent"
+                                                style="height:37px;width: 273px;">
+                                                <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
+                                                <option value="Speaker">Speaker</option>
+                                                <option value="Writer">Writer</option>
+                                                <option value="Singer">Singer</option>
+                                                <option value="Music">Muscian</option>
+                                                <option value="Multi">Multi-talented</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 mb-4 pb-2">
+                                        <div class="form-outline">
+                                            <label class="form-label">Education</label>
+                                            <select class="form-control" formControlName="education"
+                                                style="height:37px;width: 273px;">
+                                                <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
+                                                <option value="1-5">1-5</option>
+                                                <option value="6-10">6-10</option>
+                                                <option value="6-10">ITI</option>
+                                                <option value="6-10">Diploma</option>
+                                                <option value="Inter">Inter</option>
+                                                <option value="Degree">Degree</option>
+                                                <option value="PG">PG</option>
+                                                <option value="PHD">PHD</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 mb-4 pb-2">
+                                        <div class="form-outline">
+                                            <label class="form-label">YouTube Channel</label>
+                                            <input type="text" formControlName="youtubechanel" />
+
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 mb-4 pb-2">
+                                        <div class="form-outline">
+                                            <label class="form-label">మీ ఫేస్‌బుక్ ఛానల్</label>
+                                            <input type="text" formControlName="facebook" class="form-control"
+                                                placeholder="ఇక్కడ క్లిక్ చేసి నమోదు చేయండి" />
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 mb-4">
+                                        <div class="form-outline">
+                                            <label class="form-label" for="about_desp">About Yourself</label>
+                                            <input type="text" formControlName="about_desp" class="form-control"
+                                                placeholder="Enter Your About Yourself">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 mb-4 pb-2">
+                                        <div class="form-outline">
+                                            <label class="form-label">జీవిత లక్ష్యం</label>
+                                            <input type="text" formControlName="lifegoal" class="form-control"
+                                                placeholder="ఇక్కడ క్లిక్ చేసి నమోదు చేయండి" />
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 mb-4 pb-2">
+                                        <div class="form-outline">
+                                            <label class="form-label">For God</label>
+                                            <select class="form-control" formControlName="god"
+                                                style="height:37px;width: 273px;">
+                                                <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
+                                                <option value="Singing">Singing</option>
+                                                <option value="Music">Music</option>
+                                                <option value="Dance">Dance</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 mb-4 pb-2">
+                                        <div class="form-outline">
+                                            <label class="form-label">Sub Caste</label>
+                                            <input type="text" formControlName="subcaste" class="form-control"
+                                                placeholder="Enter Your SubCaste" NgModel="subcaste" />
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6 mb-4 pb-2">
+                                        <div class="form-outline">
+                                            <label class="form-label">Associated with Pastors Fellowship/
+                                                Council</label>
+                                            <div class="form-check form-check-inline">
+                                                <input class="form-check-input" type="radio" value="yes"
+                                                    formControlName="fellowship" checked
+                                                    (change)="pastorassicoation($event.target)" />
+                                                <label class="form-check-label">Yes</label>
+                                            </div>
+
+                                            <div class="form-check form-check-inline">
+                                                <input class="form-check-input" type="radio" value="no"
+                                                    formControlName="fellowship"
+                                                    (change)="pastorassicoation($event.target)" />
+                                                <label class="form-check-label">No</label>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 mb-4" *ngIf="assicoation">
+                                        <div class="form-outline">
+                                            <label class="form-label">Pastor Association </label>
+                                            <select class="form-control" formControlName="assicoation_id">
+                                                <option value="" selected disabled>Select the Association
+                                                </option>
+                                                <option *ngFor="let i of assicoations" value="{{i.id}}">
+                                                    {{i.paname}}</option>
+                                            </select>
+
+                                        </div>
+                                    </div>
+
+
+                                    <div class="col-md-6 mb-4 pb-2" *ngIf="assicoation">
+                                        <div class="form-outline">
+                                            <label class="form-label">Position in Association
+                                            </label>
+                                            <select class="form-control" formControlName="position"
+                                                style="height:37px;width: 273px;">
+                                                <option value="" selected disabled>Select Your Position</option>
+                                                <option value="president">President </option>
+                                                <option value="secretary">Secretary </option>
+                                                <option value="Vice President">Vice President </option>
+                                                <option value="Treasurer">Treasurer </option>
+                                            </select>
+
+                                        </div>
+                                    </div>
+
+                                    <br><br>
+                                    <div class="row">
+                                        <div class="col-md-6 mb-4 pb-2">
+                                            <div class="form-outline">
+                                                <label class="form-label">మీరు కోటిమంది క్రైస్తవ సమాజానికి ఏదైనా లెవెల్ లో లీడర్ గా వుండడం ఇష్టమా ?<span
+                                                        style="color:red; -webkit-text-stroke-width:thick;">*</span></label>
+                                                <div class="form-check form-check-inline">
+                                                    <input class="form-check-input" type="radio" value="YES"
+                                                        (click)="onradiochange($event.target)"
+                                                        formControlName="leadership" checked />
+                                                    <label class="form-check-label">YES</label>
+                                                </div>
+                                                <div class="form-check form-check-inline">
+                                                    <input class="form-check-input" type="radio" value="NO"
+                                                        (click)="onradiochange($event.target)"
+                                                        formControlName="leadership" checked />
+                                                    <label class="form-check-label">NO</label>
+                                                </div>
+
+                                            </div>
+
+                                        </div>
+                                        <div class="col-md-6 mb-4 pb-2" *ngIf="lead">
+                                            <div class="form-outline">
+                                                <label class="form-label">లీడర్ కేటగిరి</label>
+
+                                                <div class="form-check form-check-inline">
+                                                    <input class="form-check-input" type="radio" value="1"
+                                                        (change)="onradioleadertype($event.target)"
+                                                        formControlName="leadertype" checked />General
+
+                                                </div>
+                                                <div class="form-check form-check-inline">
+                                                    <input class="form-check-input" type="radio" value="2"
+                                                        (change)="onradioleadertype($event.target)"
+                                                        formControlName="leadertype" checked />Wing
+
+                                                </div>
+
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 mb-4 pb-2" *ngIf="leadtype">
+                                            <div class="form-outline">
+                                                <label class="form-label">మీరు చేయగలిగిన జనరల్ లీడర్ షిప్ లెవెల్ ఎంచుకోండి  </label>
+                                                <select class="form-control" formControlName="generaltype"
+                                                    (change)="onsubward($event)" style="height:37px;width: 273px;">
+                                                    <option value="">ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
+                                                    <option value="1">District</option>
+                                                    <option value="2">constituency</option>
+                                                    <option value="3">Mandal</option>
+                                                    <option value="4">Village</option>
+                                                    <option value="5">Ward</option>
+                                                    <option value="6">Sub Ward </option>
+                                                </select>
+
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 mb-4 pb-2" *ngIf="subward">
+                                            <div class="form-outline">
+                                                <label class="form-label">Subward Name
+                                                </label>
+                                                <input type="text" formControlName="subward" class="form-control"
+                                                    placeholder="Enter Your Subward" />
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 mb-4 pb-2" *ngIf="wingtype">
+                                            <div class="form-outline">
+                                                <label class="form-label">వింగ్  లీడర్ కేటగిరి</label>
+                                                <select class="form-control" formControlName="wingtype"
+                                                    style="height:37px;width: 273px;">
+                                                    <option value="" selected disabled>Select Wing Leadership
+                                                    </option>
+                                                    <option value="{{item.id}}" *ngFor="let item of wings">
+                                                        {{item.position}}
+                                                    </option>
+                                                </select>
+
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-6 mb-4 pb-2" *ngIf="wingtypes">
+                                            <div class="form-outline">
+                                                <label class="form-label">వింగ్  లీడర్ కేటగిరి
+                                                </label>
+                                                <select class="form-control" formControlName="wingtypes"
+                                                    style="height:37px;width: 273px;">
+                                                    <option value="">Select Wing Leadership</option>
+                                                    <option value="Driver">Driver</option>
+                                                    <option value="Socialmedia">Social media</option>
+                                                    <option value="Papermedia">Paper media</option>
+                                                    <option value="MeadiaReporters">Meadia Reporters</option>
+                                                </select>
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <br><br>
+                                    <div class="card shadow-2-strong card-registration" style="border-radius: 15px;">
+                                        <p>&nbsp;&nbsp; Address</p>
+                                        <div class="row">
+                                            <div class="col-md-6 mb-4 pb-2">
+                                                <div class="form-outline">
+                                                    <label class="form-label">Select District
+                                                    </label>
+                                                    <select class="form-control" formControlName="district_id"
+                                                        (change)="getconstency($event);"
+                                                        style="height:37px;width: 273px;">
+                                                        <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
+                                                        <option value="{{item.id}}" *ngFor="let item of districts">
+                                                            {{item.distrct_nm}}
+                                                        </option>
+                                                    </select>
+
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6 mb-4 pb-2">
+                                                <div class="form-outline">
+                                                    <label class="form-label">నియోజకవర్గం ఎంచుకోండి
+                                                    </label>
+                                                    <select class="form-control" formControlName="constituency_id"
+                                                        (change)="getmandals($event);"
+                                                        style="height:37px;width: 273px;">
+                                                        <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
+                                                        <option value="{{item.id}}" *ngFor="let item of constituency">
+                                                            {{item.const_nm}}
+                                                        </option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <br>
+                                        <div class="row">
+                                            <div class="col-md-6 mb-4 pb-2">
+                                                <div class="form-outline">
+                                                    <label class="form-label">Select Mandal
+                                                    </label>
+                                                    <select class="form-control" formControlName="mandal_id"
+                                                        (change)="gepanchayati($event);"
+                                                        style="height:37px;width: 273px;">
+                                                        <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
+                                                        <option value="{{item.id}}" *ngFor="let item of mandals">
+                                                            {{item.mndl_nm}}
+                                                        </option>
+                                                    </select>
+
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6 mb-4 pb-2">
+                                                <div class="form-outline">
+                                                    <label class="form-label">పంచాయతీ ఎంచుకోండి
+                                                    </label>
+                                                    <select class="form-control" formControlName="village_id"
+                                                        style="height:37px;width: 273px;">
+                                                        <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
+                                                        <option value="{{item.id}}" *ngFor="let item of panchayati">
+                                                            {{item.pnchyt_nm}}
+                                                        </option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <br>
+                                    </div>
+                                    <br>
+                                    <div class="col-md-2 mb-4 pb-2">
+                                    </div>
+                                    <div class="col-md-2 mb-4 pb-2">
+                                    </div>
+                                    <div class="col-md-2 mb-4 pb-2">
+                                        <button type="submit" (click)="editpastor()"
+                                            class="default-btn  user-all-btn">Update
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <section class="gradient-custom" *ngIf="categoryid==5">
+        <div class="container py-5 h-100">
+            <h2 style="text-align: center;">{{category}} Details </h2>
+            <div class="row justify-content-center align-items-center h-100">
+                <div class="col-12 col-lg-9 col-xl-7">
+                    <div class="card shadow-2-strong card-registration" style="border-radius: 15px;">
+                        <div class="card-body p-4 p-md-5">
+                            <h3 class="mb-4 pb-2 pb-md-0 mb-md-5"> Profile Details : </h3>
+                            <form [formGroup]="churchregsiterform">
+                                <div class="row">
+                                    <div class="col-md-6 mb-4">
+                                        <div class="form-outline">
+                                            <label class="form-label" for="church_name">Church Name </label>
+                                            <input type="text" formControlName="church_name" class="form-control"
+                                                required placeholder="Enter Your Church Name" />
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 mb-4 pb-2">
+                                        <div class="form-outline">
+                                            <label class="form-label">Google Location </label>
+                                            <textarea type="text" formControlName="location" class="form-control"
+                                                placeholder="Enter Your Location"></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                                <br>
+                                <div class="row">
+                                    <div class="col-md-6 mb-4">
+                                        <div class="form-outline">
+                                            <label class="form-label" for="pastor_name">Pastor Name</label>
+                                            <select class="form-control" formControlName="pastor_id"
+                                                (click)="churchpastor()">
+                                                <option value="" selected disabled>Select the pastor </option>
+                                                <option *ngFor="let i of getministrypast" value="{{i.id}}">
+                                                    {{i.pastorname}}</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 mb-4">
+                                        <div class="form-outline">
+                                            <label class="form-label" for="pattern_name">Denomation / Church Pattren
+                                            </label>
+                                            <select class="form-control" formControlName="denomination_id">
+                                                <option value="" selected disabled>Select the Denomation </option>
+                                                <option *ngFor="let i of denomation" value="{{i.id}}">
+                                                    {{i.denomation_name}}</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <br>
+                                <div class="row">
+                                    <div class="col-md-6 mb-4">
+                                        <div class="form-outline">
+                                            <label class="form-label" for="church_name">Total Church Members </label>
+                                            <input type="tel" formControlName="total_members" class="form-control"
+                                                placeholder="Enter Your Total Church Members">
+
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 mb-4 pb-2">
+                                        <div class="form-outline">
+                                            <label class="form-label">Contact Number</label>
+                                            <input type="text" formControlName="contactnumber" class="form-control"
+                                                placeholder="Enter Your Contact Number" maxlength="10" minlength="10"
+                                                (keypress)="numericOnly($event)" />
+                                        </div>
+                                    </div>
+                                </div>
+                                <br>
+
+                                <div class="row">
+                                    <div class="col-md-6 mb-4 pb-2">
+                                        <div class="form-outline">
+                                            <label class="form-label">Facebook </label>
+                                            <input type="text" formControlName="facebook" class="form-control"
+                                                placeholder="Enter Your Facebook">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 mb-4 pb-2">
+                                        <div class="form-outline">
+                                            <label class="form-label">Youtube </label>
+                                            <input type="text" formControlName="youtube" class="form-control"
+                                                placeholder="Enter Your Youtube">
+                                        </div>
+                                    </div>
+                                </div>
+                                <br>
+
+                                <div class="row">
+                                    <div class="col-md-6 mb-4 pb-2">
+                                        <div class="form-outline">
+                                            <label class="form-label">Type Of Church</label>
+                                            <div class="form-check form-check-inline">
+                                                <input class="form-check-input" type="radio" value="Ministry"
+                                                    (change)="churchchange($event.target)" formControlName="churchtype">
+                                                <label class="form-check-label">Ministry Church</label>
+                                            </div>
+                                            <div class="form-check form-check-inline">
+                                                <input class="form-check-input" type="radio" value="Independentchurch"
+                                                    (change)="churchchange($event.target)" formControlName="churchtype">
+                                                <label class="form-check-label">Independent Church</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 mb-4" *ngIf="mini">
+                                        <div class="form-outline">
+                                            <label class="form-label">Ministry </label>
+                                            <select class="form-control" formControlName="ministry_id">
+                                                <option value="" selected disabled>Select the Ministry </option>
+                                                <option *ngFor="let i of ministryname" value="{{i.id}}">
+                                                    {{i.ministryname}}</option>
+                                            </select>
+
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <br>
+                                <div class="card shadow-2-strong card-registration" style="border-radius: 15px;">
+                                    <p>&nbsp;&nbsp; Address</p>
+                                    <div class="row">
+                                        <div class="col-md-6 mb-4 pb-2">
+                                            <div class="form-outline">
+                                                <label class="form-label">Select District
+                                                </label>
+                                                <select class="form-control" formControlName="district_id"
+                                                    (change)="getconstency($event);" style="height:37px;width: 273px;">
+                                                    <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
+                                                    <option value="{{item.id}}" *ngFor="let item of districts">
+                                                        {{item.distrct_nm}}
+                                                    </option>
+                                                </select>
+
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 mb-4 pb-2">
+                                            <div class="form-outline">
+                                                <label class="form-label">నియోజకవర్గం ఎంచుకోండి
+                                                </label>
+                                                <select class="form-control" formControlName="constituency_id"
+                                                    (change)="getmandals($event);" style="height:37px;width: 273px;">
+                                                    <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
+                                                    <option value="{{item.id}}" *ngFor="let item of constituency">
+                                                        {{item.const_nm}}
+                                                    </option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <br>
+                                    <div class="row">
+                                        <div class="col-md-6 mb-4 pb-2">
+                                            <div class="form-outline">
+                                                <label class="form-label">Select Mandal
+                                                </label>
+                                                <select class="form-control" formControlName="mandal_id"
+                                                    (change)="gepanchayati($event);" style="height:37px;width: 273px;">
+                                                    <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
+                                                    <option value="{{item.id}}" *ngFor="let item of mandals">
+                                                        {{item.mndl_nm}}
+                                                    </option>
+                                                </select>
+
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 mb-4 pb-2">
+                                            <div class="form-outline">
+                                                <label class="form-label">పంచాయతీ ఎంచుకోండి
+                                                </label>
+                                                <select class="form-control" formControlName="village_id"
+                                                    style="height:37px;width: 273px;">
+                                                    <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
+                                                    <option value="{{item.id}}" *ngFor="let item of panchayati">
+                                                        {{item.pnchyt_nm}}
+                                                    </option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6 mb-4 pb-2">
+                                            <div class="form-outline">
+                                                <label class="form-label">Street </label>
+                                                <input type="text" formControlName="street" class="form-control"
+                                                    placeholder="Enter Your Street">
+                                            </div>
+                                        </div>
+
+
+
+
+                                        <div class="col-md-6 mb-4 pb-2">
+                                            <div class="form-outline">
+                                                <label class="form-label">Village Name</label>
+                                                <input type="text" formControlName="village_name" class="form-control"
+                                                    placeholder="Enter Your Village Name" />
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+
+                                        <div class="col-md-6 mb-4 pb-2">
+                                            <div class="form-outline">
+                                                <label class="form-label">Any Other Information </label>
+                                                <textarea type="text" formControlName="description" class="form-control"
+                                                    placeholder="Enter Your Description"></textarea>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-1 mb-4 pb-2">
+                                        </div>
+                                        <div class="col-md-2 mb-4 pb-2">
+                                            <br>
+                                            <button type="submit" (click)="editchurch()"
+                                                class="default-btn  user-all-btn">Update
+                                            </button>
+                                        </div>
+                                        <div class="col-md-3 mb-4 pb-2">
+                                        </div>
+                                    </div>
+                                    <br>
+                                </div>
+
+                            </form>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="gradient-custom" *ngIf="categoryid==6">
+        <div class="container py-5 h-100">
+            <h2 style="text-align: center;">{{category}} login </h2>
+            <div class="row justify-content-center align-items-center h-100">
+                <div class="col-12 col-lg-9 col-xl-7">
+                    <div class="card shadow-2-strong card-registration" style="border-radius: 15px;">
+                        <div class="card-body p-4 p-md-5">
+                            <h3 class="mb-4 pb-2 pb-md-0 mb-md-5"> Profile Details : </h3>
+                            <form [formGroup]="independentorgainsationform">
+
+                                <div class="row">
+                                    <div class="col-md-6 mb-4">
+                                        <div class="form-outline">
+                                            <label class="form-label" for="organisation_name">Organisation Name
+                                            </label>
+                                            <input type="text" formControlName="organisation_name" class="form-control"
+                                                placeholder="Organisation Name" />
+
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6 mb-4 pb-2">
+                                        <div class="form-outline">
+                                            <label class="form-label">Type Of Owner</label>
+                                            <div class="form-check form-check-inline">
+                                                <input class="form-check-input" type="radio" value="1"
+                                                    (change)="churchchangewe($event.target)" formControlName="checkbox">
+                                                <label class="form-check-label">Believer</label>
+                                            </div>
+                                            <div class="form-check form-check-inline">
+                                                <input class="form-check-input" type="radio" value="2"
+                                                    (change)="churchchangewe($event.target)" formControlName="checkbox">
+                                                <label class="form-check-label">Pastor</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <br>
+                                <div class="row">
+                                    <div class="col-md-6 mb-4" *ngIf="form==1">
+                                        <label class="form-label" for="church_name">Search Believer Name </label>
+                                        <input class="form-control" type="text" (keyup)="filterbelivers($event.target)">
+                                    </div>
+
+                                    <div class="col-md-6 mb-4" *ngIf="form==1">
+                                        <div class="form-outline">
+                                            <label class="form-label" for="believer_id">Believer </label>
+                                            <select class="form-control" formControlName="believer_id">
+                                                <option value="" selected disabled>Select the Believer Name
+                                                </option>
+                                                <option *ngFor="let i of bliversdata" value="{{i.id}}">
+                                                    {{i.fname}}</option>
+                                            </select>
+
+                                        </div>
+                                    </div>
+
+                                    <!-- <div class="col-md-6 mb-4" *ngIf="form==2">
+                                        <label class="form-label" for="church_name">Search Pastor Name </label>
+                                        <input class="form-control" type="text" (keyup)="filterPastor($event.target)">
+                                    </div> -->
+
+                                    <div class="col-md-6 mb-4" *ngIf="form==2">
+                                        <div class="form-outline">
+                                            <label class="form-label" for="pastor_name">Pastor</label>
+                                            <select class="form-control" formControlName="pastor_id"
+                                                (click)="pastororganization()">
+                                                <option value="" selected disabled>Select the pastor </option>
+                                                <option *ngFor="let i of getministrypa" value="{{i.id}}">
+                                                    {{i.pastorname }}</option>
+                                            </select>
+
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6 mb-4 pb-2">
+                                        <div class="form-outline">
+                                            <label class="form-label">Denomation</label>
+                                            <select class="form-control" formControlName="denomation"
+                                                style="height:37px;width: 273px;">
+                                                <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
+                                                <option value="{{item.id}}" *ngFor="let item of denomation">
+                                                    {{item.denomation_name}}
+                                                </option>
+                                            </select>
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <br>
+                                <div class="row">
+                                    <div class="col-md-6 mb-4">
+                                        <div class="form-outline">
+                                            <label class="form-label" for="org_address">Whatsapp Number
+
+                                            </label>
+                                            <input type="text" formControlName="org_address" class="form-control"
+                                                placeholder="Whatsapp Number" maxlength="10" minlength="10"
+                                                (keypress)="numericOnly($event)">
+
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 mb-4">
+                                        <div class="form-outline">
+                                            <label class="form-label" for="location">Location <span
+                                                    style="color:red; -webkit-text-stroke-width:thick;">*</span>
+                                            </label>
+                                            <input type="text" formControlName="location" class="form-control"
+                                                placeholder="location" />
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <br>
+                                <div class="row">
+                                    <div class="col-md-6 mb-4">
+                                        <div class="form-outline">
+                                            <label class="form-label">Organisation Contact Number
+                                            </label>
+                                            <input type="text" formControlName="contact_num" class="form-control"
+                                                placeholder="Organisation Contact Number" maxlength="10" minlength="10"
+                                                (keypress)="numericOnly($event)" />
+
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 mb-4">
+                                        <div class="form-outline">
+                                            <label class="form-label" for="email">Email </label>
+                                            <input type="text" formControlName="email" class="form-control"
+                                                placeholder="Email" />
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <br>
+                                <div class="row">
+                                    <div class="col-md-6 mb-4">
+                                        <div class="form-outline">
+                                            <label class="form-label" for="website">Organisation Website
+                                            </label>
+                                            <input type="text" formControlName="website" class="form-control"
+                                                placeholder="Organisation website" />
+
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 mb-4">
+                                        <div class="form-outline">
+                                            <label class="form-label" for="service_name">Service Name</label>
+                                            <select class="form-control" formControlName="service_name"
+                                                (change)="addNew($event,serviceadding)">
+                                                <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
+                                                <option value="{{item.id}}" *ngFor="let item of services">
+                                                    {{item?.servicename}}
+                                                </option>
+                                                <option value="1">Add New</option>
+                                            </select>
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <br>
+                                <div class="row">
+                                    <div class="col-md-6 mb-4 pb-2">
+                                        <div class="form-outline">
+                                            <label class="form-label">Type Of Organization</label>
+                                            <div class="form-check form-check-inline">
+                                                <input class="form-check-input" type="radio" value="Ministry"
+                                                    (change)="churchchange($event.target)"
+                                                    formControlName="organizationtype">
+                                                <label class="form-check-label">Ministry Organisation</label>
+                                            </div>
+                                            <div class="form-check form-check-inline">
+                                                <input class="form-check-input" type="radio" value="Independentchurch"
+                                                    (change)="churchchange($event.target)"
+                                                    formControlName="organizationtype">
+                                                <label class="form-check-label">Independent Organisation</label>
+                                            </div>
+
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6 mb-4" *ngIf="mini">
+                                        <div class="form-outline">
+                                            <label class="form-label">Ministry </label>
+                                            <select class="form-control" formControlName="ministry_id">
+                                                <option value="" selected disabled>Select the Ministry </option>
+                                                <option *ngFor="let i of ministryname" value="{{i.id}}">
+                                                    {{i.ministryname}}</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <br>
+                                <div class="card shadow-2-strong card-registration" style="border-radius: 15px;">
+                                    <p>&nbsp;&nbsp; Address</p>
+                                    <div class="row">
+
+                                        <div class="col-md-6 mb-4 pb-2">
+                                            <div class="form-outline">
+                                                <label class="form-label">Select Districts
+                                                </label>
+                                                <select class="form-control" formControlName="districts"
+                                                    (change)="getconstency($event);" style="height:37px;width: 273px;">
+                                                    <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
+                                                    <option value="{{item.id}}" *ngFor="let item of districts">
+                                                        {{item.distrct_nm}}
+                                                    </option>
+                                                </select>
+
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 mb-4 pb-2">
+                                            <div class="form-outline">
+                                                <label class="form-label">నియోజకవర్గం ఎంచుకోండి </label>
+                                                <select class="form-control" formControlName="constituencyname"
+                                                    (change)="getmandals($event);" style="height:37px;width: 273px;">
+                                                    <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
+                                                    <option value="{{item.id}}" *ngFor="let item of constituency">
+                                                        {{item.const_nm}}
+                                                    </option>
+                                                </select>
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <br>
+                                    <div class="row">
+                                        <div class="col-md-6 mb-4 pb-2">
+                                            <div class="form-outline">
+                                                <label class="form-label">మండలం ఎంచుకోండి
+                                                </label>
+                                                <select class="form-control" formControlName="mandals"
+                                                    (change)="gepanchayati($event);" style="height:37px;width: 273px;">
+                                                    <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
+                                                    <option value="{{item.id}}" *ngFor="let item of mandals">
+                                                        {{item.mndl_nm}}
+                                                    </option>
+                                                </select>
+
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 mb-4 pb-2">
+                                            <div class="form-outline">
+                                                <label class="form-label">పంచాయతీ ఎంచుకోండి
+                                                </label>
+                                                <select class="form-control" formControlName="panchayati"
+                                                    style="height:37px;width: 273px;">
+                                                    <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
+                                                    <option value="{{item.id}}" *ngFor="let item of panchayati">
+                                                        {{item.pnchyt_nm}}
+                                                    </option>
+                                                </select>
+
+                                            </div>
+                                        </div>
+                                        <!-- <div class="col-md-6 mb-4 pb-2">
+                                            <div class="form-outline">
+                                                <label class="form-label">Terms And Conditions</label>
+                                                <div class="form-check form-check-inline">
+                                                    <input class="form-check-input" type="checkbox" value="YES"
+                                                        formControlName="term" checked />
+                                                    <label class="form-check-label">YES</label>
+
+                                                </div>
+                                            </div>
+                                        </div> -->
+                                    </div>
+                                    <br>
+                                    <div class="row">
+                                        <div class="col-md-6 mb-4 pb-2">
+                                            <div class="form-outline">
+                                                <label class="form-label">గ్రామం పేరు / స్ట్రీట్ పేరు</label>
+                                                <input type="text" formControlName="villagename" class="form-control"
+                                                    placeholder="ఇక్కడ క్లిక్ చేసి నమోదు చేయండి" />
+
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 mb-4 pb-2">
+                                            <div class="form-outline">
+                                                <label class="form-label">మీ స్థానిక చిరునామా నమోదు చేయండి/House
+                                                    Number</label>
+                                                <input type="text" formControlName="ward" class="form-control"
+                                                    placeholder="Enter Your Street Name" />
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <br>
+                                </div>
+                                <br>
+                                <div class="row">
+                                    <!-- <div class="col-md-6 mb-4 pb-2">
+                                        <div class="form-outline">
+                                            <label class="form-label">Password</label>
+                                            <input type="password" formControlName="password" class="form-control"
+                                                placeholder="ఇక్కడ క్లిక్ చేసి నమోదు చేయండి" maxlength="16" minlength="6" />
+
+                                        </div>
+                                    </div> -->
+                                    <br>
+                                    <div class="col-md-2 mb-4 pb-2">
+                                    </div>
+                                    <div class="col-md-2 mb-4 pb-2">
+                                    </div>
+                                    <div class="col-md-6 mb-4 pb-2">
+                                        <div class="form-outline">
+                                            <button type="submit" (click)="editindependentorgainsation()"
+                                                class="default-btn  user-all-btn">Update
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <section class="gradient-custom" *ngIf="categoryid==3">
+        <div class="container py-5 h-100">
+            <h2 style="text-align: center;">{{category}} login </h2>
+            <div class="row justify-content-center align-items-center h-100">
+                <div class="col-12 col-lg-9 col-xl-7">
+                    <div class="card shadow-2-strong card-registration" style="border-radius: 15px;">
+                        <div class="card-body p-4 p-md-5">
+                            <h3 class="mb-4 pb-2 pb-md-0 mb-md-5"> Profile Details : </h3>
+                            <form [formGroup]="ministryform">
+                                <div class="row">
+                                    <div class="col-md-6 mb-4">
+                                        <div class="form-outline">
+                                            <label class="form-label">Ministry Name</label>
+                                            <input type="text" formControlName="ministryname" class="form-control"
+                                                placeholder="Enter Your MinistryName" />
+
+
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 mb-4">
+                                        <div class="form-outline">
+                                            <label class="form-label">Student Number</label>
+                                            <input type="text" formControlName="headnmber" class="form-control"
+                                                placeholder="Enter Your Number" maxlength="10" minlength="10"
+                                                (keypress)="numericOnly($event)" />
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <br>
+                                <div class="row">
+                                    <div class="col-md-6 mb-4 pb-2">
+                                        <div class="form-outline">
+                                            <label class="form-label">Headname</label>
+                                            <input type="text" formControlName="headname" class="form-control"
+                                                placeholder="Enter Your Headname" />
+
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 mb-4 pb-2">
+                                        <div class="form-outline">
+                                            <label class="form-label">Mail</label>
+                                            <input type="text" formControlName="ministryemail" class="form-control"
+                                                placeholder="Enter Your mail" />
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <br>
+                                <div class="row">
+                                    <div class="col-md-6 mb-4">
+                                        <div class="form-outline">
+                                            <label for="birthdayDate" class="form-label">MinistryWebsite</label>
+                                            <input type="text" formControlName="ministrywebsite" class="form-control"
+                                                placeholder="Enter Your MinistryWebsite" />
+
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 mb-4">
+                                        <div class="form-outline">
+                                            <label for="birthdayDate" class="form-label">NumberofChurches</label>
+                                            <input type="text" formControlName="number_ofchurches" class="form-control"
+                                                placeholder="Enter NumberofChurches" />
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <br>
+
+                                <div class="row">
+                                    <div class="col-md-6 mb-4 pb-2">
+                                        <div class="form-outline">
+                                            <label class="form-label">Number of Members</label>
+                                            <input type="text" formControlName="number_ofmembers" class="form-control"
+                                                placeholder="Enter Your Number of Members" />
+
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 mb-4">
+                                        <div class="form-outline">
+                                            <label class="form-label" for="pattern_name">Denomation / Church
+                                                Pattren
+                                            </label>
+                                            <select class="form-control" formControlName="denomation_id">
+                                                <option value="" selected disabled>Select the Denomation
+                                                </option>
+                                                <option *ngFor="let i of denomation" value="{{i.id}}">
+                                                    {{i.denomation_name}}</option>
+                                            </select>
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <br>
+
+
+
+                                <div class="card shadow-2-strong card-registration" style="border-radius: 15px;">
+                                    <p> &nbsp;&nbsp; Address</p>
+                                    <div class="row">
+                                        <div class="col-md-6 mb-4 pb-2">
+                                            <div class="form-outline">
+                                                <label class="form-label">Select Districts
+                                                </label>
+                                                <select class="form-control" formControlName="district_id"
+                                                    (change)="getconstency($event);" style="height:37px;width: 273px;">
+                                                    <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
+                                                    <option value="{{item.id}}" *ngFor="let item of districts">
+                                                        {{item.distrct_nm}}
+                                                    </option>
+                                                </select>
+
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 mb-4 pb-2">
+                                            <div class="form-outline">
+                                                <label class="form-label">నియోజకవర్గం ఎంచుకోండి
+                                                </label>
+                                                <select class="form-control" formControlName="constituency_id"
+                                                    (change)="getmandals($event);" style="height:37px;width: 273px;">
+                                                    <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
+                                                    <option value="{{item.id}}" *ngFor="let item of constituency">
+                                                        {{item.const_nm}}
+                                                    </option>
+                                                </select>
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <br>
+                                    <div class="row">
+                                        <div class="col-md-6 mb-4 pb-2">
+                                            <div class="form-outline">
+                                                <label class="form-label">మండలం ఎంచుకోండి </label>
+                                                <select class="form-control" formControlName="mandal_id"
+                                                    (change)="gepanchayati($event);" style="height:37px;width: 273px;">
+                                                    <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
+                                                    <option value="{{item.id}}" *ngFor="let item of mandals">
+                                                        {{item.mndl_nm}}
+                                                    </option>
+                                                </select>
+
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 mb-4 pb-2">
+                                            <div class="form-outline">
+                                                <label class="form-label">పంచాయతీ ఎంచుకోండి</label>
+                                                <select class="form-control" formControlName="panchayat_id"
+                                                    style="height:37px;width: 273px;">
+                                                    <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
+                                                    <option value="{{item.id}}" *ngFor="let item of panchayati">
+                                                        {{item.pnchyt_nm}}
+                                                    </option>
+                                                </select>
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <br>
+                                </div>
+
+
+                                <br>
+                                <div class="row">
+                                    <div class="col-md-6 mb-4 pb-2">
+                                        <div class="form-outline">
+                                            <label class="form-label">Select Pastor
+                                            </label>
+                                            <select class="form-control" formControlName="pastor"
+                                                style="height:37px;width: 273px;" (click)="ministrypastor()">
+                                                <option value="" selected disabled>Select Your Pastor</option>
+                                                <option value="{{item.id}}" *ngFor="let item of getministrypastor">
+                                                    {{item.pastorname}}
+                                                </option>
+                                            </select>
+
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <br>
+
+
+                                <div class="row">
+                                    <div class="col-md-2 mb-4 pb-2">
+                                    </div>
+                                    <div class="col-md-2 mb-4 pb-2">
+                                    </div>
+                                    <div class="col-md-2 mb-4 pb-2">
+                                        <button type="submit" (click)="postministryupdate()"
+                                            class="default-btn  user-all-btn">Update
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                            <br>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+
+<ng-template #serviceadding let-modal>
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card-body" style=" padding: 44px;">
+                <div class="mb-3">
+                    <marquee>
+                        <h4 class="modal-title mt-0" style="color: blue;">Add service Type</h4>
+                    </marquee>
+                    <h5>Service Name</h5>
+                    <input type="text" class="form-control" [(ngModel)]="ProofValue" placeholder="Enter service Name" />
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-light" (click)="modalDismiss()">Close</button>
+                    <button type="submit" class="btn btn-primary" (click)="addNewSubmit()">Submit</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</ng-template>

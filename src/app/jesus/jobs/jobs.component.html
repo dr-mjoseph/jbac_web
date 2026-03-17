@@ -1,0 +1,261 @@
+<div class="top_panel_title top_panel_style_3 title_present breadcrumbs_present scheme_original">
+    <div class="top_panel_title_inner inner-bg6">
+        <div class="content_wrap">
+            <h1 class="page_title">Jobs</h1>
+
+        </div>
+    </div>
+</div>
+
+<!-- /Breadcrumbs -->
+
+<div
+    class="page body_style_wide body_filled article_style_stretch scheme_original top_panel_show top_panel_above sidebar_hide">
+    <a id="toc_home" class="sc_anchor" title="Home"
+        data-description="<i>Return to Home</i> - <br>navigate to home page of the site" data-icon="icon-home"
+        data-url="index.html" data-separator="yes"></a>
+    <a id="toc_top" class="sc_anchor" title="To Top"
+        data-description="<i>Back to top</i> - <br>scroll to top of the page" data-icon="icon-double-up" data-url=""
+        data-separator="yes"></a>
+    <br>
+    <div class="latest-news-block" style="background-color:#ccc">
+        <div class="latest-news-block-hightlight">
+            <div class="latest-update-block"> <span class="block-2"> Updates </span>
+                <div style="overflow:hidden">
+                    <marquee behavior="scroll" direction="left" scrolldelay="15" scrollamount="1" truespeed="10"
+                        onmouseover="this.stop()" onmouseout="this.start()" style="height:30px; white-space: nowrap">
+                        <div class="tickercontainer">
+                            <span
+                                class="ad-blk">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Ads:</span>
+                            <a href="https://jbac.in">jbac.in
+                                Updates</a>
+                            <span
+                                class="photo_gallery-icon">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Photo
+                                Gallery:&nbsp;</span>
+                            <a href="/gallery">Update Gallery</a>
+                            <span
+                                class="polls-icon">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Poll:&nbsp;</span>
+                            <a href="/church_timings">Are You Search
+                                Church Timings</a>
+                        </div>
+                    </marquee>
+                </div>
+            </div>
+
+
+        </div>
+
+    </div>
+
+    <div id="tribe-events-content" class="tribe-events-list">
+        <marquee style="color: rgb(38, 18, 151); font-size: larger; text-align: justify;">Jobs</marquee>
+    </div>
+    <div class="container mt-3" style="padding-bottom: 28px;">
+        <h3>Jobs Searching</h3>
+        <div class="row" class="card">
+            <form [formGroup]="searchchurchingform">
+                <div class="row">
+                    <div class="col-md-4 mb-4 pb-2">
+                        <div class="form-outline">
+                            <label class="form-label">Job Title </label>
+                            <select class="form-control" formControlName="jobtile" style="height:37px;width: 273px;"
+                                (change)="searchjobswise($event,1);">
+                                <option value="" selected disabled>Select Title</option>
+                                <option value="{{item.jobtitle}}" *ngFor="let item of jobswe">
+                                    {{item.jobtitle}}
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-4 pb-2">
+                        <div class="form-outline">
+                            <label class="form-label">Qualification</label>
+                            <select class="form-control" formControlName="qual" style="height:37px;width: 273px;"
+                                (change)="searchjobswise($event,2);">
+                                <option value="" selected disabled>Select Qualification</option>
+                                <option value="{{item.qualification}}" *ngFor="let item of jobswe">
+                                    {{item.qualification}}
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-4 pb-2">
+                        <div class="form-outline">
+                            <label class="form-label">Experience </label>
+                            <select class="form-control" formControlName="experience"
+                                (change)="searchjobswise($event,3);" style="height:37px;width: 273px;">
+                                <option value="" selected disabled>Select Your Experience </option>
+                                <option value="fresher">Fresher</option>
+                                <option value="1-2">1-2</option>
+                                <option value="2-3">2-3</option>
+                                <option value="3-5">3-5</option>
+                                <option value="Above 5YEARS">Above 5 YEARS</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-3 mb-4 pb-2">
+                        <div class="form-outline">
+                            <label class="form-label">Select Districts </label>
+                            <select class="form-control" formControlName="district_id" (change)="getconstency($event);"
+                                style="height:37px;width: 273px;" (change)="searchdistric($event);">
+                                <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
+                                <option value="{{item.id}}" *ngFor="let item of districts">
+                                    {{item.distrct_nm}}
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-2 mb-4 pb-2">
+                        <div class="form-outline">
+                            <label class="form-label">నియోజకవర్గం ఎంచుకోండి </label>
+                            <select class="form-control" formControlName="constenncy_id" (change)="getmandals($event);"
+                                style="height:37px;width: 273px;" (change)="searchconstenct($event);">
+                                <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
+                                <option value="{{item.id}}" *ngFor="let item of constituency">
+                                    {{item.const_nm}}
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+                    <br>
+                    <div class="col-md-2 mb-4 pb-2">
+                        <div class="form-outline">
+                            <label class="form-label">మండలం ఎంచుకోండి </label>
+                            <select class="form-control" formControlName="mandal_id" (change)="gepanchayati($event);"
+                                style="height:37px;width: 273px;" (change)="searchmandals($event);">
+                                <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
+                                <option value="{{item.id}}" *ngFor="let item of mandals">
+                                    {{item.mndl_nm}}
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-2 mb-4 pb-2">
+                        <div class="form-outline">
+                            <label class="form-label">పంచాయతీ ఎంచుకోండి </label>
+                            <select class="form-control" formControlName="panchayati_id"
+                                style="height:37px;width: 273px;">
+                                <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
+                                <option value="{{item.id}}" *ngFor="let item of panchayati">
+                                    {{item.pnchyt_nm}}
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-2 mb-4 pb-2">
+                        <br>
+                        <button type="submit" (click)="search()" class="default-btn user-all-btn">Search
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <br>
+    <!-- <div class="container">
+        <input type="text" [(ngModel)]="searchTerm" (ngModelChange)="filterData()" placeholder="Search" />
+    </div>
+    <br> -->
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-7">
+                <div class="row">
+                    <div class="col-lg-4" *ngFor="let item of jobs" style="margin-bottom: 16px;">
+                        <div class="flex justify-center items-center h-screen">
+                            <div class="main">
+                                <ul class="cards">
+                                    <li class="cards_item">
+                                        <div class="card" tabindex="0">
+                                            <div class="card_image">
+                                                <img src="{{item.image}}" (click)="openimg(item.image,openmodel)"
+                                                    alt="image" style="height:250px; width:250px;">
+                                            </div>
+                                            <div class="card_content">
+                                                <div class="card_text">
+                                                    <p>Jobtitle:<strong> {{item.jobtitle}}</strong></p>
+                                                    <a (click)="toggleDisplayDiv()" style="color:rgb(175, 15, 15)">
+                                                        READMORE
+                                                    </a>
+                                                    <p [hidden]="isShowDiv">
+                                                        Address:<strong>{{item.workinglocation}}</strong></p>
+                                                    <p [hidden]="isShowDiv">
+                                                        Description:<strong>{{item.description}}</strong></p>
+                                                    <p [hidden]="isShowDiv">Experience
+                                                        :<strong>{{item.experience
+                                                            }}</strong></p>
+                                                    <p [hidden]="isShowDiv">
+                                                        Qualification:<strong>{{item.qualification}}</strong>
+                                                    </p>
+                                                    <p [hidden]="isShowDiv">Salary:<strong>{{item.salary}}</strong></p>
+                                                    <a href="{{item.google_location}}" [hidden]="isShowDiv">
+                                                        <img src="assets/images/marker.png" style="width:45px;"></a>
+                                                    <a href="tel:+91{{item.contactnumber}}" [hidden]="isShowDiv">&nbsp;
+                                                        <img src="assets/images/phone.png" style="width:45px;
+                                                                            "></a>
+                                                    <a href="tel:+91{{item.contactnumber2}}" [hidden]="isShowDiv">&nbsp;
+                                                        <img src="assets/images/phone.png" style="width:45px;
+                                                                                                                "></a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-5">
+                <marquee onmouseover="this.stop();" onmouseout="this.start();" direction="up"
+                    style="scroll-behavior: smooth;">
+                    <div class="container">
+                        <div style="border:solid green">
+                            <article>
+                                <div class="article-wrapper">
+                                    <div class="article-body">
+                                        <h3 style="text-align:center;color: black; padding:2%;">
+                                            Welcome To JBAC.IN
+                                        </h3>
+                                    </div>
+                                </div>
+                            </article>
+                        </div>
+                        <div *ngFor="let item of adds" style="border:solid green">
+                            <article>
+                                <div class="article-wrapper">
+                                    <div class="article-body">
+                                        <img style="height:85%;width:100%;" src="{{item.image}}"
+                                            (click)="openimg(item.image,openmodel)" alt="image" alt="images. ">
+                                        <p style="color: black; padding:2%;">
+                                            -- <b>{{item.description}}</b>
+                                        </p>
+                                    </div>
+                                </div>
+                            </article>
+                        </div>
+                    </div>
+                </marquee>
+            </div>
+        </div>
+    </div>
+</div>
+<br><br>
+
+
+<div class="my-overlay" *ngIf="showSpinner">
+    <div class="cusloader"></div>
+    <h5 style="color: white;">Please Wait...</h5>
+</div>
+
+<!-- //////image popup_code //////////////////////// -->
+<ng-template #openmodel let-modal>
+    <div class="modal-header">
+        <h5 class="modal-title mt-0 ">Image</h5>
+        <button type="button" class="close" aria-hidden="true" (click)="proofmodalDismis()">×</button>
+    </div>
+
+    <img src={{image}}>
+
+</ng-template>

@@ -1,0 +1,310 @@
+<!-- Breadcrumbs -->
+<div class="top_panel_title top_panel_style_3 title_present breadcrumbs_present scheme_original">
+    <div class="top_panel_title_inner inner-bg6">
+        <div class="content_wrap">
+            <!-- <h1 class="page_title">Signup/Register</h1> -->
+            <div class="breadcrumbs">
+                <!-- <a class="breadcrumbs_item home" href="index.html">Home</a> -->
+                <span class="breadcrumbs_delimiter"></span>
+                <!-- <span class="breadcrumbs_item current">Signup/Register</span> -->
+            </div>
+        </div>
+    </div>
+</div>
+<!-- /Breadcrumbs -->
+<div
+    class="page body_style_wide body_filled article_style_stretch scheme_original top_panel_show top_panel_above sidebar_hide">
+    <a id="toc_home" class="sc_anchor" title="Home"
+        data-description="<i>Return to Home</i> - <br>navigate to home page of the site" data-icon="icon-home"
+        data-url="index.html" data-separator="yes"></a>
+    <a id="toc_top" class="sc_anchor" title="To Top"
+        data-description="<i>Back to top</i> - <br>scroll to top of the page" data-icon="icon-double-up" data-url=""
+        data-separator="yes"></a>
+
+
+
+
+
+    <div>
+        <section class="gradient-custom">
+            <div class="container py-5 h-100">
+                <div class="row justify-content-center align-items-center h-100">
+                    <div class="col-12 col-lg-9 col-xl-7">
+                        <div class="card shadow-2-strong card-registration" style="border-radius: 15px;">
+                            <div class="card-body p-4 p-md-5">
+                                <h3 class="mb-4 pb-2 pb-md-0 mb-md-5">Adding Church Service Timings</h3>
+                                <form [formGroup]="addingchurchtimimngs">
+                                    <div class="row">
+                                        <div class="col-md-12 mb-4" style="text-align: center;">
+                                            <img src="assets/images/timeformat.png">
+                                        </div>
+                                    </div>
+                                    <br>
+                                    <div class="row">
+                                        <div class="col-md-6 mb-4">
+                                            <div class="form-outline">
+                                                <label class="form-label" for="day">Service Day<span
+                                                        style="color:red; -webkit-text-stroke-width:thick;">*</span></label>
+                                                <select class="form-control" formControlName="day"
+                                                    [ngClass]="{'is-invalid': submitted && c['day'].errors }">
+                                                    <option value="" selected disabled>Select the Day </option>
+                                                    <option value="Sunday">Sunday</option>
+                                                    <option value="Monday">Monday</option>
+                                                    <option value="Tuesday">Tuesday</option>
+                                                    <option value="Wendesday">Wednesday</option>
+                                                    <option value="Thursday">Thursday</option>
+                                                    <option value="Friday">Friday</option>
+                                                    <option value="Saturday">Saturday</option>
+                                                </select>
+                                                <div *ngIf="submitted && c['day'].errors" class="invalid-feedback">
+                                                    <div *ngIf="c['day'].errors['required']">Day is required </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 mb-4">
+                                            <div class="form-outline">
+                                                <label class="form-label" for="service_name">Service Name<span
+                                                        style="color:red; -webkit-text-stroke-width:thick;">*</span></label>
+                                                <select class="form-control" formControlName="service_name"
+                                                    [ngClass]="{'is-invalid': submitted && c['service_name'].errors }">
+                                                    <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
+                                                    <option value="FIRST">FIRST</option>
+                                                    <option value="SECOND">SECOND</option>
+                                                    <option value="THIRD">THIRD</option>
+                                                    <option value="FOURTH">FOURTH</option>
+                                                    <option value="FIFTH">FIFTH</option>
+                                                    <option value="WOMENS MEETING">WOMEN'S MEETING</option>
+                                                    <option value="MENS MEETING">MEN'S MEETING</option>
+                                                    <option value="YOUTH MEETING">YOUTH MEETING</option>
+                                                    <option value="FASTING PRAYER">FASTING PRAYER</option>
+                                                    <option value="SUNDAY SCHOOL">SUNDAY SCHOOL</option>
+                                                </select>
+                                                <div *ngIf="submitted && c['service_name'].errors"
+                                                    class="invalid-feedback">
+                                                    <div *ngIf="c['service_name'].errors['required']">Service Name is
+                                                        required </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <br>
+                                    <div class="row">
+
+                                        <div class="col-md-6 mb-4">
+                                            <div class="form-outline">
+                                                <label class="form-label">Start Time (24 hours Format) <span
+                                                        style="color:red; -webkit-text-stroke-width:thick;">*</span></label>
+                                                <input type="time" (change)="timeset1($event)"
+                                                    formControlName="time_start" class="form-control"
+                                                    [ngClass]="{'is-invalid': submitted && c['time_start'].errors }"
+                                                    placeholder="time_start Name" />
+                                                <span style="font-family:monospace;font-weight:bold;padding: 4px;">
+                                                    <b>12 hours Format Time : {{starttime}}{{starttimea}}</b></span>
+                                                <div *ngIf="submitted && c['time_start'].errors"
+                                                    class="invalid-feedback">
+                                                    <div *ngIf="c['time_start'].errors['required']">Time Start is
+                                                        required </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-6 mb-4">
+                                            <div class="form-outline">
+                                                <label class="form-label" for="time_end">End Time (24 hours Format)<span
+                                                        style="color:red; -webkit-text-stroke-width:thick;">*</span></label>
+                                                <input type="time" (change)="timeset($event)" formControlName="time_end"
+                                                    class="form-control"
+                                                    [ngClass]="{'is-invalid': submitted && c['time_end'].errors }"
+                                                    placeholder="time_end Name" />
+                                                <span style="font-family:monospace;font-weight:bold;
+                                                padding: 4px;"><b>12 hours Format Time : {{endtime}}
+                                                        {{endtimea}}</b></span>
+                                                <div *ngIf="submitted && c['time_end'].errors" class="invalid-feedback">
+                                                    <div *ngIf="c['time_end'].errors['required']">Time End is required
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <br>
+
+                                    <div class="card shadow-2-strong card-registration" style="border-radius: 15px;">
+                                        <br>
+                                        <div class="row">
+                                            <div class="col-md-6 mb-4 pb-2">
+                                                <div class="form-outline">
+                                                    <label class="form-label">1). Select Districts<span
+                                                            style="color:red; -webkit-text-stroke-width:thick;">*</span>
+                                                    </label>
+                                                    <select class="form-control" formControlName="district_id"
+                                                        [ngClass]="{'is-invalid': submitted && c['district_id'].errors }"
+                                                        (change)="getconstency($event);"
+                                                        style="height:37px;width: 273px;">
+                                                        <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
+                                                        <option value="{{item.id}}" *ngFor="let item of districts">
+                                                            {{item.distrct_nm}}
+                                                        </option>
+                                                    </select>
+                                                    <div *ngIf="submitted && c['district_id'].errors"
+                                                        class="invalid-feedback">
+                                                        <div *ngIf="c['district_id'].errors['required']">District is
+                                                            required
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-6 mb-4 pb-2">
+                                                <div class="form-outline">
+                                                    <label class="form-label">2). నియోజకవర్గం ఎంచుకోండి<span
+                                                            style="color:red; -webkit-text-stroke-width:thick;">*</span>
+                                                    </label>
+                                                    <select class="form-control" formControlName="constituency_id"
+                                                        [ngClass]="{'is-invalid': submitted && c['constituency_id'].errors }"
+                                                        (change)="getmandals($event);"
+                                                        style="height:37px;width: 273px;">
+                                                        <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
+                                                        <option value="{{item.id}}" *ngFor="let item of constituency">
+                                                            {{item.const_nm}}
+                                                        </option>
+                                                    </select>
+                                                    <div *ngIf="submitted && c['constituency_id'].errors"
+                                                        class="invalid-feedback">
+                                                        <div *ngIf="c['constituency_id'].errors['required']">
+                                                            Constituency
+                                                            is required
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <br>
+                                        <div class="row">
+
+
+
+                                            <div class="col-md-6 mb-4 pb-2">
+                                                <div class="form-outline">
+                                                    <label class="form-label">3). Select Mandal<span
+                                                            style="color:red; -webkit-text-stroke-width:thick;">*</span></label>
+                                                    <select class="form-control" formControlName="mandal_id"
+                                                        [ngClass]="{'is-invalid': submitted && c['mandal_id'].errors }"
+                                                        (change)="gepanchayati($event);"
+                                                        style="height:37px;width: 273px;">
+                                                        <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
+                                                        <option value="{{item.id}}" *ngFor="let item of mandals">
+                                                            {{item.mndl_nm}}
+                                                        </option>
+                                                    </select>
+                                                    <div *ngIf="submitted && c['mandal_id'].errors"
+                                                        class="invalid-feedback">
+                                                        <div *ngIf="c['mandal_id'].errors['required']">మండలం తప్పనిసరిగా సెలెక్ట్ చేయాలి
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6 mb-4">
+                                                <div class="form-outline">
+                                                    <label class="form-label">Street Name<span
+                                                            style="color:red; -webkit-text-stroke-width:thick;">*</span></label>
+                                                    <input type="text" formControlName="streetname"
+                                                        [(ngModel)]="forStreet" class="form-control"
+                                                        placeholder="Street Name" style="height:37px;width: 263px;" />
+
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                        <br>
+                                        <div class="row">
+                                            <div class="col-md-6 mb-4 pb-2">
+                                                <div class="form-outline">
+                                                    <label class="form-label">4). Select Church<span
+                                                            style="color:red; -webkit-text-stroke-width:thick;">*</span></label>
+                                                    <select class="form-control" formControlName="church"
+                                                        [ngClass]="{'is-invalid': submitted && c['church'].errors }"
+                                                        style="height:37px;width: 273px;" (click)="filterchurchdata()"
+                                                        (click)="street($event)">
+                                                        <option value="" selected disabled>Select Church Name</option>
+                                                        <option value="{{item.id}}"
+                                                            *ngFor="let item of getchurchstudentfilter">
+                                                            {{item.church_name}}
+                                                        </option>
+                                                    </select>
+                                                    <div *ngIf="submitted && c['church'].errors"
+                                                        class="invalid-feedback">
+                                                        <div *ngIf="c['church'].errors['required']">Church is
+                                                            required
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6 mb-4">
+                                                <div class="form-outline">
+                                                    <label class="form-label">Other Information About your Church</label>
+                                                    <input type="text" formControlName="description"
+                                                        class="form-control" placeholder="Description"
+                                                        style="height:37px;width: 263px;"
+                                                        [ngClass]="{'is-invalid': submitted && c['description'].errors }" />
+                                                    <div *ngIf="submitted && c['description'].errors"
+                                                        class="invalid-feedback">
+                                                        <div *ngIf="c['description'].errors['required']">Description is
+                                                            required
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <br>
+                                    </div>
+                                    <br>
+                                </form>
+                                <div class="row">
+                                    <div class="col-md-2 mb-4 pb-2">
+                                    </div>
+                                    <div class="col-md-2 mb-4 pb-2">
+                                    </div>
+                                    <div class="col-md-2 mb-4 pb-2">
+                                        <button type="submit" class="default-btn  user-all-btn"
+                                            (click)="postchurchtimings()">Register</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+</div>
+<!-- /Header Mobile -->
+
+<br><br>
+
+<ng-template #serviceadding let-modal>
+
+
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card-body" style=" padding: 44px;">
+                <div class="mb-3">
+                    <marquee>
+                        <h4 class="modal-title mt-0" style="color: blue;">Add service Type</h4>
+                    </marquee>
+                    <h5>Service Name</h5>
+                    <input type="text" class="form-control" [(ngModel)]="ProofValue" placeholder="Enter service Name" />
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-light" (click)="modalDismiss()">Close</button>
+                    <button type="submit" class="btn btn-primary" (click)="addNewSubmit()">Submit</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</ng-template>
+
+
+<div class="my-overlay" *ngIf="showSpinner">
+    <div class="cusloader"></div>
+    <h5 style="color: white;">Please Wait...</h5>
+</div>

@@ -1,0 +1,126 @@
+@font-face {
+  font-family: 'socials-share';
+  src: url('../font/socials-share.eot?8180448');
+  src: url('../font/socials-share.eot?8180448#iefix') format('embedded-opentype'),
+       url('../font/socials-share.woff?8180448') format('woff'),
+       url('../font/socials-share.ttf?8180448') format('truetype'),
+       url('../font/socials-share.svg?8180448#socials-share') format('svg');
+  font-weight: normal;
+  font-style: normal;
+}
+/* Chrome hack: SVG is rendered more smooth in Windozze. 100% magic, uncomment if you need it. */
+/* Note, that will break hinting! In other OS-es font will be not as sharp as it could be */
+/*
+@media screen and (-webkit-min-device-pixel-ratio:0) {
+  @font-face {
+    font-family: 'socials-share';
+    src: url('../font/socials-share.svg?8180448#socials-share') format('svg');
+  }
+}
+*/
+ 
+ [class^="icon_share-"]:before, [class*=" icon_share-"]:before {
+  font-family: "socials-share";
+  font-style: normal;
+  font-weight: normal;
+  speak: none;
+ 
+  display: inline-block;
+  text-decoration: inherit;
+  width: 1em;
+  margin-right: .2em;
+  text-align: center;
+  /* opacity: .8; */
+ 
+  /* For safety - reset parent styles, that can break glyph codes*/
+  font-variant: normal;
+  text-transform: none;
+ 
+  /* fix buttons height, for twitter bootstrap */
+  line-height: 1em;
+ 
+  /* Animation center compensation - margins should be symmetric */
+  /* remove if not needed */
+  margin-left: .2em;
+ 
+  /* you can be more comfortable with increased icons size */
+  /* font-size: 120%; */
+ 
+  /* Font smoothing. That was taken from TWBS */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+ 
+  /* Uncomment for 3D effect */
+  /* text-shadow: 1px 1px 1px rgba(127, 127, 127, 0.3); */
+}
+ 
+.icon_share-cc-paypal:before { content: '\e800'; } /* '' */
+.icon_share-behance:before { content: '\e801'; } /* '' */
+.icon_share-digg:before { content: '\e802'; } /* '' */
+.icon_share-delicious:before { content: '\e803'; } /* '' */
+.icon_share-dribbble:before { content: '\e804'; } /* '' */
+.icon_share-dropbox:before { content: '\e805'; } /* '' */
+.icon_share-facebook:before { content: '\e806'; } /* '' */
+.icon_share-forumbee:before { content: '\e807'; } /* '' */
+.icon_share-git:before { content: '\e808'; } /* '' */
+.icon_share-github:before { content: '\e809'; } /* '' */
+.icon_share-google:before { content: '\e80a'; } /* '' */
+.icon_share-gplus:before { content: '\e80b'; } /* '' */
+.icon_share-instagram:before { content: '\e80c'; } /* '' */
+.icon_share-ioxhost:before { content: '\e80d'; } /* '' */
+.icon_share-joomla:before { content: '\e80e'; } /* '' */
+.icon_share-lastfm:before { content: '\e80f'; } /* '' */
+.icon_share-leanpub:before { content: '\e810'; } /* '' */
+.icon_share-linkedin:before { content: '\e811'; } /* '' */
+.icon_share-linux:before { content: '\e812'; } /* '' */
+.icon_share-maxcdn:before { content: '\e813'; } /* '' */
+.icon_share-openid:before { content: '\e814'; } /* '' */
+.icon_share-pagelines:before { content: '\e815'; } /* '' */
+.icon_share-paypal:before { content: '\e816'; } /* '' */
+.icon_share-pinterest:before { content: '\e817'; } /* '' */
+.icon_share-reddit:before { content: '\e818'; } /* '' */
+.icon_share-renren:before { content: '\e819'; } /* '' */
+.icon_share-shirtsinbulk:before { content: '\e81a'; } /* '' */
+.icon_share-simplybuilt:before { content: '\e81b'; } /* '' */
+.icon_share-skyatlas:before { content: '\e81c'; } /* '' */
+.icon_share-skype:before { content: '\e81d'; } /* '' */
+.icon_share-slack:before { content: '\e81e'; } /* '' */
+.icon_share-slideshare:before { content: '\e81f'; } /* '' */
+.icon_share-soundcloud:before { content: '\e820'; } /* '' */
+.icon_share-stackoverflow:before { content: '\e821'; } /* '' */
+.icon_share-stumbleupon:before { content: '\e822'; } /* '' */
+.icon_share-tencent-weibo:before { content: '\e823'; } /* '' */
+.icon_share-tumblr:before { content: '\e824'; } /* '' */
+.icon_share-twitter:before { content: '\e825'; } /* '' */
+.icon_share-vine:before { content: '\e826'; } /* '' */
+.icon_share-vkontakte:before { content: '\e827'; } /* '' */
+.icon_share-youtube:before { content: '\e828'; } /* '' */
+.icon_share-yahoo:before { content: '\e829'; } /* '' */
+.icon_share-yelp:before { content: '\e82a'; } /* '' */
+.icon_share-xing:before { content: '\e82b'; } /* '' */
+.icon_share-weibo:before { content: '\e82c'; } /* '' */
+.icon_share-whatsapp:before { content: '\e82d'; } /* '' */
+.icon_share-windows:before { content: '\e82e'; } /* '' */
+.icon_share-steam:before { content: '\e82f'; } /* '' */
+.icon_share-spotify:before { content: '\e830'; } /* '' */
+.icon_share-stackexchange:before { content: '\e831'; } /* '' */
+.icon_share-meanpath:before { content: '\e832'; } /* '' */
+.icon_share-wechat:before { content: '\e833'; } /* '' */
+.icon_share-vimeo:before { content: '\e834'; } /* '' */
+.icon_share-help-circled:before { content: '\e835'; } /* '' */
+.icon_share-info-circled:before { content: '\e836'; } /* '' */
+.icon_share-minus-circled:before { content: '\e837'; } /* '' */
+.icon_share-ok-circled:before { content: '\e838'; } /* '' */
+.icon_share-cancel-circled:before { content: '\e839'; } /* '' */
+.icon_share-plus-circled:before { content: '\e83a'; } /* '' */
+.icon_share-star:before { content: '\e83b'; } /* '' */
+.icon_share-star-empty:before { content: '\e83c'; } /* '' */
+.icon_share-star-half-alt:before { content: '\e83d'; } /* '' */
+.icon_share-user:before { content: '\e83e'; } /* '' */
+.icon_share-user-plus:before { content: '\e83f'; } /* '' */
+.icon_share-user-times:before { content: '\e840'; } /* '' */
+.icon_share-users:before { content: '\e841'; } /* '' */
+.icon_share-male:before { content: '\e842'; } /* '' */
+.icon_share-female:before { content: '\e843'; } /* '' */
+.icon_share-child:before { content: '\e844'; } /* '' */
+.icon_share-home:before { content: '\e845'; } /* '' */

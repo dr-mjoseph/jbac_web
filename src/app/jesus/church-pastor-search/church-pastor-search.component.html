@@ -1,0 +1,207 @@
+<div
+    class="page body_style_wide body_filled article_style_stretch scheme_original top_panel_show top_panel_above sidebar_hide">
+    <a id="toc_home" class="sc_anchor" title="Home"
+        data-description="<i>Return to Home</i> - <br>navigate to home page of the site" data-icon="icon-home"
+        data-url="index.html" data-separator="yes"></a>
+    <a id="toc_top" class="sc_anchor" title="To Top"
+        data-description="<i>Back to top</i> - <br>scroll to top of the page" data-icon="icon-double-up" data-url=""
+        data-separator="yes"></a>
+    <section class="gradient-custom">
+        <div class="container py-5 h-100">
+            <div class="row justify-content-center align-items-center h-100">
+                <div class="col-12 col-lg-9 col-xl-7">
+                    <div class="card shadow-2-strong card-registration" style="border-radius: 15px;">
+                        <div class="card-body p-4 p-md-5">
+                            <h3 class="mb-4 pb-2 pb-md-0 mb-md-5">Searching Pastors/Churches</h3>
+                            <form [formGroup]="search">
+                                <div class="card shadow-2-strong card-registration" style="border-radius: 15px;">
+                                    <!-- <p>&nbsp;&nbsp; Address</p> -->
+                                    <div class="row">
+
+                                        <div class="col-md-6 mb-4 pb-2">
+                                            <div class="form-outline">
+                                                <label class="form-label">Select The Type</label>
+                                                <div class="form-check form-check-inline">
+                                                    <input class="form-check-input" type="radio" value="1"
+                                                        (change)="churchchangewe($event.target)"
+                                                        formControlName="checkbox">
+                                                    <label class="form-check-label">Pastor</label>
+                                                </div>
+                                                <div class="form-check form-check-inline">
+                                                    <input class="form-check-input" type="radio" value="2"
+                                                        (change)="churchchangewe($event.target)"
+                                                        formControlName="checkbox">
+                                                    <label class="form-check-label">Church</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <br>
+                                    <div class="row">
+                                        <div class="col-md-6 mb-4 pb-2">
+                                            <div class="form-outline">
+                                                <label class="form-label">Select Districts<span
+                                                        style="color:red; -webkit-text-stroke-width:thick;">*</span>
+                                                </label>
+                                                <select class="form-control" formControlName="district_id"
+                                                    (change)="getconstency($event);" (change)="searchdistric($event);"
+                                                    style="height:37px;width: 273px;">
+                                                    <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
+                                                    <option value="{{item.id}}" *ngFor="let item of districts">
+                                                        {{item.distrct_nm}}
+                                                    </option>
+                                                </select>
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <br>
+                                    <div class="row">
+                                        <div class="col-md-6 mb-4 pb-2">
+                                            <div class="form-outline">
+                                                <label class="form-label">నియోజకవర్గం ఎంచుకోండి<span
+                                                        style="color:red; -webkit-text-stroke-width:thick;">*</span>
+                                                </label>
+                                                <select class="form-control" formControlName="constituency_id"
+                                                    (change)="getmandals($event);" style="height:37px;width: 273px;">
+                                                    <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
+                                                    <option value="{{item.id}}" *ngFor="let item of constituency">
+                                                        {{item.const_nm}}
+                                                    </option>
+                                                </select>
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <br>
+
+                                    <div class="row">
+                                        <div class="col-md-6 mb-4 pb-2">
+                                            <div class="form-outline">
+                                                <label class="form-label">Select Mandal<span
+                                                        style="color:red; -webkit-text-stroke-width:thick;">*</span></label>
+                                                <select class="form-control" formControlName="mandal_id"
+                                                    (change)="gepanchayati($event);" style="height:37px;width: 273px;">
+                                                    <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
+                                                    <option value="{{item.id}}" *ngFor="let item of mandals">
+                                                        {{item.mndl_nm}}
+                                                    </option>
+                                                </select>
+
+                                            </div>
+                                        </div>
+                                        <!-- <div class="col-md-6 mb-4 pb-2">
+                                                <div class="form-outline">
+                                                    <label class="form-label">పంచాయతీ ఎంచుకోండి<span
+                                                            style="color:red; -webkit-text-stroke-width:thick;">*</span>
+                                                    </label>
+                                                    <select class="form-control" formControlName="village_id"
+                                                       
+                                                        style="height:37px;width: 273px;">
+                                                        <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
+                                                        <option value="{{item.id}}" *ngFor="let item of panchayati">
+                                                            {{item.pnchyt_nm}}
+                                                        </option>
+                                                    </select>
+                                                    
+                                                </div>
+                                            </div> -->
+
+                                    </div>
+                                    <br>
+                                    <div class="row">
+                                        <div class="col-md-6 mb-4 pb-2" *ngIf="form==1">
+                                            <div class="form-outline">
+                                                <label class="form-label">Pastor<span
+                                                        style="color:red; -webkit-text-stroke-width:thick;">*</span></label>
+                                                <select class="form-control" formControlName="pastor_id"
+                                                    style="height:37px;width: 273px;" (click)="pastorfilter()">
+                                                    <option value="" selected disabled>Select pastor Name
+                                                    </option>
+                                                    <option value="{{item.pastorname}}"
+                                                        *ngFor="let item of getpastorassciationas">
+                                                        {{item.pastorname}}
+                                                    </option>
+                                                </select>
+
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-6 mb-4 pb-2" *ngIf="form==2">
+                                            <div class="form-outline">
+                                                <label class="form-label">Select Church</label>
+                                                <select class="form-control" formControlName="church"
+                                                    style="height:37px;width: 273px;" (click)="getchurchesdata()">
+                                                    <option value="" selected disabled>Select Church Name</option>
+                                                    <option value="{{item.church_name}}"
+                                                        *ngFor="let item of getchurchfilter">
+                                                        {{item.church_name}}
+                                                    </option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <br>
+                                    <div class="row">
+                                        <div class="col-md-2 mb-4 pb-2">
+                                        </div>
+                                        <div class="col-md-2 mb-4 pb-2" *ngIf="form==1">
+                                            <button type="submit" (click)="pastorview()"
+                                                class="default-btn  user-all-btn">view
+                                            </button>
+                                        </div>
+                                        <div class="col-md-2 mb-4 pb-2" *ngIf="form==2">
+                                            <button type="submit" (click)="churchview()"
+                                                class="default-btn  user-all-btn">view
+                                            </button>
+                                        </div>
+
+                                    </div>
+                                    <br>
+                                </div>
+                                <br>
+                            </form>
+                            <div class="col-12" *ngIf="form==2">
+                                <div class="row">
+                                   <br> <p>పైన వున్న మీ ఫోన్ నంబర్ కాకపోతే, అది మారినట్లయితే,7075482182 కి మెసేజ్(SMS)
+                                        మాత్రమే పంపండి, మేము దానిని మారుస్తాము.</p>
+                                    <div class="col-lg-4" *ngFor="let item of afterchanges"
+                                        style="margin: 10px;border: 1px solid black;">
+
+
+                                        <div style="width: 200px;padding: 10px;margin: 20px;">
+                                            <h3>Church Ph: <b>{{item.contactnumber}} </b> </h3>
+                                            <p><b>Pastor Name: {{item.pastorname}} </b></p>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-12" *ngIf="form==1">
+                                <div class="row">
+                                    <div class="col-lg-12" *ngFor="let item of afterchangespastor"
+                                        style="margin: 10px;border: 1px solid black;">
+
+
+                                        <div style="width: 200px;padding: 10px;margin: 20px;">
+                                            <h3>Contact Ph: <b>{{item.phonenumber}}<br>పైన వున్న మీ ఫోన్ నంబర్ కాకపోతే,
+                                                    అది మారినట్లయితే,7075482182 కి మెసేజ్(SMS) మాత్రమే పంపండి, మేము
+                                                    దానిని మారుస్తాము.</b></h3>
+
+                                        </div>
+
+
+
+
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+</div>

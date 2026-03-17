@@ -1,0 +1,183 @@
+<!-- Breadcrumbs -->
+<div class="top_panel_title top_panel_style_3 title_present breadcrumbs_present scheme_original">
+    <div class="top_panel_title_inner inner-bg6">
+        <div class="content_wrap">
+            <h1 class="page_title">Login/Register</h1>
+            <div class="breadcrumbs">
+                <a class="breadcrumbs_item home" href="index.html">Home</a>
+                <span class="breadcrumbs_delimiter"></span>
+                <span class="breadcrumbs_item current">Login/Register</span>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- /Breadcrumbs -->
+
+
+
+<div
+    class="page body_style_wide body_filled article_style_stretch scheme_original top_panel_show top_panel_above sidebar_hide">
+    <a id="toc_home" class="sc_anchor" title="Home"
+        data-description="<i>Return to Home</i> - <br>navigate to home page of the site" data-icon="icon-home"
+        data-url="index.html" data-separator="yes"></a>
+    <a id="toc_top" class="sc_anchor" title="To Top"
+        data-description="<i>Back to top</i> - <br>scroll to top of the page" data-icon="icon-double-up" data-url=""
+        data-separator="yes"></a>
+
+
+    <section class="gradient-custom">
+        <div class="container py-5 h-100">
+            <div class="row justify-content-center align-items-center h-100">
+                <div class="col-12 col-lg-9 col-xl-7">
+                    <div class="card shadow-2-strong card-registration" style="border-radius: 15px;">
+                        <div class="card-body p-4 p-md-5" style="background-color: burlywood;border-radius: 15px;">
+                            <h3 class="mb-4 pb-2 pb-md-0 mb-md-5" style="text-align: center;">LOGIN HERE
+                            </h3>
+                            <form [formGroup]="passwordform">
+                                <div class="row">
+                                    <div class="col-md-3 mb-4"> <label><b>లాగిన్ క్యాటగిరి</b></label></div>
+                                    <div class="col-md-8 mb-4">
+                                        <div class="form-outline">
+                                            <select formControlName="category" class="form-control"
+                                                [ngClass]="{'is-invalid': Submitlogindata && f['category'].errors }">
+                                                <option value="" disabled selected>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి
+                                                </option>
+                                                <option value="1">విశ్వాసి</option>
+                                                <option value="4">పాస్టర్</option>
+                                                <option value="2">విద్యార్థి</option>
+                                                <option value="7">పాస్టర్ల అసోసియేషన్</option>
+                                                <option value="3">మినిస్ట్రీస్</option>
+                                                <option value="5">చర్చి</option>
+                                                <option value="6">క్రిస్టియన్ ఆర్గనైజెషన్ / కంపెనీ</option>
+                                            </select>
+                                            <div *ngIf="Submitlogindata && f['category'].errors"
+                                                class="invalid-feedback">
+                                                <div *ngIf="f['category'].errors['required']">Category
+                                                    is required</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-1 mb-4"></div>
+                                </div>
+                                <br>
+                                <div class="row">
+                                    <div class="col-md-3 mb-4"><label><b>Mobile Number</b></label></div>
+                                    <div class="col-md-8 mb-4">
+                                        <div class="form-outline">
+                                            <input formControlName="mobile_number" class="form-control" type="text"
+                                                [ngClass]="{'is-invalid': Submitlogindata && f['mobile_number'].errors }"
+                                                maxlength="10" minlength="10" (keypress)="numericOnly($event)"
+                                                placeholder="Enter Number ...">
+                                            <div *ngIf="Submitlogindata && f['mobile_number'].errors"
+                                                class="invalid-feedback">
+                                                <div *ngIf="f['mobile_number'].errors['required']">Mobile
+                                                    Number is
+                                                    required</div>
+                                                <div *ngIf="f['mobile_number'].errors['minlength']">Less
+                                                    than 10
+                                                    digits</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-1 mb-4"></div>
+                                </div>
+                                <br>
+                                <div class="row">
+                                    <div class="col-md-3 mb-4"><label><b>Password</b></label></div>
+                                    <div class="col-md-8 mb-4">
+                                        <input formControlName="password" class="form-control" type="password"
+                                            [ngClass]="{'is-invalid': Submitlogindata && f['password'].errors }"
+                                            maxlength="16" minlength="6" placeholder="Enter Password ...">
+                                        <div *ngIf="Submitlogindata && f['password'].errors" class="invalid-feedback">
+                                            <div *ngIf="f['password'].errors['required']">Password required
+                                            </div>
+                                            <div *ngIf="f['password'].errors['minlength']">Password between
+                                                6 to 16
+                                                Characters / Digits / Specialchracters</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-1 mb-4"></div>
+                                </div>
+                                <br>
+                                <div class="row">
+                                    <div class="col-md-4 mb-4 pb-2"> </div>
+                                    <div class="col-md-2 mb-4 pb-2">
+                                        <button type="submit" class="default-btn user-all-btn"
+                                            (click)="passlogin()">Login
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                            <br>
+                            <div style="text-align:right;cursor: pointer;">
+                                <div class="row">
+                                    <div style="text-align: left;" class="col-md-6 mb-4 pb-2">
+                                        <p>New Account? <a href="/signup" class="a2"><b
+                                                    style="color:#4a0a0a">Sign-Up</b></a></p>
+                                    </div>
+                                    <div style="text-align: right;" class="col-md-6 mb-4 pb-2">
+                                        <p (click)="forgetpassword(forget)"><b><u>Forgot Password</u>?</b>
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <br>
+</div>
+
+<ng-template #forget let-modal>
+    <form [formGroup]="checkform">
+        <div class="row" style="padding: 39px;">
+            <div class="col-sm-12">
+                <h3>Enter Category</h3>
+                <select formControlName="category" class="form-control"
+                    [ngClass]="{'is-invalid': Submitlogindata && f['category'].errors }">
+                    <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
+                    <option value="1">Believer</option>
+                    <option value="2">Student</option>
+                    <option value="3">Ministry</option>
+                    <option value="4">Pastor</option>
+                    <option value="5">Church </option>
+                    <option value="6">Independent organization </option>
+                </select>
+            </div>
+            <div class="col-sm-12">
+                <h3>Enter Your Number</h3>
+                <input type="text" class="form-control" placeholder="Enter Number" formControlName="mobile_number"
+                    (keypress)="numericOnly($event)">
+            </div>
+
+            <div class="col-sm-12" *ngIf="otpfiled">
+                <h3>Enter Your Otp</h3>
+                <input type="text" class="form-control" placeholder="Enter Otp" formControlName="otp" maxlength="4"
+                    minlength="4" (keypress)="numericOnly($event)">
+            </div>
+
+            <div class="col-sm-12" *ngIf="passwordfield">
+                <h3>Enter Your password</h3>
+                <input type="text" class="form-control" placeholder="Enter password" formControlName="password"
+                    maxlength="16" minlength="6">
+            </div>
+
+
+            <div class="col-sm-4"></div>
+            <div class="col-sm-4">
+                <button *ngIf="!otpfiled" class="btn  btn-primary" (click)="emailcheck()">Request Otp
+                </button>
+                <button *ngIf="otpfiled && !passwordfield " class="btn  btn-primary"
+                    (click)="forgetemailotpsubmit()">Sumbit Otp</button>
+                <button *ngIf="passwordfield" class="btn  btn-primary" (click)="createfrgetpassword()">Submit</button>
+            </div>
+        </div>
+    </form>
+</ng-template>
+<br><br>
+<div class="my-overlay" *ngIf="showSpinner">
+    <div class="cusloader"></div>
+    <h5 style="color: white;">Please Wait...</h5>
+</div>

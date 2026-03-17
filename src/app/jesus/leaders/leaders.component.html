@@ -1,0 +1,173 @@
+<!-- Breadcrumbs -->
+<div class="top_panel_title top_panel_style_3 title_present breadcrumbs_present scheme_original">
+    <div class="top_panel_title_inner inner-bg6">
+        <div class="content_wrap">
+            <h1 class="page_title">Leaders </h1>
+            <!-- <div class="breadcrumbs">
+                <a class="breadcrumbs_item home" href="index.html">Home</a>
+                <span class="breadcrumbs_delimiter"></span>
+                <span class="breadcrumbs_item current"> Leaders</span>
+            </div> -->
+        </div>
+    </div>
+</div>
+<!-- /Breadcrumbs -->
+<!-- Page Content Wrap -->
+<br><br>
+<div
+    class="page body_style_wide body_filled article_style_stretch scheme_original top_panel_show top_panel_above sidebar_hide">
+    <a id="toc_home" class="sc_anchor" title="Home"
+        data-description="<i>Return to Home</i> - <br>navigate to home page of the site" data-icon="icon-home"
+        data-url="index.html" data-separator="yes"></a>
+
+    <h3 style="text-align: center;">{{generals}} {{wingtypes}} {{leaders}}</h3>
+
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-4" style="text-align: center;" (click)="make(1)">
+                <button type="button">Believers Requests</button>
+            </div>
+
+
+
+            <div class="col-lg-4" style="text-align: center;" (click)="make(3)">
+                <button type="button"> Pastors Requests</button>
+            </div>
+        </div>
+    </div>
+
+    <br><br><br><br>
+    <div *ngIf="formshow ==1">
+        <section class="contact main-blog">
+            <div class="container container_center-sidebar">
+                <h2 style="text-align: center;" *ngIf="general!=''">{{general}} Level Believers Requests</h2>
+                <h2 style="text-align: center;" *ngIf="general==''">Village Believers</h2>
+                <table style="width: auto; border-collapse: collapse;">
+                    <tr>
+                        <th>S No.</th>
+                        <th>పేరు</th>
+                        <!-- <th>నియోజకవర్గం</th>
+                                                <th>ఎడ్యుకేషన్</th> -->
+                                                <th>ఫోన్ కాల్</th>
+                        <th style="text-align: center;">నిర్ణయం</th>
+                    </tr>
+                    <tr *ngFor="let x of belearr;let i=index">
+                        <td>{{i+1}}</td>
+                        <td>{{x.fname}}</td>
+                          <!-- <td *ngFor="let y of contituencyname;let i=index">{{y.const_nm }}</td>  
+                       <td>{{x.nativeplace}}</td> -->
+                      <td>  <a href="tel:+91{{x.mobile_number}}">
+                            <img src="assets/images/phone.png" style="width:45px;  text-align: center;"></a></td>
+                         <!-- <td>{{x.mobile_number}}</td> 
+                        <td>{{x.education}}</td> -->
+                        <td style="text-align: center;">
+                            <button *ngIf="x.approval_ind==0" type="button"
+                                (click)="confirm(1,x.id)">అనుమతించు</button>&nbsp;&nbsp;
+                            <button *ngIf="x.approval_ind==0" type="button"
+                                (click)="deleteAlert(1,x.id)">తిరస్కరించు &nbsp;&nbsp;</button>
+                            <p *ngIf="x.approval_ind==1" style="color:green" type="button"><b>సెలెక్టెడ్</b>&nbsp;&nbsp;
+                            </p>
+                            <p *ngIf="x.approval_ind==2" style="color:brown" type="button"><b>నాట్ సెలెక్టెడ్</b>&nbsp;&nbsp;
+                            </p> 
+                        </td>
+                    </tr>
+                    <br>
+                    <tr *ngIf="belearr.length==0">
+                        <h3>No Requests</h3>
+                    </tr>
+                </table>
+                <br>
+            </div>
+        </section>
+    </div>
+
+    <!-- <div *ngIf="formshow ==2">
+        <section class="contact main-blog">
+            <div class="container container_center-sidebar">
+                <h2 style="text-align: center;"> {{general}} Level Student Requests </h2>
+                <table>
+                    <tr>
+                        <th>Sr. No.</th>
+                        <th>Name</th>
+                        <th>Native Place</th>
+                        <th>Mobile Number</th>
+                        <th>Education</th>
+                        <th style="text-align: center;">Verify</th>
+                    </tr>
+                    <tr *ngFor="let x of studentarr;let i=index">
+                        <td>{{i+1}}</td>
+                        <td>{{x.studentname}}</td>
+                        <td>{{x.nativeplace}}</td>
+                    //     <td>{{x.number}}</td> 
+                        <a href="tel:+91{{x.number}}">
+                            <img src="assets/images/phone.png" style="width:45px;  text-align: center;"></a>
+                        <td>{{x.study}}</td>
+                        <td style="text-align: center;">
+                            <button *ngIf="x.approval_ind==0" type="button"
+                                (click)="confirm(2,x.id)">Confirm</button>&nbsp;&nbsp;
+                            <button *ngIf="x.approval_ind==0" type="button"
+                                (click)="deleteAlert(2,x.id)">Reject&nbsp;&nbsp;</button>
+                            <p *ngIf="x.approval_ind==1" style="color:green" type="button"><b>Accepted</b>&nbsp;&nbsp;
+                            </p>
+                            <p *ngIf="x.approval_ind==2" style="color:brown" type="button"><b>Rejected</b>&nbsp;&nbsp;
+                            </p>
+                        </td>
+                    </tr>
+                    <br>
+                    <tr *ngIf="studentarr.length==0">
+                        <h3>No Requests</h3>
+                    </tr>
+                </table>
+                <br>
+            </div>
+        </section>
+    </div> -->
+
+    <div *ngIf="formshow == 3">
+        <section class="contact main-blog">
+            <div class="container container_center-sidebar">
+                <h2 style="text-align: center;" *ngIf="general!=''">{{general}} Level Pastors Requests</h2>
+                <h2 style="text-align: center;" *ngIf="general==''">Village Pastors</h2>
+                <table style="width: auto; border-collapse: collapse;">
+                    <tr>
+                        <th>S. No.</th>
+                         <th>పేరు</th>
+                        <!-- <th>నియోజకవర్గం</th> -->
+                                                <!-- <th>ఎడ్యుకేషన్</th> -->
+                                                <th>ఫోన్ కాల్</th>
+                        <th style="text-align: center;">నిర్ణయం</th>
+                    </tr>
+                    <tr *ngFor="let x of pastorarr;let i=index">
+                        <td>{{i+1}}</td>
+                        <td>{{x.pastorname}}</td>
+                            <!-- <td *ngFor="let y of contituencyname;let i=index">{{y.const_nm }}</td>   -->
+                             <!-- <td >{{x.education}}</td>  -->
+                         <!-- <td>{{x.constituency_id}}</td>      -->
+                        <!-- <td>{{x.phonenumber}}</td> -->
+                     <td>  <a href="tel:+91{{x.phonenumber}}">
+                            <img src="assets/images/phone.png" style="width:45px; text-align: center;"></a></td> 
+                      
+                        <td style="text-align: center;">
+                            <button *ngIf="x.approval_ind==0" type="button"
+                                (click)="confirm(3,x.id)">అనుమతించు</button>&nbsp;&nbsp;
+                            <button *ngIf="x.approval_ind==0" type="button"
+                                (click)="deleteAlert(3,x.id)"> తిరస్కరించు&nbsp;&nbsp;</button>
+                            <p *ngIf="x.approval_ind==1" style="color:green" type="button"><b>సెలెక్టెడ్</b>&nbsp;&nbsp;
+                            </p>
+                            <p *ngIf="x.approval_ind==2" style="color:brown" type="button"><b>నాట్ సెలెక్టెడ్</b>&nbsp;&nbsp;
+                            </p>
+                        </td>
+                    </tr>
+                    <br>
+                    <tr *ngIf="pastorarr.length==0">
+                        <h3>No Requests</h3>
+                    </tr>
+                            <tr *ngIf="contituencyname.length==0">
+                        <h3>No Requests</h3>
+                    </tr>
+                </table>
+                <br>
+            </div>
+        </section>
+    </div>
+    <br><br>

@@ -1,0 +1,176 @@
+.inner-bg6 {
+    background-image: url('../../../assets/images/sign-up.png');
+}
+
+/* .gradient-custom {
+      background: #e8c8ec;
+      background: -webkit-linear-gradient(to bottom right, rgb(215, 183, 218), rgba(245, 87, 108, 1));
+    
+      background: linear-gradient(to bottom right, rgb(226, 191, 230), rgba(245, 87, 108, 1))
+    } */
+
+.card-registration .select-input.form-control[readonly]:not([disabled]) {
+    font-size: 1rem;
+    line-height: 2.15;
+    padding-left: .75em;
+    padding-right: .75em;
+}
+
+.card-registration .select-arrow {
+    top: 13px;
+}
+
+.scroll {
+    height: 50px;
+    overflow: auto;
+}
+
+/* //////////////////////////////////////////spinner//////////////////////////////////// */
+.cusloader {
+    transform: rotateZ(45deg);
+    perspective: 1000px;
+    border-radius: 50%;
+    width: 68px;
+    height: 68px;
+    color: red;
+}
+
+.cusloader:before,
+.cusloader:after {
+    content: '';
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: inherit;
+    height: inherit;
+    border-radius: 50%;
+    transform: rotateX(70deg);
+    animation: 1s spin linear infinite;
+}
+
+.cusloader:after {
+    color: yellow;
+    transform: rotateY(70deg);
+    animation-delay: .4s;
+}
+
+@keyframes rotate {
+    0% {
+        transform: translate(-50%, -50%) rotateZ(0deg);
+    }
+
+    100% {
+        transform: translate(-50%, -50%) rotateZ(360deg);
+    }
+}
+
+@keyframes rotateccw {
+    0% {
+        transform: translate(-50%, -50%) rotate(0deg);
+    }
+
+    100% {
+        transform: translate(-50%, -50%) rotate(-360deg);
+    }
+}
+
+@keyframes spin {
+
+    0%,
+    100% {
+        box-shadow: .5em 0px 0 0px currentcolor;
+    }
+
+    12% {
+        box-shadow: .5em .5em 0 0 currentcolor;
+    }
+
+    25% {
+        box-shadow: 0 .5em 0 0px currentcolor;
+    }
+
+    37% {
+        box-shadow: -.5em .5em 0 0 currentcolor;
+    }
+
+    50% {
+        box-shadow: -.5em 0 0 0 currentcolor;
+    }
+
+    62% {
+        box-shadow: -.5em -.5em 0 0 currentcolor;
+    }
+
+    75% {
+        box-shadow: 0px -.5em 0 0 currentcolor;
+    }
+
+    87% {
+        box-shadow: .5em -.5em 0 0 currentcolor;
+    }
+}
+
+.my-overlay {
+    left: 0 !important;
+    top: 0 !important;
+    z-index: 10000 !important;
+    width: 100% !important;
+    height: 100% !important;
+    position: fixed !important;
+    background-color: rgba(0, 0, 0, 0.9) !important;
+    cursor: pointer !important;
+    visibility: visible !important;
+    transition: visibility 0s, opacity 0.4s linear !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    align-content: space-between;
+    cursor: wait !important;
+    opacity: 0.6;
+}
+
+.loginbt2 {
+    box-sizing: border-box;
+    -webkit-appearance: none;
+    appearance: none;
+    background-color: green;
+    border: 2px solid green;
+    border-radius: 0.6em;
+    color: #f8f9fa;
+    cursor: pointer;
+    display: flex;
+    align-self: center;
+    font-weight: 400;
+    line-height: 1;
+    text-decoration: none;
+    text-align: center;
+    text-transform: uppercase;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    padding: 14px;
+}
+
+.fth {
+    padding: 12px 27px;
+    color: var(--whiteColor);
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    z-index: 1;
+    text-transform: capitalize;
+    color: white;
+    background-color: #909a9c;
+    border: none;
+    border: none;
+    outline: none;
+}
+
+select {
+    -webkit-appearance: listbox !important;
+}
+
+.ng-select {
+    -webkit-appearance: listbox !important;
+}

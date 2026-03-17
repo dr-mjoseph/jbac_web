@@ -1,0 +1,251 @@
+<!-- /Breadcrumbs -->
+
+<div
+    class="page body_style_wide body_filled article_style_stretch scheme_original top_panel_show top_panel_above sidebar_hide">
+
+    <br>
+    <div class="latest-news-block" style="background-color:#ccc">
+        <div class="latest-news-block-hightlight">
+            <div class="latest-update-block"> <span class="block-2"> Updates </span>
+                <div style="overflow:hidden">
+                    <marquee behavior="scroll" direction="left" scrolldelay="15" scrollamount="1" truespeed="10"
+                        onmouseover="this.stop()" onmouseout="this.start()" style="height:30px; white-space: nowrap">
+                        <div class="tickercontainer">
+                            <span
+                                class="ad-blk">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Ads:</span>
+                            <a href="https://jbac.in">jbac.in
+                                Updates</a>
+                            <span
+                                class="photo_gallery-icon">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Photo
+                                Gallery:&nbsp;</span>
+                            <a href="/gallery">Update Gallery</a>
+                            <span
+                                class="polls-icon">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Poll:&nbsp;</span>
+                            <a href="/church_timings">Are You Search
+                                Church Timings</a>
+                        </div>
+                    </marquee>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="container mt-3" style="padding-bottom: 28px">
+        <h3>Organisation</h3>
+        <div class="container mt-3" style="padding-bottom: 28px;">
+
+            <div class="row">
+                <div class="card" class="max-w-sm rounded overflow-hidden shadow-lg" style="padding:10px">
+                    <form [formGroup]="serachMeetingform">
+                        <div class="row">
+                            <div class="col-md-3 mb-4">
+                                <div class="form-outline">
+                                    <label class="form-label" for="pattern_name">Denomation
+                                        <span style="color:red; -webkit-text-stroke-width:thick;">*</span></label>
+                                    <select class="form-control" formControlName="denomation_id"
+                                        (change)="serachcaste($event);" (change)="serachgenders($event,1);">
+                                        <option value="" selected disabled>Select the Denomation </option>
+                                        <option *ngFor="let i of denomation" value="{{i.id}}">
+                                            {{i.denomation_name}}</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-3 mb-4">
+                                <div class="form-outline">
+                                    <label class="form-label">Ministry </label>
+                                    <select class="form-control" formControlName="ministry_id"
+                                        (change)="serachgenders($event,2);" (change)="serachgender($event);">
+                                        <option value="" selected disabled>Select the Ministry </option>
+                                        <option *ngFor="let i of ministryname" value="{{i.id}}">
+                                            {{i.ministryname}}</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="col-md-3 mb-4">
+                                <div class="form-outline">
+                                    <label class="form-label">Service Name</label>
+                                    <select class="form-control" formControlName="service_name"
+                                        (change)="serachgenders($event,3);" (change)="servicessearch($event);">
+                                        <option value="" selected disabled>Select the Service </option>
+                                        <option *ngFor="let item of services" value="{{item.id}}" >
+                                            {{item.servicename}}
+                                        </option>
+
+                                    </select>
+
+                                </div>
+                            </div>
+
+
+                        </div>
+                        <br>
+                        <div class="row">
+                            <div class="col-md-2 pb-2">
+                                <div class="form-outline">
+                                    <label class="form-label">Select Districts </label>
+                                    <select class="form-control" formControlName="district_id"
+                                        (change)="getconstency($event);" (change)="searchdistric($event);"
+                                        style="height:37px;width: 273px;" (change)="serachgenders($event,4);">
+                                        <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
+                                        <option value="{{item.id}}" *ngFor="let item of districts">
+                                            {{item.distrct_nm}}
+                                        </option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="col-md-2 mb-4 pb-2">
+                                <div class="form-outline">
+                                    <label class="form-label">నియోజకవర్గం ఎంచుకోండి </label>
+                                    <select class="form-control" formControlName="constenncy_id"
+                                        (change)="getmandals($event);" (change)="searchconstenct($event);"
+                                        style="height:37px;width: 273px;" (change)="serachgenders($event,5);">
+                                        <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
+                                        <option value="{{item.id}}" *ngFor="let item of constituency">
+                                            {{item.const_nm}}
+                                        </option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-2 mb-4 pb-2">
+                                <div class="form-outline">
+                                    <label class="form-label">మండలం ఎంచుకోండి </label>
+                                    <select class="form-control" formControlName="mandal_id"
+                                        (change)="gepanchayati($event);" (change)="searchmandals($event);"
+                                        style="height:37px;width: 273px;" (change)="serachgenders($event,6);">
+                                        <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
+                                        <option value="{{item.id}}" *ngFor="let item of mandals">
+                                            {{item.mndl_nm}}
+                                        </option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-2 mb-4 pb-2">
+                                <div class="form-outline">
+                                    <label class="form-label">పంచాయతీ ఎంచుకోండి </label>
+                                    <select class="form-control" formControlName="panchayati_id"
+                                        (change)="searchvillages($event);" style="height:37px;width: 273px;"
+                                        (change)="serachgenders($event,7);">
+                                        <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
+                                        <option value="{{item.id}}" *ngFor="let item of panchayati">
+                                            {{item.pnchyt_nm}}
+                                        </option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="col-md-2 mb-4 pb-2">
+                                <br>
+                                <button type="submit" class="default-btn  user-all-btn"
+                                    style="padding-top:5px; text-align: center; background-color: aquamarine;"
+                                    (click)="search()">Search
+                                </button>
+                            </div>
+                            <div class="col-md-2 mb-4 pb-2">
+                                &nbsp;&nbsp;&nbsp;&nbsp;
+                                <button type="submit" class="default-btn  user-all-btn"
+                                    style="padding-top:5px; text-align: center; background-color: aquamarine;"
+                                    (click)="reset()">Reset
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <br>
+
+        <div class="row">
+            <div class="col-lg-7">
+                <div class="row">
+                    <div class="col-lg-4" *ngFor="let item of marriagedata" style="margin-bottom: 16px;">
+                        <div class="flex justify-center items-center h-screen">
+                            <div class="main">
+                                <ul class="cards">
+                                    <li class="cards_item">
+                                        <div class="card" tabindex="0">
+                                            <div class="card_image">
+                                                <img *ngIf="item.image == undefined || item.image == null || item.image == '' "
+                                                    src="../../../assets/images/no.jpg"
+                                                    style="height: 251px;width:250px;">
+                                                <img src="{{item.image}}" style="width:212px;height:251px;"
+                                                    (click)="openimg(item.image,openmodel)">
+                                            </div>
+                                            <div class="card_content">
+                                                <div class="card_text">
+                                                    <p>Organisation Name:<strong> {{item.organisation_name}}</strong>
+                                                    </p>
+                                                    <p>Street name: <b>{{item.ward}} </b></p>
+                                                    <p>Local address:<strong> {{item.org_address}}</strong></p>
+                                                    <a (click)="toggleDisplayDiv()" style="color:rgb(175, 15, 15)">
+                                                        READMORE
+                                                    </a>
+
+
+                                                    <a href="{{item.location}}" [hidden]="isShowDiv">
+                                                        <img src="assets/images/marker.png" style="width:45px;"></a>
+                                                    <a href="tel:+91{{item.contact_num}}" [hidden]="isShowDiv">&nbsp;
+                                                        <img src="assets/images/phone.png" style="width:45px;
+                                                                        "></a>
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="col-lg-5">
+                <marquee onmouseover="this.stop();" onmouseout="this.start();" direction="up"
+                    style="scroll-behavior: smooth;">
+                    <div class="container">
+                        <div style="border:solid green">
+                            <article>
+                                <div class="article-wrapper">
+                                    <div class="article-body">
+                                        <h3 style="text-align:center;color: black; padding:2%;">
+                                            Welcome To JBAC.IN
+                                        </h3>
+                                    </div>
+                                </div>
+                            </article>
+                        </div>
+                        <div *ngFor="let item of adds" style="border:solid green">
+                            <article>
+                                <div class="article-wrapper">
+                                    <div class="article-body">
+                                        <img style="height:85%;width:100%;" src="{{item.image}}"
+                                            (click)="openimg(item.image,openmodel)" alt="image" alt="images. ">
+                                        <p style="color: black; padding:2%;">
+                                            -- <b>{{item.description}}</b>
+                                        </p>
+                                    </div>
+                                </div>
+                            </article>
+                        </div>
+                    </div>
+                </marquee>
+            </div>
+        </div>
+
+
+
+        <!-- //////image popup_code //////////////////////// -->
+        <ng-template #openmodel let-modal>
+            <div class="modal-header">
+                <h5 class="modal-title mt-0 ">Image</h5>
+                <button type="button" class="close" aria-hidden="true" (click)="proofmodalDismis()">×</button>
+            </div>
+
+            <img src={{image}}>
+
+        </ng-template>
+    </div>
+
+</div>
+<br><br>

@@ -1,0 +1,59 @@
+<section class="contact main-blog">
+    <div class="container">
+        <h2 style="text-align: center;"> Attacks </h2>
+        <div class="row cardsm" *ngFor="let i of atacks" style="text-align: center;">
+            <div class="col-lg-2 sdu card_text" style="text-align: left;">
+                <p>Attacker 1 : {{i.attackername1}}</p>
+                <p>Attacker 2 : {{i.attackername2}}</p>
+            </div>
+            <div class="col-lg-2 sdu" style="text-align: left;">
+                <p>Victim 1 : {{i.victimname1}}</p>
+                <p>Victim 2 : {{i.victimname2}}</p>
+            </div>
+            <div class="col-lg-4 sdu" style="text-align: left;">
+                <p>Document 1 : <a href="{{i.document1}}"> <img src="assets/images/images.jpg"
+                            style="width:35px;margin-left:60px"></a></p>
+                <p>Document 2 : <a href="{{i.document2}}"><img src="assets/images/images.jpg"
+                            style="width:35px;margin-left:60px"></a></p>
+                <p>Document 3 : <a href="{{i.document3}}"><img src="assets/images/images.jpg"
+                            style="width:35px;margin-left:60px"></a></p>
+            </div>
+            <div class="col-lg-4 sdu">
+                <img style="height: 100px;width: 100px;" src="{{i.image1}}">
+                <img style="height: 100px;width: 100px;" src="{{i.image2}}">
+                <img style="height: 100px;width: 100px;" src="{{i.image3}}">
+                <!-- <img style="height:100px;width:100px;margin:2%" src="assets/images/gallery6.jpg">
+                <img style="height:100px;width:100px;margin:2%" src="assets/images/gallery6.jpg">
+                <img style="height:100px;width:100px;margin:2%" src="assets/images/gallery6.jpg"> -->
+            </div>
+            <div class="col-lg-4 sdu">
+                <p style="text-align: left;">Video 1 : </p>
+                <video controls #videoPlayer style="width: 311px;">
+                    <source src="{{i.video1}}" type="video/mp4" />
+                    Browser not supported
+                </video>
+            </div>
+            <div class="col-lg-4 sdu">
+                <p style="text-align: left;">Video 2 :</p>
+                <video controls #videoPlayer style="width: 311px;">
+                    <source src="{{i.video2}}" type="video/mp4" />
+                    Browser not supported
+                </video>
+            </div>
+            <div class="col-lg-4 sdu">
+                <audio controls>
+                    <source src="{{i.audiorecordonincident}}" type="audio/mpeg" />
+                </audio>
+            </div>
+        </div>
+    </div>
+    <br><br>
+</section>
+
+
+
+
+
+<!-- /Header Mobile -->
+
+<br><br>

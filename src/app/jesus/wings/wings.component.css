@@ -1,0 +1,9 @@
+.flex-child:first-child {
+    margin-right: 52px;
+    
+}
+
+.flex-child {
+    flex: 1;
+    /* border: 2px solid green; */
+}

@@ -1,0 +1,12 @@
+.less {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 3; /* Number of lines to show before truncating */
+    -webkit-box-orient: vertical;
+}
+
+td, th {
+    border: 3px solid rgb(96, 95, 95);
+    padding: 8px; /* Add padding for better readability */
+  }

@@ -1,0 +1,83 @@
+.loginbt2 {
+    box-sizing: border-box;
+    -webkit-appearance: none;
+    appearance: none;
+    background-color: green;
+    border: 2px solid green;
+    border-radius: 0.6em;
+    color: #f8f9fa;
+    cursor: pointer;
+    display: flex;
+    align-self: center;
+    font-weight: 400;
+    line-height: 1;
+    text-decoration: none;
+    text-align: center;
+    text-transform: uppercase;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    padding: 14px;
+}
+
+.fth {
+    padding: 12px 27px;
+    color: var(--whiteColor);
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    z-index: 1;
+    text-transform: capitalize;
+    color: white;
+    background-color: #909a9c;
+    border: none;
+    outline: none;
+}
+
+
+
+
+.tooltip {
+    position: relative;
+    display: inline-block;
+    border-bottom: 1px dotted black;
+}
+
+.tooltip .tooltiptext {
+    visibility: hidden;
+    width: 120px;
+    background-color: black;
+    /* color: #fff; */
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px 0;
+
+    /* Position the tooltip */
+    position: absolute;
+    z-index: 1;
+}
+
+.tooltip:hover .tooltiptext {
+    visibility: visible;
+}
+
+.product {
+    width: 210px;
+    padding: 5px;
+    border: solid 1px #ccc;
+    border-radius: 5px;
+    overflow: hidden;
+    cursor: pointer;
+    
+}
+.product:hover {
+    width: 450px;
+}
+.product-text {
+    float: left;
+    width: 240px;
+    display: none;
+}
+.product:hover .product-text {
+    display: block;
+}
+

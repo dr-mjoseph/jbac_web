@@ -1,0 +1,337 @@
+<!-- Breadcrumbs -->
+<div class="top_panel_title top_panel_style_3 title_present breadcrumbs_present scheme_original">
+    <div class="top_panel_title_inner inner-bg6">
+        <div class="content_wrap">
+            <!-- <h1 class="page_title">Signup/Register</h1> -->
+            <div class="breadcrumbs">
+                <!-- <a class="breadcrumbs_item home" href="index.html">Home</a> -->
+                <span class="breadcrumbs_delimiter"></span>
+                <!-- <span class="breadcrumbs_item current">Signup/Register</span> -->
+            </div>
+        </div>
+    </div>
+</div>
+<!-- /Breadcrumbs -->
+<div
+    class="page body_style_wide body_filled article_style_stretch scheme_original top_panel_show top_panel_above sidebar_hide">
+    <a id="toc_home" class="sc_anchor" title="Home"
+        data-description="<i>Return to Home</i> - <br>navigate to home page of the site" data-icon="icon-home"
+        data-url="index.html" data-separator="yes"></a>
+    <a id="toc_top" class="sc_anchor" title="To Top"
+        data-description="<i>Back to top</i> - <br>scroll to top of the page" data-icon="icon-double-up" data-url=""
+        data-separator="yes"></a>
+
+
+
+  
+
+    <div>
+        <section class="gradient-custom">
+            <div class="container py-5 h-100">
+                <div class="row justify-content-center align-items-center h-100">
+                    <div class="col-12 col-lg-9 col-xl-7">
+                        <div class="card shadow-2-strong card-registration" style="border-radius: 15px;">
+                            <div class="card-body p-4 p-md-5">
+                                <h3 class="mb-4 pb-2 pb-md-0 mb-md-5">Adding Business</h3>
+                                <form [formGroup]="addingbusiness">
+
+                                    <div class="row">
+                                        <div class="col-md-6 mb-4">
+                                            <div class="form-outline">
+                                                <label class="form-label">Add Type<span
+                                                        style="color:red; -webkit-text-stroke-width:thick;">*</span></label>
+                                                <select class="form-control" formControlName="type"
+                                                    [ngClass]="{'is-invalid': submitted && j['type'].errors }">
+                                                    <option value="" selected disabled>Select the Type </option>
+                                                    <option value="Sales">Sales</option>
+                                                    <option value="Purchase">Purchase</option>
+                                                    <option value="Rent">Rent</option>
+                                                </select>
+                                                <div *ngIf="submitted && j['type'].errors" class="invalid-feedback">
+                                                    <div *ngIf="j['type'].errors['required']">Type is required </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-6 mb-4">
+                                            <div class="form-outline">
+                                                <label class="form-label">Type Of Flats<span
+                                                        style="color:red; -webkit-text-stroke-width:thick;">*</span></label>
+                                                <select class="form-control" formControlName="title"
+                                                    [ngClass]="{'is-invalid': submitted && j['title'].errors }">
+                                                    <option value="" selected disabled>Select the Type </option>
+                                                    <option value="1bhk">1BHK</option>
+                                                    <option value="2bhk">2BHK</option>
+                                                    <option value="3bhk">3BHK</option>
+                                                </select>
+                                                <div *ngIf="submitted && j['title'].errors" class="invalid-feedback">
+                                                    <div *ngIf="j['title'].errors['required']">Title is
+                                                        required
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                    <br>
+                                    <div class="row">
+
+                                        <div class="col-md-6 mb-4">
+                                            <label for="formFile" class="form-label"> Image Upload<span
+                                                    style="color:red; -webkit-text-stroke-width:thick;">*</span>
+                                            </label>
+                                            <input class="image" type="file" id="formFile"
+                                                accept="image/x-png,image/jpeg" formControlName="image"
+                                                (change)="onImageChange($event)"
+                                                [ngClass]="{'is-invalid': submitted && j['image'].errors }" />
+                                            <img *ngIf="imagesData.length" src="{{imagesData[0].reviewimg}}" alt=""
+                                                height="100px" width="100px">
+                                            <div *ngIf="submitted && j['image'].errors" class="invalid-feedback">
+                                                <div *ngIf="j['image'].errors['required']">Image is required </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 mb-4">
+                                            <div class="form-outline">
+                                                <label class="form-label"> Description<span
+                                                        style="color:red; -webkit-text-stroke-width:thick;">*</span></label>
+                                                <textarea type="text" formControlName="description" class="form-control"
+                                                    placeholder="Enter  Description"
+                                                    [ngClass]="{'is-invalid': submitted && j['description'].errors }"></textarea>
+                                                <div *ngIf="submitted && j['description'].errors"
+                                                    class="invalid-feedback">
+                                                    <div *ngIf="j['description'].errors['required']"> Description is
+                                                        required
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <br>
+                                    <div class="row">
+
+                                        <div class="col-md-6 mb-4 pb-2">
+                                            <div class="form-outline">
+                                                <label class="form-label">Denomation</label>
+                                                <select class="form-control" formControlName="denomation"
+                                                    style="height:37px;width: 273px;">
+                                                    <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
+                                                    <option value="{{item.id}}" *ngFor="let item of denomation">
+                                                        {{item.denomation_name}}
+                                                    </option>
+                                                </select>
+
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 mb-4">
+                                            <div class="form-outline">
+                                                <label class="form-label">Select Ministry </label>
+                                                <select class="form-control" formControlName="ministry_id"
+                                                    style="height:37px;width: 273px;">
+                                                    <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
+                                                    <option *ngFor="let i of ministryname" value="{{i.ministryname}}">
+                                                        {{i.ministryname}}</option>
+
+                                                </select>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                    <br>
+                                    <div class="card shadow-2-strong card-registration" style="border-radius: 15px;">
+                                        <p>&nbsp;&nbsp; Address</p>
+                                        <div class="row">
+                                            <div class="col-md-6 mb-4">
+                                                <div class="form-outline">
+                                                    <label class="form-label">LocalAddress/StreetName <span
+                                                            style="color:red; -webkit-text-stroke-width:thick;">*</span></label>
+                                                    <input type="text" formControlName="ward" class="form-control"
+                                                        placeholder="Enter StreetName"
+                                                        [ngClass]="{'is-invalid': submitted && j['ward'].errors }" />
+                                                    <div *ngIf="submitted && j['ward'].errors" class="invalid-feedback">
+                                                        <div *ngIf="j['ward'].errors['required']">
+                                                            LocalAddress/StreetName
+                                                            required</div>
+
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-6 mb-4">
+                                                <div class="form-outline">
+                                                    <label class="form-label">Contact Number <span
+                                                            style="color:red; -webkit-text-stroke-width:thick;">*</span></label>
+                                                    <input type="text" formControlName="number" class="form-control"
+                                                        placeholder="Enter Contact Number" maxlength="10"
+                                                        (keypress)="numericOnly($event)"
+                                                        [ngClass]="{'is-invalid': submitted && j['number'].errors }" />
+                                                    <div *ngIf="submitted && j['number'].errors"
+                                                        class="invalid-feedback">
+                                                        <div *ngIf="j['number'].errors['required']">Contact Number is
+                                                            required</div>
+                                                        <div *ngIf="j['number'].errors['minlength']">Less than 10
+                                                            digits</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <br>
+                                        <div class="row">
+                                            <div class="col-md-6 mb-4 pb-2">
+                                                <div class="form-outline">
+                                                    <label class="form-label">Select Districts <span
+                                                            style="color:red; -webkit-text-stroke-width:thick;">*</span></label>
+                                                    <select class="form-control" formControlName="districtname"
+                                                        (change)="getconstency($event);"
+                                                        [ngClass]="{'is-invalid': submitted && j['districtname'].errors }"
+                                                        style="height:37px;width: 273px;">
+                                                        <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
+                                                        <option value="{{item.id}}" *ngFor="let item of districts">
+                                                            {{item.distrct_nm}}
+                                                        </option>
+                                                    </select>
+                                                    <div *ngIf="submitted && j['districtname'].errors"
+                                                        class="invalid-feedback">
+                                                        <div *ngIf="j['districtname'].errors['required']">District is
+                                                            required </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6 mb-4 pb-2">
+                                                <div class="form-outline">
+                                                    <label class="form-label">నియోజకవర్గం ఎంచుకోండి <span
+                                                            style="color:red; -webkit-text-stroke-width:thick;">*</span>
+                                                    </label>
+                                                    <select class="form-control" formControlName="constituencyname"
+                                                        (change)="getmandals($event);" style="height:37px;width: 273px;"
+                                                        [ngClass]="{'is-invalid': submitted && j['constituencyname'].errors }">
+                                                        <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
+                                                        <option value="{{item.id}}" *ngFor="let item of constituency">
+                                                            {{item.const_nm}}
+                                                        </option>
+                                                    </select>
+                                                    <div *ngIf="submitted && j['constituencyname'].errors"
+                                                        class="invalid-feedback">
+                                                        <div *ngIf="j['constituencyname'].errors['required']">District
+                                                            is required </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <br>
+
+                                        <div class="row">
+                                            <div class="col-md-6 mb-4 pb-2">
+                                                <div class="form-outline">
+                                                    <label class="form-label">మండలం ఎంచుకోండి <span
+                                                            style="color:red; -webkit-text-stroke-width:thick;">*</span>
+                                                    </label>
+                                                    <select class="form-control" formControlName="mandals"
+                                                        (change)="gepanchayati($event);"
+                                                        style="height:37px;width: 273px;"
+                                                        [ngClass]="{'is-invalid': submitted && j['mandals'].errors }">
+                                                        <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
+                                                        <option value="{{item.id}}" *ngFor="let item of mandals">
+                                                            {{item.mndl_nm}}
+                                                        </option>
+                                                    </select>
+                                                    <div *ngIf="submitted && j['mandals'].errors"
+                                                        class="invalid-feedback">
+                                                        <div *ngIf="j['mandals'].errors['required']">Mandal is
+                                                            required </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6 mb-4 pb-2">
+                                                <div class="form-outline">
+                                                    <label class="form-label">పంచాయతీ ఎంచుకోండి <span
+                                                            style="color:red; -webkit-text-stroke-width:thick;">*</span></label>
+                                                    <select class="form-control" formControlName="village_name"
+                                                        [ngClass]="{'is-invalid': submitted && j['village_name'].errors }"
+                                                        style="height:37px;width: 273px;">
+                                                        <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
+                                                        <option value="{{item.id}}" *ngFor="let item of panchayati">
+                                                            {{item.pnchyt_nm}}
+                                                        </option>
+                                                    </select>
+                                                    <div *ngIf="submitted && j['village_name'].errors"
+                                                        class="invalid-feedback">
+                                                        <div *ngIf="j['village_name'].errors['required']">Village is
+                                                            required </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6 mb-4 pb-2">
+                                                <div class="form-outline">
+                                                    <label class="form-label">Terms And Conditions<span
+                                                            style="color:red; -webkit-text-stroke-width:thick;">*</span></label>
+                                                    <div class="form-check form-check-inline">
+                                                        <input class="form-check-input" type="checkbox" value="YES"
+                                                            formControlName="term" checked
+                                                            [ngClass]="{'is-invalid': submitted && j['term'].errors }" />
+                                                        <label class="form-check-label">YES</label>
+                                                        <div *ngIf="submitted && j['term'].errors"
+                                                            class="invalid-feedback">
+                                                            <div *ngIf="j['term'].errors['required']">Terms And
+                                                                Conditions is required
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <br>
+                                    </div>
+                                    <br>
+                                </form>
+
+                                <div class="row">
+                                    <div class="col-md-2 mb-4 pb-2">
+                                    </div>
+                                    <div class="col-md-2 mb-4 pb-2">
+                                    </div>
+                                    <div class="col-md-2 mb-4 pb-2">
+                                        <button type="submit" class="default-btn  user-all-btn"
+                                            (click)="postbusiness()">Register
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+</div>
+<!-- /Header Mobile -->
+
+<br><br>
+
+<ng-template #serviceadding let-modal>
+
+
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card-body" style=" padding: 44px;">
+                <div class="mb-3">
+                    <marquee>
+                        <h4 class="modal-title mt-0" style="color: blue;">Add service Type</h4>
+                    </marquee>
+                    <h5>Service Name</h5>
+                    <input type="text" class="form-control" [(ngModel)]="ProofValue" placeholder="Enter service Name" />
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-light" (click)="modalDismiss()">Close</button>
+                    <button type="submit" class="btn btn-primary" (click)="addNewSubmit()">Submit</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</ng-template>
+
+
+<div class="my-overlay" *ngIf="showSpinner">
+    <div class="cusloader"></div>
+    <h5 style="color: white;">Please Wait...</h5>
+</div>

@@ -1,0 +1,440 @@
+<div class="top_panel_title top_panel_style_3 title_present breadcrumbs_present scheme_original">
+    <div class="top_panel_title_inner" style="background-image: url('assets/images/Church-timimgs.png');">
+        <div class="content_wrap">
+            <h1 class="page_title">Church Registration Form</h1>
+            <!-- <div class="breadcrumbs">
+                <a class="breadcrumbs_item home" href="index.html">Home</a>
+                <span class="breadcrumbs_delimiter"></span>
+                <span class="breadcrumbs_item current">Institute</span>
+            </div> -->
+        </div>
+    </div>
+</div>
+<div
+    class="page body_style_wide body_filled article_style_stretch scheme_original top_panel_show top_panel_above sidebar_hide">
+    <a id="toc_home" class="sc_anchor" title="Home"
+        data-description="<i>Return to Home</i> - <br>navigate to home page of the site" data-icon="icon-home"
+        data-url="index.html" data-separator="yes"></a>
+    <a id="toc_top" class="sc_anchor" title="To Top"
+        data-description="<i>Back to top</i> - <br>scroll to top of the page" data-icon="icon-double-up" data-url=""
+        data-separator="yes"></a>
+    <br>
+    <div class="latest-news-block" style="background-color:#ccc">
+
+        <div class="latest-news-block-hightlight">
+
+            <div class="latest-update-block"> <span class="block-2"> Updates </span>
+                <div style="overflow:hidden">
+                    <marquee behavior="scroll" direction="left" scrolldelay="15" scrollamount="1" truespeed="10"
+                        onmouseover="this.stop()" onmouseout="this.start()" style="height:30px; white-space: nowrap">
+
+                        <div class="tickercontainer">
+                            <span
+                                class="ad-blk">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Ads:</span>
+                            <a href="https://jbac.in">jbac.in
+                                Updates</a>
+
+                            <span
+                                class="photo_gallery-icon">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Photo
+                                Gallery:&nbsp;</span>
+                            <a href="/gallery">Update Gallery</a>
+                            <span
+                                class="polls-icon">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Poll:&nbsp;</span>
+                            <a href="/church_timings">Are You Search
+                                Church Timings</a>
+                        </div>
+                    </marquee>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div id="ele">
+        <section class="gradient-custom">
+            <div class="container py-5 h-100">
+                <div class="row justify-content-center align-items-center h-100">
+                    <div class="col-12 col-lg-9 col-xl-7">
+                        <div class="card shadow-2-strong card-registration" style="border-radius: 15px;">
+                            <div class="card-body p-4 p-md-5">
+                                <h3 class="mb-4 pb-2 pb-md-0 mb-md-5">Church Register Form</h3>
+                                <form [formGroup]="churchregsiterform">
+                                    <div class="row">
+                                        <div class="col-md-6 mb-4">
+                                            <div class="form-outline">
+                                                <label class="form-label" for="church_name">Church Name <span
+                                                        style="color:red; -webkit-text-stroke-width:thick;">*</span></label>
+                                                <input type="text" formControlName="church_name" class="form-control"
+                                                    required placeholder="Enter Your Church Name"
+                                                    [ngClass]="{'is-invalid': submitted && k['church_name'].errors }" />
+                                                <div *ngIf="submitted && k['church_name'].errors"
+                                                    class="invalid-feedback">
+                                                    <div *ngIf="k['church_name'].errors['required']">Church Name
+                                                        is required </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 mb-4 pb-2">
+                                            <div class="form-outline">
+                                                <label class="form-label">Contact Number <span
+                                                        style="color:red; -webkit-text-stroke-width:thick;">*</span></label>
+                                                <input type="text" formControlName="contactnumber" class="form-control"
+                                                    placeholder="Enter Your Contact Number" maxlength="10"
+                                                    minlength="10" (keypress)="numericOnly($event)"
+                                                    [ngClass]="{'is-invalid': submitted && k['contactnumber'].errors }" />
+                                                <div *ngIf="submitted && k['contactnumber'].errors"
+                                                    class="invalid-feedback">
+                                                    <div *ngIf="k['contactnumber'].errors['required']">Contact Number
+                                                        is required </div>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                    <br>
+                                    <div class="row">
+                                        <div class="col-md-6 mb-4">
+                                            <div class="form-outline">
+                                                <label class="form-label" for="church_name">Total Church Members <span
+                                                        style="color:red; -webkit-text-stroke-width:thick;">*</span></label>
+                                                <input type="tel" formControlName="total_members" class="form-control"
+                                                    placeholder="Enter Your Total Church Members"
+                                                    [ngClass]="{'is-invalid': submitted && k['total_members'].errors }" />
+                                                <div *ngIf="submitted && k['total_members'].errors"
+                                                    class="invalid-feedback">
+                                                    <div *ngIf="k['total_members'].errors['required']">Total Church
+                                                        Members
+                                                        is required </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-6 mb-4">
+                                            <div class="form-outline">
+                                                <label class="form-label" for="pattern_name">Denomation / Church Pattren
+                                                    <span
+                                                        style="color:red; -webkit-text-stroke-width:thick;">*</span></label>
+                                                <select class="form-control" formControlName="denomination_id"
+                                                    [ngClass]="{'is-invalid': submitted && k['denomination_id'].errors }">
+                                                    <option value="" selected disabled>Select the Denomation </option>
+                                                    <option *ngFor="let i of denomation" value="{{i.id}}">
+                                                        {{i.denomation_name}}</option>
+                                                </select>
+                                                <div *ngIf="submitted && k['denomination_id'].errors"
+                                                    class="invalid-feedback">
+                                                    <div *ngIf="k['denomination_id'].errors['required']">Denomation
+                                                        is required </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <br>
+                                    <div class="row">
+                                        <div class="col-md-6 mb-4 pb-2">
+                                            <div class="form-outline">
+                                                <label class="form-label">Type Of Church</label>
+                                                <div class="form-check form-check-inline">
+                                                    <input class="form-check-input" type="radio" value="Ministry"
+                                                        (change)="churchchange($event.target)"
+                                                        formControlName="churchtype">
+                                                    <label class="form-check-label">Ministry Church</label>
+                                                </div>
+                                                <div class="form-check form-check-inline">
+                                                    <input class="form-check-input" type="radio"
+                                                        value="Independentchurch" (change)="churchchange($event.target)"
+                                                        formControlName="churchtype">
+                                                    <label class="form-check-label">Independent Church</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 mb-4" *ngIf="mini">
+                                            <div class="form-outline">
+                                                <label class="form-label">Ministry </label>
+                                                <select class="form-control" formControlName="ministry_id">
+                                                    <option value="" selected disabled>Select the Ministry </option>
+                                                    <option *ngFor="let i of ministryname" value="{{i.id}}">
+                                                        {{i.ministryname}}</option>
+                                                </select>
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <br>
+                                    <div class="card shadow-2-strong card-registration" style="border-radius: 15px;">
+                                        <p>&nbsp;&nbsp; Address</p>
+                                        <div class="row">
+                                            <div class="col-md-6 mb-4 pb-2">
+                                                <div class="form-outline">
+                                                    <label class="form-label">Select District <span
+                                                            style="color:red; -webkit-text-stroke-width:thick;">*</span>
+                                                    </label>
+                                                    <select class="form-control" formControlName="district_id"
+                                                        (change)="getconstency($event);"
+                                                        style="height:37px;width: 273px;"
+                                                        [ngClass]="{'is-invalid': submitted && k['district_id'].errors }">
+                                                        <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
+                                                        <option value="{{item.id}}" *ngFor="let item of districts">
+                                                            {{item.distrct_nm}}
+                                                        </option>
+                                                    </select>
+                                                    <div *ngIf="submitted && k['district_id'].errors"
+                                                        class="invalid-feedback">
+                                                        <div *ngIf="k['district_id'].errors['required']">జిల్లా తప్పనిసరిగా సెలెక్ట్ చేయాలి </div>
+                                                    </div>
+                                                </div>
+
+                                            </div>
+                                            <div class="col-md-6 mb-4 pb-2">
+                                                <div class="form-outline">
+                                                    <label class="form-label">నియోజకవర్గం ఎంచుకోండి <span
+                                                            style="color:red; -webkit-text-stroke-width:thick;">*</span>
+                                                    </label>
+                                                    <select class="form-control" formControlName="constituency_id"
+                                                        (change)="getmandals($event);" style="height:37px;width: 273px;"
+                                                        [ngClass]="{'is-invalid': submitted && k['constituency_id'].errors }">
+                                                        <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
+                                                        <option value="{{item.id}}" *ngFor="let item of constituency">
+                                                            {{item.const_nm}}
+                                                        </option>
+                                                    </select>
+                                                    <div *ngIf="submitted && k['constituency_id'].errors"
+                                                        class="invalid-feedback">
+                                                        <div *ngIf="k['constituency_id'].errors['required']">
+                                                            constituency
+                                                            is required </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <br>
+                                        <div class="row">
+                                            <div class="col-md-6 mb-4 pb-2">
+                                                <div class="form-outline">
+                                                    <label class="form-label">Select Mandal <span
+                                                            style="color:red; -webkit-text-stroke-width:thick;">*</span>
+                                                    </label>
+                                                    <select class="form-control" formControlName="mandal_id"
+                                                        (change)="gepanchayati($event);"
+                                                        style="height:37px;width: 273px;"
+                                                        [ngClass]="{'is-invalid': submitted && k['mandal_id'].errors }">
+                                                        <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
+                                                        <option value="{{item.id}}" *ngFor="let item of mandals">
+                                                            {{item.mndl_nm}}
+                                                        </option>
+                                                    </select>
+                                                    <div *ngIf="submitted && k['mandal_id'].errors"
+                                                        class="invalid-feedback">
+                                                        <div *ngIf="k['mandal_id'].errors['required']">Mandals
+                                                            is required </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6 mb-4 pb-2">
+                                                <div class="form-outline">
+                                                    <label class="form-label">పంచాయతీ ఎంచుకోండి <span
+                                                            style="color:red; -webkit-text-stroke-width:thick;">*</span>
+                                                    </label>
+                                                    <select class="form-control" formControlName="village_id"
+                                                        style="height:37px;width: 273px;"
+                                                        [ngClass]="{'is-invalid': submitted && k['village_id'].errors }">
+                                                        <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
+                                                        <option value="{{item.id}}" *ngFor="let item of panchayati">
+                                                            {{item.pnchyt_nm}}
+                                                        </option>
+                                                    </select>
+                                                    <div *ngIf="submitted && k['village_id'].errors"
+                                                        class="invalid-feedback">
+                                                        <div *ngIf="k['village_id'].errors['required']">పంచాయతీ తప్పనిసరిగా సెలెక్ట్ చేయాలి </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <br>
+
+                                        <div class="row">
+                                            <div class="col-md-6 mb-4 pb-2">
+                                                <div class="form-outline">
+                                                    <label class="form-label">Google Location </label>
+                                                    <input type="text" formControlName="location" class="form-control"
+                                                        placeholder="Enter Your Location" />
+
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6 mb-4 pb-2" style="width:273px;">
+                                                <div class="form-outline">
+                                                    <label class="form-label">Enter Your Street Name<span
+                                                            style="color:red; -webkit-text-stroke-width:thick;">*</span></label>
+                                                    <input type="text" formControlName="street" class="form-control"
+                                                        placeholder="Enter Your Street Name"
+                                                        [ngClass]="{'is-invalid': submitted && k['street'].errors }" />
+                                                    <div *ngIf="submitted && k['street'].errors"
+                                                        class="invalid-feedback">
+                                                        <div *ngIf="k['street'].errors['required']">Street Name
+                                                            is required </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <br>
+
+                                        <div class="row">
+                                            <!-- <div class="col-md-6 mb-4">
+                                            <label class="form-label" for="church_name">Search Pastor Name <span
+                                                    style="color:red; -webkit-text-stroke-width:thick;">*</span></label>
+                                            <input class="form-control" type="text"
+                                                (keyup)="filterPastor($event.target)">
+                                        </div> -->
+                                            <div class="col-md-6 mb-4">
+                                                <div class="form-outline">
+                                                    <label class="form-label" for="pastor_name">Pastor Name<span
+                                                            style="color:red; -webkit-text-stroke-width:thick;">*</span></label>
+                                                    <select class="form-control" formControlName="pastor_id"
+                                                        style="height:37px;width: 273px;"
+                                                        [ngClass]="{'is-invalid': submitted && k['pastor_id'].errors }"
+                                                        (click)="churchpastorfilter()">
+                                                        <option value="" selected disabled>Select the pastor
+                                                        </option>
+                                                        <option *ngFor="let i of getchurchpastors" value="{{i.id}}">
+                                                            {{i.pastorname }}</option>
+                                                    </select>
+                                                    <div *ngIf="submitted && k['pastor_id'].errors"
+                                                        class="invalid-feedback">
+                                                        <div *ngIf="k['pastor_id'].errors['required']">Pastor
+                                                            is required </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                        <br>
+
+                                    </div>
+                                    <br>
+
+
+                                    <div class="row">
+                                        <div class="col-md-6 mb-4 pb-2">
+                                            <div class="form-outline">
+                                                <label class="form-label">Facebook </label>
+                                                <input type="text" formControlName="facebook" class="form-control"
+                                                    placeholder="Enter Your Facebook">
+
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 mb-4 pb-2">
+                                            <div class="form-outline">
+                                                <label class="form-label">Youtube</label>
+                                                <input type="text" formControlName="youtube" class="form-control"
+                                                    placeholder="Enter Your Youtube">
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <br>
+                                    <div class="row">
+                                        <div class="col-md-6 mb-4 pb-2">
+                                            <div class="form-outline">
+                                                <label class="form-label">Village Name<span
+                                                        style="color:red; -webkit-text-stroke-width:thick;">*</span></label>
+                                                <input type="text" formControlName="village_name" class="form-control"
+                                                    placeholder="Enter Your Village Name"
+                                                    [ngClass]="{'is-invalid': submitted && k['village_name'].errors }" />
+                                                <div *ngIf="submitted && k['village_name'].errors"
+                                                    class="invalid-feedback">
+                                                    <div *ngIf="k['village_name'].errors['required']">Street Name
+                                                        is required </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 mb-4 pb-2">
+                                            <div class="form-outline">
+                                                <label class="form-label">Any Other Information </label>
+                                                <textarea type="text" formControlName="description" class="form-control"
+                                                    placeholder="Enter Your Description"></textarea>
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <br>
+
+                                    <div class="row">
+                                        <div class="col-md-6 mb-4 pb-2">
+                                            <div class="form-outline">
+                                                <label class="form-label">Password <span
+                                                        style="color:red; -webkit-text-stroke-width:thick;">*</span></label>
+                                                <input type="password" formControlName="password" class="form-control"
+                                                    placeholder="ఇక్కడ క్లిక్ చేసి నమోదు చేయండి" maxlength="16" minlength="6"
+                                                    [ngClass]="{'is-invalid': submitted && k['password'].errors }" />
+                                                <div *ngIf="submitted && k['password'].errors" class="invalid-feedback">
+                                                    <div *ngIf="k['password'].errors['required']">Password
+                                                        is required </div>
+                                                    <div *ngIf="k['password'].errors['minlength']">Password between 6 to
+                                                        16 Characters / Digits</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 mb-4 pb-2">
+                                            <div class="form-outline">
+                                                <label class="form-label">Retype-Password <span
+                                                        style="color:red; -webkit-text-stroke-width:thick;">*</span></label>
+                                                <input type="password" formControlName="retypepassword"
+                                                    class="form-control" placeholder="Enter Your Retype-Password"
+                                                    maxlength="16" minlength="6"
+                                                    [ngClass]="{'is-invalid': submitted && k['retypepassword'].errors }" />
+                                                <div *ngIf="submitted && k['retypepassword'].errors"
+                                                    class="invalid-feedback">
+                                                    <div *ngIf="k['retypepassword'].errors['required']">Retype-Password
+                                                        is required </div>
+                                                    <div *ngIf="k['retypepassword'].errors['minlength']">Password
+                                                        between 6 to 16 Characters / Digits</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <br>
+                                    <div class="row">
+
+                                        <div class="col-md-6 mb-4 pb-2">
+                                            <div class="form-outline">
+                                                <label class="form-label">Agree to Store and sending information to
+                                                    you<span
+                                                        style="color:red; -webkit-text-stroke-width:thick;">*</span></label>
+                                                <div class="form-check form-check-inline">
+                                                    <input class="form-check-input" type="checkbox" value="YES"
+                                                        formControlName="term" checked
+                                                        [ngClass]="{'is-invalid': submitted && k['term'].errors }" />
+                                                    <label class="form-check-label">YES</label>
+                                                    <div *ngIf="submitted && k['term'].errors" class="invalid-feedback">
+                                                        <div *ngIf="k['term'].errors['required']">Agree to Store and
+                                                            sending information to
+                                                            you </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </form>
+                                <br>
+                                <div class="row">
+                                    <div class="col-md-2 mb-4 pb-2">
+                                    </div>
+                                    <div class="col-md-2 mb-4 pb-2">
+                                    </div>
+                                    <div class="col-md-2 mb-4 pb-2">
+                                        <button type="submit" (click)="postchurchregister()"
+                                            class="default-btn  user-all-btn">Register
+                                        </button>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+    <br>
+</div>
