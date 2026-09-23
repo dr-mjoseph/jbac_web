@@ -10,6 +10,7 @@
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
 SET time_zone = "+00:00";
+SET FOREIGN_KEY_CHECKS = 0;
 
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -20,6 +21,10 @@ SET time_zone = "+00:00";
 --
 -- Database: `jbac_jbac`
 --
+DROP DATABASE IF EXISTS `jbac_jbac`;
+CREATE DATABASE `jbac_jbac` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci;
+USE `jbac_jbac`;
+SET FOREIGN_KEY_CHECKS = 0;
 
 -- --------------------------------------------------------
 
@@ -25437,7 +25442,7 @@ ALTER TABLE `church_reg`
 -- Constraints for table `const_dtl_t`
 --
 ALTER TABLE `const_dtl_t`
-  ADD CONSTRAINT `const_dtl_t_ibfk_1` FOREIGN KEY (`dstrct_id`) REFERENCES `dstrct1` (`id`);
+  ADD CONSTRAINT `const_dtl_t_ibfk_1` FOREIGN KEY (`dstrct_id`) REFERENCES `dstrct` (`id`);
 
 --
 -- Constraints for table `events`
@@ -25454,6 +25459,8 @@ ALTER TABLE `jobs`
   ADD CONSTRAINT `jobs_ibfk_2` FOREIGN KEY (`constituency_id`) REFERENCES `const_dtl_t` (`id`),
   ADD CONSTRAINT `jobs_ibfk_3` FOREIGN KEY (`mandal_id`) REFERENCES `mndls_lst_t` (`id`),
   ADD CONSTRAINT `jobs_ibfk_4` FOREIGN KEY (`panchayat_id`) REFERENCES `pnchyt_lst_t` (`id`);
+
+SET FOREIGN_KEY_CHECKS = 1;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

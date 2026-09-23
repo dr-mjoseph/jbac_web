@@ -29,6 +29,6 @@ if [ ! -f "$SQL_FILE" ]; then
 fi
 
 echo "Importing into RDS MySQL (enter master password when prompted)..."
-mysql -h "$HOSTNAME" -P 3306 -u "$USERNAME" -p --default-character-set=utf8mb4 "$DATABASE_NAME" < "$SQL_FILE"
+mysql -h "$HOSTNAME" -P 3306 -u "$USERNAME" -p --init-command="SET FOREIGN_KEY_CHECKS=0;" --default-character-set=utf8mb4 "$DATABASE_NAME" < "$SQL_FILE"
 
 echo "Database $DATABASE_NAME successfully imported!"
