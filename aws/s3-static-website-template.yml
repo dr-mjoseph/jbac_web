@@ -1,0 +1,54 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'CloudFormation Template for Angular Web Application on AWS S3 Static Website Hosting (No CloudFront required, works immediately on new AWS accounts)'
+
+Parameters:
+  ProjectName:
+    Type: String
+    Default: 'jbac-web'
+    Description: 'Project identifier for bucket name'
+  Environment:
+    Type: String
+    Default: 'production'
+    AllowedValues: ['development', 'staging', 'production']
+    Description: 'Deployment environment'
+
+Resources:
+  # S3 Bucket configured for Direct Static Website Hosting
+  WebBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub '${ProjectName}-${Environment}-${AWS::AccountId}'
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: false
+        BlockPublicPolicy: false
+        IgnorePublicAcls: false
+        RestrictPublicBuckets: false
+      WebsiteConfiguration:
+        IndexDocument: index.html
+        # SPA routing: map 404 to index.html so Angular client-side routes work
+        ErrorDocument: index.html
+
+  # Public Read Bucket Policy for Website Hosting
+  WebBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref WebBucket
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Sid: PublicReadGetObject
+            Effect: Allow
+            Principal: '*'
+            Action: s3:GetObject
+            Resource: !Sub '${WebBucket.Arn}/*'
+
+Outputs:
+  BucketName:
+    Description: 'S3 Bucket Name (use for AWS_S3_BUCKET secret in GitHub)'
+    Value: !Ref WebBucket
+    Export:
+      Name: !Sub '${ProjectName}-${Environment}-S3Bucket'
+
+  WebsiteURL:
+    Description: 'Public Website URL (Instant live Angular website)'
+    Value: !GetAtt WebBucket.WebsiteURL
