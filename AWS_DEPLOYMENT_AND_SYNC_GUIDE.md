@@ -1,6 +1,6 @@
 # Complete Guide: AWS Deployment (Web + MySQL DB) & Web-to-Android Auto-Sync
 
-This repository is configured to deploy the Angular web application and MySQL database to Amazon Web Services (AWS) with automated continuous deployment (CI/CD) and automated synchronization with the Android mobile application ([`jbscapp_new`](https://github.com/mjosephp7-dot/jbscapp_new)).
+This repository is configured to deploy the Angular web application and MySQL database to Amazon Web Services (AWS) with automated continuous deployment (CI/CD) and automated synchronization with the Android mobile application ([`jbac_app`](https://github.com/dr-mjoseph/jbac_app)).
 
 ---
 
@@ -8,7 +8,7 @@ This repository is configured to deploy the Angular web application and MySQL da
 
 ```
                       +---------------------------------------+
-                      |   Developer Push to final_jan30th     |
+                      |     Developer Push to jbac_web        |
                       +---------------------------------------+
                                           |
                 +-------------------------+-------------------------+
@@ -19,7 +19,7 @@ This repository is configured to deploy the Angular web application and MySQL da
       Builds Angular 15 App                               Builds Production Web App
                 |                                                   |
                 v                                                   v
-      Deploys to AWS S3 &                                 Syncs to jbscapp_new
+      Deploys to AWS S3 &                                 Syncs to jbac_app
       Invalidates CloudFront CDN                          (Commits & pushes to GitHub)
                 |                                                   |
                 v                                                   v
@@ -102,10 +102,10 @@ chmod +x ./aws/import-db.sh
 ### Method B: Deploying Updates
 
 #### 1. Via Automated GitHub Actions (Continuous Deployment)
-In your GitHub repository ([`final_jan30th`](https://github.com/mjosephp7-dot/final_jan30th)), navigate to **Settings** -> **Secrets and variables** -> **Actions** and add the following secrets:
+In your GitHub repository ([`jbac_web`](https://github.com/dr-mjoseph/jbac_web)), navigate to **Settings** -> **Secrets and variables** -> **Actions** and add the following secrets:
 - `AWS_ACCESS_KEY_ID`: Your AWS IAM access key ID.
 - `AWS_SECRET_ACCESS_KEY`: Your AWS IAM secret access key.
-- `AWS_REGION`: e.g. `us-east-1`
+- `AWS_REGION`: e.g. `us-east-1` (or `ap-south-1`)
 - `AWS_S3_BUCKET`: The S3 bucket name created in Step 1.
 - `AWS_CLOUDFRONT_DISTRIBUTION_ID`: The CloudFront distribution ID.
 
@@ -120,7 +120,7 @@ npm run deploy:aws
 
 ## Part 3: Simultaneous Development & Automatic Sync to Android Mobile App
 
-Whenever you make changes to your web application, you want the mobile application ([`jbscapp_new`](https://github.com/mjosephp7-dot/jbscapp_new)) to automatically receive the updates.
+Whenever you make changes to your web application, you want the mobile application ([`jbac_app`](https://github.com/dr-mjoseph/jbac_app)) to automatically receive the updates.
 
 ### 1. Automatic GitHub Sync Workflow (Zero Manual Effort)
 
@@ -130,14 +130,14 @@ We created [`.github/workflows/sync-mobile.yml`](.github/workflows/sync-mobile.y
 1. Generate a GitHub Personal Access Token (Classic) with `repo` permissions:
    - Go to [GitHub Token Settings](https://github.com/settings/tokens).
    - Click **Generate new token (classic)**, check `repo` scope, and copy the token.
-2. In your web app repo ([`final_jan30th`](https://github.com/mjosephp7-dot/final_jan30th)):
+2. In your web app repo ([`jbac_web`](https://github.com/dr-mjoseph/jbac_web)):
    - Go to **Settings** -> **Secrets and variables** -> **Actions**.
    - Click **New repository secret**.
    - Name: `MOBILE_REPO_PAT`
    - Value: Paste your Personal Access Token.
-3. That's it! Every time you commit and push changes to `final_jan30th`:
+3. That's it! Every time you commit and push changes to `jbac_web`:
    - GitHub Actions automatically compiles the web app.
-   - Synchronizes the compiled assets, services, and media to [`jbscapp_new`](https://github.com/mjosephp7-dot/jbscapp_new).
+   - Synchronizes the compiled assets, services, and media to [`jbac_app`](https://github.com/dr-mjoseph/jbac_app).
    - Commits and pushes the update directly into the mobile app repository.
 
 ### 2. Manual 1-Command Local Sync
@@ -145,7 +145,7 @@ We created [`.github/workflows/sync-mobile.yml`](.github/workflows/sync-mobile.y
 You can also trigger synchronization directly from your development machine:
 
 ```bash
-# Sync web app changes to sibling directory ../jbscapp_new
+# Sync web app changes to sibling directory ../jbac_app
 npm run sync:mobile
 
 # Or sync and automatically push commits to GitHub

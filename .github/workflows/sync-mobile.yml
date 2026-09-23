@@ -11,19 +11,19 @@ on:
 
 jobs:
   sync-to-mobile:
-    name: Sync Web Changes to jbscapp_new
+    name: Sync Web Changes to jbac_app
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout Web App (final_jan30th)
+      - name: Checkout Web App (jbac_web)
         uses: actions/checkout@v4
         with:
           path: web_app
 
-      - name: Checkout Mobile App (jbscapp_new)
+      - name: Checkout Mobile App (jbac_app)
         uses: actions/checkout@v4
         with:
-          repository: 'mjosephp7-dot/jbscapp_new'
+          repository: 'dr-mjoseph/jbac_app'
           token: ${{ secrets.MOBILE_REPO_PAT || github.token }}
           path: mobile_app
 
@@ -58,5 +58,5 @@ jobs:
           else
             git commit -m "chore(auto-sync): sync web updates from commit ${{ github.sha }}"
             git push origin main
-            echo "Successfully synced and pushed updates to jbscapp_new!"
+            echo "Successfully synced and pushed updates to jbac_app!"
           fi

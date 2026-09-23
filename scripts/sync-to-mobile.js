@@ -1,6 +1,6 @@
 /**
- * Sync Engine: Synchronizes Web App changes (final_jan30th) to Android Mobile App (jbscapp_new).
- * Usage: node scripts/sync-to-mobile.js [--mobile-path ../jbscapp_new] [--push] [--no-build]
+ * Sync Engine: Synchronizes Web App changes (jbac_web) to Android Mobile App (jbac_app).
+ * Usage: node scripts/sync-to-mobile.js [--mobile-path ../jbac_app] [--push] [--no-build]
  */
 
 const fs = require('fs');
@@ -20,7 +20,7 @@ function getArg(flag, defaultValue) {
 const shouldBuild = !args.includes('--no-build');
 const shouldPush = args.includes('--push');
 const customMobilePath = getArg('--mobile-path', null);
-const repoUrl = getArg('--repo', 'https://github.com/mjosephp7-dot/jbscapp_new.git');
+const repoUrl = getArg('--repo', 'https://github.com/dr-mjoseph/jbac_app.git');
 
 console.log('====================================================');
 console.log('  Web-to-Mobile Synchronization Engine');
@@ -31,8 +31,10 @@ let mobilePath = customMobilePath;
 if (!mobilePath) {
   // Check common sibling paths
   const possiblePaths = [
+    path.resolve(WEB_ROOT, '..', 'jbac_app'),
     path.resolve(WEB_ROOT, '..', 'jbscapp_new'),
     path.resolve(WEB_ROOT, 'mobile'),
+    path.resolve(process.env.TEMP || 'C:\\temp', 'jbac_app'),
     path.resolve(process.env.TEMP || 'C:\\temp', 'jbscapp_new')
   ];
   for (const p of possiblePaths) {
@@ -45,7 +47,7 @@ if (!mobilePath) {
 
 // If mobile directory is still not found, clone into temporary or sibling directory
 if (!mobilePath || !fs.existsSync(mobilePath)) {
-  const targetDir = path.resolve(WEB_ROOT, '..', 'jbscapp_new');
+  const targetDir = path.resolve(WEB_ROOT, '..', 'jbac_app');
   console.log(`[INFO] Mobile repository not found locally. Cloning ${repoUrl} to ${targetDir}...`);
   try {
     execSync(`git clone --depth 1 ${repoUrl} "${targetDir}"`, { stdio: 'inherit' });
@@ -110,7 +112,7 @@ if (fs.existsSync(webAssets) && fs.existsSync(path.join(mobilePath, 'src'))) {
 // 5. Update Sync Metadata
 const syncMeta = {
   lastSyncedAt: new Date().toISOString(),
-  syncedFromRepo: 'final_jan30th',
+  syncedFromRepo: 'jbac_web',
   webVersion: require('../package.json').version || '1.0.0'
 };
 fs.writeFileSync(path.join(mobilePath, 'sync-metadata.json'), JSON.stringify(syncMeta, null, 2));
