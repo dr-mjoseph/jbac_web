@@ -1,0 +1,106 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'CloudFormation Template for AWS RDS MySQL 8.0 Database (Free Tier Eligible)'
+
+Parameters:
+  DBInstanceIdentifier:
+    Type: String
+    Default: 'jbac-mysql-db'
+    Description: 'Unique identifier for the RDS DB Instance'
+  DatabaseName:
+    Type: String
+    Default: 'jbac_jbac'
+    Description: 'Initial database name'
+  MasterUsername:
+    Type: String
+    Default: 'admin'
+    Description: 'Master database username'
+  MasterUserPassword:
+    Type: String
+    NoEcho: true
+    Description: 'Master database password (minimum 8 alphanumeric characters)'
+  DBInstanceClass:
+    Type: String
+    Default: 'db.t4g.micro'
+    AllowedValues:
+      - 'db.t4g.micro'
+      - 'db.t3.micro'
+      - 'db.t3.small'
+      - 'db.t3.medium'
+    Description: 'RDS DB Instance Class (db.t4g.micro or db.t3.micro for Free Tier)'
+  AllocatedStorageGB:
+    Type: Number
+    Default: 20
+    MinValue: 20
+    MaxValue: 100
+    Description: 'Allocated storage in GB (20GB is free tier eligible)'
+  VpcId:
+    Type: AWS::EC2::VPC::Id
+    Description: 'VPC ID where RDS should be deployed (Default VPC)'
+  AllowedCIDR:
+    Type: String
+    Default: '0.0.0.0/0'
+    Description: 'Allowed CIDR IP for database access (Restrict to your IP or App Server in production)'
+
+Resources:
+  DBSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: 'Security Group for RDS MySQL Database'
+      VpcId: !Ref VpcId
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 3306
+          ToPort: 3306
+          CidrIp: !Ref AllowedCIDR
+          Description: 'Allow MySQL access from allowed CIDR'
+
+  DBParameterGroup:
+    Type: AWS::RDS::DBParameterGroup
+    Properties:
+      Description: 'Custom Parameter Group for MySQL 8.0 utf8mb4 encoding'
+      Family: 'mysql8.0'
+      Parameters:
+        character_set_server: 'utf8mb4'
+        collation_server: 'utf8mb4_unicode_ci'
+        character_set_client: 'utf8mb4'
+        character_set_connection: 'utf8mb4'
+        character_set_database: 'utf8mb4'
+        character_set_results: 'utf8mb4'
+        max_allowed_packet: 67108864
+
+  RDSInstance:
+    Type: AWS::RDS::DBInstance
+    Properties:
+      DBInstanceIdentifier: !Ref DBInstanceIdentifier
+      DBName: !Ref DatabaseName
+      Engine: mysql
+      EngineVersion: '8.0'
+      DBInstanceClass: !Ref DBInstanceClass
+      AllocatedStorage: !Ref AllocatedStorageGB
+      StorageType: gp3
+      MasterUsername: !Ref MasterUsername
+      MasterUserPassword: !Ref MasterUserPassword
+      DBParameterGroupName: !Ref DBParameterGroup
+      VPCSecurityGroups:
+        - !GetAtt DBSecurityGroup.GroupId
+      PubliclyAccessible: true
+      BackupRetentionPeriod: 7
+      PreferredBackupWindow: '03:00-04:00'
+      PreferredMaintenanceWindow: 'Sun:04:30-Sun:05:30'
+      MultiAZ: false
+      AutoMinorVersionUpgrade: true
+      DeletionProtection: false
+
+Outputs:
+  DBEndpoint:
+    Description: 'RDS MySQL Endpoint hostname'
+    Value: !GetAtt RDSInstance.Endpoint.Address
+  DBPort:
+    Description: 'RDS MySQL Port'
+    Value: !GetAtt RDSInstance.Endpoint.Port
+  DBName:
+    Description: 'Database Name'
+    Value: !Ref DatabaseName
+  JDBCConnectionString:
+    Description: 'Connection string for applications'
+    Value: !Sub 'jdbc:mysql://${RDSInstance.Endpoint.Address}:${RDSInstance.Endpoint.Port}/${DatabaseName}'

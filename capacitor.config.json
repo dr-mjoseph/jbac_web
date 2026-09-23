@@ -1,0 +1,13 @@
+{
+  "appId": "com.jbac.churchapp",
+  "appName": "JbacApp",
+  "webDir": "dist/churchwebsite",
+  "bundledWebRuntime": false,
+  "server": {
+    "cleartext": true,
+    "androidScheme": "https"
+  },
+  "android": {
+    "allowMixedContent": true
+  }
+}

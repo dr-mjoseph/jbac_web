@@ -1,0 +1,62 @@
+name: Auto-Sync Web App to Android Mobile App
+
+on:
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - 'README.md'
+      - 'aws/**'
+      - '.github/workflows/deploy-web-aws.yml'
+
+jobs:
+  sync-to-mobile:
+    name: Sync Web Changes to jbscapp_new
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Web App (final_jan30th)
+        uses: actions/checkout@v4
+        with:
+          path: web_app
+
+      - name: Checkout Mobile App (jbscapp_new)
+        uses: actions/checkout@v4
+        with:
+          repository: 'mjosephp7-dot/jbscapp_new'
+          token: ${{ secrets.MOBILE_REPO_PAT || github.token }}
+          path: mobile_app
+
+      - name: Setup Node.js 18
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: web_app/package-lock.json
+
+      - name: Install Web App Dependencies
+        working-directory: web_app
+        run: npm ci --legacy-peer-deps
+
+      - name: Build Web App Production Bundle
+        working-directory: web_app
+        run: npm run build -- --configuration production
+
+      - name: Run Web-to-Mobile Sync Engine
+        working-directory: web_app
+        run: |
+          node scripts/sync-to-mobile.js --mobile-path ../mobile_app --no-build
+
+      - name: Commit and Push Changes to Mobile Repository
+        working-directory: mobile_app
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if git diff --staged --quiet; then
+            echo "No changes to sync."
+          else
+            git commit -m "chore(auto-sync): sync web updates from commit ${{ github.sha }}"
+            git push origin main
+            echo "Successfully synced and pushed updates to jbscapp_new!"
+          fi

@@ -5,8 +5,12 @@
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build",
+    "build:prod": "ng build --configuration production",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
+    "sync:mobile": "node scripts/sync-to-mobile.js",
+    "deploy:aws": "powershell -ExecutionPolicy Bypass -File ./aws/deploy.ps1",
+    "import:db": "powershell -ExecutionPolicy Bypass -File ./aws/import-db.ps1",
     "post-build": "node./build/post-build.js"
   },
   "private": true,
