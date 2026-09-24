@@ -1,5 +1,5 @@
 $headers = @{ "User-Agent" = "PowerShell" }
-$runId = 35989620777
+$runId = 35992258407
 $artifacts = Invoke-RestMethod -Uri "https://api.github.com/repos/dr-mjoseph/jbac_app/actions/runs/$runId/artifacts" -Headers $headers
 Write-Output "Artifacts count: $($artifacts.total_count)"
 foreach ($a in $artifacts.artifacts) {

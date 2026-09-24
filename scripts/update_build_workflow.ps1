@@ -51,13 +51,18 @@ jobs:
     - name: Build Android Release APK
       run: cordova build android --release -- --packageType=apk
 
+    - name: List Build Outputs
+      run: find platforms/android/app/build/outputs/ -type f || true
+
     - name: Upload APK
       uses: actions/upload-artifact@v4
       with:
         name: app-release-unsigned.apk
-        path: platforms/android/app/build/outputs/apk/release/*.apk
+        path: |
+          platforms/android/app/build/outputs/**/*.apk
+          platforms/android/app/build/outputs/**/*.aab
 "@
 
 $utf8NoBom = New-Object System.Text.UTF8Encoding($false)
 [System.IO.File]::WriteAllText($workflowPath, $content.TrimStart([char]0xFEFF), $utf8NoBom)
-Write-Output "Successfully updated build-apk.yml to clean two-stage build"
+Write-Output "Successfully updated build-apk.yml with recursive artifact path"

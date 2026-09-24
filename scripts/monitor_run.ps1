@@ -1,5 +1,5 @@
 $headers = @{ "User-Agent" = "PowerShell" }
-$runId = 35990629609
+$runId = 35992723154
 $run = Invoke-RestMethod -Uri "https://api.github.com/repos/dr-mjoseph/jbac_app/actions/runs/$runId/jobs" -Headers $headers
 $job = $run.jobs[0]
 Write-Output "Job: $($job.name) | Status: $($job.status) | Conclusion: $($job.conclusion)"
