@@ -101,18 +101,34 @@ jobs:
           exit 1
         }
 
+    - name: Sign Android Release APK
+      run: |
+        ALIGN="/usr/local/lib/android/sdk/build-tools/30.0.3/zipalign"
+        SIGNER="/usr/local/lib/android/sdk/build-tools/30.0.3/apksigner"
+        UNSIGNED="platforms/android/app/build/outputs/apk/release/app-release-unsigned.apk"
+        ALIGNED="platforms/android/app/build/outputs/apk/release/app-release-aligned.apk"
+        SIGNED="platforms/android/app/build/outputs/apk/release/app-release.apk"
+
+        echo "Aligning APK..."
+        `$ALIGN -f -p 4 "`$UNSIGNED" "`$ALIGNED"
+
+        echo "Signing APK with Jbac.keystore..."
+        `$SIGNER sign --ks Jbac.keystore --ks-pass pass:123456 --ks-key-alias jbac --key-pass pass:123456 --out "`$SIGNED" "`$ALIGNED"
+
+        echo "Verifying signature..."
+        `$SIGNER verify --verbose "`$SIGNED"
+        ls -la "`$SIGNED"
+
     - name: List Build Outputs
       run: find platforms/android/app/build/outputs/ -type f || true
 
     - name: Upload APK
       uses: actions/upload-artifact@v4
       with:
-        name: app-release-unsigned.apk
-        path: |
-          platforms/android/app/build/outputs/**/*.apk
-          platforms/android/app/build/outputs/**/*.aab
+        name: app-release.apk
+        path: platforms/android/app/build/outputs/apk/release/app-release.apk
 "@
 
 $utf8NoBom = New-Object System.Text.UTF8Encoding($false)
 [System.IO.File]::WriteAllText($workflowPath, $content.TrimStart([char]0xFEFF), $utf8NoBom)
-Write-Output "Successfully updated build-apk.yml with SDK permissions and build-tools 30.0.3"
+Write-Output "Successfully updated build-apk.yml with automated APK signing"
