@@ -1,0 +1,149 @@
+  async useCurrentLocation(): Promise<void> {
+    this.locationError = '';
+    this.locationSuccess = '';
+    this.locationName = '';
+    this.locationSourceMessage = '';
+    this.locationLoading = true;
+
+    var reverseGeocode = async (lat: number, lng: number): Promise<string> => {
+      try {
+        var bdcUrl = 'https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=' + lat + '&longitude=' + lng + '&localityLanguage=en';
+        var res = await fetch(bdcUrl);
+        var data = await res.json();
+        var parts = [
+          data.locality || data.name || '',
+          data.city || data.principalSubdivision || '',
+          data.countryName || ''
+        ].filter(function(p: any) { return !!p; });
+        if (parts.length > 0) {
+          return parts.join(', ');
+        }
+      } catch (e) {
+        console.warn('BigDataCloud geocoding error:', e);
+      }
+
+      try {
+        var nominatimUrl = 'https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=' + lat + '&lon=' + lng;
+        var resNom = await fetch(nominatimUrl);
+        var dataNom = await resNom.json();
+        if (dataNom && dataNom.display_name) {
+          return dataNom.display_name;
+        }
+      } catch (e) {
+        console.warn('Nominatim geocoding error:', e);
+      }
+
+      return lat.toFixed(5) + ', ' + lng.toFixed(5);
+    };
+
+    var applyLocation = (lat: number, lng: number, place: string, source: string) => {
+      var updateFn = () => {
+        var googleUrl = 'https://maps.google.com/?q=' + lat + ',' + lng;
+        this.form.patchValue({
+          location: googleUrl,
+          address: place
+        });
+        if (this.form.controls['location']) {
+          this.form.controls['location'].markAsDirty();
+          this.form.controls['location'].markAsTouched();
+        }
+        if (this.form.controls['address']) {
+          this.form.controls['address'].markAsDirty();
+          this.form.controls['address'].markAsTouched();
+        }
+
+        this.locationName = place;
+        this.locationSuccess = 'కరెంటు లొకేషన్ విజయవంతముగా నమోదు చేయబడింది.';
+        this.locationSourceMessage = source;
+        this.locationLoading = false;
+        if (this.cdr) {
+          this.cdr.detectChanges();
+        }
+
+        var alertSuccess = this.alertctrl.create({
+          mode: 'ios',
+          title: 'లొకేషన్ నమోదు అయ్యింది!',
+          subTitle: place,
+          message: googleUrl,
+          buttons: ['సరే']
+        });
+        alertSuccess.present();
+      };
+
+      if (this.zone) {
+        this.zone.run(updateFn);
+      } else {
+        updateFn();
+      }
+    };
+
+    var fallbackToIp = async (reasonMsg: string) => {
+      try {
+        var ipRes = await fetch('https://ipapi.co/json/');
+        var ipData = await ipRes.json();
+        if (ipData && ipData.latitude && ipData.longitude) {
+          var lat = parseFloat(ipData.latitude);
+          var lng = parseFloat(ipData.longitude);
+          var parts = [ipData.city, ipData.region, ipData.country_name].filter(function(p: any) { return !!p; });
+          var place = parts.join(', ') || (lat + ', ' + lng);
+          applyLocation(lat, lng, place, 'నెట్‌వర్క్ (IP) ఆధారంగా లొకేషన్ నమోదు చేయబడింది.');
+          return;
+        }
+      } catch (ipErr) {
+        console.warn('IP location fallback failed:', ipErr);
+      }
+
+      var errorFn = () => {
+        this.locationLoading = false;
+        this.locationError = reasonMsg;
+        if (this.cdr) {
+          this.cdr.detectChanges();
+        }
+
+        var alertErr = this.alertctrl.create({
+          mode: 'ios',
+          title: 'లొకేషన్ లోపం',
+          message: reasonMsg,
+          buttons: ['సరే']
+        });
+        alertErr.present();
+      };
+
+      if (this.zone) {
+        this.zone.run(errorFn);
+      } else {
+        errorFn();
+      }
+    };
+
+    if (!navigator.geolocation) {
+      await fallbackToIp('మీ డివైస్ లో GPS జియోలొకేషన్ సపోర్ట్ లేదు.');
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        var lat = position.coords.latitude;
+        var lng = position.coords.longitude;
+        var place = await reverseGeocode(lat, lng);
+        applyLocation(lat, lng, place, 'GPS ద్వారా లొకేషన్ విజయవంతముగా పొందబడింది.');
+      },
+      async (error) => {
+        var msg = 'లొకేషన్ పొందడంలో సమస్య ఏర్పడింది.';
+        if (error.code === error.PERMISSION_DENIED) {
+          msg = 'లొకేషన్ అనుమతి నిరాకరించబడింది. దయచేసి మొబైల్ సెట్టింగ్స్ లో లొకేషన్ పర్మిషన్ ఆన్ చేయండి.';
+        } else if (error.code === error.TIMEOUT) {
+          msg = 'లొకేషన్ రిక్వెస్ట్ టైమ్‌అవుట్ అయ్యింది.';
+        } else if (error.code === error.POSITION_UNAVAILABLE) {
+          msg = 'లొకేషన్ సిగ్నల్ అందుబాటులో లేదు.';
+        }
+        await fallbackToIp(msg);
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 60000
+      }
+    );
+  }
+

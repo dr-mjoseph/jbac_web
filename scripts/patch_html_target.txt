@@ -1,0 +1,10 @@
+      <ion-col col-12>
+        <ion-item class="mb-4 pb-2">
+          <ion-label stacked>కూటముల గూగుల్ లొకేషన్ లింక్</ion-label>
+          <ion-input type="text" formControlName="location" placeholder="ఇక్కడ క్లిక్ చేసి ఎంటర్ చేయండి"
+            class="form-control"></ion-input>
+          <div *ngIf="submitted && t['location'].errors" class="invalid-feedback">
+            <div *ngIf="t['location'].errors['required']">కూటముల గూగుల్ లొకేషన్ ఎంటర్ చేయండి</div>
+          </div>
+        </ion-item>
+      </ion-col>

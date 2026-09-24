@@ -1,0 +1,29 @@
+      <ion-col col-12>
+        <ion-item class="mb-2">
+          <ion-label stacked>కూటముల గూగుల్ లొకేషన్ లింక్</ion-label>
+          <ion-input type="text" formControlName="location" placeholder="ఎంటర్ కూటముల గూగుల్ లొకేషన్"
+            class="form-control"></ion-input>
+          <div *ngIf="submitted && t['location'].errors" class="invalid-feedback">
+            <div *ngIf="t['location'].errors['required']">కూటముల గూగుల్ లొకేషన్ ఎంటర్ చేయండి</div>
+          </div>
+        </ion-item>
+
+        <button ion-button block color="primary" type="button" (click)="useCurrentLocation()" [disabled]="locationLoading" style="margin-top: 8px; margin-bottom: 8px; height: 48px; font-size: 15px; font-weight: bold; border-radius: 8px; text-transform: none;">
+          <ion-icon name="pin" style="margin-right: 8px; font-size: 20px;"></ion-icon>
+          {{ locationLoading ? 'శోధిస్తున్నాము... దయచేసి ఆగండి' : 'కరెంటు లొకేషన్ నమోదు కోసం క్లిక్ ' }}
+        </button>
+
+        <div *ngIf="locationLoading" style="background: #e7f3fe; color: #0c5460; padding: 10px 14px; border-radius: 8px; margin-bottom: 10px; font-size: 13px; border-left: 4px solid #17a2b8;">
+          <ion-icon name="sync" style="margin-right: 6px;"></ion-icon> లొకేషన్ శోధిస్తున్నాము... దయచేసి ఆగండి.
+        </div>
+        <div *ngIf="locationError" style="background: #fff3cd; color: #856404; padding: 10px 14px; border-radius: 8px; margin-bottom: 10px; font-size: 13px; border-left: 4px solid #ffc107;">
+          <ion-icon name="warning" style="margin-right: 6px;"></ion-icon> {{ locationError }}
+        </div>
+        <div *ngIf="locationSuccess" style="background: #d4edda; color: #155724; padding: 10px 14px; border-radius: 8px; margin-bottom: 10px; font-size: 13px; border-left: 4px solid #28a745;">
+          <ion-icon name="checkmark-circle" style="margin-right: 6px;"></ion-icon> {{ locationSuccess }}
+          <div *ngIf="locationName" style="margin-top: 6px; font-weight: 500;"><strong>ప్రదేశం:</strong> {{ locationName }}</div>
+        </div>
+        <div *ngIf="locationSourceMessage" style="color: #666; font-size: 12px; margin-top: 2px; margin-bottom: 8px;">
+          {{ locationSourceMessage }}
+        </div>
+      </ion-col>

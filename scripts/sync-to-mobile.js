@@ -31,7 +31,9 @@ let mobilePath = customMobilePath;
 if (!mobilePath) {
   // Check common sibling paths
   const possiblePaths = [
+    path.resolve(process.env.USERPROFILE || 'C:\\Users\\rajes', 'StudioProjects', 'jbac_app'),
     path.resolve(WEB_ROOT, '..', 'jbac_app'),
+    path.resolve(WEB_ROOT, '..', '..', 'StudioProjects', 'jbac_app'),
     path.resolve(WEB_ROOT, '..', 'jbscapp_new'),
     path.resolve(WEB_ROOT, 'mobile'),
     path.resolve(process.env.TEMP || 'C:\\temp', 'jbac_app'),
@@ -186,7 +188,18 @@ if (fs.existsSync(webAssets) && fs.existsSync(path.join(mobilePath, 'src'))) {
   console.log(`  -> Synced assets to ${mobileAssets}`);
 }
 
-// 6. Update Sync Metadata
+// 6. Ensure mobile native addmeetings page and permissions are patched
+const patchScript = path.join(WEB_ROOT, 'scripts', 'apply_all_patches.ps1');
+if (fs.existsSync(patchScript)) {
+  try {
+    console.log('\n[PATCH] Ensuring mobile addmeetings page and location permissions are patched...');
+    execSync(`powershell -ExecutionPolicy Bypass -File "${patchScript}"`, { stdio: 'inherit' });
+  } catch (err) {
+    console.warn('[WARN] Could not run patch script automatically:', err.message);
+  }
+}
+
+// 7. Update Sync Metadata
 const syncMeta = {
   lastSyncedAt: new Date().toISOString(),
   syncedFromRepo: 'jbac_web',
