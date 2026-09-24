@@ -58,6 +58,24 @@ jobs:
             echo "No changes to sync."
           else
             git commit -m "chore(auto-sync): sync web updates from commit ${{ github.sha }}"
+            
+            # Robust push with pull --rebase retry in case remote changed concurrently
+            for attempt in 1 2 3; do
+              echo "Push attempt $attempt..."
+              if git push origin main; then
+                echo "Successfully synced and pushed updates to jbac_app!"
+                exit 0
+              fi
+              echo "Push rejected, fetching latest origin/main and rebasing with local changes..."
+              git fetch origin main
+              git pull --rebase -X theirs origin main || {
+                git rebase --abort || true
+                git reset --soft origin/main
+                git add -f www/
+                git add -A
+                git commit -m "chore(auto-sync): sync web updates from commit ${{ github.sha }}"
+              }
+              sleep 2
+            done
             git push origin main
-            echo "Successfully synced and pushed updates to jbac_app!"
           fi

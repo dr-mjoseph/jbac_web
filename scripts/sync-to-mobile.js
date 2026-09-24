@@ -206,8 +206,33 @@ if (shouldPush) {
     const status = execSync('git status --porcelain', { cwd: mobilePath }).toString();
     if (status.trim().length > 0) {
       execSync(`git commit -m "chore(sync): automated update from web app (${new Date().toISOString()})"`, { cwd: mobilePath, stdio: 'inherit' });
-      execSync('git push origin main', { cwd: mobilePath, stdio: 'inherit' });
-      console.log('[SUCCESS] Successfully committed and pushed updates to mobile repository!');
+      
+      let pushed = false;
+      for (let attempt = 1; attempt <= 3; attempt++) {
+        try {
+          console.log(`Push attempt ${attempt}...`);
+          execSync('git push origin main', { cwd: mobilePath, stdio: 'inherit' });
+          pushed = true;
+          break;
+        } catch (pushErr) {
+          console.log(`[WARN] Push attempt ${attempt} failed. Pulling latest remote changes with rebase...`);
+          try {
+            execSync('git pull --rebase -X theirs origin main', { cwd: mobilePath, stdio: 'inherit' });
+          } catch (rebaseErr) {
+            console.log('[WARN] Rebase failed, aborting and resetting softly...');
+            try { execSync('git rebase --abort', { cwd: mobilePath, stdio: 'ignore' }); } catch (e) {}
+            execSync('git reset --soft origin/main', { cwd: mobilePath, stdio: 'inherit' });
+            execSync('git add -f www/', { cwd: mobilePath, stdio: 'inherit' });
+            execSync('git add -A', { cwd: mobilePath, stdio: 'inherit' });
+            execSync(`git commit -m "chore(sync): automated update from web app (${new Date().toISOString()})"`, { cwd: mobilePath, stdio: 'inherit' });
+          }
+        }
+      }
+      if (pushed) {
+        console.log('[SUCCESS] Successfully committed and pushed updates to mobile repository!');
+      } else {
+        console.error('[ERROR] Failed to push to mobile repository after multiple attempts.');
+      }
     } else {
       console.log('[INFO] No changes detected in mobile repository. Nothing to commit.');
     }
