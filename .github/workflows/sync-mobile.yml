@@ -40,7 +40,7 @@ jobs:
 
       - name: Build Web App Production Bundle
         working-directory: web_app
-        run: npm run build -- --configuration production
+        run: npm run build -- --configuration production --base-href ./
 
       - name: Run Web-to-Mobile Sync Engine
         working-directory: web_app
@@ -52,6 +52,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add -f www/
           git add -A
           if git diff --staged --quiet; then
             echo "No changes to sync."

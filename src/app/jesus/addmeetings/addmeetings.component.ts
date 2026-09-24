@@ -5,6 +5,7 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { DatePipe } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import Swal from 'sweetalert2';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-addmeetings',
@@ -43,9 +44,14 @@ export class AddmeetingsComponent {
   denomation: any;
   ministryname: any;
   from_id: any;
+  locationLoading: boolean = false;
+  locationError: string = '';
+  locationSuccess: string = '';
+  locationName: string = '';
+  locationSourceMessage: string = '';
+  googleMapsApiKey: string = environment.googleMapsApiKey;
 
   constructor(private formBuilder: FormBuilder, private service: ServiceService, private modalService: NgbModal, private route: ActivatedRoute, private router: Router) {
-
     this.route.queryParams.subscribe(params => {
       this.from_id = params['id'];
     });
@@ -349,6 +355,81 @@ getbelivers() {
     let patt = /^([0-9])$/;
     let result = patt.test(event.key);
     return result;
+  }
+
+  useCurrentLocation(): void {
+    this.locationError = '';
+    this.locationSuccess = '';
+    this.locationName = '';
+    this.showSpinner = true;
+
+    if (!navigator.geolocation) {
+      this.locationError = 'Your browser does not support geolocation.';
+      this.showSpinner = false;
+      return;
+    }
+
+    this.locationLoading = true;
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        const lat = position.coords.latitude;
+        const lng = position.coords.longitude;
+        const googleUrl = `https://maps.google.com/?q=${lat},${lng}`;
+        this.addingmeetings.patchValue({ location: googleUrl });
+
+        let placeName = '';
+        this.locationSourceMessage = '';
+        try {
+          if (this.googleMapsApiKey) {
+            const geocodeUrl = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=${this.googleMapsApiKey}`;
+            const response = await fetch(geocodeUrl);
+            const data = await response.json();
+            if (data.status === 'OK' && data.results && data.results.length > 0) {
+              placeName = data.results[0].formatted_address;
+              this.locationSourceMessage = 'Location name from Google Geocoding API.';
+            }
+          }
+
+          if (!placeName) {
+            const nominatimUrl = `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}`;
+            const response = await fetch(nominatimUrl);
+            const data = await response.json();
+            placeName = data.display_name || `${lat}, ${lng}`;
+  //  this.locationSourceMessage = 'Location name from OpenStreetMap fallback.';
+          }
+
+          this.addingmeetings.patchValue({ address: placeName });
+          this.locationName = placeName;
+    //      this.locationSuccess = `Current location specified and added successfully.`;
+        } catch (err) {
+          this.addingmeetings.patchValue({ address: `${lat}, ${lng}` });
+          this.locationName = '';
+          this.locationSourceMessage = '';
+          this.locationSuccess = `Current location specified and added successfully.`;
+        } finally {
+          this.locationLoading = false;
+          this.showSpinner = false;
+        }
+      },
+      (error) => {
+        this.locationLoading = false;
+        this.showSpinner = false;
+        switch (error.code) {
+          case error.PERMISSION_DENIED:
+            this.locationError = 'Location permission denied. Please allow location access.';
+            break;
+          case error.POSITION_UNAVAILABLE:
+            this.locationError = 'Current position unavailable. Please try again.';
+            break;
+          case error.TIMEOUT:
+            this.locationError = 'Location request timed out. Please try again.';
+            break;
+          default:
+            this.locationError = 'Unable to fetch location. Please try again.';
+        }
+      },
+      { timeout: 15000 }
+    );
   }
 
   formshow(id: any) {

@@ -23,8 +23,8 @@
                             class="polls-icon">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
                         <a href="/about">జోసెఫ్ గారు కలిసిన నాయకులు తో గేలరీ</a>
                         <span
-                        class="polls-icon">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
-                    <a href="/ourhelp">మీకు మా సహాయం</a>
+                            class="polls-icon">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                        <a href="/ourhelp">మీకు మా సహాయం</a>
 
                         <span
                             class="photo_gallery-icon">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
@@ -65,12 +65,16 @@
             <div class="container py-5 h-100">
                 <div class="row justify-content-center align-items-center h-100">
                     <div class="col-12 col-lg-9 col-xl-7">
-                        <div class="card shadow-2-strong card-registration" style="border-radius: 15px;font-size: 18px;font-family: cursive;font-family: Ramabhadra,sans-serif !important;">
+                        <div class="card shadow-2-strong card-registration"
+                            style="border-radius: 15px;font-size: 18px;font-family: cursive;font-family: Ramabhadra,sans-serif !important;">
                             <div class="card-body p-4 p-md-5">
-                                <h3 class="mb-4 pb-2 pb-md-0 mb-md-5" style="border-radius: 15px;text-align:center ;color: #fb0404;font-size: 20px;font-family: cursive;font-family: Ramabhadra,sans-serif !important;"><u>క్రైస్తవ మీటింగ్స్ సమాచారం సబ్మిట్ చేయండి (* మార్క్ వున్నవి కంపల్సరీ ఫిల్ చేయాలి)</u></h3>
+                                <h3 class="mb-4 pb-2 pb-md-0 mb-md-5"
+                                    style="border-radius: 15px;text-align:center ;color: #fb0404;font-size: 20px;font-family: cursive;font-family: Ramabhadra,sans-serif !important;">
+                                    <u>క్రైస్తవ మీటింగ్స్ సమాచారం సబ్మిట్ చేయండి (* మార్క్ వున్నవి కంపల్సరీ ఫిల్
+                                        చేయాలి)</u></h3>
                                 <form [formGroup]="addingmeetings">
                                     <!-- -->
-                                    
+
                                     <div class="row">
                                         <div class="col-md-6 mb-4 pb-2">
                                             <div class="form-outline">
@@ -80,32 +84,34 @@
                                                     [ngClass]="{'is-invalid': submitted && t['mettingtype'].errors }">
                                                     <option value="" selected disabled>సెలెక్ట్ కూటముల టైపు </option>
 
-                                                    <option value="1">VBS</option>
-                                                    <option value="2">ఉజ్జీవ కూటములు</option>
-                                                    <option value="3">సువార్త కూటములు</option>
-                                                    <option value="4">స్వస్థత కూటములు</option>
-                                                    <option value="5">ఉజ్జీవ స్వస్థత కూటములు</option>
-                                                    <option value="6">యూత్ మీటింగ్స్</option>
-                                                    <option value="7">క్రైస్తవ నాయకుల కూటములు</option>
-                                                    <option value="8">స్త్రీల కూటములు</option>
-                                                    <option value="9">పాస్టర్ ఫెలోషిప్ కూటములు</option>
-                                                    <option value="10">క్రైస్తవ పిల్లల కూటములు</option>
-                                                    <option value="11">క్రైస్తవ బుక్స్ ఎక్సిబిషన్</option>
-                                                    <option value="12">క్రైస్తవ సంగీత కూటములు</option>
+                                                    <option value="VBS"> VBS</option>
+                                                    <option value="ఉజ్జీవ కూటములు">ఉజ్జీవ కూటములు</option>
+                                                    <option value="సువార్త కూటములు">సువార్త కూటములు</option>
+                                                    <option value="స్వస్థత కూటములు">స్వస్థత కూటములు</option>
+                                                    <option value="ఉజ్జీవ స్వస్థత కూటములు">ఉజ్జీవ స్వస్థత కూటములు</option>
+                                                    <option value="యూత్ మీటింగ్స్ కూటములు">యూత్ మీటింగ్స్</option>
+                                                    <option value="క్రైస్తవ నాయకుల కూటములు">క్రైస్తవ నాయకుల కూటములు</option>
+                                                    <option value="స్త్రీల కూటములు">స్త్రీల కూటములు</option>
+                                                    <option value="పాస్టర్ ఫెలోషిప్ కూటములు">పాస్టర్ ఫెలోషిప్ కూటములు</option>
+                                                    <option value="క్రైస్తవ పిల్లల కూటములు">క్రైస్తవ పిల్లల కూటములు</option>
+                                                    <option value="క్రైస్తవ బుక్స్ ఎక్సిబిషన్">క్రైస్తవ బుక్స్ ఎక్సిబిషన్</option>
+                                                    <option value="కూటములు">క్రైస్తవ సంగీత కూటములు</option>
                                                 </select>
                                                 <div *ngIf="submitted && t['mettingtype'].errors"
                                                     class="invalid-feedback">
-                                                    <div *ngIf="t['mettingtype'].errors['required']">సెలెక్ట్ కూటముల టైపు</div>
+                                                    <div *ngIf="t['mettingtype'].errors['required']">సెలెక్ట్ కూటముల
+                                                        టైపు</div>
                                                 </div>
                                             </div>
                                         </div>
                                         <div class="col-md-6 mb-4 pb-2">
                                             <div class="form-outline">
-                                                <label class="form-label">సెలెక్ట్ డినామినేషన్ మోడల్‌          <span
+                                                <label class="form-label">సెలెక్ట్ డినామినేషన్ మోడల్‌ <span
                                                         style="color:red; -webkit-text-stroke-width:thick;">*</span></label>
                                                 <select class="form-control" formControlName="denomation"
                                                     style="height:37px;width: 273px;">
-                                                    <option value="" selected disabled> సెలెక్ట్ డినామినేషన్ మోడల్‌                        </option>
+                                                    <option value="" selected disabled> సెలెక్ట్ డినామినేషన్ మోడల్‌
+                                                    </option>
                                                     <option value="{{item.id}}" *ngFor="let item of denomation">
                                                         {{item.denomation_name}}
                                                     </option>
@@ -113,7 +119,7 @@
 
                                             </div>
                                         </div>
-                                      
+
                                         <!-- <div class="col-md-6 mb-4">
                                             <div class="form-outline">
                                                 <label class="form-label">సెలెక్ట్  మీ మినిస్ట్రీ పేరు</label>
@@ -127,7 +133,7 @@
                                             </div>
                                         </div> -->
                                     </div>
-                                   <br>
+                                    <br>
 
                                     <div class="row">
                                         <div class="col-md-6 mb-4">
@@ -139,7 +145,8 @@
                                                     [min]="now"
                                                     [ngClass]="{'is-invalid': submitted && t['fromdate'].errors }" />
                                                 <div *ngIf="submitted && t['fromdate'].errors" class="invalid-feedback">
-                                                    <div *ngIf="t['fromdate'].errors['required']">కూటముల ప్రారంభ తేదీ</div>
+                                                    <div *ngIf="t['fromdate'].errors['required']">కూటముల ప్రారంభ తేదీ
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
@@ -151,7 +158,7 @@
                                                     [min]="now"
                                                     [ngClass]="{'is-invalid': submitted && t['todate'].errors }" />
                                                 <div *ngIf="submitted && t['todate'].errors" class="invalid-feedback">
-                                                    <div *ngIf="t['todate'].errors['required']">కూటముల చివరి తేదీ 
+                                                    <div *ngIf="t['todate'].errors['required']">కూటముల చివరి తేదీ
                                                     </div>
                                                 </div>
                                             </div>
@@ -172,7 +179,8 @@
                                             <img *ngIf="imagesData.length" src="{{imagesData[0].reviewimg}}" alt=""
                                                 height="100px" width="100px">
                                             <div *ngIf="submitted && t['image'].errors" class="invalid-feedback">
-                                                <div *ngIf="t['image'].errors['required']">అప్‌లోడ్ కూటముల పోస్టర్‌ని</div>
+                                                <div *ngIf="t['image'].errors['required']">అప్‌లోడ్ కూటముల పోస్టర్‌ని
+                                                </div>
                                             </div>
                                         </div>
                                         <div class="col-md-6 mb-4">
@@ -184,79 +192,87 @@
                                                     [ngClass]="{'is-invalid': submitted && t['description'].errors }" />
                                                 <div *ngIf="submitted && t['description'].errors"
                                                     class="invalid-feedback">
-                                                    <div *ngIf="t['description'].errors['required']">కూటముల సమయాలు & ఇతర సమాచారం </div>
+                                                    <div *ngIf="t['description'].errors['required']">కూటముల సమయాలు & ఇతర
+                                                        సమాచారం </div>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
                                     <br>
                                     <!-- phone number name start -->
-                                     <div class="row">
+                                    <div class="row">
                                         <div class="col-md-6 mb-4">
                                             <div class="form-outline">
                                                 <label class="form-label">మీటింగ్ ఆర్గనైజర్ పేరు<span
                                                         style="color:red; -webkit-text-stroke-width:thick;">*</span></label>
-                                                <input type="text" formControlName="orgname" class="form-control" placeholder="పేరు ఎంటర్ చేయండి"
-                                                    [min]="now"
+                                                <input type="text" formControlName="orgname" class="form-control"
+                                                    placeholder="పేరు ఎంటర్ చేయండి" [min]="now"
                                                     [ngClass]="{'is-invalid': submitted && t['orgname'].errors }" />
                                                 <div *ngIf="submitted && t['orgname'].errors" class="invalid-feedback">
                                                     <div *ngIf="t['orgname'].errors['required']">మీ పేరు ఎంటర్ చేయండి
-                                                        </div>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
                                         <div class="col-md-6 mb-4">
                                             <div class="form-outline">
-                                                <label class="form-label">మీటింగ్ హాజరు అయ్యే వారి సంఖ్య ఎంత ఉండవచ్చు (నంబర్)<span
+                                                <label class="form-label">మీటింగ్ హాజరు అయ్యే వారి సంఖ్య ఎంత ఉండవచ్చు
+                                                    (నంబర్)<span
                                                         style="color:red; -webkit-text-stroke-width:thick;">*</span></label>
-                                                <input type="text" formControlName="meetsize" class="form-control" placeholder="మీటింగ్ హాజరు అయ్యే వారి సంఖ్య"
-                                                    
+                                                <input type="text" formControlName="meetsize" class="form-control"
+                                                    placeholder="మీటింగ్ హాజరు అయ్యే వారి సంఖ్య"
                                                     (keypress)="numericOnly($event)"
                                                     [ngClass]="{'is-invalid': submitted && t['meetsize'].errors }" />
                                                 <div *ngIf="submitted && t['meetsize'].errors" class="invalid-feedback">
-                                                    <div *ngIf="t['meetsize'].errors['required']">మీటింగ్ హాజరు అయ్యే వారి సంఖ్య ఎంటర్ చేయండి
+                                                    <div *ngIf="t['meetsize'].errors['required']">మీటింగ్ హాజరు అయ్యే
+                                                        వారి సంఖ్య ఎంటర్ చేయండి
                                                     </div>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
-                                </div>
                                     <br>
-                                        <div class="row">
-                                         <div class="col-md-6 mb-4">
+                                    <div class="row">
+                                        <div class="col-md-6 mb-4">
                                             <div class="form-outline">
-                                                <label class="form-label">మీటింగ్ ఆర్గనైజర్ ఫోన్ నెంబర్ (పబ్లిక్ కు చూపించ బడదు)<span
+                                                <label class="form-label">మీటింగ్ ఆర్గనైజర్ ఫోన్ నెంబర్ (పబ్లిక్ కు
+                                                    చూపించ బడదు)<span
                                                         style="color:red; -webkit-text-stroke-width:thick;">*</span></label>
                                                 <input type="text" formControlName="orgphone" class="form-control"
-                                                    placeholder="మీ ఫోన్ నెంబర్ ఎంటర్ చేయండి" maxlength="10" minlength="10"
-                                                    (keypress)="numericOnly($event)"
+                                                    placeholder="మీ ఫోన్ నెంబర్ ఎంటర్ చేయండి" maxlength="10"
+                                                    minlength="10" (keypress)="numericOnly($event)"
                                                     [ngClass]="{'is-invalid': submitted && t['orgphone'].errors }" />
                                                 <div *ngIf="submitted && t['orgphone'].errors" class="invalid-feedback">
-                                                    <div *ngIf="t['orgphone'].errors['required']">మీ ఫోన్ నెంబర్ ఎంటర్ చేయండి
+                                                    <div *ngIf="t['orgphone'].errors['required']">మీ ఫోన్ నెంబర్ ఎంటర్
+                                                        చేయండి
                                                     </div>
                                                     <div *ngIf="t['orgphone'].errors['maxLength']">పది నంబర్లు
                                                     </div>
                                                 </div>
                                             </div>
-                                        </div> 
+                                        </div>
                                         <div class="col-md-6 mb-4">
                                             <div class="form-outline">
-                                                <label class="form-label">మీటింగ్ కోసం సంప్రదించే ఫోన్ (పబ్లిక్ కు చూపించ బడును)<span
+                                                <label class="form-label">మీటింగ్ కోసం సంప్రదించే ఫోన్ (పబ్లిక్ కు
+                                                    చూపించ బడును)<span
                                                         style="color:red; -webkit-text-stroke-width:thick;">*</span></label>
                                                 <input type="text" formControlName="evntphone" class="form-control"
-                                                    placeholder="మీటింగ్ కోసం సంప్రదించే ఫోన్" maxlength="10" minlength="10"
-                                                    (keypress)="numericOnly($event)"
+                                                    placeholder="మీటింగ్ కోసం సంప్రదించే ఫోన్" maxlength="10"
+                                                    minlength="10" (keypress)="numericOnly($event)"
                                                     [ngClass]="{'is-invalid': submitted && e['evntphone'].errors }" />
-                                                <div *ngIf="submitted && e['evntphone'].errors" class="invalid-feedback">
-                                                    <div *ngIf="e['evntphone'].errors['required']">మీ ఫోన్ నెంబర్ ఎంటర్ చేయండి
+                                                <div *ngIf="submitted && e['evntphone'].errors"
+                                                    class="invalid-feedback">
+                                                    <div *ngIf="e['evntphone'].errors['required']">మీ ఫోన్ నెంబర్ ఎంటర్
+                                                        చేయండి
                                                     </div>
                                                     <div *ngIf="e['evntphone'].errors['maxLength']">పది నంబర్లు
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
-                                    </div> 
-<!-- phone number name end -->
-<br>
+                                    </div>
+                                    <!-- phone number name end -->
+                                    <br>
                                     <div class="row">
                                         <div class="col-md-6 mb-4">
                                             <div class="form-outline">
@@ -265,18 +281,20 @@
                                                     placeholder="మీ యూ ట్యూబ్ ఛానెల్"
                                                     [ngClass]="{'is-invalid': submitted && t['youtube'].errors }" />
                                                 <div *ngIf="submitted && t['youtube'].errors" class="invalid-feedback">
-                                                    <div *ngIf="t['youtube'].errors['required']">మీ యూ ట్యూబ్ ఛానెల్ లింక్ </div>
+                                                    <div *ngIf="t['youtube'].errors['required']">మీ యూ ట్యూబ్ ఛానెల్
+                                                        లింక్ </div>
                                                 </div>
                                             </div>
                                         </div>
                                         <div class="col-md-6 mb-4">
                                             <div class="form-outline">
-                                                <label class="form-label">మీ ఫేస్ బుక్-లింక్    </label>
+                                                <label class="form-label">మీ ఫేస్ బుక్-లింక్ </label>
                                                 <input type="text" formControlName="facebook" class="form-control"
                                                     placeholder="మీ ఫేస్ బుక్-లింక్"
                                                     [ngClass]="{'is-invalid': submitted && t['facebook'].errors }" />
                                                 <div *ngIf="submitted && t['facebook'].errors" class="invalid-feedback">
-                                                    <div *ngIf="t['facebook'].errors['required']">మీ ఫేస్ బుక్-లింక్ </div>
+                                                    <div *ngIf="t['facebook'].errors['required']">మీ ఫేస్ బుక్-లింక్
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
@@ -300,7 +318,8 @@
                                                     </select>
                                                     <div *ngIf="submitted && t['districtname'].errors"
                                                         class="invalid-feedback">
-                                                        <div *ngIf="t['districtname'].errors['required']">సెలెక్ట్ జిల్లా </div>
+                                                        <div *ngIf="t['districtname'].errors['required']">సెలెక్ట్
+                                                            జిల్లా </div>
                                                     </div>
                                                 </div>
                                             </div>
@@ -319,7 +338,8 @@
                                                     </select>
                                                     <div *ngIf="submitted && t['constituencyname'].errors"
                                                         class="invalid-feedback">
-                                                        <div *ngIf="t['constituencyname'].errors['required']">సెలెక్ట్ నియోజకవర్గం </div>
+                                                        <div *ngIf="t['constituencyname'].errors['required']">సెలెక్ట్
+                                                            నియోజకవర్గం </div>
                                                     </div>
                                                 </div>
                                             </div>
@@ -337,76 +357,99 @@
                                                         (change)="gepanchayati($event);"
                                                         style="height:37px;width: 273px;"
                                                         [ngClass]="{'is-invalid': submitted && t['mandals'].errors }">
-                                                        <option value="" selected disabled>సెలెక్ట్ మండలం / మున్సిపాలిటీ</option>
+                                                        <option value="" selected disabled>సెలెక్ట్ మండలం / మున్సిపాలిటీ
+                                                        </option>
                                                         <option value="{{item.id}}" *ngFor="let item of mandals">
                                                             {{item.mndl_nm}}
                                                         </option>
                                                     </select>
                                                     <div *ngIf="submitted && t['mandals'].errors"
                                                         class="invalid-feedback">
-                                                        <div *ngIf="t['mandals'].errors['required']">సెలెక్ట్ మండలం / మున్సిపాలిటీ </div>
+                                                        <div *ngIf="t['mandals'].errors['required']">సెలెక్ట్ మండలం /
+                                                            మున్సిపాలిటీ </div>
                                                     </div>
                                                 </div>
                                             </div>
                                             <div class="col-md-6 mb-4 pb-2">
                                                 <div class="form-outline">
-                                                    <label class="form-label">4). సెలెక్ట్ పంచాయతీ/వార్డు                                                        <span
+                                                    <label class="form-label">4). సెలెక్ట్ పంచాయతీ/వార్డు <span
                                                             style="color:red; -webkit-text-stroke-width:thick;">*</span></label>
                                                     <select class="form-control" formControlName="village_name"
                                                         [ngClass]="{'is-invalid': submitted && t['mandals'].errors }"
                                                         style="height:37px;width: 273px;">
-                                                        <option value="" selected disabled>సెలెక్ట్ పంచాయతీ/వార్డు</option>
+                                                        <option value="" selected disabled>సెలెక్ట్ పంచాయతీ/వార్డు
+                                                        </option>
                                                         <option value="{{item.id}}" *ngFor="let item of panchayati">
                                                             {{item.pnchyt_nm}}
                                                         </option>
                                                     </select>
                                                     <div *ngIf="submitted && t['village_name'].errors"
                                                         class="invalid-feedback">
-                                                        <div *ngIf="t['village_name'].errors['required']">సెలెక్ట్ పంచాయతీ/వార్డు </div>
+                                                        <div *ngIf="t['village_name'].errors['required']">సెలెక్ట్
+                                                            పంచాయతీ/వార్డు </div>
                                                     </div>
                                                 </div>
                                             </div>
+                                        </div><br>  
                                         </div>
-                                        <br>
-                                        
+                    <br>                    
+ <div class="card shadow-2-strong card-registration" style="border-radius: 15px;">
                                         <div class="row">
-
+<div class="col-md-6 mb-4 pb-2">
+                                                <div class="form-outline">
+                                                    <label class="form-label">కూటముల గూగుల్ లొకేషన్</label>
+                                                    <div class="d-flex align-items-start gap-2">
+                                                        <input type="text" formControlName="location"
+                                                            class="form-control" placeholder="ఎంటర్ కూటముల గూగుల్ లొకేషన్"
+                                                            [ngClass]="{'is-invalid': submitted && t['location'].errors }" />
+                                                        <button type="button"
+                                                            class="btn btn-primary btn-lg mt-2 w-100 w-md-auto"
+                                                            style="min-height: 72px; padding: 0.8rem 0.8rem; font-size: 1rem; line-height: 1.35; white-space: normal;"
+                                                            (click)="useCurrentLocation()" [disabled]="locationLoading">
+                                                            {{ locationLoading ? 'Fetching...' : 'కరెంటు లొకేషన్ నమోదు కోసం క్లిక్ '
+                                                            }}
+                                                        </button>
+                                                    </div>
+                                                    <!-- <div *ngIf="locationLoading" class="text-info mt-1">Fetching current
+                                                        location...</div>
+                                                    <div *ngIf="locationError" class="text-danger mt-1">{{ locationError
+                                                        }}</div>
+                                                    <div *ngIf="locationSuccess" class="text-success mt-1">{{
+                                                        locationSuccess }}</div>
+                                                    <div *ngIf="locationName" class="text-primary mt-1">Location name:
+                                                        {{ locationName }}</div> -->
+                                                    <div *ngIf="locationSourceMessage" class="text-secondary mt-1">{{
+                                                        locationSourceMessage }}</div>
+                                                    <div *ngIf="submitted && t['location'].errors"
+                                                        class="invalid-feedback">
+                                                        <div *ngIf="t['location'].errors['required']">కూటముల గూగుల్
+                                                            లొకేషన్ </div>
+                                                    </div>
+                                                </div>
+                                            </div>
                                             <div class="col-md-6 mb-4 pb-2">
                                                 <div class="form-outline">
-                                                    <label class="form-label">కూటములు జరిగే ప్రదేశం స్ట్రీట్ పేరు / ల్యాండ్ మార్క్ <span
+                                                    <label class="form-label">కూటములు జరిగే ప్రదేశం <span
                                                             style="color:red; -webkit-text-stroke-width:thick;">*</span></label>
-                                                    <textarea type="text" formControlName="address" class="form-control"
-                                                        placeholder="కూటములు జరిగే ప్రదేశం స్ట్రీట్ పేరు / ల్యాండ్ మార్క్"
+                                                    <textarea type="text" formControlName="address" class="form-control address-field"
+                                                        placeholder="కూటములు జరిగే ప్రదేశం "
                                                         [ngClass]="{'is-invalid': submitted && t['address'].errors }"></textarea>
                                                     <div *ngIf="submitted && t['address'].errors"
                                                         class="invalid-feedback">
-                                                        <div *ngIf="t['address'].errors['required']">కూటములు జరిగే ప్రదేశం స్ట్రీట్ పేరు / ల్యాండ్ మార్క్
+                                                        <div *ngIf="t['address'].errors['required']">కూటములు జరిగే
+                                                            ప్రదేశం అడ్రసు
                                                         </div>
                                                     </div>
                                                 </div>
                                             </div>
-                                        <!-- </div>
-                                        <br>
 
-                                        <div class="row"> -->
-                                            <div class="col-md-6 mb-4 pb-2">
-                                                <div class="form-outline">
-                                                    <label class="form-label">కూటముల గూగుల్ లొకేషన్</label>
-                                                    <input type="text" formControlName="location" class="form-control"
-                                                        placeholder="కూటముల గూగుల్ లొకేషన్"
-                                                        [ngClass]="{'is-invalid': submitted && t['location'].errors }" />
-                                                    <div *ngIf="submitted && t['location'].errors"
-                                                        class="invalid-feedback">
-                                                        <div *ngIf="t['location'].errors['required']">కూటముల గూగుల్ లొకేషన్ </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-
+                                      
                                         </div>
                                         <br>
+
                                         
-                                        
-<!--                                         
+
+                                        <!--                                         
                                         <div class="row">
 
                                             <div class="col-md-6 mb-4">
@@ -466,18 +509,14 @@
                                         <br> -->
                                     </div>
 
-                                    <br>
+                                
                                 </form>
                                 <br>
-                                <div class="row">
-                                    <div class="col-md-2 mb-4 pb-2">
-                                    </div>
-                                    <div class="col-md-2 mb-4 pb-2">
-                                    </div>
+                                <div class="row justify-content-center">
+                                
                                     <div class="col-md-2 mb-4 pb-2">
                                         <button type="submit" class="default-btn  user-all-btn"
-                                            (click)="postmeetings()">Submit
-                                        </button>
+                                            (click)="postmeetings()">సబ్మిట్ </button>
                                     </div>
                                 </div>
                             </div>
@@ -490,14 +529,13 @@
 </div>
 <!-- /Header Mobile -->
 
-<br><br>
 
 <ng-template #serviceadding let-modal>
 
 
     <div class="row">
         <div class="col-lg-12">
-            <div class="card-body" style=" padding: 44px;">
+            <div class="card-body" style=" padding: 14px;">
                 <div class="mb-3">
                     <marquee>
                         <h4 class="modal-title mt-0" style="color: blue;">Add service Type</h4>

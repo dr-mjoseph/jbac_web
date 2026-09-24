@@ -130,6 +130,86 @@
     opacity: 0.6;
   }
   
-  select {
+  /* select {
     -webkit-appearance: listbox !important;
+  } */
+
+  .address-field {
+    width: 100%;
+  }
+
+  :host {
+    display: block;
+    overflow-x: hidden;
+  }
+
+  .card-registration,
+  .card-registration .card-body,
+  .card-registration form {
+    max-width: 100%;
+  }
+
+  .card-registration .form-control,
+  .card-registration select {
+    width: 100% !important;
+    max-width: 100%;
+  }
+
+  .card-registration input[type='file'] {
+    max-width: 100%;
+  }
+
+  .card-registration img {
+    display: block;
+    max-width: 100%;
+    height: auto;
+    margin-top: 0.5rem;
+  }
+
+  .card-registration .d-flex {
+    min-width: 0;
+  }
+
+  @media (max-width: 767px) {
+    .container.py-5 {
+      padding-top: 1.5rem !important;
+      padding-bottom: 1.5rem !important;
+      padding-left: 0.75rem;
+      padding-right: 0.75rem;
+    }
+
+    .card-registration .card-body {
+      padding: 1.25rem !important;
+    }
+
+    .card-registration h3 {
+      font-size: 1rem !important;
+      line-height: 1.6;
+      overflow-wrap: anywhere;
+    }
+
+    .card-registration .row > [class*='col-'] {
+      min-width: 0;
+    }
+
+    .card-registration .d-flex {
+      flex-direction: column;
+      align-items: stretch !important;
+      gap: 0.5rem !important;
+    }
+
+    .card-registration .d-flex button {
+      width: 100% !important;
+      min-height: 3.25rem !important;
+      margin-top: 0 !important;
+    }
+
+    .card-registration .card-registration {
+      margin-left: -0.25rem;
+      margin-right: -0.25rem;
+    }
+
+    .address-field {
+      width: 100%;
+    }
   }

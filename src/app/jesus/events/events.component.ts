@@ -34,6 +34,7 @@ export class EventsComponent {
   submitted: boolean = false;
   ministry_id: any;
   pastors: any;
+  showFilters = false;
   constructor(public service: ServiceService, private modalService: NgbModal, private fromb: FormBuilder, private router: Router) {
 
     this.searchdenomation = this.fromb.group({
