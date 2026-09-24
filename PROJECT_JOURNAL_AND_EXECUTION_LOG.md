@@ -148,3 +148,22 @@ The user requested:
 | **CI/CD Web Deploy** | Validated | [`.github/workflows/deploy-web-aws.yml`](.github/workflows/deploy-web-aws.yml) |
 | **CI/CD Mobile Sync** | Validated | [`.github/workflows/sync-mobile.yml`](.github/workflows/sync-mobile.yml) |
 | **Documentation** | Complete | [`AWS_DEPLOYMENT_AND_SYNC_GUIDE.md`](AWS_DEPLOYMENT_AND_SYNC_GUIDE.md) |
+
+---
+
+## 6. Mobile App UI Synchronization Update (September 2026)
+
+### Issue Identified
+1. The mobile app repository (`dr-mjoseph/jbac_app`) appeared outdated because `.gitignore` in `jbac_app` was ignoring `/www`.
+2. When the synchronization ran, Git skipped the compiled web distribution (`www/index.html`, JavaScript bundles, and CSS) and only committed `sync-metadata.json`.
+3. The modern Angular 15 source components were also missing from the mobile repository root, leaving only legacy 2022 Ionic 3 templates.
+
+### Resolution Implemented
+1. **Un-ignored `www/`**: Modified `jbac_app/.gitignore` to track `!www/**`.
+2. **Post-processed `index.html`**: Configured `<base href="./">` and injected `<script src="cordova.js"></script>` for seamless Cordova and WebView asset loading.
+3. **Mirrored Modern Source Tree**: Synchronized all Angular 15 components (`src/app/`, `src/environments/`, `styles.css`, `custom-theme.scss`) into `web-src/` in the mobile repository.
+4. **Compiled Production Bundle**: Generated fresh production build (`dist/churchwebsite`) and staged `www/` and `web-src/`.
+5. **Committed & Pushed**:
+   - `dr-mjoseph/jbac_app`: Commit `4465840` pushed to `main`.
+   - `dr-mjoseph/jbac_web`: Commit `42b6461` pushed to `main` with enhanced sync script and CI/CD workflow.
+
