@@ -7,6 +7,9 @@ on:
     branches: [ main, master ]
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -14,12 +17,35 @@ jobs:
     steps:
     - name: Checkout Repository
       uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
 
     - name: Setup Java
       uses: actions/setup-java@v4
       with:
         distribution: 'temurin'
-        java-version: '17'
+        java-version: '11'
+
+    - name: Setup Gradle
+      uses: gradle/actions/setup-gradle@v4
+      with:
+        gradle-version: '7.1.1'
+
+    - name: Install Android Build Tools 30.0.3
+      run: |
+        curl -fsSL https://dl.google.com/android/repository/build-tools_r30.0.3-linux.zip -o /tmp/build-tools.zip
+        unzip -q /tmp/build-tools.zip -d /tmp/build-tools
+        sudo mkdir -p /usr/local/lib/android/sdk/build-tools/30.0.3
+        sudo cp -r /tmp/build-tools/android-11/* /usr/local/lib/android/sdk/build-tools/30.0.3/
+        sudo chmod -R a+rx /usr/local/lib/android/sdk/build-tools/30.0.3
+        echo "=== Installed Build Tools ==="
+        ls -la /usr/local/lib/android/sdk/build-tools/30.0.3/aapt
+
+    - name: Verify Toolchain
+      run: |
+        java -version
+        gradle -v
+        ls -la /usr/local/lib/android/sdk/build-tools/30.0.3/
 
     - name: Setup Node.js
       uses: actions/setup-node@v4
@@ -37,19 +63,43 @@ jobs:
       run: |
         npm config set production false
         npm install --production=false
-        npm ls @ionic/app-scripts typescript
-
-    - name: Accept Android SDK Licenses
-      run: yes | sdkmanager --licenses || true
+        if [ -f node_modules/cordova-android/framework/cordova.gradle ]; then
+          grep -q "import groovy.xml.XmlParser" node_modules/cordova-android/framework/cordova.gradle || sed -i '1s/^/import groovy.xml.XmlParser\n/' node_modules/cordova-android/framework/cordova.gradle
+        fi
 
     - name: Add Android Platform
-      run: cordova platform add android --no-interactive
+      run: |
+        cordova platform add android --no-interactive
+        if [ -f platforms/android/CordovaLib/cordova.gradle ]; then
+          grep -q "import groovy.xml.XmlParser" platforms/android/CordovaLib/cordova.gradle || sed -i '1s/^/import groovy.xml.XmlParser\n/' platforms/android/CordovaLib/cordova.gradle
+        fi
+        if [ -f platforms/android/cdv-gradle-config.json ]; then
+          node -e '
+            const fs = require("fs");
+            const file = "platforms/android/cdv-gradle-config.json";
+            const cfg = JSON.parse(fs.readFileSync(file, "utf8"));
+            cfg.BUILD_TOOLS_VERSION = "30.0.3";
+            fs.writeFileSync(file, JSON.stringify(cfg, null, 2));
+            console.log("Updated cdv-gradle-config.json:", cfg);
+          ' || true
+        fi
 
-    - name: Build Web Assets (AoT Production)
-      run: npm run build -- --prod
-
-    - name: Build Android Release APK
-      run: cordova build android --release -- --packageType=apk
+    - name: Build Android Release Package
+      env:
+        CORDOVA_ANDROID_GRADLE_DISTRIBUTION_URL: "https://services.gradle.org/distributions/gradle-7.1.1-all.zip"
+      run: |
+        set -o pipefail
+        cordova build android --release --verbose -- --packageType=apk --gradleArg=-PcdvBuildToolsVersion=30.0.3 2>&1 | tee cordova_build.log || {
+          echo "Build failed, pushing log to build-log-branch..."
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git checkout -B build-log-branch
+          git add -f cordova_build.log
+          git commit -m "ci: capture cordova build error log"
+          git push origin build-log-branch --force
+          cat cordova_build.log | tail -n 100
+          exit 1
+        }
 
     - name: List Build Outputs
       run: find platforms/android/app/build/outputs/ -type f || true
@@ -65,4 +115,4 @@ jobs:
 
 $utf8NoBom = New-Object System.Text.UTF8Encoding($false)
 [System.IO.File]::WriteAllText($workflowPath, $content.TrimStart([char]0xFEFF), $utf8NoBom)
-Write-Output "Successfully updated build-apk.yml with recursive artifact path"
+Write-Output "Successfully updated build-apk.yml with SDK permissions and build-tools 30.0.3"
