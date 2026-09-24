@@ -116,7 +116,17 @@ if (fs.existsSync(mobileGitignore)) {
 // 4. Sync Compiled Web Distribution to Mobile www/
 console.log('\n[3/5] Syncing compiled web assets to mobile app www/ ...');
 const mobileWww = path.join(mobilePath, 'www');
-if (!fs.existsSync(mobileWww)) fs.mkdirSync(mobileWww, { recursive: true });
+if (!fs.existsSync(mobileWww)) {
+  fs.mkdirSync(mobileWww, { recursive: true });
+} else {
+  // Clean old root hashed bundle files to prevent accumulation
+  for (const item of fs.readdirSync(mobileWww)) {
+    const itemPath = path.join(mobileWww, item);
+    if (fs.statSync(itemPath).isFile() && (item.endsWith('.js') || item.endsWith('.css') || item.endsWith('.txt'))) {
+      fs.unlinkSync(itemPath);
+    }
+  }
+}
 copyRecursiveSync(DIST_DIR, mobileWww);
 console.log(`  -> Synced dist/churchwebsite to ${mobileWww}`);
 

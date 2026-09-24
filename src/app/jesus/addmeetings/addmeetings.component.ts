@@ -49,7 +49,7 @@ export class AddmeetingsComponent {
   locationSuccess: string = '';
   locationName: string = '';
   locationSourceMessage: string = '';
-  googleMapsApiKey: string = environment.googleMapsApiKey;
+  googleMapsApiKey: string = (environment as any).googleMapsApiKey || '';
 
   constructor(private formBuilder: FormBuilder, private service: ServiceService, private modalService: NgbModal, private route: ActivatedRoute, private router: Router) {
     this.route.queryParams.subscribe(params => {
