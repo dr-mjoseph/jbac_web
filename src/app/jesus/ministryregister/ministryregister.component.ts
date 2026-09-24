@@ -49,7 +49,7 @@ export class MinistryregisterComponent {
       mandal_id: ['', [Validators.required]],
       panchayat_id: ['', [Validators.required]],
       password: ['', [Validators.required, Validators.minLength(6)]],
-     // retypepassword: ['', [Validators.required, Validators.minLength(6)]],
+      retypepassword: ['', [Validators.required, Validators.minLength(6)]],
       // dob: ['', [Validators.required]],
       pastor: [''],
       description: [''],

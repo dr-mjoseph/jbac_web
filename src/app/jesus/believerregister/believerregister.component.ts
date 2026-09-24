@@ -76,7 +76,7 @@ export class BelieverregisterComponent {
       god: [''],
       // // term: ['', [Validators.required]],
       password: ['', [Validators.required, Validators.minLength(6)]],
-     // retypepassword: ['', [Validators.required, Validators.minLength(6)]],
+      retypepassword: ['', [Validators.required, Validators.minLength(6)]],
     })
   }
   get h() { return this.beliverform.controls; }

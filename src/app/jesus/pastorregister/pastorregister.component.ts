@@ -96,7 +96,7 @@ godOptions: string[] = [
       god: [''],
     // // // term: ['', [Validators.required]],
       password: ['', [Validators.required, Validators.minLength(6)]],
-      //// retypepassword: ['', [Validators.required, Validators.minLength(6)]],
+      retypepassword: ['', [Validators.required, Validators.minLength(6)]],
     })
 
     this.studentform = this.formBuilder.group({
@@ -114,7 +114,7 @@ godOptions: string[] = [
       mandal_id: ['', [Validators.required]],
       village_id: ['', [Validators.required]],
       password: ['', [Validators.required, Validators.minLength(6)]],
-     // retypepassword: ['', [Validators.required, Validators.minLength(6)]],
+      retypepassword: ['', [Validators.required, Validators.minLength(6)]],
       church: ['',],
       pastor: [''],
       leadership: ['', [Validators.required]],
@@ -160,7 +160,7 @@ godOptions: string[] = [
       mandal_id: ['', [Validators.required]],
       panchayat_id: ['', [Validators.required]],
       password: ['', [Validators.required, Validators.minLength(6)]],
-     // retypepassword: ['', [Validators.required, Validators.minLength(6)]],
+      retypepassword: ['', [Validators.required, Validators.minLength(6)]],
       // dob: ['', [Validators.required]],
       pastor: [''],
       description: [''],
@@ -190,7 +190,7 @@ godOptions: string[] = [
       ward: [''],
       youtubechanel: [''],
       password: ['', [Validators.required, Validators.minLength(6)]],
-     // retypepassword: ['', [Validators.required, Validators.minLength(6)]],
+      retypepassword: ['', [Validators.required, Validators.minLength(6)]],
       leaders: ['', [Validators.required]],
       leadertype: [''],
       generaltype: ['',],
@@ -224,7 +224,7 @@ godOptions: string[] = [
       ministry_id: [''],
       churchtype: [''],
       password: ['', [Validators.required, Validators.minLength(6)]],
-     // retypepassword: ['', [Validators.required, Validators.minLength(6)]],
+      retypepassword: ['', [Validators.required, Validators.minLength(6)]],
       facebook: [''],
       youtube: [''],
       remarks: [''],
@@ -249,7 +249,7 @@ godOptions: string[] = [
       organizationtype: ['', [Validators.required]],
       ministry_id: [''],
       password: ['', [Validators.required, Validators.minLength(6)]],
-     // retypepassword: ['', [Validators.required, Validators.minLength(6)]],
+      retypepassword: ['', [Validators.required, Validators.minLength(6)]],
       districts: ['', [Validators.required]],
       constituencyname: ['', [Validators.required]],
       mandals: ['', [Validators.required]],
@@ -275,7 +275,7 @@ godOptions: string[] = [
       panchayat_id: ['', [Validators.required]],
       street: ['', [Validators.required]],
       password: ['', [Validators.required, Validators.minLength(6)]],
-     // retypepassword: ['', [Validators.required, Validators.minLength(6)]],
+      retypepassword: ['', [Validators.required, Validators.minLength(6)]],
     })
     this.pastorsassociations = this.formBuilder.group({
       pa_name: ['', [Validators.required]],
@@ -293,7 +293,7 @@ godOptions: string[] = [
       workingareas: [''],
       description: [''],
       password: ['', [Validators.required, Validators.minLength(6)]],
-     // retypepassword: ['', [Validators.required, Validators.minLength(6)]],
+      retypepassword: ['', [Validators.required, Validators.minLength(6)]],
       // // term: ['', [Validators.required]],
 
     })
@@ -876,12 +876,10 @@ geteducational() {
     if (this.pastorform.invalid) {
       Swal.fire('* ఉన్న తప్పనిసరి  ఫీల్డ్స్ ఎంటర్ చేయండి');
       return;
-    } 
-    // else if (this.pastorform.value.password != this.pastorform.value.retypepassword) {
-    //   Swal.fire("Passwords are Unmatched")
-    //   // this.showSpinner = false;
-    // }
-     else {
+    } else if (this.pastorform.value.password != this.pastorform.value.retypepassword) {
+      Swal.fire("Passwords are Unmatched");
+      return;
+    } else {
       this.service.postrpastor(this.pastorform.value).subscribe((res: any) => {
         if (res.status == 451) {
           Swal.fire('ఇదే ఫోన్ నెంబర్ తో ఇంతకుముందే రిజిస్టర్ అయ్యారు')
@@ -922,11 +920,9 @@ geteducational() {
     this.submitted = true;
     if (this.independentchurchform.invalid) {
       Swal.fire('* ఉన్న తప్పనిసరి  ఫీల్డ్స్ ఎంటర్ చేయండి');
-    } 
-      // else if (this.independentchurchform.value.password != this.independentchurchform.value.retypepassword) {
-    //   Swal.fire("Passwords are Unmatched");
-    // }
-    else {
+    } else if (this.independentchurchform.value.password != this.independentchurchform.value.retypepassword) {
+      Swal.fire("Passwords are Unmatched");
+    } else {
       this.independentchurchform.value.church_img = this.imagedata
       this.service.postindepedentchurch(this.independentchurchform.value).subscribe((res: any) => {
         if (res.status == 451) {

@@ -86,7 +86,7 @@ export class PastorassociationregisterComponent {
       god: [''],
       // // term: ['', [Validators.required]],
       password: ['', [Validators.required, Validators.minLength(6)]],
-     // retypepassword: ['', [Validators.required, Validators.minLength(6)]],
+      retypepassword: ['', [Validators.required, Validators.minLength(6)]],
     })
 
     this.studentform = this.formBuilder.group({
@@ -104,7 +104,7 @@ export class PastorassociationregisterComponent {
       mandal_id: ['', [Validators.required]],
       village_id: ['', [Validators.required]],
       password: ['', [Validators.required, Validators.minLength(6)]],
-     // retypepassword: ['', [Validators.required, Validators.minLength(6)]],
+      retypepassword: ['', [Validators.required, Validators.minLength(6)]],
       church: ['',],
       pastor: [''],
       leadership: ['', [Validators.required]],
@@ -150,7 +150,7 @@ export class PastorassociationregisterComponent {
       mandal_id: ['', [Validators.required]],
       panchayat_id: ['', [Validators.required]],
       password: ['', [Validators.required, Validators.minLength(6)]],
-     // retypepassword: ['', [Validators.required, Validators.minLength(6)]],
+      retypepassword: ['', [Validators.required, Validators.minLength(6)]],
       // dob: ['', [Validators.required]],
       pastor: [''],
       description: [''],
@@ -179,7 +179,7 @@ export class PastorassociationregisterComponent {
       ward: [''],
       youtubechanel: [''],
       password: ['', [Validators.required, Validators.minLength(6)]],
-     // retypepassword: ['', [Validators.required, Validators.minLength(6)]],
+      retypepassword: ['', [Validators.required, Validators.minLength(6)]],
       leaders: ['', [Validators.required]],
       leadertype: [''],
       generaltype: ['',],
@@ -213,7 +213,7 @@ export class PastorassociationregisterComponent {
       ministry_id: [''],
       churchtype: [''],
       password: ['', [Validators.required, Validators.minLength(6)]],
-     // retypepassword: ['', [Validators.required, Validators.minLength(6)]],
+      retypepassword: ['', [Validators.required, Validators.minLength(6)]],
       facebook: [''],
       youtube: [''],
       remarks: [''],
@@ -238,7 +238,7 @@ export class PastorassociationregisterComponent {
       organizationtype: ['', [Validators.required]],
       ministry_id: [''],
       password: ['', [Validators.required, Validators.minLength(6)]],
-     // retypepassword: ['', [Validators.required, Validators.minLength(6)]],
+      retypepassword: ['', [Validators.required, Validators.minLength(6)]],
       districts: ['', [Validators.required]],
       constituencyname: ['', [Validators.required]],
       mandals: ['', [Validators.required]],
@@ -264,7 +264,7 @@ export class PastorassociationregisterComponent {
       panchayat_id: ['', [Validators.required]],
       street: ['', [Validators.required]],
       password: ['', [Validators.required, Validators.minLength(6)]],
-     // retypepassword: ['', [Validators.required, Validators.minLength(6)]],
+      retypepassword: ['', [Validators.required, Validators.minLength(6)]],
     })
     this.pastorsassociations = this.formBuilder.group({
       pa_name: ['', [Validators.required]],
@@ -285,8 +285,8 @@ export class PastorassociationregisterComponent {
       website: [''],
       workingareas: [''],
       description: [''],
-      password: [''],
-      //// retypepassword: ['', [Validators.required, Validators.minLength(6)]],
+      password: ['', [Validators.required, Validators.minLength(6)]],
+      retypepassword: ['', [Validators.required, Validators.minLength(6)]],
       term: [''],
 
     })
@@ -795,12 +795,10 @@ export class PastorassociationregisterComponent {
     
       this.showSpinner = false; // Stop spinner on validation failure
       return;
-    }
-    
-    //  else if (this.pastorsassociations.value.password != this.pastorsassociations.value.retypepassword) {
-    //   Swal.fire("Passwords are Unmatched")
-    // }
-    else {
+    } else if (this.pastorsassociations.value.password != this.pastorsassociations.value.retypepassword) {
+      Swal.fire("Passwords are Unmatched");
+      return;
+    } else {
       this.service.postpastorassociationss(this.pastorsassociations.value).subscribe((res: any) => {
         if (res.status == 200) {
           Swal.fire('మీరు విజయవంతముగా నమోదు చేసినారు')

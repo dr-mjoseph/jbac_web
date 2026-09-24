@@ -85,7 +85,7 @@ export class OrganisationregisterComponent {
       god: [''],
       // // term: ['', [Validators.required]],
       password: ['', [Validators.required, Validators.minLength(6)]],
-     // retypepassword: ['', [Validators.required, Validators.minLength(6)]],
+      retypepassword: ['', [Validators.required, Validators.minLength(6)]],
     })
 
     this.studentform = this.formBuilder.group({
@@ -103,7 +103,7 @@ export class OrganisationregisterComponent {
       mandal_id: ['', [Validators.required]],
       village_id: ['', [Validators.required]],
       password: ['', [Validators.required, Validators.minLength(6)]],
-     // retypepassword: ['', [Validators.required, Validators.minLength(6)]],
+      retypepassword: ['', [Validators.required, Validators.minLength(6)]],
       church: ['',],
       pastor: [''],
       leadership: ['', [Validators.required]],
@@ -149,7 +149,7 @@ export class OrganisationregisterComponent {
       mandal_id: ['', [Validators.required]],
       panchayat_id: ['', [Validators.required]],
       password: ['', [Validators.required, Validators.minLength(6)]],
-     // retypepassword: ['', [Validators.required, Validators.minLength(6)]],
+      retypepassword: ['', [Validators.required, Validators.minLength(6)]],
       // dob: ['', [Validators.required]],
       pastor: [''],
       description: [''],
@@ -178,7 +178,7 @@ export class OrganisationregisterComponent {
       ward: [''],
       youtubechanel: [''],
       password: ['', [Validators.required, Validators.minLength(6)]],
-     // retypepassword: ['', [Validators.required, Validators.minLength(6)]],
+      retypepassword: ['', [Validators.required, Validators.minLength(6)]],
       leaders: ['', [Validators.required]],
       leadertype: [''],
       generaltype: ['',],
@@ -212,7 +212,7 @@ export class OrganisationregisterComponent {
       ministry_id: [''],
       churchtype: [''],
       password: ['', [Validators.required, Validators.minLength(6)]],
-     // retypepassword: ['', [Validators.required, Validators.minLength(6)]],
+      retypepassword: ['', [Validators.required, Validators.minLength(6)]],
       facebook: [''],
       youtube: [''],
       remarks: [''],
@@ -237,7 +237,7 @@ export class OrganisationregisterComponent {
       organizationtype: ['', [Validators.required]],
       ministry_id: [''],
       password: ['', [Validators.required, Validators.minLength(6)]],
-     // retypepassword: ['', [Validators.required, Validators.minLength(6)]],
+      retypepassword: ['', [Validators.required, Validators.minLength(6)]],
       districts: ['', [Validators.required]],
       constituencyname: ['', [Validators.required]],
       mandals: ['', [Validators.required]],
@@ -263,7 +263,7 @@ export class OrganisationregisterComponent {
       panchayat_id: ['', [Validators.required]],
       street: ['', [Validators.required]],
       password: ['', [Validators.required, Validators.minLength(6)]],
-     // retypepassword: ['', [Validators.required, Validators.minLength(6)]],
+      retypepassword: ['', [Validators.required, Validators.minLength(6)]],
     })
     this.pastorsassociations = this.formBuilder.group({
       pa_name: ['', [Validators.required]],
@@ -281,7 +281,7 @@ export class OrganisationregisterComponent {
       workingareas: [''],
       description: [''],
       password: ['', [Validators.required, Validators.minLength(6)]],
-     // retypepassword: ['', [Validators.required, Validators.minLength(6)]],
+      retypepassword: ['', [Validators.required, Validators.minLength(6)]],
       // // term: ['', [Validators.required]],
 
     })

@@ -406,20 +406,22 @@
                                                             class="btn btn-primary btn-lg mt-2 w-100 w-md-auto"
                                                             style="min-height: 72px; padding: 0.8rem 0.8rem; font-size: 1rem; line-height: 1.35; white-space: normal;"
                                                             (click)="useCurrentLocation()" [disabled]="locationLoading">
-                                                            {{ locationLoading ? 'Fetching...' : 'కరెంటు లొకేషన్ నమోదు కోసం క్లిక్ '
-                                                            }}
+                                                            {{ locationLoading ? 'శోధిస్తున్నాము...' : 'కరెంటు లొకేషన్ నమోదు కోసం క్లిక్ ' }}
                                                         </button>
                                                     </div>
-                                                    <!-- <div *ngIf="locationLoading" class="text-info mt-1">Fetching current
-                                                        location...</div>
-                                                    <div *ngIf="locationError" class="text-danger mt-1">{{ locationError
-                                                        }}</div>
-                                                    <div *ngIf="locationSuccess" class="text-success mt-1">{{
-                                                        locationSuccess }}</div>
-                                                    <div *ngIf="locationName" class="text-primary mt-1">Location name:
-                                                        {{ locationName }}</div> -->
-                                                    <div *ngIf="locationSourceMessage" class="text-secondary mt-1">{{
-                                                        locationSourceMessage }}</div>
+                                                    <div *ngIf="locationLoading" class="alert alert-info mt-2 py-2 px-3 small">
+                                                        <i class="fa fa-spinner fa-spin me-1"></i> లొకేషన్ శోధిస్తున్నాము... దయచేసి ఆగండి.
+                                                    </div>
+                                                    <div *ngIf="locationError" class="alert alert-warning mt-2 py-2 px-3 small">
+                                                        <i class="fa fa-exclamation-triangle me-1"></i> {{ locationError }}
+                                                    </div>
+                                                    <div *ngIf="locationSuccess" class="alert alert-success mt-2 py-2 px-3 small">
+                                                        <i class="fa fa-check-circle me-1"></i> {{ locationSuccess }}
+                                                        <div *ngIf="locationName" class="mt-1"><strong>ప్రదేశం:</strong> {{ locationName }}</div>
+                                                    </div>
+                                                    <div *ngIf="locationSourceMessage" class="text-muted small mt-1">
+                                                        {{ locationSourceMessage }}
+                                                    </div>
                                                     <div *ngIf="submitted && t['location'].errors"
                                                         class="invalid-feedback">
                                                         <div *ngIf="t['location'].errors['required']">కూటముల గూగుల్

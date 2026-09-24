@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, NgZone, ChangeDetectorRef } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { ServiceService } from '../service.service';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
@@ -51,7 +51,15 @@ export class AddmeetingsComponent {
   locationSourceMessage: string = '';
   googleMapsApiKey: string = (environment as any).googleMapsApiKey || '';
 
-  constructor(private formBuilder: FormBuilder, private service: ServiceService, private modalService: NgbModal, private route: ActivatedRoute, private router: Router) {
+  constructor(
+    private formBuilder: FormBuilder,
+    private service: ServiceService,
+    private modalService: NgbModal,
+    private route: ActivatedRoute,
+    private router: Router,
+    private ngZone: NgZone,
+    private cdr: ChangeDetectorRef
+  ) {
     this.route.queryParams.subscribe(params => {
       this.from_id = params['id'];
     });
@@ -357,78 +365,154 @@ getbelivers() {
     return result;
   }
 
-  useCurrentLocation(): void {
+  async useCurrentLocation(): Promise<void> {
     this.locationError = '';
     this.locationSuccess = '';
     this.locationName = '';
+    this.locationSourceMessage = '';
+    this.locationLoading = true;
     this.showSpinner = true;
 
+    // Helper to reverse geocode lat/lng to human-readable address
+    const reverseGeocode = async (lat: number, lng: number): Promise<string> => {
+      // 1. If Google Maps API key is configured
+      if (this.googleMapsApiKey) {
+        try {
+          const geocodeUrl = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=${this.googleMapsApiKey}`;
+          const res = await fetch(geocodeUrl);
+          const data = await res.json();
+          if (data.status === 'OK' && data.results && data.results.length > 0) {
+            return data.results[0].formatted_address;
+          }
+        } catch (e) {
+          console.warn('Google geocoding error:', e);
+        }
+      }
+
+      // 2. BigDataCloud Client Reverse Geocoding (Free, CORS-friendly, no API key needed)
+      try {
+        const bdcUrl = `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lng}&localityLanguage=en`;
+        const res = await fetch(bdcUrl);
+        const data = await res.json();
+        const parts = [
+          data.locality || data.name || '',
+          data.city || data.principalSubdivision || '',
+          data.countryName || ''
+        ].filter(p => !!p);
+        if (parts.length > 0) {
+          return parts.join(', ');
+        }
+      } catch (e) {
+        console.warn('BigDataCloud geocoding error:', e);
+      }
+
+      // 3. OpenStreetMap Nominatim fallback
+      try {
+        const nominatimUrl = `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}`;
+        const res = await fetch(nominatimUrl);
+        const data = await res.json();
+        if (data && data.display_name) {
+          return data.display_name;
+        }
+      } catch (e) {
+        console.warn('Nominatim geocoding error:', e);
+      }
+
+      return `${lat.toFixed(5)}, ${lng.toFixed(5)}`;
+    };
+
+    // Helper to apply location safely inside NgZone
+    const applyLocation = (lat: number, lng: number, place: string, source: string) => {
+      this.ngZone.run(() => {
+        const googleUrl = `https://maps.google.com/?q=${lat},${lng}`;
+        this.addingmeetings.patchValue({
+          location: googleUrl,
+          address: place
+        });
+        this.addingmeetings.get('location')?.markAsDirty();
+        this.addingmeetings.get('location')?.markAsTouched();
+        this.addingmeetings.get('address')?.markAsDirty();
+        this.addingmeetings.get('address')?.markAsTouched();
+
+        this.locationName = place;
+        this.locationSuccess = 'కరెంటు లొకేషన్ విజయవంతముగా నమోదు చేయబడింది.';
+        this.locationSourceMessage = source;
+        this.locationLoading = false;
+        this.showSpinner = false;
+        this.cdr.detectChanges();
+
+        Swal.fire({
+          icon: 'success',
+          title: 'లొకేషన్ నమోదు అయ్యింది!',
+          html: `<div style="text-align: left; font-size: 14px;">
+                   <p><b>గూగుల్ లొకేషన్:</b> <br><a href="${googleUrl}" target="_blank" style="color: #0d6efd; word-break: break-all;">${googleUrl}</a></p>
+                   <p><b>ప్రదేశం / అడ్రసు:</b> <br>${place}</p>
+                 </div>`,
+          confirmButtonText: 'సరే'
+        });
+      });
+    };
+
+    // Fallback: IP-based location
+    const fallbackToIp = async (reasonMsg: string) => {
+      try {
+        const ipRes = await fetch('https://ipapi.co/json/');
+        const ipData = await ipRes.json();
+        if (ipData && ipData.latitude && ipData.longitude) {
+          const lat = parseFloat(ipData.latitude);
+          const lng = parseFloat(ipData.longitude);
+          const parts = [ipData.city, ipData.region, ipData.country_name].filter(p => !!p);
+          const place = parts.join(', ') || `${lat}, ${lng}`;
+          applyLocation(lat, lng, place, 'నెట్‌వర్క్ (IP) ఆధారంగా లొకేషన్ నమోదు చేయబడింది.');
+          return;
+        }
+      } catch (ipErr) {
+        console.warn('IP location fallback failed:', ipErr);
+      }
+
+      this.ngZone.run(() => {
+        this.locationLoading = false;
+        this.showSpinner = false;
+        this.locationError = reasonMsg;
+        this.cdr.detectChanges();
+        Swal.fire({
+          icon: 'warning',
+          title: 'లొకేషన్ లోపం',
+          text: reasonMsg,
+          confirmButtonText: 'సరే'
+        });
+      });
+    };
+
+    // Check if navigator.geolocation exists
     if (!navigator.geolocation) {
-      this.locationError = 'Your browser does not support geolocation.';
-      this.showSpinner = false;
+      await fallbackToIp('మీ బ్రౌజర్ లేదా డివైస్ లో GPS జియోలొకేషన్ సపోర్ట్ లేదు.');
       return;
     }
 
-    this.locationLoading = true;
     navigator.geolocation.getCurrentPosition(
       async (position) => {
         const lat = position.coords.latitude;
         const lng = position.coords.longitude;
-        const googleUrl = `https://maps.google.com/?q=${lat},${lng}`;
-        this.addingmeetings.patchValue({ location: googleUrl });
-
-        let placeName = '';
-        this.locationSourceMessage = '';
-        try {
-          if (this.googleMapsApiKey) {
-            const geocodeUrl = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=${this.googleMapsApiKey}`;
-            const response = await fetch(geocodeUrl);
-            const data = await response.json();
-            if (data.status === 'OK' && data.results && data.results.length > 0) {
-              placeName = data.results[0].formatted_address;
-              this.locationSourceMessage = 'Location name from Google Geocoding API.';
-            }
-          }
-
-          if (!placeName) {
-            const nominatimUrl = `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}`;
-            const response = await fetch(nominatimUrl);
-            const data = await response.json();
-            placeName = data.display_name || `${lat}, ${lng}`;
-  //  this.locationSourceMessage = 'Location name from OpenStreetMap fallback.';
-          }
-
-          this.addingmeetings.patchValue({ address: placeName });
-          this.locationName = placeName;
-    //      this.locationSuccess = `Current location specified and added successfully.`;
-        } catch (err) {
-          this.addingmeetings.patchValue({ address: `${lat}, ${lng}` });
-          this.locationName = '';
-          this.locationSourceMessage = '';
-          this.locationSuccess = `Current location specified and added successfully.`;
-        } finally {
-          this.locationLoading = false;
-          this.showSpinner = false;
-        }
+        const place = await reverseGeocode(lat, lng);
+        applyLocation(lat, lng, place, 'GPS ద్వారా లొకేషన్ విజయవంతముగా పొందబడింది.');
       },
-      (error) => {
-        this.locationLoading = false;
-        this.showSpinner = false;
-        switch (error.code) {
-          case error.PERMISSION_DENIED:
-            this.locationError = 'Location permission denied. Please allow location access.';
-            break;
-          case error.POSITION_UNAVAILABLE:
-            this.locationError = 'Current position unavailable. Please try again.';
-            break;
-          case error.TIMEOUT:
-            this.locationError = 'Location request timed out. Please try again.';
-            break;
-          default:
-            this.locationError = 'Unable to fetch location. Please try again.';
+      async (error) => {
+        let msg = 'లొకేషన్ పొందడంలో సమస్య ఏర్పడింది.';
+        if (error.code === error.PERMISSION_DENIED) {
+          msg = 'లొకేషన్ అనుమతి నిరాకరించబడింది (Permission Denied). దయచేసి బ్రౌజర్ లేదా మొబైల్ సెట్టింగ్స్ లో లొకేషన్ పర్మిషన్ ఆన్ చేయండి.';
+        } else if (error.code === error.TIMEOUT) {
+          msg = 'లొకేషన్ రిక్వెస్ట్ టైమ్‌అవుట్ అయ్యింది.';
+        } else if (error.code === error.POSITION_UNAVAILABLE) {
+          msg = 'లొకేషన్ సిగ్నల్ అందుబాటులో లేదు.';
         }
+        await fallbackToIp(msg);
       },
-      { timeout: 15000 }
+      {
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 60000
+      }
     );
   }
 
