@@ -923,8 +923,8 @@ geteducational() {
     } else if (this.independentchurchform.value.password != this.independentchurchform.value.retypepassword) {
       Swal.fire("Passwords are Unmatched");
     } else {
-      this.independentchurchform.value.church_img = this.imagedata
-      this.service.postindepedentchurch(this.independentchurchform.value).subscribe((res: any) => {
+      const data = Object.assign({}, this.independentchurchform.value, { church_img: this.imagedata });
+      this.service.postindepedentchurch(data).subscribe((res: any) => {
         if (res.status == 451) {
           Swal.fire('ఇదే ఫోన్ నెంబర్ తో ఇంతకుముందే రిజిస్టర్ అయ్యారు');
         } else if (res.status == 200) {

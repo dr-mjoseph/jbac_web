@@ -862,8 +862,8 @@ export class PastorassociationregisterComponent {
     if (this.independentchurchform.invalid) {
       Swal.fire('* ఉన్న తప్పనిసరి  ఫీల్డ్స్ ఎంటర్ చేయండి');
     }   else {
-      this.independentchurchform.value.church_img = this.imagedata
-      this.service.postindepedentchurch(this.independentchurchform.value).subscribe((res: any) => {
+      const data = Object.assign({}, this.independentchurchform.value, { church_img: this.imagedata });
+      this.service.postindepedentchurch(data).subscribe((res: any) => {
         if (res.status == 451) {
           Swal.fire('ఇదే ఫోన్ నెంబర్ తో ఇంతకుముందే రిజిస్టర్ అయ్యారు');
         } else if (res.status == 200) {

@@ -625,10 +625,12 @@ export class ProfileComponent {
     if (this.addinginsututies.invalid) {
       Swal.fire('* ఉన్న తప్పనిసరి  ఫీల్డ్స్ ఎంటర్ చేయండి');
     } else {
-      this.addinginsututies.value.image = this.imagesDatains
-      this.addinginsututies.value.usr_id = sessionStorage.getItem('usr_id')
-      this.addinginsututies.value.number = sessionStorage.getItem('mobile_number')
-      this.service.postinsututies(this.addinginsututies.value).subscribe((res: any) => {
+      const data = Object.assign({}, this.addinginsututies.value, {
+        image: this.imagesDatains,
+        usr_id: sessionStorage.getItem('usr_id'),
+        number: sessionStorage.getItem('mobile_number')
+      });
+      this.service.postinsututies(data).subscribe((res: any) => {
         if (res.status == 200) {
           Swal.fire('విజయవంతముగా నమోదు చేయబడింది, మీ ఫోన్ నెంబర్ మరియు పాస్వర్డ్ తో లాగిన్ అవగలరు')
           this.addinginsututies.reset();
@@ -870,16 +872,18 @@ export class ProfileComponent {
     if (this.attacksform.invalid) {
       Swal.fire('please fiil the details ');
     } else {
-      this.attacksform.value.image = this.imagesData;
-      this.attacksform.value.videoa = this.url;
-      this.attacksform.value.videob = this.urlb;
-      this.attacksform.value.document = this.documentarray;
-      this.attacksform.value.audio = this.urlaudio
-      this.attacksform.value.usr_id = sessionStorage.getItem('usr_id')
-      this.attacksform.value.username = sessionStorage.getItem('name')
-      this.attacksform.value.usernumber = sessionStorage.getItem('mobile_number')
+      const data = Object.assign({}, this.attacksform.value, {
+        image: this.imagesData,
+        videoa: this.url,
+        videob: this.urlb,
+        document: this.documentarray,
+        audio: this.urlaudio,
+        usr_id: sessionStorage.getItem('usr_id'),
+        username: sessionStorage.getItem('name'),
+        usernumber: sessionStorage.getItem('mobile_number')
+      });
 
-      this.service.postattacks(this.attacksform.value).subscribe((res: any) => {
+      this.service.postattacks(data).subscribe((res: any) => {
         if (res.status == 200) {
           Swal.fire('విజయవంతముగా నమోదు చేయబడింది, మీ ఫోన్ నెంబర్ మరియు పాస్వర్డ్ తో లాగిన్ అవగలరు')
           this.attacksform.reset();

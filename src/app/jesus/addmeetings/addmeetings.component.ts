@@ -366,6 +366,25 @@ getbelivers() {
   }
 
   async useCurrentLocation(): Promise<void> {
+    // 1. Explicitly ask for user permission before accessing location
+    const confirmResult = await Swal.fire({
+      title: 'లొకేషన్ అనుమతి (Location Permission)',
+      html: `<div style="text-align: left; font-size: 14px; line-height: 1.6;">
+               <p>మీ ప్రస్తుత ఖచ్చితమైన GPS లొకేషన్ తీసుకోవడానికి అనుమతించాలా?</p>
+               <p style="color: #666; font-size: 13px;">అనుమతించిన తర్వాత <b>కూటముల గూగుల్ లొకేషన్ లింక్</b> మరియు <b>కూటములు జరిగే ప్రదేశం (పూర్తి అడ్రసు)</b> ఆటోమేటిక్ గా నమోదు చేయబడతాయి.</p>
+             </div>`,
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: 'అనుమతించు (Allow)',
+      cancelButtonText: 'వద్దు (Cancel)',
+      confirmButtonColor: '#0d6efd',
+      cancelButtonColor: '#6c757d'
+    });
+
+    if (!confirmResult.isConfirmed) {
+      return;
+    }
+
     this.locationError = '';
     this.locationSuccess = '';
     this.locationName = '';
@@ -373,9 +392,42 @@ getbelivers() {
     this.locationLoading = true;
     this.showSpinner = true;
 
-    // Helper to reverse geocode lat/lng to human-readable address
+    // Helper to reverse geocode lat/lng to accurate, full human-readable address
     const reverseGeocode = async (lat: number, lng: number): Promise<string> => {
-      // 1. If Google Maps API key is configured
+      // 1. OpenStreetMap Nominatim with full address details (gives detailed building, road, neighbourhood, village/city, mandal, district, state, pin code)
+      try {
+        const nominatimUrl = `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}&addressdetails=1`;
+        const res = await fetch(nominatimUrl, {
+          headers: { 'Accept': 'application/json' }
+        });
+        const data = await res.json();
+        if (data) {
+          if (data.display_name && data.display_name.trim().length > 0) {
+            return data.display_name.trim();
+          }
+          if (data.address) {
+            const a = data.address;
+            const parts = [
+              a.house_number || a.building || a.amenity || '',
+              a.road || a.street || '',
+              a.neighbourhood || a.suburb || '',
+              a.village || a.town || a.city || '',
+              a.county || a.mandal || '',
+              a.state_district || a.district || '',
+              a.state || '',
+              a.postcode || '',
+              a.country || ''
+            ].filter(p => !!p && p.trim().length > 0);
+            if (parts.length > 0) {
+              return parts.join(', ');
+            }
+          }
+        }
+      } catch (e) {
+        console.warn('Nominatim reverse geocoding error:', e);
+      }
+
+      // 2. Google Maps Geocoding API if key configured
       if (this.googleMapsApiKey) {
         try {
           const geocodeUrl = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=${this.googleMapsApiKey}`;
@@ -389,16 +441,18 @@ getbelivers() {
         }
       }
 
-      // 2. BigDataCloud Client Reverse Geocoding (Free, CORS-friendly, no API key needed)
+      // 3. BigDataCloud full structured address fallback
       try {
         const bdcUrl = `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lng}&localityLanguage=en`;
         const res = await fetch(bdcUrl);
         const data = await res.json();
         const parts = [
           data.locality || data.name || '',
-          data.city || data.principalSubdivision || '',
+          data.city || '',
+          data.principalSubdivision || '',
+          data.postcode || '',
           data.countryName || ''
-        ].filter(p => !!p);
+        ].filter(p => !!p && p.trim().length > 0);
         if (parts.length > 0) {
           return parts.join(', ');
         }
@@ -406,19 +460,7 @@ getbelivers() {
         console.warn('BigDataCloud geocoding error:', e);
       }
 
-      // 3. OpenStreetMap Nominatim fallback
-      try {
-        const nominatimUrl = `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}`;
-        const res = await fetch(nominatimUrl);
-        const data = await res.json();
-        if (data && data.display_name) {
-          return data.display_name;
-        }
-      } catch (e) {
-        console.warn('Nominatim geocoding error:', e);
-      }
-
-      return `${lat.toFixed(5)}, ${lng.toFixed(5)}`;
+      return `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
     };
 
     // Helper to apply location safely inside NgZone
@@ -444,32 +486,17 @@ getbelivers() {
         Swal.fire({
           icon: 'success',
           title: 'లొకేషన్ నమోదు అయ్యింది!',
-          html: `<div style="text-align: left; font-size: 14px;">
-                   <p><b>గూగుల్ లొకేషన్:</b> <br><a href="${googleUrl}" target="_blank" style="color: #0d6efd; word-break: break-all;">${googleUrl}</a></p>
-                   <p><b>ప్రదేశం / అడ్రసు:</b> <br>${place}</p>
+          html: `<div style="text-align: left; font-size: 14px; line-height: 1.5;">
+                   <p><b>మీటింగ్స్ గూగుల్ లొకేషన్ లింక్:</b> <br><a href="${googleUrl}" target="_blank" style="color: #0d6efd; word-break: break-all;">${googleUrl}</a></p>
+                   <p><b>కూటములు జరిగే ప్రదేశం (పూర్తి అడ్రసు):</b> <br>${place}</p>
                  </div>`,
           confirmButtonText: 'సరే'
         });
       });
     };
 
-    // Fallback: IP-based location
-    const fallbackToIp = async (reasonMsg: string) => {
-      try {
-        const ipRes = await fetch('https://ipapi.co/json/');
-        const ipData = await ipRes.json();
-        if (ipData && ipData.latitude && ipData.longitude) {
-          const lat = parseFloat(ipData.latitude);
-          const lng = parseFloat(ipData.longitude);
-          const parts = [ipData.city, ipData.region, ipData.country_name].filter(p => !!p);
-          const place = parts.join(', ') || `${lat}, ${lng}`;
-          applyLocation(lat, lng, place, 'నెట్‌వర్క్ (IP) ఆధారంగా లొకేషన్ నమోదు చేయబడింది.');
-          return;
-        }
-      } catch (ipErr) {
-        console.warn('IP location fallback failed:', ipErr);
-      }
-
+    // Handle failure to obtain GPS
+    const handleLocationFailure = (reasonMsg: string) => {
       this.ngZone.run(() => {
         this.locationLoading = false;
         this.showSpinner = false;
@@ -486,7 +513,7 @@ getbelivers() {
 
     // Check if navigator.geolocation exists
     if (!navigator.geolocation) {
-      await fallbackToIp('మీ బ్రౌజర్ లేదా డివైస్ లో GPS జియోలొకేషన్ సపోర్ట్ లేదు.');
+      handleLocationFailure('మీ బ్రౌజర్ లేదా డివైస్ లో GPS జియోలొకేషన్ సపోర్ట్ లేదు.');
       return;
     }
 
@@ -495,23 +522,23 @@ getbelivers() {
         const lat = position.coords.latitude;
         const lng = position.coords.longitude;
         const place = await reverseGeocode(lat, lng);
-        applyLocation(lat, lng, place, 'GPS ద్వారా లొకేషన్ విజయవంతముగా పొందబడింది.');
+        applyLocation(lat, lng, place, 'GPS ద్వారా ఖచ్చితమైన లొకేషన్ పొందబడింది.');
       },
       async (error) => {
         let msg = 'లొకేషన్ పొందడంలో సమస్య ఏర్పడింది.';
         if (error.code === error.PERMISSION_DENIED) {
-          msg = 'లొకేషన్ అనుమతి నిరాకరించబడింది (Permission Denied). దయచేసి బ్రౌజర్ లేదా మొబైల్ సెట్టింగ్స్ లో లొకేషన్ పర్మిషన్ ఆన్ చేయండి.';
+          msg = 'లొకేషన్ అనుమతి నిరాకరించబడింది. దయచేసి బ్రౌజర్ లేదా డివైస్ సెట్టింగ్స్ లో లొకేషన్ ఆన్ చేసి పర్మిషన్ అనుమతించండి.';
         } else if (error.code === error.TIMEOUT) {
-          msg = 'లొకేషన్ రిక్వెస్ట్ టైమ్‌అవుట్ అయ్యింది.';
+          msg = 'లొకేషన్ శోధించడానికి సమయం మించిపోయింది. దయచేసి డివైస్ GPS ఆన్ లో ఉందో లేదో సరిచూసుకోండి.';
         } else if (error.code === error.POSITION_UNAVAILABLE) {
-          msg = 'లొకేషన్ సిగ్నల్ అందుబాటులో లేదు.';
+          msg = 'GPS సిగ్నల్ అందుబాటులో లేదు. దయచేసి లొకేషన్ ఆన్ చేయండి.';
         }
-        await fallbackToIp(msg);
+        handleLocationFailure(msg);
       },
       {
         enableHighAccuracy: true,
-        timeout: 10000,
-        maximumAge: 60000
+        timeout: 20000,
+        maximumAge: 0 // Do not accept cached inaccurate location
       }
     );
   }

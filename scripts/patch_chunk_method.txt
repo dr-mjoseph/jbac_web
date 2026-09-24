@@ -1,35 +1,73 @@
     AddmeetingsPage.prototype.useCurrentLocation = function () {
+        var _this = this;
+        var confirmAlert = this.alertctrl.create({
+            mode: 'ios',
+            title: 'లొకేషన్ అనుమతి (Location Permission)',
+            message: 'మీ ప్రస్తుత GPS లొకేషన్ మరియు అడ్రసును ఫారమ్‌లో నమోదు చేయడానికి అనుమతిస్తున్నారా?',
+            buttons: [
+                {
+                    text: 'రద్దు (Cancel)',
+                    role: 'cancel'
+                },
+                {
+                    text: 'అనుమతించు (Allow)',
+                    handler: function () {
+                        _this.executeGetCurrentLocation();
+                    }
+                }
+            ]
+        });
+        confirmAlert.present();
+    };
+    AddmeetingsPage.prototype.executeGetCurrentLocation = function () {
         return __awaiter(this, void 0, void 0, function () {
             var _this = this;
-            var reverseGeocode, applyLocation, fallbackToIp;
+            var reverseGeocode, applyLocation, handleFailure;
             return __generator(this, function (_a) {
                 this.locationError = '';
                 this.locationSuccess = '';
                 this.locationName = '';
                 this.locationSourceMessage = '';
                 this.locationLoading = true;
+                if (this.cdr) {
+                    this.cdr.detectChanges();
+                }
 
                 reverseGeocode = function (lat, lng) {
                     return __awaiter(_this, void 0, void 0, function () {
-                        var bdcUrl, res, data, parts, nominatimUrl, resNom, dataNom;
+                        var nominatimUrl, resNom, dataNom, a, parts, bdcUrl, resBdc, dataBdc, bdcParts;
                         return __generator(this, function (_b) {
                             switch (_b.label) {
                                 case 0:
                                     _b.trys.push([0, 3, , 4]);
-                                    bdcUrl = 'https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=' + lat + '&longitude=' + lng + '&localityLanguage=en';
-                                    return [4, fetch(bdcUrl)];
+                                    nominatimUrl = 'https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=' + lat + '&lon=' + lng + '&addressdetails=1';
+                                    return [4, fetch(nominatimUrl, { headers: { 'Accept': 'application/json' } })];
                                 case 1:
-                                    res = _b.sent();
-                                    return [4, res.json()];
+                                    resNom = _b.sent();
+                                    return [4, resNom.json()];
                                 case 2:
-                                    data = _b.sent();
-                                    parts = [
-                                        data.locality || data.name || '',
-                                        data.city || data.principalSubdivision || '',
-                                        data.countryName || ''
-                                    ].filter(function (p) { return !!p; });
-                                    if (parts.length > 0) {
-                                        return [2, parts.join(', ')];
+                                    dataNom = _b.sent();
+                                    if (dataNom) {
+                                        if (dataNom.display_name && dataNom.display_name.trim().length > 0) {
+                                            return [2, dataNom.display_name.trim()];
+                                        }
+                                        if (dataNom.address) {
+                                            a = dataNom.address;
+                                            parts = [
+                                                a.house_number || a.building || a.amenity || '',
+                                                a.road || a.street || '',
+                                                a.neighbourhood || a.suburb || '',
+                                                a.village || a.town || a.city || '',
+                                                a.county || a.mandal || '',
+                                                a.state_district || a.district || '',
+                                                a.state || '',
+                                                a.postcode || '',
+                                                a.country || ''
+                                            ].filter(function (p) { return !!p && p.trim().length > 0; });
+                                            if (parts.length > 0) {
+                                                return [2, parts.join(', ')];
+                                            }
+                                        }
                                     }
                                     return [3, 4];
                                 case 3:
@@ -37,22 +75,29 @@
                                     return [3, 4];
                                 case 4:
                                     _b.trys.push([4, 7, , 8]);
-                                    nominatimUrl = 'https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=' + lat + '&lon=' + lng;
-                                    return [4, fetch(nominatimUrl)];
+                                    bdcUrl = 'https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=' + lat + '&longitude=' + lng + '&localityLanguage=en';
+                                    return [4, fetch(bdcUrl)];
                                 case 5:
-                                    resNom = _b.sent();
-                                    return [4, resNom.json()];
+                                    resBdc = _b.sent();
+                                    return [4, resBdc.json()];
                                 case 6:
-                                    dataNom = _b.sent();
-                                    if (dataNom && dataNom.display_name) {
-                                        return [2, dataNom.display_name];
+                                    dataBdc = _b.sent();
+                                    bdcParts = [
+                                        dataBdc.locality || dataBdc.name || '',
+                                        dataBdc.city || '',
+                                        dataBdc.principalSubdivision || '',
+                                        dataBdc.postcode || '',
+                                        dataBdc.countryName || ''
+                                    ].filter(function (p) { return !!p && p.trim().length > 0; });
+                                    if (bdcParts.length > 0) {
+                                        return [2, bdcParts.join(', ')];
                                     }
                                     return [3, 8];
                                 case 7:
                                     _b.sent();
                                     return [3, 8];
                                 case 8:
-                                    return [2, lat.toFixed(5) + ', ' + lng.toFixed(5)];
+                                    return [2, lat.toFixed(6) + ', ' + lng.toFixed(6)];
                             }
                         });
                     });
@@ -76,102 +121,76 @@
                     _this.locationSuccess = 'కరెంటు లొకేషన్ విజయవంతముగా నమోదు చేయబడింది.';
                     _this.locationSourceMessage = source;
                     _this.locationLoading = false;
+                    if (_this.cdr) {
+                        _this.cdr.detectChanges();
+                    }
 
                     var alertSuccess = _this.alertctrl.create({
                         mode: 'ios',
                         title: 'లొకేషన్ నమోదు అయ్యింది!',
-                        subTitle: place,
-                        message: googleUrl,
+                        subTitle: 'కూటములు జరిగే ప్రదేశం: ' + place,
+                        message: 'గూగుల్ లొకేషన్: ' + googleUrl,
                         buttons: ['సరే']
                     });
                     alertSuccess.present();
                 };
 
-                fallbackToIp = function (reasonMsg) {
-                    return __awaiter(_this, void 0, void 0, function () {
-                        var ipRes, ipData, lat, lng, parts, place, alertErr;
-                        return __generator(this, function (_c) {
-                            switch (_c.label) {
-                                case 0:
-                                    _c.trys.push([0, 3, , 4]);
-                                    return [4, fetch('https://ipapi.co/json/')];
-                                case 1:
-                                    ipRes = _c.sent();
-                                    return [4, ipRes.json()];
-                                case 2:
-                                    ipData = _c.sent();
-                                    if (ipData && ipData.latitude && ipData.longitude) {
-                                        lat = parseFloat(ipData.latitude);
-                                        lng = parseFloat(ipData.longitude);
-                                        parts = [ipData.city, ipData.region, ipData.country_name].filter(function (p) { return !!p; });
-                                        place = parts.join(', ') || (lat + ', ' + lng);
-                                        applyLocation(lat, lng, place, 'నెట్‌వర్క్ (IP) ఆధారంగా లొకేషన్ నమోదు చేయబడింది.');
-                                        return [2];
-                                    }
-                                    return [3, 4];
-                                case 3:
-                                    _c.sent();
-                                    return [3, 4];
-                                case 4:
-                                    _this.locationLoading = false;
-                                    _this.locationError = reasonMsg;
-                                    alertErr = _this.alertctrl.create({
-                                        mode: 'ios',
-                                        title: 'లొకేషన్ లోపం',
-                                        message: reasonMsg,
-                                        buttons: ['సరే']
-                                    });
-                                    alertErr.present();
-                                    return [2];
-                            }
-                        });
+                handleFailure = function (reasonMsg) {
+                    _this.locationLoading = false;
+                    _this.locationError = reasonMsg;
+                    if (_this.cdr) {
+                        _this.cdr.detectChanges();
+                    }
+                    var alertErr = _this.alertctrl.create({
+                        mode: 'ios',
+                        title: 'లొకేషన్ లోపం',
+                        message: reasonMsg,
+                        buttons: ['సరే']
                     });
+                    alertErr.present();
                 };
 
                 if (!navigator.geolocation) {
-                    return [2, fallbackToIp('మీ డివైస్ లో GPS జియోలొకేషన్ సపోర్ట్ లేదు.')];
+                    handleFailure('మీ డివైస్ లేదా బ్రౌజర్ లో GPS జియోలొకేషన్ సపోర్ట్ లేదు.');
+                    return [2];
                 }
 
                 navigator.geolocation.getCurrentPosition(
                     function (position) {
                         return __awaiter(_this, void 0, void 0, function () {
                             var lat, lng, place;
-                            return __generator(this, function (_d) {
-                                switch (_d.label) {
+                            return __generator(this, function (_a) {
+                                switch (_a.label) {
                                     case 0:
                                         lat = position.coords.latitude;
                                         lng = position.coords.longitude;
                                         return [4, reverseGeocode(lat, lng)];
                                     case 1:
-                                        place = _d.sent();
-                                        applyLocation(lat, lng, place, 'GPS ద్వారా లొకేషన్ విజయవంతముగా పొందబడింది.');
+                                        place = _a.sent();
+                                        applyLocation(lat, lng, place, 'GPS ద్వారా ఖచ్చితమైన లొకేషన్ పొందబడింది.');
                                         return [2];
                                 }
                             });
                         });
                     },
                     function (error) {
-                        return __awaiter(_this, void 0, void 0, function () {
-                            var msg;
-                            return __generator(this, function (_e) {
-                                msg = 'లొకేషన్ పొందడంలో సమస్య ఏర్పడింది.';
-                                if (error.code === error.PERMISSION_DENIED) {
-                                    msg = 'లొకేషన్ అనుమతి నిరాకరించబడింది. దయచేసి మొబైల్ సెట్టింగ్స్ లో లొకేషన్ పర్మిషన్ ఆన్ చేయండి.';
-                                } else if (error.code === error.TIMEOUT) {
-                                    msg = 'లొకేషన్ రిక్వెస్ట్ టైమ్‌అవుట్ అయ్యింది.';
-                                } else if (error.code === error.POSITION_UNAVAILABLE) {
-                                    msg = 'లొకేషన్ సిగ్నల్ అందుబాటులో లేదు.';
-                                }
-                                return [2, fallbackToIp(msg)];
-                            });
-                        });
+                        var msg = 'లొకేషన్ పొందడంలో సమస్య ఏర్పడింది.';
+                        if (error.code === error.PERMISSION_DENIED) {
+                            msg = 'లొకేషన్ అనుమతి నిరాకరించబడింది. దయచేసి మొబైల్ సెట్టింగ్స్ లో లొకేషన్ ఆన్ చేసి పర్మిషన్ అనుమతించండి.';
+                        } else if (error.code === error.TIMEOUT) {
+                            msg = 'లొకేషన్ శోధించడానికి సమయం మించిపోయింది. దయచేసి డివైస్ GPS ఆన్ లో ఉందో లేదో సరిచూసుకోండి.';
+                        } else if (error.code === error.POSITION_UNAVAILABLE) {
+                            msg = 'GPS సిగ్నల్ అందుబాటులో లేదు. దయచేసి లొకేషన్ ఆన్ చేయండి.';
+                        }
+                        handleFailure(msg);
                     },
                     {
                         enableHighAccuracy: true,
-                        timeout: 10000,
-                        maximumAge: 60000
+                        timeout: 20000,
+                        maximumAge: 0
                     }
                 );
+
                 return [2];
             });
         });

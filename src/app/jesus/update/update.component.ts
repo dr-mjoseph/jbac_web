@@ -721,87 +721,101 @@ export class UpdateComponent {
     })
   }
   editpastor() {
-    this.pastorform.value.usr_id = sessionStorage.getItem('usr_id');
-    this.service.editpastor(this.pastorform.value).subscribe((res: any) => {
+    const usr_id = sessionStorage.getItem('usr_id');
+    const data = Object.assign({}, this.pastorform.value, { usr_id });
+    this.service.editpastor(data).subscribe((res: any) => {
       if (res.status == 200) {
-        Swal.fire('విజయవంతముగా నమోదు చేయబడింది, మీ ఫోన్ నెంబర్ మరియు పాస్వర్డ్ తో లాగిన్ అవగలరు')
+        Swal.fire('విజయవంతముగా అప్‌డేట్ చేయబడింది / Updated Successfully')
       } else {
-        alert('సర్వర్ డౌన్ వుంది, దయచేసి తరువాత ప్రయత్నిచండి')
+        Swal.fire('లోపం!', 'సర్వర్ లో సమస్య ఉంది, దయచేసి తర్వాత ప్రయత్నించండి', 'error')
       }
+    }, (error: any) => {
+      Swal.fire('లోపం!', 'సర్వర్ లో సమస్య ఉంది, దయచేసి తర్వాత ప్రయత్నించండి', 'error')
     })
   }
-  // editministry() {
-  //   this.pastorform.value.usr_id = sessionStorage.getItem('usr_id');
-  //   this.service.editministry(this.ministryform.value).subscribe((res: any) => {
-  //     if (res.status == 200) {
-  //       Swal.fire('విజయవంతముగా నమోదు చేయబడింది, మీ ఫోన్ నెంబర్ మరియు పాస్వర్డ్ తో లాగిన్ అవగలరు')
-  //     } else {
-  //       alert('సర్వర్ డౌన్ వుంది, దయచేసి తరువాత ప్రయత్నిచండి')
-  //     }
-  //   })
-  // }
+
   editchurch() {
-    this.churchregsiterform.value.usr_id = sessionStorage.getItem('usr_id');
-    this.service.editchurch(this.churchregsiterform.value).subscribe((res: any) => {
+    const usr_id = sessionStorage.getItem('usr_id');
+    const data = Object.assign({}, this.churchregsiterform.value, { usr_id });
+    this.service.editchurch(data).subscribe((res: any) => {
       if (res.status == 200) {
-        Swal.fire('Update Successfully')
+        Swal.fire('విజయవంతముగా అప్‌డేట్ చేయబడింది / Updated Successfully')
       } else {
-        alert('సర్వర్ డౌన్ వుంది, దయచేసి తరువాత ప్రయత్నిచండి')
+        Swal.fire('లోపం!', 'సర్వర్ లో సమస్య ఉంది, దయచేసి తర్వాత ప్రయత్నించండి', 'error')
       }
+    }, (error: any) => {
+      Swal.fire('లోపం!', 'సర్వర్ లో సమస్య ఉంది, దయచేసి తర్వాత ప్రయత్నించండి', 'error')
     })
   }
+
   editindependentorgainsation() {
-    this.independentorgainsationform.value.usr_id = sessionStorage.getItem('usr_id');
-    this.service.editindependentorgainsation(this.independentorgainsationform.value).subscribe((res: any) => {
-
-
+    const usr_id = sessionStorage.getItem('usr_id');
+    const data = Object.assign({}, this.independentorgainsationform.value, { usr_id });
+    this.service.editindependentorgainsation(data).subscribe((res: any) => {
       if (res.status == 200) {
-        Swal.fire('Update Successfully')
+        Swal.fire('విజయవంతముగా అప్‌డేట్ చేయబడింది / Updated Successfully')
       } else {
-        alert('సర్వర్ డౌన్ వుంది, దయచేసి తరువాత ప్రయత్నిచండి')
+        Swal.fire('లోపం!', 'సర్వర్ లో సమస్య ఉంది, దయచేసి తర్వాత ప్రయత్నించండి', 'error')
       }
+    }, (error: any) => {
+      Swal.fire('లోపం!', 'సర్వర్ లో సమస్య ఉంది, దయచేసి తర్వాత ప్రయత్నించండి', 'error')
     })
   }
+
   editindepastororgainsation() {
-    this.pastorsassociations.value.usr_id = sessionStorage.getItem('usr_id');
-    this.service.editpastororgainsation(this.pastorsassociations.value).subscribe((res: any) => {
+    const usr_id = sessionStorage.getItem('usr_id');
+    const data = Object.assign({}, this.pastorsassociations.value, { usr_id });
+    this.service.editpastororgainsation(data).subscribe((res: any) => {
       if (res.status == 200) {
-        Swal.fire('Update Successfully')
+        Swal.fire('విజయవంతముగా అప్‌డేట్ చేయబడింది / Updated Successfully')
       } else {
-        alert('సర్వర్ డౌన్ వుంది, దయచేసి తరువాత ప్రయత్నిచండి')
+        Swal.fire('లోపం!', 'సర్వర్ లో సమస్య ఉంది, దయచేసి తర్వాత ప్రయత్నించండి', 'error')
       }
+    }, (error: any) => {
+      Swal.fire('లోపం!', 'సర్వర్ లో సమస్య ఉంది, దయచేసి తర్వాత ప్రయత్నించండి', 'error')
     })
   }
+
   editbeliver() {
-    this.beliverform.value.usr_id = sessionStorage.getItem('usr_id');
-    this.service.editbeliver(this.beliverform.value).subscribe((res: any) => {
+    const usr_id = sessionStorage.getItem('usr_id');
+    const data = Object.assign({}, this.beliverform.value, { usr_id });
+    this.service.editbeliver(data).subscribe((res: any) => {
       if (res.status == 200) {
-        Swal.fire('Update Successfully')
+        Swal.fire('విజయవంతముగా అప్‌డేట్ చేయబడింది / Updated Successfully')
       } else {
-        alert('సర్వర్ డౌన్ వుంది, దయచేసి తరువాత ప్రయత్నిచండి')
+        Swal.fire('లోపం!', 'సర్వర్ లో సమస్య ఉంది, దయచేసి తర్వాత ప్రయత్నించండి', 'error')
       }
+    }, (error: any) => {
+      Swal.fire('లోపం!', 'సర్వర్ లో సమస్య ఉంది, దయచేసి తర్వాత ప్రయత్నించండి', 'error')
     })
   }
+
   editstudent() {
-    this.studentform.value.usr_id = sessionStorage.getItem('usr_id');
-    this.service.editstudent(this.studentform.value).subscribe((res: any) => {
+    const usr_id = sessionStorage.getItem('usr_id');
+    const data = Object.assign({}, this.studentform.value, { usr_id });
+    this.service.editstudent(data).subscribe((res: any) => {
       if (res.status == 200) {
-        Swal.fire('Update Successfully')
+        Swal.fire('విజయవంతముగా అప్‌డేట్ చేయబడింది / Updated Successfully')
       } else {
-        alert('సర్వర్ డౌన్ వుంది, దయచేసి తరువాత ప్రయత్నిచండి')
+        Swal.fire('లోపం!', 'సర్వర్ లో సమస్య ఉంది, దయచేసి తర్వాత ప్రయత్నించండి', 'error')
       }
+    }, (error: any) => {
+      Swal.fire('లోపం!', 'సర్వర్ లో సమస్య ఉంది, దయచేసి తర్వాత ప్రయత్నించండి', 'error')
     })
   }
+
   postministryupdate() {
-    this.ministryform.value.usr_id = sessionStorage.getItem('usr_id');
-    this.service.editministry(this.ministryform.value).subscribe((res: any) => {
-
-
+    const usr_id = sessionStorage.getItem('usr_id');
+    const sourceData = this.updateprofileministry ? this.updateprofileministry.value : this.ministryform.value;
+    const data = Object.assign({}, this.ministryform ? this.ministryform.value : {}, sourceData, { usr_id });
+    this.service.editministry(data).subscribe((res: any) => {
       if (res.status == 200) {
-        Swal.fire('Update Successfully')
+        Swal.fire('విజయవంతముగా అప్‌డేట్ చేయబడింది / Updated Successfully')
       } else {
-        alert('సర్వర్ డౌన్ వుంది, దయచేసి తరువాత ప్రయత్నిచండి')
+        Swal.fire('లోపం!', 'సర్వర్ లో సమస్య ఉంది, దయచేసి తర్వాత ప్రయత్నించండి', 'error')
       }
+    }, (error: any) => {
+      Swal.fire('లోపం!', 'సర్వర్ లో సమస్య ఉంది, దయచేసి తర్వాత ప్రయత్నించండి', 'error')
     })
   }
 
