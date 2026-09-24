@@ -43,21 +43,15 @@ jobs:
       run: yes | sdkmanager --licenses || true
 
     - name: Add Android Platform
-      run: ionic cordova platform add android --no-interactive
+      run: cordova platform add android --no-interactive
+
+    - name: Build Web Assets (AoT Production)
+      run: npm run build -- --prod
 
     - name: Build Android Release APK
-      run: |
-        ionic cordova build android --prod --release --no-interactive --verbose 2>&1 | tee build.log
-
-    - name: Upload Build Log
-      if: always()
-      uses: actions/upload-artifact@v4
-      with:
-        name: build-log
-        path: build.log
+      run: cordova build android --release -- --packageType=apk
 
     - name: Upload APK
-      if: success()
       uses: actions/upload-artifact@v4
       with:
         name: app-release-unsigned.apk
@@ -66,4 +60,4 @@ jobs:
 
 $utf8NoBom = New-Object System.Text.UTF8Encoding($false)
 [System.IO.File]::WriteAllText($workflowPath, $content.TrimStart([char]0xFEFF), $utf8NoBom)
-Write-Output "Successfully updated build-apk.yml with build-log artifact upload"
+Write-Output "Successfully updated build-apk.yml to clean two-stage build"
