@@ -511,36 +511,133 @@ getbelivers() {
       });
     };
 
-    // Check if navigator.geolocation exists
-    if (!navigator.geolocation) {
-      handleLocationFailure('మీ బ్రౌజర్ లేదా డివైస్ లో GPS జియోలొకేషన్ సపోర్ట్ లేదు.');
+    // Helper to fetch approximate location via Network/IP services (CORS & HTTPS friendly)
+    const fetchNetworkLocation = async (): Promise<{ lat: number, lng: number, fallbackPlace?: string } | null> => {
+      // Provider 1: ipwho.is (Free, fast, supports CORS and HTTPS)
+      try {
+        const res = await fetch('https://ipwho.is/');
+        const data = await res.json();
+        if (data && data.success && typeof data.latitude === 'number' && typeof data.longitude === 'number') {
+          const parts = [data.city, data.region, data.postal, data.country].filter(Boolean);
+          return {
+            lat: data.latitude,
+            lng: data.longitude,
+            fallbackPlace: parts.join(', ')
+          };
+        }
+      } catch (e) {
+        console.warn('ipwho.is lookup failed:', e);
+      }
+
+      // Provider 2: freeipapi.com
+      try {
+        const res = await fetch('https://freeipapi.com/api/json');
+        const data = await res.json();
+        if (data && typeof data.latitude === 'number' && typeof data.longitude === 'number') {
+          const parts = [data.cityName, data.regionName, data.zipCode, data.countryName].filter(Boolean);
+          return {
+            lat: data.latitude,
+            lng: data.longitude,
+            fallbackPlace: parts.join(', ')
+          };
+        }
+      } catch (e) {
+        console.warn('freeipapi lookup failed:', e);
+      }
+
+      // Provider 3: bigdatacloud client IP reverse geocode
+      try {
+        const res = await fetch('https://api.bigdatacloud.net/data/reverse-geocode-client');
+        const data = await res.json();
+        if (data && typeof data.latitude === 'number' && typeof data.longitude === 'number') {
+          const parts = [data.locality || data.name, data.city, data.principalSubdivision, data.postcode, data.countryName].filter(Boolean);
+          return {
+            lat: data.latitude,
+            lng: data.longitude,
+            fallbackPlace: parts.join(', ')
+          };
+        }
+      } catch (e) {
+        console.warn('bigdatacloud lookup failed:', e);
+      }
+
+      return null;
+    };
+
+    // Fallback executor when GPS is unavailable, rejected, or blocked on HTTP
+    const tryNetworkFallback = async (reasonNote: string) => {
+      try {
+        const netLoc = await fetchNetworkLocation();
+        if (netLoc) {
+          let place = await reverseGeocode(netLoc.lat, netLoc.lng);
+          if (!place || place === `${netLoc.lat.toFixed(6)}, ${netLoc.lng.toFixed(6)}`) {
+            if (netLoc.fallbackPlace) {
+              place = netLoc.fallbackPlace;
+            }
+          }
+          applyLocation(netLoc.lat, netLoc.lng, place, reasonNote);
+          return;
+        }
+      } catch (err) {
+        console.error('Network location fallback error:', err);
+      }
+
+      handleLocationFailure('లొకేషన్ పొందడం సాధ్యం కాలేదు. దయచేసి గూగుల్ లొకేషన్ లింక్ మరియు అడ్రసును ఫారమ్‌లో నమోదు చేయండి.');
+    };
+
+    // Determine whether origin is a secure context (HTTPS or localhost)
+    const isSecure = typeof window !== 'undefined' && (
+      window.isSecureContext ||
+      window.location.protocol === 'https:' ||
+      window.location.hostname === 'localhost' ||
+      window.location.hostname === '127.0.0.1'
+    );
+
+    // If browser strictly blocks GPS (insecure HTTP context) or navigator.geolocation is absent
+    if (!isSecure || !navigator.geolocation) {
+      console.warn('Insecure origin or geolocation not supported; activating IP network location fallback.');
+      await tryNetworkFallback('నెట్‌వర్క్ ద్వారా లొకేషన్ నమోదు చేయబడింది (HTTP సైట్).');
       return;
     }
 
-    navigator.geolocation.getCurrentPosition(
-      async (position) => {
-        const lat = position.coords.latitude;
-        const lng = position.coords.longitude;
-        const place = await reverseGeocode(lat, lng);
-        applyLocation(lat, lng, place, 'GPS ద్వారా ఖచ్చితమైన లొకేషన్ పొందబడింది.');
-      },
-      async (error) => {
-        let msg = 'లొకేషన్ పొందడంలో సమస్య ఏర్పడింది.';
-        if (error.code === error.PERMISSION_DENIED) {
-          msg = 'లొకేషన్ అనుమతి నిరాకరించబడింది. దయచేసి బ్రౌజర్ లేదా డివైస్ సెట్టింగ్స్ లో లొకేషన్ ఆన్ చేసి పర్మిషన్ అనుమతించండి.';
-        } else if (error.code === error.TIMEOUT) {
-          msg = 'లొకేషన్ శోధించడానికి సమయం మించిపోయింది. దయచేసి డివైస్ GPS ఆన్ లో ఉందో లేదో సరిచూసుకోండి.';
-        } else if (error.code === error.POSITION_UNAVAILABLE) {
-          msg = 'GPS సిగ్నల్ అందుబాటులో లేదు. దయచేసి లొకేషన్ ఆన్ చేయండి.';
-        }
-        handleLocationFailure(msg);
-      },
-      {
-        enableHighAccuracy: true,
-        timeout: 20000,
-        maximumAge: 0 // Do not accept cached inaccurate location
+    // Try high-accuracy GPS with automatic network fallback on denial, timeout, or error
+    let fallbackTriggered = false;
+    const triggerFallbackOnce = async (note: string) => {
+      if (!fallbackTriggered) {
+        fallbackTriggered = true;
+        await tryNetworkFallback(note);
       }
-    );
+    };
+
+    try {
+      navigator.geolocation.getCurrentPosition(
+        async (position) => {
+          if (fallbackTriggered) return;
+          const lat = position.coords.latitude;
+          const lng = position.coords.longitude;
+          const place = await reverseGeocode(lat, lng);
+          applyLocation(lat, lng, place, 'GPS ద్వారా ఖచ్చితమైన లొకేషన్ పొందబడింది.');
+        },
+        async (error) => {
+          console.warn('navigator.geolocation error code:', error.code, error.message);
+          let note = 'GPS అందుబాటులో లేనందున నెట్‌వర్క్ ద్వారా లొకేషన్ నమోదు చేయబడింది.';
+          if (error.code === error.PERMISSION_DENIED) {
+            note = 'GPS అనుమతి లేనందున నెట్‌వర్క్ ద్వారా లొకేషన్ నమోదు చేయబడింది.';
+          } else if (error.code === error.TIMEOUT) {
+            note = 'GPS సమయం మించినందున నెట్‌వర్క్ ద్వారా లొకేషన్ నమోదు చేయబడింది.';
+          }
+          await triggerFallbackOnce(note);
+        },
+        {
+          enableHighAccuracy: true,
+          timeout: 8000,
+          maximumAge: 0 // Do not accept cached inaccurate location
+        }
+      );
+    } catch (e) {
+      console.warn('Exception calling getCurrentPosition:', e);
+      await triggerFallbackOnce('నెట్‌వర్క్ ద్వారా లొకేషన్ నమోదు చేయబడింది.');
+    }
   }
 
   formshow(id: any) {
