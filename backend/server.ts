@@ -2,6 +2,12 @@ import express from 'express';
 import serverless from 'serverless-http';
 import mysql from 'mysql2/promise';
 import cors from 'cors';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const app = express();
 app.use(express.json({ limit: '50mb' }));
@@ -60,6 +66,30 @@ function isValidTable(table) {
     return VALID_TABLES.has(table.toLowerCase());
 }
 
+function extractUploadedImage(body) {
+    if (!body) return '';
+    if (typeof body === 'string') return body.trim();
+    if (typeof body.image === 'string' && body.image.trim()) return body.image.trim();
+    if (typeof body.reviewimg === 'string' && body.reviewimg.trim()) return body.reviewimg.trim();
+    if (typeof body.reviewImg === 'string' && body.reviewImg.trim()) return body.reviewImg.trim();
+
+    const candidates = [body.reviewImg, body.reviewimg, body.imagesData, body.images, body.image, body.imagedata];
+    for (const cand of candidates) {
+        if (Array.isArray(cand) && cand.length > 0) {
+            const first = cand[0];
+            if (typeof first === 'string' && first.trim()) return first.trim();
+            if (first && typeof first === 'object') {
+                const val = first.reviewimg || first.reviewImg || first.image || first.url || first.src || '';
+                if (typeof val === 'string' && val.trim()) return val.trim();
+            }
+        } else if (cand && typeof cand === 'object') {
+            const val = cand.reviewimg || cand.reviewImg || cand.image || cand.url || cand.src || '';
+            if (typeof val === 'string' && val.trim()) return val.trim();
+        }
+    }
+    return '';
+}
+
 // Dynamic insert helper: matches input fields to real table columns
 async function dynamicInsert(tableName, data) {
     try {
@@ -68,6 +98,21 @@ async function dynamicInsert(tableName, data) {
         for (const c of cols) {
             colMap.set(c.Field.toLowerCase(), c.Field);
         }
+
+        // Auto-extract image if table has image column and data has reviewImg/imagesData
+        if (colMap.has('image') && (!data.image || typeof data.image === 'object' || Array.isArray(data.image))) {
+            const extracted = extractUploadedImage(data);
+            if (extracted) {
+                data.image = extracted;
+            }
+        }
+        if (colMap.has('photo') && (!data.photo || typeof data.photo === 'object' || Array.isArray(data.photo))) {
+            const extracted = extractUploadedImage(data);
+            if (extracted) {
+                data.photo = extracted;
+            }
+        }
+
         const fields = [];
         const placeholders = [];
         const values = [];
@@ -114,11 +159,24 @@ app.get(['/api/tables', '/dashboardapi/tables', '/tables'], async (_req, res) =>
             total_tables: tableList.length,
             database: dbName,
             host: dbHost,
+            tables: tableList,
             data: tableList
         });
     } catch (err) {
         res.status(500).json({ status: 500, error: err.message });
     }
+});
+
+// Interactive Web Database Cockpit UI
+app.get(['/admin-db', '/api/admin-db', '/dashboardapi/admin-db', '/api/admin-database-view'], (_req, res) => {
+    res.setHeader('Content-Type', 'text/html; charset=utf-8');
+    try {
+        const htmlPath = path.join(__dirname, 'admin_db.html');
+        if (fs.existsSync(htmlPath)) {
+            return res.send(fs.readFileSync(htmlPath, 'utf8'));
+        }
+    } catch (_) {}
+    res.send('<!DOCTYPE html><html><body><h2>JBAC Database Cockpit</h2><p>Please visit <a href="/dashboardapi/tables">/dashboardapi/tables</a> for JSON view.</p></body></html>');
 });
 
 app.get(['/api/crud/:table', '/dashboardapi/crud/:table', '/crud/:table'], async (req, res) => {
@@ -332,7 +390,7 @@ app.all(['/api/events', '/dashboardapi/getevents', '/dashboardapi/getupdateevent
 app.post(['/dashboardapi/postmeetings', '/api/postmeetings'], async (req, res) => {
     try {
         const m = req.body;
-        const img = m.image || (Array.isArray(m.reviewImg) && m.reviewImg.length > 0 ? (typeof m.reviewImg[0] === 'string' ? m.reviewImg[0] : m.reviewImg[0].image) : '') || '';
+        const img = extractUploadedImage(m);
         
         const eventData = {
             eventname: m.mettingtype || m.eventname || 'Meeting',
@@ -385,6 +443,49 @@ app.post(['/dashboardapi/postmeetings', '/api/postmeetings'], async (req, res) =
     }
 });
 
+app.all(['/dashboardapi/searchingdata', '/api/searchingdata'], async (req, res) => {
+    try {
+        const body = req.body || {};
+        let sql = 'SELECT id, eventname as title, eventname, eventname as event_name, orgname, meetsize, description, startdate, startdate as event_date, enddate, starttime, starttime as event_time, endtime, location, address, facebook, youtube, phone, eventcontactnumber, image, speaker1, speaker2, speaker3, speaker4, district_id, constituency_id, mandal_id, panchayat_id FROM events WHERE d_in = 0';
+        const params = [];
+        
+        if (body.district_id) { sql += ' AND district_id = ?'; params.push(body.district_id); }
+        if (body.constenncy_id || body.constituency_id) { sql += ' AND constituency_id = ?'; params.push(body.constenncy_id || body.constituency_id); }
+        if (body.mandal_id || body.mandals) { sql += ' AND mandal_id = ?'; params.push(body.mandal_id || body.mandals); }
+        if (body.village_id || body.panchayat_id) { sql += ' AND panchayat_id = ?'; params.push(body.village_id || body.panchayat_id); }
+        if (body.denomation_id || body.denomation) { sql += ' AND denomation_id = ?'; params.push(body.denomation_id || body.denomation); }
+        if (body.mettingtype) { sql += ' AND (LOWER(eventname) LIKE ? OR eventname = ?)'; params.push(`%${body.mettingtype}%`, body.mettingtype); }
+        if (body.speakerone) { sql += ' AND (speaker1 LIKE ? OR speaker2 LIKE ?)'; params.push(`%${body.speakerone}%`, `%${body.speakerone}%`); }
+        if (body.fromdate) { sql += ' AND startdate >= ?'; params.push(body.fromdate); }
+        if (body.todate) { sql += ' AND startdate <= ?'; params.push(body.todate); }
+
+        sql += ' ORDER BY id DESC';
+        const [rows] = await db.query(sql, params);
+        res.json({ status: 200, data: rows });
+    } catch (err) {
+        res.status(500).json({ status: 500, error: err.message });
+    }
+});
+
+app.all(['/dashboardapi/searchingdemonationdata', '/api/searchingdemonationdata'], async (req, res) => {
+    try {
+        const body = req.body || {};
+        let sql = 'SELECT id, eventname as title, eventname, eventname as event_name, orgname, meetsize, description, startdate, startdate as event_date, enddate, starttime, starttime as event_time, endtime, location, address, facebook, youtube, phone, eventcontactnumber, image, speaker1, speaker2, speaker3, speaker4, district_id, constituency_id, mandal_id, panchayat_id FROM events WHERE d_in = 0';
+        const params = [];
+        
+        if (body.denomation) { sql += ' AND denomation_id = ?'; params.push(body.denomation); }
+        if (body.mettingtype) { sql += ' AND (LOWER(eventname) LIKE ? OR eventname = ?)'; params.push(`%${body.mettingtype}%`, body.mettingtype); }
+        if (body.speakerone) { sql += ' AND (speaker1 LIKE ? OR speaker2 LIKE ?)'; params.push(`%${body.speakerone}%`, `%${body.speakerone}%`); }
+        if (body.ministry_id) { sql += ' AND ministry_id = ?'; params.push(body.ministry_id); }
+
+        sql += ' ORDER BY id DESC';
+        const [rows] = await db.query(sql, params);
+        res.json({ status: 200, data: rows });
+    } catch (err) {
+        res.status(500).json({ status: 500, error: err.message });
+    }
+});
+
 const getMeetingHandler = (type) => async (_req, res) => {
     try {
         const [rows] = await db.query('SELECT id, eventname as mettingtype, speaker1 as speakerone, speaker2 as speakertwo, speaker3 as speakerthree, speaker4 as speakerfour, startdate as fromdate, enddate as todate, starttime as fromtime, endtime as totime, image, district_id as districtname, constituency_id as constituencyname, mandal_id as mandals, panchayat_id as village_name, description, address, location, facebook, youtube, denomation_id as denomation, user_id as usr_id FROM events WHERE d_in = 0 AND (LOWER(eventname) LIKE ? OR LOWER(description) LIKE ?) ORDER BY id DESC', [`%${type}%`, `%${type}%`]);
@@ -405,7 +506,7 @@ app.all(['/dashboardapi/getmusical', '/api/getmusical'], getMeetingHandler('musi
 app.post(['/dashboardapi/postadds', '/api/postadds'], async (req, res) => {
     try {
         const a = req.body;
-        const img = a.image || (Array.isArray(a.reviewImg) && a.reviewImg.length > 0 ? (typeof a.reviewImg[0] === 'string' ? a.reviewImg[0] : a.reviewImg[0].image) : '') || '';
+        const img = extractUploadedImage(a);
         const result = await dynamicInsert('adds_data', {
             type: a.type || 'General',
             title: a.title || '',

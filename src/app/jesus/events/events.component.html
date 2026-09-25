@@ -299,10 +299,10 @@
                         <div class="card" style="width: 244px;">
                             <div class="card-header">
                                 <div class="card_image">
-                                    <img *ngIf="item.image == undefined || item.image == null || item.image == '' "
-                                        src="../../../assets/images/no.jpg" style="height: 212px;width:250px;">
-                                    <img src="{{item.image}}" style="width:212px;height:250px;"
-                                        (click)="openimg(item.image,openmodel)" alt="image" alt="Church Images">
+                                    <img *ngIf="!item.image"
+                                        src="assets/images/no.jpg" style="height: 212px;width:250px;object-fit:cover;">
+                                    <img *ngIf="item.image" [src]="item.image" style="width:212px;height:250px;object-fit:cover;cursor:pointer;"
+                                        (click)="openimg(item.image,openmodel)" alt="Church Meeting Poster">
                                 </div>
                             </div>
                             <div class="card-body">

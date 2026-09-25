@@ -708,6 +708,7 @@ getbelivers() {
         facebook: this.addingmeetings.value.facebook,
         youtube: this.addingmeetings.value.youtube,
         ministry_id: this.addingmeetings.value.ministry_id,
+        image: (this.imagesData && this.imagesData.length > 0) ? (this.imagesData[0].reviewimg || this.imagesData[0].reviewImg || '') : '',
         reviewImg: this.imagesData
       }
 console.log(data);

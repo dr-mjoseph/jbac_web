@@ -15,7 +15,7 @@ if [ -d "backend" ]; then
   (
     cd backend
     npm install --omit=dev --legacy-peer-deps
-    zip -q -r backend-deploy.zip server.js package.json node_modules
+    zip -q -r backend-deploy.zip server.js admin_db.html package.json node_modules
   )
 fi
 
