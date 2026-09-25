@@ -1,4 +1,11 @@
-import express from 'express';
+const fs = require('fs');
+const path = require('path');
+
+const rootDir = path.resolve(__dirname, '..');
+const serverJsPath = path.join(rootDir, 'backend', 'server.js');
+const serverTsPath = path.join(rootDir, 'backend', 'server.ts');
+
+const serverJsContent = `import express from 'express';
 import serverless from 'serverless-http';
 import mysql from 'mysql2/promise';
 import cors from 'cors';
@@ -62,7 +69,7 @@ function isValidTable(table) {
 // Dynamic insert helper: matches input fields to real table columns
 async function dynamicInsert(tableName, data) {
     try {
-        const [cols] = await db.query(`DESCRIBE \`${tableName}\``);
+        const [cols] = await db.query(\`DESCRIBE \\\`\${tableName}\\\`\`);
         const colMap = new Map();
         for (const c of cols) {
             colMap.set(c.Field.toLowerCase(), c.Field);
@@ -75,17 +82,17 @@ async function dynamicInsert(tableName, data) {
             const lk = k.toLowerCase();
             if (lk !== 'id' && colMap.has(lk)) {
                 const actualCol = colMap.get(lk);
-                fields.push(`\`${actualCol}\``);
+                fields.push(\`\\\`\${actualCol}\\\`\`);
                 placeholders.push('?');
                 values.push(typeof v === 'object' && v !== null ? JSON.stringify(v) : (v === undefined ? null : v));
             }
         }
         if (fields.length === 0) return null;
-        const sql = `INSERT INTO \`${tableName}\` (${fields.join(',')}) VALUES (${placeholders.join(',')})`;
+        const sql = \`INSERT INTO \\\`\${tableName}\\\` (\${fields.join(',')}) VALUES (\${placeholders.join(',')})\`;
         const [res] = await db.query(sql, values);
         return res;
     } catch (e) {
-        console.error(`dynamicInsert error in ${tableName}:`, e.message);
+        console.error(\`dynamicInsert error in \${tableName}:\`, e.message);
         throw e;
     }
 }
@@ -99,8 +106,8 @@ app.get(['/api/tables', '/dashboardapi/tables', '/tables'], async (_req, res) =>
         const tableList = [];
         for (const t of tables) {
             const tableName = Object.values(t)[0];
-            const [cnt] = await db.query(`SELECT COUNT(*) as count FROM \`${tableName}\``).catch(() => [[{ count: 0 }]]);
-            const [cols] = await db.query(`DESCRIBE \`${tableName}\``).catch(() => [[]]);
+            const [cnt] = await db.query(\`SELECT COUNT(*) as count FROM \\\`\${tableName}\\\`\`).catch(() => [[{ count: 0 }]]);
+            const [cols] = await db.query(\`DESCRIBE \\\`\${tableName}\\\`\`).catch(() => [[]]);
             const count = cnt && cnt[0] ? Number(cnt[0].count) : 0;
             tableList.push({
                 name: tableName,
@@ -123,7 +130,7 @@ app.get(['/api/tables', '/dashboardapi/tables', '/tables'], async (_req, res) =>
 app.get(['/api/crud/:table', '/dashboardapi/crud/:table', '/crud/:table'], async (req, res) => {
     const table = req.params.table;
     if (!isValidTable(table)) {
-        return res.status(400).json({ status: 400, error: `Invalid or restricted table: ${table}` });
+        return res.status(400).json({ status: 400, error: \`Invalid or restricted table: \${table}\` });
     }
     try {
         const limit = Math.min(Number(req.query.limit) || 100, 500);
@@ -133,17 +140,17 @@ app.get(['/api/crud/:table', '/dashboardapi/crud/:table', '/crud/:table'], async
         const filters = [];
         for (const [key, val] of Object.entries(req.query)) {
             if (!['limit', 'offset', 'search', 'sort', 'order'].includes(key) && typeof val === 'string') {
-                filters.push(`\`${key.replace(/[^a-zA-Z0-9_]/g, '')}\` = ?`);
+                filters.push(\`\\\`\${key.replace(/[^a-zA-Z0-9_]/g, '')}\\\` = ?\`);
                 queryParams.push(val);
             }
         }
         if (filters.length > 0) {
             whereClause = 'WHERE ' + filters.join(' AND ');
         }
-        const sql = `SELECT * FROM \`${table}\` ${whereClause} ORDER BY id DESC LIMIT ? OFFSET ?`;
+        const sql = \`SELECT * FROM \\\`\${table}\\\` \${whereClause} ORDER BY id DESC LIMIT ? OFFSET ?\`;
         queryParams.push(limit, offset);
         const [rows] = await db.query(sql, queryParams);
-        const [countResult] = await db.query(`SELECT COUNT(*) as total FROM \`${table}\` ${whereClause}`, queryParams.slice(0, filters.length)).catch(() => [[{ total: rows.length }]]);
+        const [countResult] = await db.query(\`SELECT COUNT(*) as total FROM \\\`\${table}\\\` \${whereClause}\`, queryParams.slice(0, filters.length)).catch(() => [[{ total: rows.length }]]);
         const total = countResult && countResult[0] ? Number(countResult[0].total) : rows.length;
         res.json({ status: 200, table, total, limit, offset, count: rows.length, data: rows });
     } catch (err) {
@@ -155,12 +162,12 @@ app.get(['/api/crud/:table/:id', '/dashboardapi/crud/:table/:id', '/crud/:table/
     const table = req.params.table;
     const id = req.params.id;
     if (!isValidTable(table)) {
-        return res.status(400).json({ status: 400, error: `Invalid table: ${table}` });
+        return res.status(400).json({ status: 400, error: \`Invalid table: \${table}\` });
     }
     try {
-        const [rows] = await db.query(`SELECT * FROM \`${table}\` WHERE id = ?`, [id]);
+        const [rows] = await db.query(\`SELECT * FROM \\\`\${table}\\\` WHERE id = ?\`, [id]);
         if (!rows || rows.length === 0) {
-            return res.status(404).json({ status: 404, message: `Record with ID ${id} not found in ${table}` });
+            return res.status(404).json({ status: 404, message: \`Record with ID \${id} not found in \${table}\` });
         }
         res.json({ status: 200, table, data: rows[0] });
     } catch (err) {
@@ -386,7 +393,7 @@ app.post(['/dashboardapi/postmeetings', '/api/postmeetings'], async (req, res) =
 
 const getMeetingHandler = (type) => async (_req, res) => {
     try {
-        const [rows] = await db.query('SELECT id, eventname as mettingtype, speaker1 as speakerone, speaker2 as speakertwo, speaker3 as speakerthree, speaker4 as speakerfour, startdate as fromdate, enddate as todate, starttime as fromtime, endtime as totime, image, district_id as districtname, constituency_id as constituencyname, mandal_id as mandals, panchayat_id as village_name, description, address, location, facebook, youtube, denomation_id as denomation, user_id as usr_id FROM events WHERE d_in = 0 AND (LOWER(eventname) LIKE ? OR LOWER(description) LIKE ?) ORDER BY id DESC', [`%${type}%`, `%${type}%`]);
+        const [rows] = await db.query('SELECT id, eventname as mettingtype, speaker1 as speakerone, speaker2 as speakertwo, speaker3 as speakerthree, speaker4 as speakerfour, startdate as fromdate, enddate as todate, starttime as fromtime, endtime as totime, image, district_id as districtname, constituency_id as constituencyname, mandal_id as mandals, panchayat_id as village_name, description, address, location, facebook, youtube, denomation_id as denomation, user_id as usr_id FROM events WHERE d_in = 0 AND (LOWER(eventname) LIKE ? OR LOWER(description) LIKE ?) ORDER BY id DESC', [\`%\${type}%\`, \`%\${type}%\`]);
         res.json({ status: 200, data: rows });
     } catch (err) {
         res.status(500).json({ status: 500, error: err.message });
@@ -505,7 +512,7 @@ app.post(['/dashboardapi/postbeliversignup', '/api/postbeliver', '/dashboardapi/
         if (phone && b.password) {
             try {
                 await dynamicInsert('users', {
-                    name: `${b.fname || ''} ${b.lname || ''}`.trim() || 'Believer',
+                    name: \`\${b.fname || ''} \${b.lname || ''}\`.trim() || 'Believer',
                     number: phone,
                     email: b.email || null,
                     otp: b.password,
@@ -597,7 +604,7 @@ app.post(['/dashboardapi/postchurchregister', '/api/postchurchregister'], async 
 
 app.all(['/dashboardapi/getchurch', '/dashboardapi/getchurches', '/api/getchurch'], async (_req, res) => {
     try {
-        const [rows] = await db.query('SELECT id, church_name, church_name as churchname, church_name as name, pastor_id, pastor_id as pastorname, pastor_id as pastor_name, contactnumber as phonenumber, contactnumber as mobile_number, district_id, constituency_id, mandal_id, village_id, address FROM church_reg WHERE d_in = 0 ORDER BY id DESC');
+        const [rows] = await db.query('SELECT id, churchname, churchname as church_name, churchname as name, pastorname, pastorname as pastor_name, phonenumber, phonenumber as mobile_number, district_id, constituency_id, mandal_id, village_id, address FROM church_reg WHERE d_in = 0 ORDER BY id DESC');
         res.json({ status: 200, data: rows });
     } catch (err) {
         res.status(500).json({ status: 500, error: err.message });
@@ -607,7 +614,7 @@ app.all(['/dashboardapi/getchurch', '/dashboardapi/getchurches', '/api/getchurch
 app.all(['/dashboardapi/getchurchesdatafilters', '/api/getchurchesdatafilters'], async (req, res) => {
     try {
         const { districts, constituencyname, mandal_id } = req.body || {};
-        let sql = 'SELECT id, church_name, church_name as churchname, church_name as name, pastor_id, pastor_id as pastorname, pastor_id as pastor_name, contactnumber as phonenumber, contactnumber as mobile_number, district_id, constituency_id, mandal_id, village_id, address FROM church_reg WHERE d_in = 0';
+        let sql = 'SELECT id, churchname, churchname as church_name, churchname as name, pastorname, pastorname as pastor_name, phonenumber, phonenumber as mobile_number, district_id, constituency_id, mandal_id, village_id, address FROM church_reg WHERE d_in = 0';
         const params = [];
         if (districts) { sql += ' AND district_id = ?'; params.push(districts); }
         if (constituencyname) { sql += ' AND constituency_id = ?'; params.push(constituencyname); }
@@ -1044,6 +1051,10 @@ export const handler = serverless(app);
 if (!process.env.AWS_LAMBDA_FUNCTION_NAME) {
     const PORT = process.env.PORT || 8081;
     app.listen(PORT, async () => {
-        console.log(`JBAC Backend API listening on port ${PORT}`);
+        console.log(\`JBAC Backend API listening on port \${PORT}\`);
     });
 }
+`;
+
+fs.writeFileSync(serverJsPath, serverJsContent, 'utf8');
+console.log('[SUCCESS] Generated backend/server.js');

@@ -531,20 +531,24 @@ getbelivers() {
       return;
     }
 
-    // 2. Check if context is secure (HTTPS or localhost)
+    // 2. Check if context is secure (HTTPS, localhost, or mobile webview)
     const isSecure = typeof window !== 'undefined' && (
       window.isSecureContext ||
       window.location.protocol === 'https:' ||
       window.location.hostname === 'localhost' ||
-      window.location.hostname === '127.0.0.1'
+      window.location.hostname === '127.0.0.1' ||
+      window.location.protocol === 'file:' ||
+      (window as any).cordova !== undefined ||
+      (window as any).Capacitor !== undefined
     );
 
-    if (!isSecure) {
-      handleLocationFailure(
-        'బ్రౌజర్ భద్రతా నిబంధనల ప్రకారం HTTP సైట్లలో GPS లొకేషన్ అనుమతించబడదు. దయచేసి HTTPS లింక్ లేదా మొబైల్ యాప్ ఉపయోగించండి.',
-        true
-      );
-      return;
+    // If on HTTP on a domain that supports HTTPS, redirect immediately to HTTPS
+    if (typeof window !== 'undefined' && window.location.protocol === 'http:') {
+      const host = window.location.hostname;
+      if (!['localhost', '127.0.0.1'].includes(host) && !host.includes('s3-website')) {
+        window.location.href = window.location.href.replace('http:', 'https:');
+        return;
+      }
     }
 
     // 3. Request actual hardware GPS coordinates from device
@@ -559,9 +563,11 @@ getbelivers() {
         let msg = 'లొకేషన్ పొందడంలో సమస్య ఏర్పడింది.';
         let isHttp = false;
         if (error.code === error.PERMISSION_DENIED) {
-          msg = 'లొకేషన్ అనుమతి నిరాకరించబడింది. దయచేసి బ్రౌజర్ లేదా డివైస్ సెట్టింగ్స్ లో లొకేషన్ ఆన్ చేసి పర్మిషన్ Allow చేయండి.';
           if (!isSecure) {
+            msg = 'బ్రౌజర్ భద్రతా నిబంధనల ప్రకారం HTTP సైట్లలో GPS లొకేషన్ అనుమతించబడదు. దయచేసి HTTPS లింక్ లేదా మొబైల్ యాప్ ఉపయోగించండి.';
             isHttp = true;
+          } else {
+            msg = 'లొకేషన్ అనుమతి నిరాకరించబడింది. దయచేసి బ్రౌజర్ లేదా డివైస్ సెట్టింగ్స్ లో లొకేషన్ ఆన్ చేసి పర్మిషన్ Allow చేయండి.';
           }
         } else if (error.code === error.TIMEOUT) {
           msg = 'లొకేషన్ శోధించడానికి సమయం మించిపోయింది. దయచేసి డివైస్ GPS ఆన్ లో ఉందో లేదో సరిచూసుకోండి.';

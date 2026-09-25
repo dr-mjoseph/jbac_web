@@ -33,8 +33,9 @@ if [ -z "${CF_ID}" ] || [ "${CF_ID}" = "null" ]; then
   CF_CONFIG=$(cat <<EOF
 {
   "CallerReference": "${CALLER_REF}",
-  "Comment": "CDN for ${BUCKET_NAME}",
-  "Enabled": true,
+  "Aliases": {
+    "Quantity": 0
+  },
   "DefaultRootObject": "index.html",
   "Origins": {
     "Quantity": 1,
@@ -42,10 +43,20 @@ if [ -z "${CF_ID}" ] || [ "${CF_ID}" = "null" ]; then
       {
         "Id": "S3-${BUCKET_NAME}",
         "DomainName": "${ORIGIN_DOMAIN}",
+        "OriginPath": "",
+        "CustomHeaders": {
+          "Quantity": 0
+        },
         "CustomOriginConfig": {
           "HTTPPort": 80,
           "HTTPSPort": 443,
-          "OriginProtocolPolicy": "http-only"
+          "OriginProtocolPolicy": "http-only",
+          "OriginSslProtocols": {
+            "Quantity": 3,
+            "Items": ["TLSv1", "TLSv1.1", "TLSv1.2"]
+          },
+          "OriginReadTimeout": 30,
+          "OriginKeepaliveTimeout": 5
         }
       }
     ]
@@ -63,12 +74,22 @@ if [ -z "${CF_ID}" ] || [ "${CF_ID}" = "null" ]; then
     },
     "ForwardedValues": {
       "QueryString": false,
-      "Cookies": { "Forward": "none" }
+      "Cookies": { "Forward": "none" },
+      "Headers": { "Quantity": 0 },
+      "QueryStringCacheKeys": { "Quantity": 0 }
+    },
+    "TrustedSigners": {
+      "Enabled": false,
+      "Quantity": 0
     },
     "MinTTL": 0,
     "DefaultTTL": 86400,
     "MaxTTL": 31536000,
-    "Compress": true
+    "Compress": true,
+    "SmoothStreaming": false
+  },
+  "CacheBehaviors": {
+    "Quantity": 0
   },
   "CustomErrorResponses": {
     "Quantity": 2,
@@ -86,6 +107,18 @@ if [ -z "${CF_ID}" ] || [ "${CF_ID}" = "null" ]; then
         "ErrorCachingMinTTL": 10
       }
     ]
+  },
+  "Comment": "CDN for ${BUCKET_NAME}",
+  "PriceClass": "PriceClass_All",
+  "Enabled": true,
+  "ViewerCertificate": {
+    "CloudFrontDefaultCertificate": true
+  },
+  "Restrictions": {
+    "GeoRestriction": {
+      "RestrictionType": "none",
+      "Quantity": 0
+    }
   }
 }
 EOF
@@ -102,7 +135,18 @@ EOF
   else
     echo "[WARNING] CloudFront automated creation returned:"
     echo "${CF_CREATE_OUTPUT}"
-    echo "Continuing deployment to S3 bucket without blocking the pipeline."
+    echo "Attempting fallback simple creation via CLI flags..."
+    CF_FALLBACK=$(aws cloudfront create-distribution --origin-domain-name "${ORIGIN_DOMAIN}" --default-root-object "index.html" --output json 2>&1 || true)
+    if echo "${CF_FALLBACK}" | grep -q '"Distribution"'; then
+      CF_ID=$(echo "${CF_FALLBACK}" | jq -r '.Distribution.Id' 2>/dev/null || true)
+      CF_DOMAIN=$(echo "${CF_FALLBACK}" | jq -r '.Distribution.DomainName' 2>/dev/null || true)
+      echo "Successfully created CloudFront Distribution via CLI flags: ${CF_ID}"
+      echo "CloudFront HTTPS Website URL: https://${CF_DOMAIN}"
+    else
+      echo "CloudFront create-distribution error: ${CF_CREATE_OUTPUT}" >> diagnostics.txt
+      echo "CloudFront fallback error: ${CF_FALLBACK}" >> diagnostics.txt
+      echo "Continuing deployment to S3 bucket without blocking the pipeline."
+    fi
   fi
 fi
 
