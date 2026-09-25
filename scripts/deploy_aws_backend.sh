@@ -126,6 +126,16 @@ fi
 API_GATEWAY_URL="https://${API_ID}.execute-api.${REGION}.amazonaws.com/"
 echo "API Gateway HTTPS Endpoint: ${API_GATEWAY_URL}"
 
+# Write URLs to files and environment
+echo "${FUNCTION_URL}" > backend_url.txt
+echo "FUNCTION_URL=${FUNCTION_URL}" >> $GITHUB_ENV 2>/dev/null || true
+echo "API_GATEWAY_URL=${API_GATEWAY_URL}" >> $GITHUB_ENV 2>/dev/null || true
+
+# Test endpoint
+echo "Testing backend health ping: ${FUNCTION_URL}api ..."
+curl -s -m 10 "${FUNCTION_URL}api" || true
+echo ""
+
 # 5. Output Summary to GitHub Step Summary if running in Actions
 echo "=========================================================="
 echo "BACKEND DEPLOYMENT SUCCESSFUL!"

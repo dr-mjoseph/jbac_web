@@ -23,12 +23,6 @@ jobs:
           node-version: '18'
           cache: 'npm'
 
-      - name: Install Dependencies
-        run: npm ci --legacy-peer-deps
-
-      - name: Build Production Bundle
-        run: npm run build -- --configuration production
-
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
@@ -37,9 +31,16 @@ jobs:
           aws-region: ${{ secrets.AWS_REGION || 'ap-southeast-2' }}
 
       - name: Deploy Backend to AWS Lambda & API Gateway
+        id: deploy_backend
         run: |
           chmod +x scripts/deploy_aws_backend.sh
           ./scripts/deploy_aws_backend.sh
+
+      - name: Install Dependencies
+        run: npm ci --legacy-peer-deps
+
+      - name: Build Production Bundle
+        run: npm run build -- --configuration production
 
       - name: Provision / Verify CloudFront HTTPS CDN
         env:
@@ -61,7 +62,7 @@ jobs:
         run: |
           if [ -n "$CF_DIST_ID" ] && [ "$CF_DIST_ID" != "None" ]; then
             echo "Invalidating CloudFront cache for distribution: $CF_DIST_ID"
-            aws cloudfront create-invalidation --distribution-id "$CF_DIST_ID" --paths "/*"
+            aws cloudfront create-invalidation --distribution-id "$CF_DIST_ID" --paths "/*" || true
           else
             echo "No CloudFront distribution ID configured. Skipping cache invalidation."
           fi
