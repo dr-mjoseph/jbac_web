@@ -1,0 +1,23 @@
+# "org" ensures this Service is used with the correct Serverless Framework Access Key.
+org: mjosephp7
+service: jbac-backend-api
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  region: ap-southeast-2 # Sydney Data Center
+  environment:
+    DB_HOST: 'jbac-db-cluster.cluster-cdeeuw0s2trf.ap-southeast-2.rds.amazonaws.com'
+    DB_USER: 'admin'
+    DB_NAME: 'jbac_db'
+    DB_PASSWORD: 'biUt2TrZ9EZAqn6GXhiA'
+    DB_PORT: '3306'
+
+functions:
+  api:
+    handler: server.handler
+    events:
+      - http:
+          path: /{proxy+}
+          method: any
+          cors: true
