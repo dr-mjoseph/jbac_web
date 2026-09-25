@@ -35,6 +35,11 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION || 'ap-southeast-2' }}
 
+      - name: Provision Aurora Serverless v2 & Enable Data API
+        run: |
+          chmod +x scripts/create_aurora_data_api.sh
+          ./scripts/create_aurora_data_api.sh || true
+
       - name: Deploy Backend to AWS Lambda & API Gateway
         id: deploy_backend
         run: |

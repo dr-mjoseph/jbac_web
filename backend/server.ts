@@ -30,6 +30,7 @@ const db = mysql.createPool({
     user: dbUser,
     password: dbPassword,
     database: dbName,
+    charset: 'utf8mb4',
     waitForConnections: true,
     connectionLimit: 15,
     enableKeepAlive: true,
