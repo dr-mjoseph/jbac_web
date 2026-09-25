@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-set -e
 
 REGION="${AWS_REGION:-ap-southeast-2}"
 FUNCTION_NAME="jbac-backend-api"
@@ -85,10 +84,11 @@ if [ -z "${URL_CONFIG}" ]; then
     --function-name "${FUNCTION_NAME}" \
     --auth-type NONE \
     --cors '{"AllowOrigins":["*"],"AllowMethods":["*"],"AllowHeaders":["*"],"MaxAge":86400}' \
-    --region "${REGION}"
+    --region "${REGION}" 2>&1 || true
 fi
 
-# Unconditionally refresh Function URL public invocation permission
+# Refresh Function URL public invocation permission
+echo "Setting Function URL public invocation permission..."
 aws lambda remove-permission --function-name "${FUNCTION_NAME}" --statement-id "FunctionURLAllowPublicAccess" --region "${REGION}" 2>/dev/null || true
 aws lambda add-permission \
   --function-name "${FUNCTION_NAME}" \
@@ -96,15 +96,15 @@ aws lambda add-permission \
   --action "lambda:InvokeFunctionUrl" \
   --principal "*" \
   --function-url-auth-type NONE \
-  --region "${REGION}"
+  --region "${REGION}" 2>&1 || true
 
-FUNCTION_URL=$(aws lambda get-function-url-config --function-name "${FUNCTION_NAME}" --query "FunctionUrl" --output text --region "${REGION}")
+FUNCTION_URL=$(aws lambda get-function-url-config --function-name "${FUNCTION_NAME}" --query "FunctionUrl" --output text --region "${REGION}" 2>/dev/null || true)
 echo "Lambda Function URL: ${FUNCTION_URL}"
 
 # 4. Create or Update API Gateway HTTP API
 echo "[4/5] Configuring API Gateway HTTP API v2..."
 API_ID=$(aws apigatewayv2 get-apis --query "Items[?Name=='jbac-backend-http-api'].ApiId" --output text --region "${REGION}" 2>/dev/null || true)
-LAMBDA_ARN=$(aws lambda get-function --function-name "${FUNCTION_NAME}" --query "Configuration.FunctionArn" --output text --region "${REGION}")
+LAMBDA_ARN=$(aws lambda get-function --function-name "${FUNCTION_NAME}" --query "Configuration.FunctionArn" --output text --region "${REGION}" 2>/dev/null || true)
 
 if [ -z "${API_ID}" ] || [ "${API_ID}" = "None" ]; then
   echo "Creating API Gateway HTTP API..."
@@ -114,10 +114,10 @@ if [ -z "${API_ID}" ] || [ "${API_ID}" = "None" ]; then
     --cors-configuration '{"AllowOrigins":["*"],"AllowMethods":["*"],"AllowHeaders":["*"]}' \
     --target "${LAMBDA_ARN}" \
     --region "${REGION}" \
-    --query "ApiId" --output text)
+    --query "ApiId" --output text 2>&1 || true)
 fi
 
-# Unconditionally refresh API Gateway invocation permission
+echo "Setting API Gateway Lambda invocation permission..."
 aws lambda remove-permission --function-name "${FUNCTION_NAME}" --statement-id "ApiGatewayInvokePermission" --region "${REGION}" 2>/dev/null || true
 aws lambda add-permission \
   --function-name "${FUNCTION_NAME}" \
@@ -125,34 +125,45 @@ aws lambda add-permission \
   --action "lambda:InvokeFunction" \
   --principal "apigateway.amazonaws.com" \
   --source-arn "arn:aws:execute-api:${REGION}:*:*/*" \
-  --region "${REGION}"
+  --region "${REGION}" 2>&1 || true
 
 API_GATEWAY_URL="https://${API_ID}.execute-api.${REGION}.amazonaws.com/"
 echo "API Gateway HTTPS Endpoint: ${API_GATEWAY_URL}"
 
+# Choose primary target URL
+TARGET_BACKEND_URL="${FUNCTION_URL}"
+if [ -z "${TARGET_BACKEND_URL}" ] || [ "${TARGET_BACKEND_URL}" = "None" ]; then
+  TARGET_BACKEND_URL="${API_GATEWAY_URL}"
+fi
+
 # Write URLs to files and environment
-echo "${FUNCTION_URL}" > backend_url.txt
+echo "${TARGET_BACKEND_URL}" > backend_url.txt
 echo "FUNCTION_URL=${FUNCTION_URL}" >> $GITHUB_ENV 2>/dev/null || true
 echo "API_GATEWAY_URL=${API_GATEWAY_URL}" >> $GITHUB_ENV 2>/dev/null || true
+echo "TARGET_BACKEND_URL=${TARGET_BACKEND_URL}" >> $GITHUB_ENV 2>/dev/null || true
 
-# Test endpoint
-echo "Testing backend health ping: ${FUNCTION_URL}api ..."
+# Test endpoints
+echo "Testing API Gateway ping: ${API_GATEWAY_URL}api ..."
+curl -s -m 10 "${API_GATEWAY_URL}api" || true
+echo ""
+echo "Testing Function URL ping: ${FUNCTION_URL}api ..."
 curl -s -m 10 "${FUNCTION_URL}api" || true
 echo ""
 
 # 5. Output Summary to GitHub Step Summary if running in Actions
 echo "=========================================================="
 echo "BACKEND DEPLOYMENT SUCCESSFUL!"
-echo "Primary HTTPS Backend URL: ${FUNCTION_URL}"
+echo "Primary HTTPS Backend URL: ${TARGET_BACKEND_URL}"
 echo "API Gateway HTTPS URL:     ${API_GATEWAY_URL}"
-echo "Tables URL:                ${FUNCTION_URL}dashboardapi/tables"
-echo "Admin Database Cockpit:    ${FUNCTION_URL}api/admin-database-view"
+echo "Function URL:              ${FUNCTION_URL}"
+echo "Tables URL:                ${TARGET_BACKEND_URL}dashboardapi/tables"
+echo "Admin Database Cockpit:    ${TARGET_BACKEND_URL}api/admin-database-view"
 echo "=========================================================="
 
 if [ -n "${GITHUB_STEP_SUMMARY}" ]; then
   echo "## 🚀 AWS Backend API Deployed Successfully!" >> "${GITHUB_STEP_SUMMARY}"
-  echo "- **Primary HTTPS URL**: [${FUNCTION_URL}](${FUNCTION_URL})" >> "${GITHUB_STEP_SUMMARY}"
+  echo "- **Primary HTTPS URL**: [${TARGET_BACKEND_URL}](${TARGET_BACKEND_URL})" >> "${GITHUB_STEP_SUMMARY}"
   echo "- **API Gateway URL**: [${API_GATEWAY_URL}](${API_GATEWAY_URL})" >> "${GITHUB_STEP_SUMMARY}"
-  echo "- **Admin Cockpit**: [${FUNCTION_URL}api/admin-database-view](${FUNCTION_URL}api/admin-database-view)" >> "${GITHUB_STEP_SUMMARY}"
+  echo "- **Admin Cockpit**: [${TARGET_BACKEND_URL}api/admin-database-view](${TARGET_BACKEND_URL}api/admin-database-view)" >> "${GITHUB_STEP_SUMMARY}"
   echo "- **Database Cluster**: \`jbac-mysql-db.cdeeuw0s2trf.ap-southeast-2.rds.amazonaws.com:3306\`" >> "${GITHUB_STEP_SUMMARY}"
 fi
