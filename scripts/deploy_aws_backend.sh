@@ -155,8 +155,19 @@ echo "Testing Function URL ping: ${FUNCTION_URL}api ..."
 curl -s -m 10 "${FUNCTION_URL}api" || true
 echo ""
 
-# CloudWatch Diagnostics written to file
-echo "=== CLOUDWATCH LOGS ===" > diagnostics.txt
+# CloudWatch Diagnostics and Direct Invoke written to file
+echo "=== DIRECT INVOCATION TEST ===" > diagnostics.txt
+aws lambda invoke \
+  --function-name "${FUNCTION_NAME}" \
+  --cli-binary-format raw-in-base64-out \
+  --payload '{"version":"2.0","routeKey":"GET /api","rawPath":"/api","rawQueryString":"","headers":{"accept":"application/json"},"requestContext":{"http":{"method":"GET","path":"/api"}}}' \
+  --region "${REGION}" \
+  lambda_response.json >> diagnostics.txt 2>&1 || true
+
+cat lambda_response.json >> diagnostics.txt 2>&1 || true
+echo "" >> diagnostics.txt
+
+echo "=== CLOUDWATCH LOGS ===" >> diagnostics.txt
 sleep 4
 aws logs filter-log-events --log-group-name "/aws/lambda/${FUNCTION_NAME}" --limit 30 --region "${REGION}" --query "events[*].message" --output text >> diagnostics.txt 2>&1 || true
 
