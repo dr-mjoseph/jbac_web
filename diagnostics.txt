@@ -1,6 +1,12 @@
+=== DIRECT INVOCATION TEST ===
+{
+    "StatusCode": 200,
+    "ExecutedVersion": "$LATEST"
+}
+{"statusCode":200,"isBase64Encoded":false,"body":"{\"status\":200,\"service\":\"JBAC Backend API Gateway\",\"database\":\"jbac_jbac\",\"active_endpoints\":{\"admin_gui\":\"/api/admin-database-view\",\"tables_list\":\"/api/tables\",\"generic_crud\":\"/api/crud/:table\",\"events\":\"/api/events\",\"register_unified\":\"/api/register-all\"}}","headers":{"x-powered-by":"Express","access-control-allow-origin":"*","content-type":"application/json; charset=utf-8","content-length":"258","etag":"W/\"102-NEhpZiTYAImG2R81dSxbcVibIOc\""},"cookies":[]}
 === CLOUDWATCH LOGS ===
 === LAMBDA RESOURCE POLICY ===
 {
     "Policy": "{\"Version\":\"2012-10-17\",\"Id\":\"default\",\"Statement\":[{\"Sid\":\"lambda-89517b81-2dc3-4c1a-b8c5-884d201e00e1\",\"Effect\":\"Allow\",\"Principal\":{\"Service\":\"apigateway.amazonaws.com\"},\"Action\":\"lambda:InvokeFunction\",\"Resource\":\"arn:aws:lambda:ap-southeast-2:298363284024:function:jbac-backend-api\",\"Condition\":{\"ArnLike\":{\"AWS:SourceArn\":\"arn:aws:execute-api:ap-southeast-2:298363284024:tit71pnnuc/*/*/jbac-backend-api\"}}},{\"Sid\":\"FunctionURLAllowPublicAccess\",\"Effect\":\"Allow\",\"Principal\":\"*\",\"Action\":\"lambda:InvokeFunctionUrl\",\"Resource\":\"arn:aws:lambda:ap-southeast-2:298363284024:function:jbac-backend-api\",\"Condition\":{\"StringEquals\":{\"lambda:FunctionUrlAuthType\":\"NONE\"}}}]}",
-    "RevisionId": "196268c4-d696-4ff4-94f0-188db9d0b75e"
+    "RevisionId": "08f08f62-d6c9-4bf5-90f3-11fc4db9098d"
 }
