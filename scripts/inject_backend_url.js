@@ -4,7 +4,7 @@ const path = require('path');
 const rootDir = path.resolve(__dirname, '..');
 const urlFile = path.join(rootDir, 'backend_url.txt');
 
-let targetUrl = (process.env.FUNCTION_URL || process.env.API_GATEWAY_URL || '').trim();
+let targetUrl = (process.env.TARGET_BACKEND_URL || process.env.API_GATEWAY_URL || process.env.FUNCTION_URL || '').trim();
 
 if (!targetUrl && fs.existsSync(urlFile)) {
   targetUrl = fs.readFileSync(urlFile, 'utf8').trim();
@@ -18,8 +18,8 @@ if (!targetUrl) {
 }
 
 const apiEndpoint = targetUrl.endsWith('/') ? targetUrl + 'dashboardapi/' : targetUrl + '/dashboardapi/';
-const fallbackEndpoint = process.env.API_GATEWAY_URL
-  ? (process.env.API_GATEWAY_URL.endsWith('/') ? process.env.API_GATEWAY_URL + 'dashboardapi/' : process.env.API_GATEWAY_URL + '/dashboardapi/')
+const fallbackEndpoint = (process.env.FALLBACK_URL || process.env.API_GATEWAY_URL || '')
+  ? ((process.env.FALLBACK_URL || process.env.API_GATEWAY_URL).endsWith('/') ? (process.env.FALLBACK_URL || process.env.API_GATEWAY_URL) + 'dashboardapi/' : (process.env.FALLBACK_URL || process.env.API_GATEWAY_URL) + '/dashboardapi/')
   : apiEndpoint;
 
 const envFiles = [

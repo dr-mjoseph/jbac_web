@@ -106,9 +106,15 @@ EOF
   fi
 fi
 
+echo "=== CLOUDFRONT CDN STATUS ===" >> diagnostics.txt
+echo "CF_ID=${CF_ID}" >> diagnostics.txt
+echo "CF_DOMAIN=${CF_DOMAIN}" >> diagnostics.txt
+
 if [ -n "${CF_ID}" ] && [ "${CF_ID}" != "null" ]; then
   echo "CF_DIST_ID=${CF_ID}" >> $GITHUB_ENV 2>/dev/null || true
   echo "CF_DOMAIN=https://${CF_DOMAIN}" >> $GITHUB_ENV 2>/dev/null || true
+  echo "https://${CF_DOMAIN}" > cloudfront_url.txt
+  echo "CloudFront URL: https://${CF_DOMAIN}" >> diagnostics.txt
 
   if [ -n "${GITHUB_STEP_SUMMARY}" ]; then
     echo "## 🔒 AWS CloudFront HTTPS CDN Active!" >> "${GITHUB_STEP_SUMMARY}"
@@ -118,4 +124,6 @@ if [ -n "${CF_ID}" ] && [ "${CF_ID}" != "null" ]; then
   fi
 else
   echo "[INFO] CloudFront distribution ID not currently configured or pending manual console creation."
+  echo "CloudFront not yet active or created." >> diagnostics.txt
 fi
+

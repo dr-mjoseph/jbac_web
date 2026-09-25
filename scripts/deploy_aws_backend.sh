@@ -90,6 +90,13 @@ if [ -z "${URL_CONFIG}" ]; then
     --auth-type NONE \
     --cors '{"AllowOrigins":["*"],"AllowMethods":["*"],"AllowHeaders":["*"],"MaxAge":86400}' \
     --region "${REGION}" 2>&1 || true
+else
+  echo "Updating existing Function URL configuration to AuthType NONE..."
+  aws lambda update-function-url-config \
+    --function-name "${FUNCTION_NAME}" \
+    --auth-type NONE \
+    --cors '{"AllowOrigins":["*"],"AllowMethods":["*"],"AllowHeaders":["*"],"MaxAge":86400}' \
+    --region "${REGION}" 2>&1 || true
 fi
 
 # Refresh Function URL public invocation permission
@@ -108,8 +115,12 @@ echo "Lambda Function URL: ${FUNCTION_URL}"
 
 # 4. Create or Update API Gateway HTTP API
 echo "[4/5] Configuring API Gateway HTTP API v2..."
-API_ID=$(aws apigatewayv2 get-apis --query "Items[?Name=='jbac-backend-http-api'].ApiId" --output text --region "${REGION}" 2>/dev/null || true)
+ACCOUNT_ID=$(aws sts get-caller-identity --query "Account" --output text 2>/dev/null || true)
+echo "AWS Account ID: ${ACCOUNT_ID}"
 LAMBDA_ARN=$(aws lambda get-function --function-name "${FUNCTION_NAME}" --query "Configuration.FunctionArn" --output text --region "${REGION}" 2>/dev/null || true)
+echo "Lambda ARN: ${LAMBDA_ARN}"
+
+API_ID=$(aws apigatewayv2 get-apis --query "Items[?Name=='jbac-backend-http-api'].ApiId" --output text --region "${REGION}" 2>/dev/null || true)
 
 if [ -z "${API_ID}" ] || [ "${API_ID}" = "None" ]; then
   echo "Creating API Gateway HTTP API..."
@@ -121,24 +132,92 @@ if [ -z "${API_ID}" ] || [ "${API_ID}" = "None" ]; then
     --region "${REGION}" \
     --query "ApiId" --output text 2>&1 || true)
 fi
+echo "API Gateway ID: ${API_ID}"
 
-echo "Setting API Gateway Lambda invocation permission..."
+# Ensure integration exists
+INTEGRATION_ID=$(aws apigatewayv2 get-integrations --api-id "${API_ID}" --region "${REGION}" --query "Items[0].IntegrationId" --output text 2>/dev/null || true)
+if [ -z "${INTEGRATION_ID}" ] || [ "${INTEGRATION_ID}" = "None" ]; then
+  echo "Creating integration for ${API_ID} -> ${LAMBDA_ARN}..."
+  INTEGRATION_ID=$(aws apigatewayv2 create-integration \
+    --api-id "${API_ID}" \
+    --integration-type AWS_PROXY \
+    --integration-uri "${LAMBDA_ARN}" \
+    --payload-format-version "2.0" \
+    --region "${REGION}" \
+    --query "IntegrationId" --output text 2>&1 || true)
+fi
+echo "API Gateway Integration ID: ${INTEGRATION_ID}"
+
+# Ensure default route exists
+ROUTE_EXISTS=$(aws apigatewayv2 get-routes --api-id "${API_ID}" --region "${REGION}" --query "Items[?RouteKey=='\$default'].RouteId" --output text 2>/dev/null || true)
+if [ -z "${ROUTE_EXISTS}" ] || [ "${ROUTE_EXISTS}" = "None" ]; then
+  echo "Creating \$default route for ${API_ID}..."
+  aws apigatewayv2 create-route \
+    --api-id "${API_ID}" \
+    --route-key '$default' \
+    --target "integrations/${INTEGRATION_ID}" \
+    --region "${REGION}" 2>&1 || true
+fi
+
+# Ensure default stage exists with auto-deploy
+aws apigatewayv2 get-stage --api-id "${API_ID}" --stage-name '$default' --region "${REGION}" >/dev/null 2>&1 || \
+aws apigatewayv2 create-stage \
+  --api-id "${API_ID}" \
+  --stage-name '$default' \
+  --auto-deploy \
+  --region "${REGION}" 2>&1 || true
+
+echo "Setting API Gateway Lambda invocation permissions..."
 aws lambda remove-permission --function-name "${FUNCTION_NAME}" --statement-id "ApiGatewayInvokePermission" --region "${REGION}" 2>/dev/null || true
+aws lambda remove-permission --function-name "${FUNCTION_NAME}" --statement-id "ApiGatewayWildcard" --region "${REGION}" 2>/dev/null || true
+aws lambda remove-permission --function-name "${FUNCTION_NAME}" --statement-id "lambda-89517b81-2dc3-4c1a-b8c5-884d201e00e1" --region "${REGION}" 2>/dev/null || true
+
+# Specific API Gateway source ARN
 aws lambda add-permission \
   --function-name "${FUNCTION_NAME}" \
   --statement-id "ApiGatewayInvokePermission" \
   --action "lambda:InvokeFunction" \
   --principal "apigateway.amazonaws.com" \
-  --source-arn "arn:aws:execute-api:${REGION}:*:*/*" \
+  --source-arn "arn:aws:execute-api:${REGION}:${ACCOUNT_ID}:${API_ID}/*" \
+  --region "${REGION}" 2>&1 || true
+
+# Wildcard API Gateway service principal
+aws lambda add-permission \
+  --function-name "${FUNCTION_NAME}" \
+  --statement-id "ApiGatewayWildcard" \
+  --action "lambda:InvokeFunction" \
+  --principal "apigateway.amazonaws.com" \
   --region "${REGION}" 2>&1 || true
 
 API_GATEWAY_URL="https://${API_ID}.execute-api.${REGION}.amazonaws.com/"
 echo "API Gateway HTTPS Endpoint: ${API_GATEWAY_URL}"
 
-# Choose primary target URL
-TARGET_BACKEND_URL="${FUNCTION_URL}"
-if [ -z "${TARGET_BACKEND_URL}" ] || [ "${TARGET_BACKEND_URL}" = "None" ]; then
+# Sleep 3 seconds for IAM / Lambda policy propagation
+sleep 3
+
+# Test endpoints
+echo "Testing API Gateway ping: ${API_GATEWAY_URL}api ..."
+GW_PING=$(curl -s -m 10 "${API_GATEWAY_URL}api" || true)
+echo "API Gateway Result: ${GW_PING}"
+
+echo "Testing Function URL ping: ${FUNCTION_URL}api ..."
+FN_PING=$(curl -s -m 10 "${FUNCTION_URL}api" || true)
+echo "Function URL Result: ${FN_PING}"
+
+# Choose functional primary target URL
+TARGET_BACKEND_URL="${API_GATEWAY_URL}"
+FALLBACK_URL="${FUNCTION_URL}"
+
+if echo "${GW_PING}" | grep -q '"JBAC Backend API Gateway"'; then
   TARGET_BACKEND_URL="${API_GATEWAY_URL}"
+  FALLBACK_URL="${FUNCTION_URL}"
+  echo "[VERIFIED] API Gateway is 100% active and healthy!"
+elif echo "${FN_PING}" | grep -q '"JBAC Backend API Gateway"'; then
+  TARGET_BACKEND_URL="${FUNCTION_URL}"
+  FALLBACK_URL="${API_GATEWAY_URL}"
+  echo "[VERIFIED] Function URL is 100% active and healthy!"
+else
+  echo "[WARNING] Neither endpoint responded with expected health check. Using API Gateway as default."
 fi
 
 # Write URLs to files and environment
@@ -146,14 +225,7 @@ echo "${TARGET_BACKEND_URL}" > backend_url.txt
 echo "FUNCTION_URL=${FUNCTION_URL}" >> $GITHUB_ENV 2>/dev/null || true
 echo "API_GATEWAY_URL=${API_GATEWAY_URL}" >> $GITHUB_ENV 2>/dev/null || true
 echo "TARGET_BACKEND_URL=${TARGET_BACKEND_URL}" >> $GITHUB_ENV 2>/dev/null || true
-
-# Test endpoints
-echo "Testing API Gateway ping: ${API_GATEWAY_URL}api ..."
-curl -s -m 10 "${API_GATEWAY_URL}api" || true
-echo ""
-echo "Testing Function URL ping: ${FUNCTION_URL}api ..."
-curl -s -m 10 "${FUNCTION_URL}api" || true
-echo ""
+echo "FALLBACK_URL=${FALLBACK_URL}" >> $GITHUB_ENV 2>/dev/null || true
 
 # CloudWatch Diagnostics and Direct Invoke written to file
 echo "=== DIRECT INVOCATION TEST ===" > diagnostics.txt
@@ -165,6 +237,14 @@ aws lambda invoke \
   lambda_response.json >> diagnostics.txt 2>&1 || true
 
 cat lambda_response.json >> diagnostics.txt 2>&1 || true
+echo "" >> diagnostics.txt
+
+echo "=== API GATEWAY CURL TEST ===" >> diagnostics.txt
+echo "${GW_PING}" >> diagnostics.txt
+echo "" >> diagnostics.txt
+
+echo "=== FUNCTION URL CURL TEST ===" >> diagnostics.txt
+echo "${FN_PING}" >> diagnostics.txt
 echo "" >> diagnostics.txt
 
 echo "=== CLOUDWATCH LOGS ===" >> diagnostics.txt
