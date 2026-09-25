@@ -301,7 +301,7 @@ app.all(['/dashboardapi/getwing', '/api/wings', '/wings'], async (_req, res) => 
 // About & Foundation Information
 app.all(['/dashboardapi/getaboutwebsite', '/api/about'], async (_req, res) => {
     try {
-        const [rows] = await db.query('SELECT id, name, aboutus as description, mission, vision, image, d_in FROM about_tbl LIMIT 1');
+        const [rows] = await db.query('SELECT id, title, title as name, para1, para2, para3, para1 as description, para1 as aboutus, image, d_in FROM about_tbl LIMIT 1');
         if (rows && rows.length > 0) {
             res.json({ status: 200, data: rows });
         } else {
