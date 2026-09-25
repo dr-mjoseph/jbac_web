@@ -150,6 +150,14 @@ echo "Testing Function URL ping: ${FUNCTION_URL}api ..."
 curl -s -m 10 "${FUNCTION_URL}api" || true
 echo ""
 
+# CloudWatch Diagnostics
+echo "=== CLOUDWATCH LOGS FOR LAMBDA ==="
+sleep 3
+aws logs filter-log-events --log-group-name "/aws/lambda/${FUNCTION_NAME}" --limit 20 --region "${REGION}" --query "events[*].message" --output text 2>&1 || true
+
+echo "=== LAMBDA RESOURCE POLICY ==="
+aws lambda get-policy --function-name "${FUNCTION_NAME}" --region "${REGION}" --output json 2>&1 || true
+
 # 5. Output Summary to GitHub Step Summary if running in Actions
 echo "=========================================================="
 echo "BACKEND DEPLOYMENT SUCCESSFUL!"
