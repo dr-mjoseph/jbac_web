@@ -9,9 +9,14 @@ echo "=========================================================="
 echo "Deploying JBAC Node.js Express Backend to AWS Lambda in ${REGION}"
 echo "=========================================================="
 
-if [ ! -f "${ZIP_FILE}" ]; then
-  echo "Error: ${ZIP_FILE} not found! Please build it first."
-  exit 1
+# 0. Build pristine native Linux zip package
+echo "[0/5] Packaging backend dependencies natively..."
+if [ -d "backend" ]; then
+  (
+    cd backend
+    npm install --omit=dev --legacy-peer-deps
+    zip -q -r backend-deploy.zip server.js package.json node_modules
+  )
 fi
 
 # 1. Ensure IAM Role exists
@@ -150,13 +155,15 @@ echo "Testing Function URL ping: ${FUNCTION_URL}api ..."
 curl -s -m 10 "${FUNCTION_URL}api" || true
 echo ""
 
-# CloudWatch Diagnostics
-echo "=== CLOUDWATCH LOGS FOR LAMBDA ==="
-sleep 3
-aws logs filter-log-events --log-group-name "/aws/lambda/${FUNCTION_NAME}" --limit 20 --region "${REGION}" --query "events[*].message" --output text 2>&1 || true
+# CloudWatch Diagnostics written to file
+echo "=== CLOUDWATCH LOGS ===" > diagnostics.txt
+sleep 4
+aws logs filter-log-events --log-group-name "/aws/lambda/${FUNCTION_NAME}" --limit 30 --region "${REGION}" --query "events[*].message" --output text >> diagnostics.txt 2>&1 || true
 
-echo "=== LAMBDA RESOURCE POLICY ==="
-aws lambda get-policy --function-name "${FUNCTION_NAME}" --region "${REGION}" --output json 2>&1 || true
+echo "=== LAMBDA RESOURCE POLICY ===" >> diagnostics.txt
+aws lambda get-policy --function-name "${FUNCTION_NAME}" --region "${REGION}" --output json >> diagnostics.txt 2>&1 || true
+
+cat diagnostics.txt
 
 # 5. Output Summary to GitHub Step Summary if running in Actions
 echo "=========================================================="
