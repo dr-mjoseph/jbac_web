@@ -525,9 +525,49 @@ getbelivers() {
       });
     };
 
+    // Helper for IP-based geolocation fallback
+    const tryIpFallback = async (fallbackReason: string) => {
+      try {
+        let ipLoc: { lat: number, lng: number, city?: string, region?: string } | null = null;
+        try {
+          const res = await fetch('https://ipapi.co/json/');
+          const data = await res.json();
+          if (data && data.latitude && data.longitude) {
+            ipLoc = { lat: Number(data.latitude), lng: Number(data.longitude), city: data.city, region: data.region };
+          }
+        } catch (e1) {
+          console.warn('ipapi fallback error:', e1);
+        }
+
+        if (!ipLoc) {
+          try {
+            const res2 = await fetch('https://freeipapi.com/api/json');
+            const data2 = await res2.json();
+            if (data2 && data2.latitude && data2.longitude) {
+              ipLoc = { lat: Number(data2.latitude), lng: Number(data2.longitude), city: data2.cityName, region: data2.regionName };
+            }
+          } catch (e2) {
+            console.warn('freeipapi fallback error:', e2);
+          }
+        }
+
+        if (ipLoc && !isNaN(ipLoc.lat) && !isNaN(ipLoc.lng)) {
+          const place = await reverseGeocode(ipLoc.lat, ipLoc.lng);
+          applyLocation(ipLoc.lat, ipLoc.lng, place, 'నెట్‌వర్క్ ఆధారిత లొకేషన్ పొందబడింది (' + fallbackReason + ').');
+          return true;
+        }
+      } catch (err) {
+        console.warn('IP fallback failed:', err);
+      }
+      return false;
+    };
+
     // 1. Verify browser supports HTML5 Geolocation API
     if (!navigator.geolocation) {
-      handleLocationFailure('మీ బ్రౌజర్ లేదా డివైస్ లో GPS జియోలొకేషన్ సపోర్ట్ లేదు.');
+      const recovered = await tryIpFallback('GPS సపోర్ట్ లేనందున');
+      if (!recovered) {
+        handleLocationFailure('మీ బ్రౌజర్ లేదా డివైస్ లో GPS జియోలొకేషన్ సపోర్ట్ లేదు.');
+      }
       return;
     }
 
@@ -551,7 +591,7 @@ getbelivers() {
       }
     }
 
-    // 3. Request actual hardware GPS coordinates from device
+    // Tier 1: Hardware GPS with High Accuracy
     navigator.geolocation.getCurrentPosition(
       async (position) => {
         const lat = position.coords.latitude;
@@ -560,26 +600,54 @@ getbelivers() {
         applyLocation(lat, lng, place, 'డివైస్ GPS ద్వారా ఖచ్చితమైన లొకేషన్ పొందబడింది.');
       },
       (error) => {
-        let msg = 'లొకేషన్ పొందడంలో సమస్య ఏర్పడింది.';
-        let isHttp = false;
-        if (error.code === error.PERMISSION_DENIED) {
-          if (!isSecure) {
-            msg = 'బ్రౌజర్ భద్రతా నిబంధనల ప్రకారం HTTP సైట్లలో GPS లొకేషన్ అనుమతించబడదు. దయచేసి HTTPS లింక్ లేదా మొబైల్ యాప్ ఉపయోగించండి.';
-            isHttp = true;
-          } else {
-            msg = 'లొకేషన్ అనుమతి నిరాకరించబడింది. దయచేసి బ్రౌజర్ లేదా డివైస్ సెట్టింగ్స్ లో లొకేషన్ ఆన్ చేసి పర్మిషన్ Allow చేయండి.';
+        console.warn('High accuracy GPS error, trying low accuracy / network fallback:', error.message);
+        // Tier 2: Low-accuracy fallback (Cell towers / WiFi / cache)
+        navigator.geolocation.getCurrentPosition(
+          async (lowPos) => {
+            const lat = lowPos.coords.latitude;
+            const lng = lowPos.coords.longitude;
+            const place = await reverseGeocode(lat, lng);
+            applyLocation(lat, lng, place, 'నెట్‌వర్క్ / వై-ఫై ద్వారా లొకేషన్ పొందబడింది.');
+          },
+          async (lowErr) => {
+            console.warn('Low accuracy GPS also failed, attempting IP fallback:', lowErr.message);
+            // Tier 3: IP Geolocation fallback
+            let reason = 'GPS అందుబాటులో లేనందున';
+            if (error.code === error.PERMISSION_DENIED) {
+              reason = 'లొకేషన్ అనుమతి నిరాకరించబడినందున';
+            } else if (error.code === error.TIMEOUT) {
+              reason = 'GPS సమయం మించినందున';
+            }
+            const recovered = await tryIpFallback(reason);
+            if (!recovered) {
+              let msg = 'లొకేషన్ పొందడంలో సమస్య ఏర్పడింది.';
+              let isHttp = false;
+              if (error.code === error.PERMISSION_DENIED) {
+                if (!isSecure) {
+                  msg = 'బ్రౌజర్ భద్రతా నిబంధనల ప్రకారం HTTP సైట్లలో GPS లొకేషన్ అనుమతించబడదు. దయచేసి HTTPS లింక్ లేదా మొబైల్ యాప్ ఉపయోగించండి.';
+                  isHttp = true;
+                } else {
+                  msg = 'లొకేషన్ అనుమతి నిరాకరించబడింది. దయచేసి బ్రౌజర్ లేదా డివైస్ సెట్టింగ్స్ లో లొకేషన్ ఆన్ చేసి పర్మిషన్ Allow చేయండి.';
+                }
+              } else if (error.code === error.TIMEOUT) {
+                msg = 'లొకేషన్ శోధించడానికి సమయం మించిపోయింది. దయచేసి డివైస్ GPS ఆన్ లో ఉందో లేదో సరిచూసుకోండి.';
+              } else if (error.code === error.POSITION_UNAVAILABLE) {
+                msg = 'GPS సిగ్నల్ అందుబాటులో లేదు. దయచేసి డివైస్ లో GPS లొకేషన్ ఆన్ చేయండి.';
+              }
+              handleLocationFailure(msg, isHttp);
+            }
+          },
+          {
+            enableHighAccuracy: false,
+            timeout: 10000,
+            maximumAge: 60000
           }
-        } else if (error.code === error.TIMEOUT) {
-          msg = 'లొకేషన్ శోధించడానికి సమయం మించిపోయింది. దయచేసి డివైస్ GPS ఆన్ లో ఉందో లేదో సరిచూసుకోండి.';
-        } else if (error.code === error.POSITION_UNAVAILABLE) {
-          msg = 'GPS సిగ్నల్ అందుబాటులో లేదు. దయచేసి డివైస్ లో GPS లొకేషన్ ఆన్ చేయండి.';
-        }
-        handleLocationFailure(msg, isHttp);
+        );
       },
       {
         enableHighAccuracy: true,
-        timeout: 15000,
-        maximumAge: 0 // Always fetch fresh, real-time GPS hardware coordinates
+        timeout: 12000,
+        maximumAge: 0 // Fetch fresh GPS coordinates
       }
     );
   }

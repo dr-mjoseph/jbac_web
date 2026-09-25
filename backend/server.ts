@@ -686,27 +686,39 @@ app.all(['/dashboardapi/getpastorsfilters', '/api/getpastorsfilters'], async (re
 });
 
 // Churches (church_reg)
-app.post(['/dashboardapi/postchurchregister', '/api/postchurchregister'], async (req, res) => {
+app.post(['/dashboardapi/postchurchregister', '/api/postchurchregister'], async (req: any, res: any) => {
     try {
         const c = req.body;
         c.d_in = 0;
         const result = await dynamicInsert('church_reg', c);
+        const phone = c.contactnumber || c.phonenumber || c.mobile_number;
+        if (phone && c.password) {
+            try {
+                await dynamicInsert('users', {
+                    name: c.church_name || c.churchname || 'Church',
+                    number: phone,
+                    email: c.email || null,
+                    otp: c.password,
+                    d_in: 0
+                });
+            } catch (_) {}
+        }
         res.json({ status: 200, message: 'Church registration successful', insertId: result?.insertId });
-    } catch (err) {
+    } catch (err: any) {
         res.status(500).json({ status: 500, error: err.message });
     }
 });
 
-app.all(['/dashboardapi/getchurch', '/dashboardapi/getchurches', '/api/getchurch'], async (_req, res) => {
+app.all(['/dashboardapi/getchurch', '/dashboardapi/getchurches', '/api/getchurch'], async (_req: any, res: any) => {
     try {
         const [rows] = await db.query('SELECT id, church_name, church_name as churchname, church_name as name, pastor_id, pastor_id as pastorname, pastor_id as pastor_name, contactnumber as phonenumber, contactnumber as mobile_number, district_id, constituency_id, mandal_id, village_id, address FROM church_reg WHERE d_in = 0 ORDER BY id DESC');
         res.json({ status: 200, data: rows });
-    } catch (err) {
+    } catch (err: any) {
         res.status(500).json({ status: 500, error: err.message });
     }
 });
 
-app.all(['/dashboardapi/getchurchesdatafilters', '/api/getchurchesdatafilters'], async (req, res) => {
+app.all(['/dashboardapi/getchurchesdatafilters', '/api/getchurchesdatafilters'], async (req: any, res: any) => {
     try {
         const { districts, constituencyname, mandal_id } = req.body || {};
         let sql = 'SELECT id, church_name, church_name as churchname, church_name as name, pastor_id, pastor_id as pastorname, pastor_id as pastor_name, contactnumber as phonenumber, contactnumber as mobile_number, district_id, constituency_id, mandal_id, village_id, address FROM church_reg WHERE d_in = 0';
@@ -717,82 +729,130 @@ app.all(['/dashboardapi/getchurchesdatafilters', '/api/getchurchesdatafilters'],
         sql += ' ORDER BY id DESC';
         const [rows] = await db.query(sql, params);
         res.json({ status: 200, data: rows });
-    } catch (err) {
+    } catch (err: any) {
         res.status(500).json({ status: 500, error: err.message });
     }
 });
 
 // Students (student_reg)
-app.post(['/dashboardapi/studentsignup', '/api/studentsignup'], async (req, res) => {
+app.post(['/dashboardapi/studentsignup', '/api/studentsignup'], async (req: any, res: any) => {
     try {
         const s = req.body;
         s.d_in = 0;
         const result = await dynamicInsert('student_reg', s);
+        const phone = s.number || s.phonenumber || s.mobile_number;
+        if (phone && s.password) {
+            try {
+                await dynamicInsert('users', {
+                    name: s.studentname || 'Student',
+                    number: phone,
+                    email: s.email || null,
+                    otp: s.password,
+                    d_in: 0
+                });
+            } catch (_) {}
+        }
         res.json({ status: 200, message: 'Student registration successful', insertId: result?.insertId });
-    } catch (err) {
+    } catch (err: any) {
         res.status(500).json({ status: 500, error: err.message });
     }
 });
 
-app.all(['/dashboardapi/getstudent', '/api/getstudent'], async (_req, res) => {
+app.all(['/dashboardapi/getstudent', '/api/getstudent'], async (_req: any, res: any) => {
     try {
         const [rows] = await db.query('SELECT * FROM student_reg WHERE d_in = 0 ORDER BY id DESC');
         res.json({ status: 200, data: rows });
-    } catch (err) {
+    } catch (err: any) {
         res.status(500).json({ status: 500, error: err.message });
     }
 });
 
 // Ministries (ministry_signup)
-app.post(['/dashboardapi/postministrysignup', '/api/postministrysignup'], async (req, res) => {
+app.post(['/dashboardapi/postministrysignup', '/api/postministrysignup'], async (req: any, res: any) => {
     try {
         const m = req.body;
         m.d_in = 0;
         const result = await dynamicInsert('ministry_signup', m);
+        const phone = m.headnmber || m.phonenumber || m.mobile_number;
+        if (phone && m.password) {
+            try {
+                await dynamicInsert('users', {
+                    name: m.ministryname || 'Ministry',
+                    number: phone,
+                    email: m.ministryemail || m.email || null,
+                    otp: m.password,
+                    d_in: 0
+                });
+            } catch (_) {}
+        }
         res.json({ status: 200, message: 'Ministry registration successful', insertId: result?.insertId });
-    } catch (err) {
+    } catch (err: any) {
         res.status(500).json({ status: 500, error: err.message });
     }
 });
 
-app.all(['/dashboardapi/getministry', '/api/getministry'], async (_req, res) => {
+app.all(['/dashboardapi/getministry', '/api/getministry'], async (_req: any, res: any) => {
     try {
         const [rows] = await db.query('SELECT * FROM ministry_signup WHERE d_in = 0 ORDER BY id DESC');
         res.json({ status: 200, data: rows });
-    } catch (err) {
+    } catch (err: any) {
         res.status(500).json({ status: 500, error: err.message });
     }
 });
 
 // Organisations (independentorganisation_reg)
-app.post(['/dashboardapi/postindepedentorganisation', '/api/postindepedentorganisation'], async (req, res) => {
+app.post(['/dashboardapi/postindepedentorganisation', '/api/postindepedentorganisation'], async (req: any, res: any) => {
     try {
         const o = req.body;
         o.d_in = 0;
         const result = await dynamicInsert('independentorganisation_reg', o);
+        const phone = o.contact_num || o.phonenumber || o.mobile_number;
+        if (phone && o.password) {
+            try {
+                await dynamicInsert('users', {
+                    name: o.organisation_name || 'Organization',
+                    number: phone,
+                    email: o.email || null,
+                    otp: o.password,
+                    d_in: 0
+                });
+            } catch (_) {}
+        }
         res.json({ status: 200, message: 'Organisation registration successful', insertId: result?.insertId });
-    } catch (err) {
+    } catch (err: any) {
         res.status(500).json({ status: 500, error: err.message });
     }
 });
 
-app.all(['/dashboardapi/getorganizations', '/dashboardapi/searchorganization', '/dashboardapi/searchinorganizations', '/api/organizations'], async (_req, res) => {
+app.all(['/dashboardapi/getorganizations', '/dashboardapi/searchorganization', '/dashboardapi/searchinorganizations', '/api/organizations'], async (_req: any, res: any) => {
     try {
         const [rows] = await db.query('SELECT * FROM independentorganisation_reg WHERE d_in = 0 ORDER BY id DESC');
         res.json({ status: 200, data: rows });
-    } catch (err) {
+    } catch (err: any) {
         res.status(500).json({ status: 500, error: err.message });
     }
 });
 
 // Pastor Associations (pastors_associations)
-app.post(['/dashboardapi/postpastorassociations', '/api/postpastorassociations'], async (req, res) => {
+app.post(['/dashboardapi/postpastorassociations', '/api/postpastorassociations'], async (req: any, res: any) => {
     try {
         const a = req.body;
         a.d_in = 0;
         const result = await dynamicInsert('pastors_associations', a);
+        const phone = a.phonenumber || a.whatsapp_number || a.mobile_number;
+        if (phone && a.password) {
+            try {
+                await dynamicInsert('users', {
+                    name: a.paname || a.headname || 'Pastor Association',
+                    number: phone,
+                    email: a.email || null,
+                    otp: a.password,
+                    d_in: 0
+                });
+            } catch (_) {}
+        }
         res.json({ status: 200, message: 'Pastor Association registration successful', insertId: result?.insertId });
-    } catch (err) {
+    } catch (err: any) {
         res.status(500).json({ status: 500, error: err.message });
     }
 });
@@ -949,46 +1009,127 @@ app.post(['/dashboardapi/contact', '/api/contact'], async (req, res) => {
 });
 
 // Authentication & Users
-app.post(['/dashboardapi/passwordwebsitelogin', '/api/login'], async (req, res) => {
+app.post(['/dashboardapi/passwordwebsitelogin', '/api/login'], async (req: any, res: any) => {
     try {
-        const { mobile_number, mobilenumber, phonenumber, number, password } = req.body;
-        const phone = mobile_number || mobilenumber || phonenumber || number;
-        if (!phone || !password) {
+        const { mobile_number, mobilenumber, phonenumber, number, password, category } = req.body;
+        const phone = String(mobile_number || mobilenumber || phonenumber || number || '').trim();
+        const pwd = String(password || '').trim();
+        const cat = category !== undefined && category !== null ? String(category).trim() : '';
+
+        if (!phone || !pwd) {
             return res.json({ status: 400, message: 'Missing phone or password' });
         }
 
-        // 1. Check users table
-        const [users] = await db.query('SELECT id, name, number as mobile_number, email, otp as password FROM users WHERE number = ? AND otp = ?', [phone, password]);
+        const formatUser = (user: any, defaultCatId: string, defaultCatName: string) => {
+            return {
+                id: user.id,
+                name: user.name || user.studentname || user.ministryname || user.pastorname || user.church_name || user.organisation_name || user.paname || 'User',
+                mobile_number: phone,
+                email: user.email || user.ministryemail || null,
+                password: pwd,
+                category_id: user.category_id || cat || defaultCatId,
+                category: defaultCatName
+            };
+        };
+
+        const categoryTables: Record<string, { name: string; category_id: string; category_name: string; query: string; phoneQuery: string }> = {
+            '1': {
+                name: 'signup_form',
+                category_id: '1',
+                category_name: 'Believer',
+                query: 'SELECT id, CONCAT(fname, " ", COALESCE(lname, "")) as name, mobile_number, email, password FROM signup_form WHERE mobile_number = ? AND password = ?',
+                phoneQuery: 'SELECT id FROM signup_form WHERE mobile_number = ?'
+            },
+            '2': {
+                name: 'student_reg',
+                category_id: '2',
+                category_name: 'Student',
+                query: 'SELECT id, studentname as name, number as mobile_number, null as email, password FROM student_reg WHERE number = ? AND password = ?',
+                phoneQuery: 'SELECT id FROM student_reg WHERE number = ?'
+            },
+            '3': {
+                name: 'ministry_signup',
+                category_id: '3',
+                category_name: 'Ministry',
+                query: 'SELECT id, ministryname as name, headnmber as mobile_number, ministryemail as email, password FROM ministry_signup WHERE headnmber = ? AND password = ?',
+                phoneQuery: 'SELECT id FROM ministry_signup WHERE headnmber = ?'
+            },
+            '4': {
+                name: 'pastor_reg',
+                category_id: '4',
+                category_name: 'Pastor',
+                query: 'SELECT id, pastorname as name, phonenumber as mobile_number, null as email, password FROM pastor_reg WHERE phonenumber = ? AND password = ?',
+                phoneQuery: 'SELECT id FROM pastor_reg WHERE phonenumber = ?'
+            },
+            '5': {
+                name: 'church_reg',
+                category_id: '5',
+                category_name: 'Church',
+                query: 'SELECT id, church_name as name, contactnumber as mobile_number, null as email, password FROM church_reg WHERE contactnumber = ? AND password = ?',
+                phoneQuery: 'SELECT id FROM church_reg WHERE contactnumber = ?'
+            },
+            '6': {
+                name: 'independentorganisation_reg',
+                category_id: '6',
+                category_name: 'Independent Organization',
+                query: 'SELECT id, organisation_name as name, contact_num as mobile_number, email, password FROM independentorganisation_reg WHERE contact_num = ? AND password = ?',
+                phoneQuery: 'SELECT id FROM independentorganisation_reg WHERE contact_num = ?'
+            },
+            '7': {
+                name: 'pastors_associations',
+                category_id: '7',
+                category_name: 'Pastors Association',
+                query: 'SELECT id, paname as name, phonenumber as mobile_number, null as email, password FROM pastors_associations WHERE phonenumber = ? AND password = ?',
+                phoneQuery: 'SELECT id FROM pastors_associations WHERE phonenumber = ?'
+            }
+        };
+
+        // 1. If category provided, check category table first
+        if (cat && categoryTables[cat]) {
+            const cfg = categoryTables[cat];
+            const [rows]: any = await db.query(cfg.query, [phone, pwd]);
+            if (rows && rows.length > 0) {
+                return res.json({ status: 200, message: 'Login successful', data: [formatUser(rows[0], cfg.category_id, cfg.category_name)] });
+            }
+        }
+
+        // 2. Check users table
+        const [users]: any = await db.query('SELECT id, name, number as mobile_number, email, otp as password FROM users WHERE number = ? AND otp = ?', [phone, pwd]);
         if (users && users.length > 0) {
-            return res.json({ status: 200, message: 'Login successful', data: users });
+            return res.json({ status: 200, message: 'Login successful', data: [formatUser(users[0], cat || '1', 'Believer')] });
         }
 
-        // 2. Check signup_form (believers)
-        const [believers] = await db.query('SELECT id, CONCAT(fname, " ", COALESCE(lname, "")) as name, mobile_number, email, password FROM signup_form WHERE mobile_number = ? AND password = ?', [phone, password]);
-        if (believers && believers.length > 0) {
-            return res.json({ status: 200, message: 'Login successful', data: believers });
+        // 3. Fallback across all category tables
+        for (const [key, cfg] of Object.entries(categoryTables)) {
+            if (cat && key === cat) continue;
+            const [rows]: any = await db.query(cfg.query, [phone, pwd]);
+            if (rows && rows.length > 0) {
+                return res.json({ status: 200, message: 'Login successful', data: [formatUser(rows[0], cfg.category_id, cfg.category_name)] });
+            }
         }
 
-        // 3. Check pastor_reg
-        const [pastors] = await db.query('SELECT id, pastorname as name, phonenumber as mobile_number, password FROM pastor_reg WHERE phonenumber = ? AND password = ?', [phone, password]);
-        if (pastors && pastors.length > 0) {
-            return res.json({ status: 200, message: 'Login successful', data: pastors });
+        // 4. Distinguish wrong password vs unregistered phone
+        let phoneFound = false;
+        const [userExists]: any = await db.query('SELECT id FROM users WHERE number = ?', [phone]);
+        if (userExists && userExists.length > 0) phoneFound = true;
+
+        if (!phoneFound) {
+            for (const cfg of Object.values(categoryTables)) {
+                const [pRows]: any = await db.query(cfg.phoneQuery, [phone]);
+                if (pRows && pRows.length > 0) {
+                    phoneFound = true;
+                    break;
+                }
+            }
         }
 
-        // 4. Check church_reg
-        const [churches] = await db.query('SELECT id, churchname as name, phonenumber as mobile_number, password FROM church_reg WHERE phonenumber = ? AND password = ?', [phone, password]);
-        if (churches && churches.length > 0) {
-            return res.json({ status: 200, message: 'Login successful', data: churches });
-        }
-
-        // Check if phone exists anywhere
-        const [phoneExists] = await db.query('SELECT id FROM signup_form WHERE mobile_number = ? UNION SELECT id FROM pastor_reg WHERE phonenumber = ? UNION SELECT id FROM users WHERE number = ?', [phone, phone, phone]);
-        if (!phoneExists || phoneExists.length === 0) {
+        if (phoneFound) {
+            return res.json({ status: 600, message: 'Wrong password' });
+        } else {
             return res.json({ status: 250, message: 'Phone number not registered' });
         }
-
-        return res.json({ status: 600, message: 'Wrong password' });
-    } catch (err) {
+    } catch (err: any) {
+        console.error('Login error:', err);
         res.status(500).json({ status: 500, error: err.message });
     }
 });

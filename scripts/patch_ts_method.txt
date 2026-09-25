@@ -146,12 +146,47 @@
       }
     };
 
+    var tryIpFallback = async (fallbackReason: string) => {
+      try {
+        var ipLoc: any = null;
+        try {
+          var res1 = await fetch('https://ipapi.co/json/');
+          var d1 = await res1.json();
+          if (d1 && d1.latitude && d1.longitude) {
+            ipLoc = { lat: Number(d1.latitude), lng: Number(d1.longitude) };
+          }
+        } catch (e1) {}
+
+        if (!ipLoc) {
+          try {
+            var res2 = await fetch('https://freeipapi.com/api/json');
+            var d2 = await res2.json();
+            if (d2 && d2.latitude && d2.longitude) {
+              ipLoc = { lat: Number(d2.latitude), lng: Number(d2.longitude) };
+            }
+          } catch (e2) {}
+        }
+
+        if (ipLoc && !isNaN(ipLoc.lat) && !isNaN(ipLoc.lng)) {
+          var place = await reverseGeocode(ipLoc.lat, ipLoc.lng);
+          applyLocation(ipLoc.lat, ipLoc.lng, place, 'నెట్‌వర్క్ ఆధారిత లొకేషన్ (' + fallbackReason + ').');
+          return true;
+        }
+      } catch (e) {
+        console.warn('IP fallback error:', e);
+      }
+      return false;
+    };
+
     if (!navigator.geolocation) {
-      handleFailure('మీ డివైస్ లేదా బ్రౌజర్ లో GPS జియోలొకేషన్ సపోర్ట్ లేదు.');
+      var ok = await tryIpFallback('GPS సపోర్ట్ లేనందున');
+      if (!ok) {
+        handleFailure('మీ డివైస్ లేదా బ్రౌజర్ లో GPS జియోలొకేషన్ సపోర్ట్ లేదు.');
+      }
       return;
     }
 
-    // Direct hardware GPS query with High Accuracy
+    // Tier 1: Hardware GPS with High Accuracy
     navigator.geolocation.getCurrentPosition(
       async (position) => {
         var lat = position.coords.latitude;
@@ -160,19 +195,45 @@
         applyLocation(lat, lng, place, 'డివైస్ GPS ద్వారా ఖచ్చితమైన లొకేషన్ పొందబడింది.');
       },
       (error) => {
-        var msg = 'GPS లొకేషన్ పొందడంలో సమస్య ఏర్పడింది.';
-        if (error.code === error.PERMISSION_DENIED) {
-          msg = 'లొకేషన్ అనుమతి నిరాకరించబడింది. ఖచ్చితమైన స్థానం నమోదు కోసం దయచేసి మొబైల్ లేదా బ్రౌజర్ సెట్టింగ్స్ లో లొకేషన్ పర్మిషన్ Allow చేయండి.';
-        } else if (error.code === error.TIMEOUT) {
-          msg = 'GPS శోధించడానికి సమయం మించిపోయింది. దయచేసి డివైస్ లో GPS / Location ఆన్ లో ఉందో లేదో సరిచూసుకోండి.';
-        } else if (error.code === error.POSITION_UNAVAILABLE) {
-          msg = 'డివైస్ GPS సిగ్నల్ అందుబాటులో లేదు. దయచేసి డివైస్ లో లొకేషన్ ఆన్ చేయండి.';
-        }
-        handleFailure(msg);
+        // Tier 2: Low-accuracy fallback
+        navigator.geolocation.getCurrentPosition(
+          async (lowPos) => {
+            var lat = lowPos.coords.latitude;
+            var lng = lowPos.coords.longitude;
+            var place = await reverseGeocode(lat, lng);
+            applyLocation(lat, lng, place, 'నెట్‌వర్క్ / వై-ఫై ద్వారా లొకేషన్ పొందబడింది.');
+          },
+          async (lowErr) => {
+            // Tier 3: IP Geolocation fallback
+            var reason = 'GPS అందుబాటులో లేనందున';
+            if (error.code === error.PERMISSION_DENIED) {
+              reason = 'లొకేషన్ అనుమతి నిరాకరించబడినందున';
+            } else if (error.code === error.TIMEOUT) {
+              reason = 'GPS సమయం మించినందున';
+            }
+            var recovered = await tryIpFallback(reason);
+            if (!recovered) {
+              var msg = 'GPS లొకేషన్ పొందడంలో సమస్య ఏర్పడింది.';
+              if (error.code === error.PERMISSION_DENIED) {
+                msg = 'లొకేషన్ అనుమతి నిరాకరించబడింది. ఖచ్చితమైన స్థానం నమోదు కోసం దయచేసి మొబైల్ సెట్టింగ్స్ లో లొకేషన్ పర్మిషన్ Allow చేయండి.';
+              } else if (error.code === error.TIMEOUT) {
+                msg = 'GPS శోధించడానికి సమయం మించిపోయింది. దయచేసి డివైస్ లో GPS / Location ఆన్ లో ఉందో లేదో సరిచూసుకోండి.';
+              } else if (error.code === error.POSITION_UNAVAILABLE) {
+                msg = 'డివైస్ GPS సిగ్నల్ అందుబాటులో లేదు. దయచేసి డివైస్ లో లొకేషన్ ఆన్ చేయండి.';
+              }
+              handleFailure(msg);
+            }
+          },
+          {
+            enableHighAccuracy: false,
+            timeout: 10000,
+            maximumAge: 60000
+          }
+        );
       },
       {
         enableHighAccuracy: true,
-        timeout: 15000,
+        timeout: 12000,
         maximumAge: 0
       }
     );

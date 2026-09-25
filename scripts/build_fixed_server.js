@@ -856,44 +856,125 @@ app.post(['/dashboardapi/contact', '/api/contact'], async (req, res) => {
 // Authentication & Users
 app.post(['/dashboardapi/passwordwebsitelogin', '/api/login'], async (req, res) => {
     try {
-        const { mobile_number, mobilenumber, phonenumber, number, password } = req.body;
-        const phone = mobile_number || mobilenumber || phonenumber || number;
-        if (!phone || !password) {
+        const { mobile_number, mobilenumber, phonenumber, number, password, category } = req.body;
+        const phone = String(mobile_number || mobilenumber || phonenumber || number || '').trim();
+        const pwd = String(password || '').trim();
+        const cat = category !== undefined && category !== null ? String(category).trim() : '';
+
+        if (!phone || !pwd) {
             return res.json({ status: 400, message: 'Missing phone or password' });
         }
 
-        // 1. Check users table
-        const [users] = await db.query('SELECT id, name, number as mobile_number, email, otp as password FROM users WHERE number = ? AND otp = ?', [phone, password]);
+        const formatUser = (user, defaultCatId, defaultCatName) => {
+            return {
+                id: user.id,
+                name: user.name || user.studentname || user.ministryname || user.pastorname || user.church_name || user.organisation_name || user.paname || 'User',
+                mobile_number: phone,
+                email: user.email || user.ministryemail || null,
+                password: pwd,
+                category_id: user.category_id || cat || defaultCatId,
+                category: defaultCatName
+            };
+        };
+
+        const categoryTables = {
+            '1': {
+                name: 'signup_form',
+                category_id: '1',
+                category_name: 'Believer',
+                query: 'SELECT id, CONCAT(fname, " ", COALESCE(lname, "")) as name, mobile_number, email, password FROM signup_form WHERE mobile_number = ? AND password = ?',
+                phoneQuery: 'SELECT id FROM signup_form WHERE mobile_number = ?'
+            },
+            '2': {
+                name: 'student_reg',
+                category_id: '2',
+                category_name: 'Student',
+                query: 'SELECT id, studentname as name, number as mobile_number, null as email, password FROM student_reg WHERE number = ? AND password = ?',
+                phoneQuery: 'SELECT id FROM student_reg WHERE number = ?'
+            },
+            '3': {
+                name: 'ministry_signup',
+                category_id: '3',
+                category_name: 'Ministry',
+                query: 'SELECT id, ministryname as name, headnmber as mobile_number, ministryemail as email, password FROM ministry_signup WHERE headnmber = ? AND password = ?',
+                phoneQuery: 'SELECT id FROM ministry_signup WHERE headnmber = ?'
+            },
+            '4': {
+                name: 'pastor_reg',
+                category_id: '4',
+                category_name: 'Pastor',
+                query: 'SELECT id, pastorname as name, phonenumber as mobile_number, null as email, password FROM pastor_reg WHERE phonenumber = ? AND password = ?',
+                phoneQuery: 'SELECT id FROM pastor_reg WHERE phonenumber = ?'
+            },
+            '5': {
+                name: 'church_reg',
+                category_id: '5',
+                category_name: 'Church',
+                query: 'SELECT id, church_name as name, contactnumber as mobile_number, null as email, password FROM church_reg WHERE contactnumber = ? AND password = ?',
+                phoneQuery: 'SELECT id FROM church_reg WHERE contactnumber = ?'
+            },
+            '6': {
+                name: 'independentorganisation_reg',
+                category_id: '6',
+                category_name: 'Independent Organization',
+                query: 'SELECT id, organisation_name as name, contact_num as mobile_number, email, password FROM independentorganisation_reg WHERE contact_num = ? AND password = ?',
+                phoneQuery: 'SELECT id FROM independentorganisation_reg WHERE contact_num = ?'
+            },
+            '7': {
+                name: 'pastors_associations',
+                category_id: '7',
+                category_name: 'Pastors Association',
+                query: 'SELECT id, paname as name, phonenumber as mobile_number, null as email, password FROM pastors_associations WHERE phonenumber = ? AND password = ?',
+                phoneQuery: 'SELECT id FROM pastors_associations WHERE phonenumber = ?'
+            }
+        };
+
+        // 1. If category provided, check category table first
+        if (cat && categoryTables[cat]) {
+            const cfg = categoryTables[cat];
+            const [rows] = await db.query(cfg.query, [phone, pwd]);
+            if (rows && rows.length > 0) {
+                return res.json({ status: 200, message: 'Login successful', data: [formatUser(rows[0], cfg.category_id, cfg.category_name)] });
+            }
+        }
+
+        // 2. Check users table
+        const [users] = await db.query('SELECT id, name, number as mobile_number, email, otp as password FROM users WHERE number = ? AND otp = ?', [phone, pwd]);
         if (users && users.length > 0) {
-            return res.json({ status: 200, message: 'Login successful', data: users });
+            return res.json({ status: 200, message: 'Login successful', data: [formatUser(users[0], cat || '1', 'Believer')] });
         }
 
-        // 2. Check signup_form (believers)
-        const [believers] = await db.query('SELECT id, CONCAT(fname, " ", COALESCE(lname, "")) as name, mobile_number, email, password FROM signup_form WHERE mobile_number = ? AND password = ?', [phone, password]);
-        if (believers && believers.length > 0) {
-            return res.json({ status: 200, message: 'Login successful', data: believers });
+        // 3. Fallback across all category tables
+        for (const [key, cfg] of Object.entries(categoryTables)) {
+            if (cat && key === cat) continue;
+            const [rows] = await db.query(cfg.query, [phone, pwd]);
+            if (rows && rows.length > 0) {
+                return res.json({ status: 200, message: 'Login successful', data: [formatUser(rows[0], cfg.category_id, cfg.category_name)] });
+            }
         }
 
-        // 3. Check pastor_reg
-        const [pastors] = await db.query('SELECT id, pastorname as name, phonenumber as mobile_number, password FROM pastor_reg WHERE phonenumber = ? AND password = ?', [phone, password]);
-        if (pastors && pastors.length > 0) {
-            return res.json({ status: 200, message: 'Login successful', data: pastors });
+        // 4. Distinguish wrong password vs unregistered phone
+        let phoneFound = false;
+        const [userExists] = await db.query('SELECT id FROM users WHERE number = ?', [phone]);
+        if (userExists && userExists.length > 0) phoneFound = true;
+
+        if (!phoneFound) {
+            for (const cfg of Object.values(categoryTables)) {
+                const [pRows] = await db.query(cfg.phoneQuery, [phone]);
+                if (pRows && pRows.length > 0) {
+                    phoneFound = true;
+                    break;
+                }
+            }
         }
 
-        // 4. Check church_reg
-        const [churches] = await db.query('SELECT id, churchname as name, phonenumber as mobile_number, password FROM church_reg WHERE phonenumber = ? AND password = ?', [phone, password]);
-        if (churches && churches.length > 0) {
-            return res.json({ status: 200, message: 'Login successful', data: churches });
-        }
-
-        // Check if phone exists anywhere
-        const [phoneExists] = await db.query('SELECT id FROM signup_form WHERE mobile_number = ? UNION SELECT id FROM pastor_reg WHERE phonenumber = ? UNION SELECT id FROM users WHERE number = ?', [phone, phone, phone]);
-        if (!phoneExists || phoneExists.length === 0) {
+        if (phoneFound) {
+            return res.json({ status: 600, message: 'Wrong password' });
+        } else {
             return res.json({ status: 250, message: 'Phone number not registered' });
         }
-
-        return res.json({ status: 600, message: 'Wrong password' });
     } catch (err) {
+        console.error('Login error:', err);
         res.status(500).json({ status: 500, error: err.message });
     }
 });
