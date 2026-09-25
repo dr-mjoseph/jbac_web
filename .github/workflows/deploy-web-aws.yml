@@ -9,6 +9,9 @@ on:
       - '.gitignore'
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
@@ -16,6 +19,8 @@ jobs:
     steps:
       - name: Checkout Source Code
         uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Setup Node.js 18
         uses: actions/setup-node@v4
@@ -35,6 +40,34 @@ jobs:
         run: |
           chmod +x scripts/deploy_aws_backend.sh
           ./scripts/deploy_aws_backend.sh
+
+      - name: Update Environment with Live AWS Backend URLs
+        run: |
+          node -e '
+            const fs = require("fs");
+            const fnUrl = (process.env.FUNCTION_URL || "").trim();
+            const apiGwUrl = (process.env.API_GATEWAY_URL || "").trim();
+            const envProd = "src/environments/environment.prod.ts";
+            const envDev = "src/environments/environment.ts";
+            console.log("FUNCTION_URL:", fnUrl);
+            console.log("API_GATEWAY_URL:", apiGwUrl);
+            
+            const targetUrl = fnUrl || apiGwUrl;
+            if (targetUrl) {
+              const apiEndpoint = targetUrl.endsWith("/") ? targetUrl + "dashboardapi/" : targetUrl + "/dashboardapi/";
+              const fallbackEndpoint = apiGwUrl ? (apiGwUrl.endsWith("/") ? apiGwUrl + "dashboardapi/" : apiGwUrl + "/dashboardapi/") : apiEndpoint;
+              
+              [envProd, envDev].forEach(f => {
+                if (fs.existsSync(f)) {
+                  let c = fs.readFileSync(f, "utf8");
+                  c = c.replace(/apiUrl:\s*['\"][^'\"]+['\"]/g, "apiUrl: \"" + apiEndpoint + "\"");
+                  c = c.replace(/fallbackApiUrl:\s*['\"][^'\"]+['\"]/g, "fallbackApiUrl: \"" + fallbackEndpoint + "\"");
+                  fs.writeFileSync(f, c, "utf8");
+                  console.log("Updated", f, "with", apiEndpoint);
+                }
+              });
+            }
+          '
 
       - name: Install Dependencies
         run: npm ci --legacy-peer-deps
@@ -66,3 +99,10 @@ jobs:
           else
             echo "No CloudFront distribution ID configured. Skipping cache invalidation."
           fi
+
+      - name: Commit & Push Deployed AWS Config
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add src/environments/environment.prod.ts src/environments/environment.ts backend_url.txt || true
+          git diff --quiet && git diff --staged --quiet || (git commit -m "chore: connect frontend to AWS Lambda backend API [skip ci]" && git push origin main) || true
