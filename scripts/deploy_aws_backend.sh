@@ -19,7 +19,30 @@ if [ -d "backend" ]; then
   )
 fi
 
-# 1. Ensure IAM Role exists
+# 0b. Configure RDS Password and ensure database schema is imported
+echo "[0b/5] Discovering and configuring AWS RDS MySQL instance..."
+DB_INSTANCE_ID=$(aws rds describe-db-instances --region "${REGION}" --query "DBInstances[0].DBInstanceIdentifier" --output text 2>/dev/null || true)
+if [ -z "${DB_INSTANCE_ID}" ] || [ "${DB_INSTANCE_ID}" = "None" ]; then
+  DB_INSTANCE_ID="jbac-mysql-db"
+fi
+echo "Target RDS Instance: ${DB_INSTANCE_ID}"
+
+echo "Synchronizing master password for ${DB_INSTANCE_ID}..."
+aws rds modify-db-instance \
+  --db-instance-identifier "${DB_INSTANCE_ID}" \
+  --master-user-password "biUt2TrZ9EZAqn6GXhiA" \
+  --apply-immediately \
+  --region "${REGION}" 2>&1 || true
+
+echo "Waiting 10 seconds for RDS credentials to apply..."
+sleep 10
+
+echo "Verifying and importing RDS schema if needed..."
+(
+  cd backend
+  node ../scripts/import_db_rds.js >> ../diagnostics.txt 2>&1 || true
+)
+
 echo "[1/5] Checking IAM Execution Role: ${ROLE_NAME}..."
 ROLE_ARN=$(aws iam get-role --role-name "${ROLE_NAME}" --query "Role.Arn" --output text 2>/dev/null || true)
 
