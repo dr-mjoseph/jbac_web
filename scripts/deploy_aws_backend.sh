@@ -86,15 +86,17 @@ if [ -z "${URL_CONFIG}" ]; then
     --auth-type NONE \
     --cors '{"AllowOrigins":["*"],"AllowMethods":["*"],"AllowHeaders":["*"],"MaxAge":86400}' \
     --region "${REGION}"
-  
-  aws lambda add-permission \
-    --function-name "${FUNCTION_NAME}" \
-    --statement-id "FunctionURLAllowPublicAccess" \
-    --action "lambda:InvokeFunctionUrl" \
-    --principal "*" \
-    --function-url-auth-type NONE \
-    --region "${REGION}" || true
 fi
+
+# Unconditionally refresh Function URL public invocation permission
+aws lambda remove-permission --function-name "${FUNCTION_NAME}" --statement-id "FunctionURLAllowPublicAccess" --region "${REGION}" 2>/dev/null || true
+aws lambda add-permission \
+  --function-name "${FUNCTION_NAME}" \
+  --statement-id "FunctionURLAllowPublicAccess" \
+  --action "lambda:InvokeFunctionUrl" \
+  --principal "*" \
+  --function-url-auth-type NONE \
+  --region "${REGION}"
 
 FUNCTION_URL=$(aws lambda get-function-url-config --function-name "${FUNCTION_NAME}" --query "FunctionUrl" --output text --region "${REGION}")
 echo "Lambda Function URL: ${FUNCTION_URL}"
@@ -113,15 +115,17 @@ if [ -z "${API_ID}" ] || [ "${API_ID}" = "None" ]; then
     --target "${LAMBDA_ARN}" \
     --region "${REGION}" \
     --query "ApiId" --output text)
-  
-  aws lambda add-permission \
-    --function-name "${FUNCTION_NAME}" \
-    --statement-id "ApiGatewayInvokePermission" \
-    --action "lambda:InvokeFunction" \
-    --principal "apigateway.amazonaws.com" \
-    --source-arn "arn:aws:execute-api:${REGION}:*:*/*" \
-    --region "${REGION}" || true
 fi
+
+# Unconditionally refresh API Gateway invocation permission
+aws lambda remove-permission --function-name "${FUNCTION_NAME}" --statement-id "ApiGatewayInvokePermission" --region "${REGION}" 2>/dev/null || true
+aws lambda add-permission \
+  --function-name "${FUNCTION_NAME}" \
+  --statement-id "ApiGatewayInvokePermission" \
+  --action "lambda:InvokeFunction" \
+  --principal "apigateway.amazonaws.com" \
+  --source-arn "arn:aws:execute-api:${REGION}:*:*/*" \
+  --region "${REGION}"
 
 API_GATEWAY_URL="https://${API_ID}.execute-api.${REGION}.amazonaws.com/"
 echo "API Gateway HTTPS Endpoint: ${API_GATEWAY_URL}"

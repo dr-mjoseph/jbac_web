@@ -1474,9 +1474,11 @@ app.get(['/', '/api'], (_req, res) => {
     });
 });
 export const handler = serverless(app);
-const PORT = process.env.PORT || 8081;
-app.listen(PORT, async () => {
-    console.log(`JBAC Backend API successfully listening on port ${PORT}!`);
-    console.log(`Connected to Database Cluster at: ${dbHost}`);
-});
+if (!process.env.AWS_LAMBDA_FUNCTION_NAME) {
+    const PORT = process.env.PORT || 8081;
+    app.listen(PORT, async () => {
+        console.log(`JBAC Backend API successfully listening on port ${PORT}!`);
+        console.log(`Connected to Database Cluster at: ${dbHost}`);
+    });
+}
 //# sourceMappingURL=server.js.map
