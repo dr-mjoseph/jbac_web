@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Sep 23, 2026 at 06:40 AM
+-- Generation Time: Sep 25, 2026 at 05:05 PM
 -- Server version: 8.0.46
 -- PHP Version: 8.4.25
 
@@ -198,9 +198,9 @@ INSERT INTO `banner_dlt_t` (`id`, `i_ts`, `type`, `category_nm`, `category_id`, 
 (52, '2024-05-05 00:00:00', 3, 'ప్రొఫెసర్ జోసఫ్ గారి వీడియోస్', 3, 'https://www.youtube.com/embed/Rd8azVxfIRk?si=sOsFtC_7V7fwhTHq', 0, 'Rd8azVxfIRk?si=sOsFtC_7V7fwhTHq', 'Joseph Comments on Jagan Reddy Governence', 1),
 (53, '2024-05-05 00:00:00', 3, 'ప్రొఫెసర్ జోసఫ్ గారి వీడియోస్', 3, 'https://www.youtube.com/embed/5QVFZtXsDxk?si=xsn6lMtPboEvr8tN', 0, '5QVFZtXsDxk?si=xsn6lMtPboEvr8tN', 'Joseph Comparing YCP Manifesto and TDP Manifesto', 0),
 (54, '2024-05-05 00:00:00', 3, 'ప్రొఫెసర్ జోసఫ్ గారి వీడియోస్', 3, 'https://www.youtube.com/embed/Rd8azVxfIRk?si=sOsFtC_7V7fwhTHq', 0, 'Rd8azVxfIRk?si=sOsFtC_7V7fwhTHq', 'Dr Joseph Comments on Jagan gari Governence', 0),
-(55, '2024-05-10 00:00:00', 3, 'నాయకుల వాగ్దానం', 2, 'https://www.youtube.com/embed/xw1K3frjBfg?si=wpcPirtzwRGGPmPj', 0, 'xw1K3frjBfg?si=wpcPirtzwRGGPmPj', 'Nara Lokesh gari surety about Pastors Honorarium', 0),
-(56, '2024-05-10 00:00:00', 3, 'నాయకుల వాగ్దానం', 2, 'https://www.youtube.com/embed/j00H43UMD-Y?si=skvYKkA07r9CBxN3', 0, 'j00H43UMD-Y?si=skvYKkA07r9CBxN3', 'Naraa Lokesh garu gave assurance to restore pastors permanent marriage license ', 1),
-(57, '2024-05-10 00:00:00', 3, 'నాయకుల వాగ్దానం', 2, 'https://www.youtube.com/embed/fvlJAWnVA9Y?si=a6cMG0zzpgulIubl', 0, 'fvlJAWnVA9Y?si=a6cMG0zzpgulIubl', 'Nara Lokesh gave surety to give burial grounds from constituency level to panchaiti level ', 1),
+(55, '2024-05-10 00:00:00', 3, 'నాయకుల వాగ్దానం', 2, 'https://www.youtube.com/embed/xw1K3frjBfg?si=wpcPirtzwRGGPmPj', 0, 'xw1K3frjBfg?si=wpcPirtzwRGGPmPj', 'Nara Lokesh gari surety about Pastors Honorarium', 0),
+(56, '2024-05-10 00:00:00', 3, 'నాయకుల వాగ్దానం', 2, 'https://www.youtube.com/embed/j00H43UMD-Y?si=skvYKkA07r9CBxN3', 0, 'j00H43UMD-Y?si=skvYKkA07r9CBxN3', 'Naraa Lokesh garu gave assurance to restore pastors permanent marriage license ', 1),
+(57, '2024-05-10 00:00:00', 3, 'నాయకుల వాగ్దానం', 2, 'https://www.youtube.com/embed/fvlJAWnVA9Y?si=a6cMG0zzpgulIubl', 0, 'fvlJAWnVA9Y?si=a6cMG0zzpgulIubl', 'Nara Lokesh gave surety to give burial grounds from constituency level to panchaiti level ', 1),
 (58, '2024-05-12 00:00:00', 3, 'క్రైస్తవ సమాజం మీద దాడులు వీడియోస్', 1, 'https://www.youtube.com/embed/FlTkG5wHpZo?si=BK_5xbtwhOW5UlJz', 0, 'FlTkG5wHpZo?si=BK_5xbtwhOW5UlJz', 'Figur No.15', 1),
 (59, '2024-05-12 00:00:00', 3, 'క్రైస్తవ సమాజం మీద దాడులు వీడియోస్', 1, 'https://www.youtube.com/embed/6a7X07mOgrw?si=FLVi2klqQ9TXStuQ', 0, '6a7X07mOgrw?si=FLVi2klqQ9TXStuQ', 'Figur No 16', 1),
 (60, '2024-05-12 00:00:00', 3, 'క్రైస్తవ సమాజం మీద దాడులు వీడియోస్', 1, 'https://www.youtube.com/embed/m1q5rZ9T-LU?si=rlzEWdw1dsrMzOtl', 0, 'm1q5rZ9T-LU?si=rlzEWdw1dsrMzOtl', 'Figure No.17', 1),
@@ -539,7 +539,7 @@ INSERT INTO `church_reg` (`id`, `cts`, `church_name`, `description`, `denominati
 (179, '2024-10-09 08:23:35', 'YESU NIRNAYAM DEVALAYAM', NULL, NULL, NULL, 5, 27, 87, 1259, NULL, NULL, '179', NULL, '9988700179', 0, NULL, NULL, NULL, NULL, '9988700179', NULL, NULL, 'No', 0),
 (180, '2024-10-09 08:23:35', 'ELIM PRAYER HOUSE', NULL, NULL, NULL, 5, 27, 87, 1259, NULL, NULL, '180', NULL, '9988700180', 0, NULL, NULL, NULL, NULL, '9988700180', NULL, NULL, 'No', 0),
 (181, '2024-10-09 08:23:35', 'U C I M CHURCH', NULL, NULL, NULL, 5, 27, 87, 1262, NULL, NULL, '181', NULL, '9988700181', 0, NULL, NULL, NULL, NULL, '9988700181', NULL, NULL, 'No', 0),
-(182, '2024-10-09 08:23:35', ' CHRISTIAN OUT REACH MINISTRIES', NULL, NULL, NULL, 5, 27, 88, 1273, NULL, NULL, '182', NULL, '9988700182', 0, NULL, NULL, NULL, NULL, '9988700182', NULL, NULL, 'No', 0),
+(182, '2024-10-09 08:23:35', ' CHRISTIAN OUT REACH MINISTRIES', NULL, NULL, NULL, 5, 27, 88, 1273, NULL, NULL, '182', NULL, '9988700182', 0, NULL, NULL, NULL, NULL, '9988700182', NULL, NULL, 'No', 0),
 (183, '2024-10-09 08:23:35', 'YESU KRISTHU PRARDANA MANDIRAMAM', NULL, NULL, NULL, 5, 27, 88, 1273, NULL, NULL, '183', NULL, '9988700183', 0, NULL, NULL, NULL, NULL, '9988700183', NULL, NULL, 'No', 0),
 (184, '2024-10-09 08:23:35', 'CHRISTAVA PRADHANA MANDHIRAM', NULL, NULL, NULL, 5, 27, 88, 1276, NULL, NULL, '184', NULL, '9988700184', 0, NULL, NULL, NULL, NULL, '9988700184', NULL, NULL, 'No', 0),
 (185, '2024-10-09 08:23:35', 'DAIVARADHANA MANDHIRAM', NULL, NULL, NULL, 5, 27, 88, 1276, NULL, NULL, '185', NULL, '9988700185', 0, NULL, NULL, NULL, NULL, '9988700185', NULL, NULL, 'No', 0),
@@ -674,7 +674,7 @@ INSERT INTO `church_reg` (`id`, `cts`, `church_name`, `description`, `denominati
 (313, '2024-10-09 08:23:35', 'TRINITY BAPTIST TABERNICLE', NULL, NULL, NULL, 6, 29, 102, 1563, NULL, NULL, '313', NULL, '9988700313', 0, NULL, NULL, NULL, NULL, '9988700313', NULL, NULL, 'No', 0),
 (314, '2024-10-09 08:23:35', 'GARNIKAM SIYANU PRADHANA MANDIRAM', NULL, NULL, NULL, 6, 29, 102, 1564, NULL, NULL, '314', NULL, '9988700314', 0, NULL, NULL, NULL, NULL, '9988700314', NULL, NULL, 'No', 0),
 (315, '2024-10-09 08:23:35', 'SHALOM CHURCH', NULL, NULL, NULL, 6, 29, 102, 1565, NULL, NULL, '315', NULL, '9988700315', 0, NULL, NULL, NULL, NULL, '9988700315', NULL, NULL, 'No', 0),
-(316, '2024-10-09 08:23:35', ' SHALOM PRARDHANA MANDHIRAM', NULL, NULL, NULL, 6, 29, 102, 1566, NULL, NULL, '316', NULL, '9988700316', 0, NULL, NULL, NULL, NULL, '9988700316', NULL, NULL, 'No', 0),
+(316, '2024-10-09 08:23:35', ' SHALOM PRARDHANA MANDHIRAM', NULL, NULL, NULL, 6, 29, 102, 1566, NULL, NULL, '316', NULL, '9988700316', 0, NULL, NULL, NULL, NULL, '9988700316', NULL, NULL, 'No', 0),
 (317, '2024-10-09 08:23:35', 'YESU CRISTU PRADHANA SANGAMU', NULL, NULL, NULL, 6, 29, 102, 1567, NULL, NULL, '317', NULL, '9988700317', 0, NULL, NULL, NULL, NULL, '9988700317', NULL, NULL, 'No', 0),
 (318, '2024-10-09 08:23:35', 'CHURCH OF CHIRST', NULL, NULL, NULL, 6, 30, 103, 1584, NULL, NULL, '318', NULL, '9988700318', 0, NULL, NULL, NULL, NULL, '9988700318', NULL, NULL, 'No', 0),
 (319, '2024-10-09 08:23:35', 'CALVARY SWASTHA SANGHAM', NULL, NULL, NULL, 6, 30, 103, 1585, NULL, NULL, '319', NULL, '9988700319', 0, NULL, NULL, NULL, NULL, '9988700319', NULL, NULL, 'No', 0),
@@ -912,7 +912,8 @@ INSERT INTO `church_timings` (`id`, `cts`, `service_id`, `church_id`, `day`, `st
 (12, NULL, 'SUNDAY SCHOOL', '', 'Sunday', '10:00', '13:00', '25', '827', '795', 'undefined', 604, 0, 'Church of God ministry ', '9032328532', 'G JOHN MARK '),
 (13, NULL, 'FIRST', '', 'Sunday', '08:30', '10:30', '11', '735', '300', 'undefined', 935, 0, 'KREESTU Suvartha Bheri church ministry ', '9059111210', 'K. Satish babu'),
 (15, NULL, 'FIRST', '', 'Sunday', '09:00', '13:00', '24', '822', '616', 'undefined', 45, 0, 'KSS Prardhana mandiram ', '8985480500', 'Gummadi Amara Kishore '),
-(16, '2026-04-17 18:55:52', 'FIRST', '', 'Sunday', '11:00', '13:15', '17', '772', '407', 'undefined', 1071, 0, 'PRAYER FELLOWSHIP ', '8501987107', 'Jetti Yehoshuva ');
+(16, '2026-04-17 18:55:52', 'FIRST', '', 'Sunday', '11:00', '13:15', '17', '772', '407', 'undefined', 1071, 0, 'PRAYER FELLOWSHIP ', '8501987107', 'Jetti Yehoshuva '),
+(17, '2026-09-24 22:55:22', 'Sunday Service', 'Test Church', 'Sunday', '09:00', '11:00', '1', '1', '1', 'undefined', 483, 0, 'Test description', '9966119812', 'Test Pastor');
 
 -- --------------------------------------------------------
 
@@ -1164,7 +1165,8 @@ INSERT INTO `contactus` (`id`, `cts`, `name`, `phonenumber`, `email`, `subject`,
 (8, '2026-08-26 11:51:30', 'httXycKXPWSaVUFKOcdLFw', NULL, 'de.bo.vef.uh.a.9.2@gmail.com', 'gLZrOZISjoAeGlNszCYGY', 'RvEFZirAZPNQNTBjVht', 0),
 (9, '2026-08-27 07:12:54', 'ixgAIDiYMDryZVGdv', NULL, 'd.ine.ja.li.d11.6@gmail.com', 'PZGdxbFmcRqrNxTKw', 'zfrXdlwEqkumFQoijme', 0),
 (10, '2026-08-28 13:15:34', 'GHlrJypiGcjedTCWTMZMyJVT', NULL, 'b.o.fe.ronin5.3@gmail.com', 'GBFxDFWGOgOKroGjUIfVF', 'ZVMiwykMiBRiZiUgP', 0),
-(11, '2026-09-05 19:16:24', 'VibeZZXaltdovJHoJFgofDW', NULL, 'axe.f.o.r.e.vu.m.o.q08@gmail.com', 'wtOgbbRnXIGzTnjisWq', 'nXccGnCuYLqxljXTyDg', 0);
+(11, '2026-09-05 19:16:24', 'VibeZZXaltdovJHoJFgofDW', NULL, 'axe.f.o.r.e.vu.m.o.q08@gmail.com', 'wtOgbbRnXIGzTnjisWq', 'nXccGnCuYLqxljXTyDg', 0),
+(12, '2026-09-25 15:53:42', 'URXkZfZWrxQomveciwNSp', NULL, 'u.ne.xu.yis.i40@gmail.com', 'LiHqZsvuiYZZCUlRQEYwE', 'uxItYfTzMgFaiZwOVJ', 0);
 
 -- --------------------------------------------------------
 

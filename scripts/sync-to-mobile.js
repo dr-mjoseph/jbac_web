@@ -10,6 +10,12 @@ const { execSync } = require('child_process');
 const WEB_ROOT = path.resolve(__dirname, '..');
 const DIST_DIR = path.join(WEB_ROOT, 'dist', 'churchwebsite');
 
+// Ensure node and npm are in PATH for child processes
+const nodeDir = path.dirname(process.execPath);
+if (!process.env.PATH.includes(nodeDir)) {
+  process.env.PATH = `${nodeDir}${path.delimiter}${process.env.PATH}`;
+}
+
 // Parse CLI flags
 const args = process.argv.slice(2);
 function getArg(flag, defaultValue) {

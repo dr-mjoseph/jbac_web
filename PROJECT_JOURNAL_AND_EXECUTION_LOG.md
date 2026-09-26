@@ -201,4 +201,26 @@ However, in the mobile application (`jbac_app`), when users registered, logged i
 6. **Committed & Pushed**:
    - `dr-mjoseph/jbac_app`: Committed `92fbf54` and pushed to `main`.
 
+---
+
+## 8. Database Structure & Live AWS RDS Synchronization (September 26, 2026)
+
+### Summary of Database Updates
+1. **SQL Dump Synchronized ([`database/jbac_structure.sql`](database/jbac_structure.sql))**:
+   - Updated dump timestamp to `Generation Time: Sep 25, 2026 at 05:05 PM` (MySQL 8.0.46 / PHP 8.4.25).
+   - Added new service timings row `17` in `church_timings` (`Sunday Service` at `Test Church`).
+   - Added new enquiry row `12` in `contactus` (`URXkZfZWrxQomveciwNSp`).
+   - Normalized and cleaned non-breaking whitespace (`\u00a0`) in `banner_dlt_t` (`నాయకుల వాగ్దానం`) and `church_reg`.
+2. **AWS RDS Database Updated & Verified**:
+   - Connected directly to live AWS RDS MySQL (`jbac-mysql-db.cdeeuw0s2trf.ap-southeast-2.rds.amazonaws.com`).
+   - Inserted `church_timings` row 17 and `contactus` row 12.
+   - Updated category names and table strings in `banner_dlt_t` and `church_reg`.
+   - Re-applied all 21 compatibility views (`denominations`, `churches`, `pastors`, `meetings`, `ads`, `news`, etc.).
+3. **Production Web Application Compiled**:
+   - Compiled Angular 15 production distribution with `--configuration production`.
+   - Verified all endpoints against AWS API Gateway (`https://1a8kqxawxd.execute-api.ap-southeast-2.amazonaws.com/dashboardapi/`).
+4. **Mobile Application Synchronized**:
+   - Synced latest compiled assets (`www/`) and mirrored source code (`web-src/`) to `C:\Users\rajes\StudioProjects\jbac_app`.
+   - Committed and pushed to `dr-mjoseph/jbac_app` on `main`.
+
 
