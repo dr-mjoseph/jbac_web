@@ -82,7 +82,7 @@ if aws lambda get-function --function-name "${FUNCTION_NAME}" --region "${REGION
     --runtime "nodejs18.x" \
     --handler "server.handler" \
     --timeout 30 \
-    --memory-size 512 \
+    --memory-size 256 \
     --environment "${ENV_VARS}" \
     --region "${REGION}"
 else
@@ -94,7 +94,7 @@ else
     --handler "server.handler" \
     --zip-file "fileb://${ZIP_FILE}" \
     --timeout 30 \
-    --memory-size 512 \
+    --memory-size 256 \
     --environment "${ENV_VARS}" \
     --region "${REGION}"
   
@@ -227,19 +227,18 @@ echo "Testing Function URL ping: ${FUNCTION_URL}api ..."
 FN_PING=$(curl -s -m 10 "${FUNCTION_URL}api" || true)
 echo "Function URL Result: ${FN_PING}"
 
-# Choose functional primary target URL
-TARGET_BACKEND_URL="${API_GATEWAY_URL}"
-FALLBACK_URL="${FUNCTION_URL}"
-
-if echo "${GW_PING}" | grep -q '"JBAC Backend API Gateway"'; then
+# Choose functional primary target URL (Prefer Function URL for 100% free zero-markup invocations)
+if echo "${FN_PING}" | grep -q '"JBAC Backend API Gateway"'; then
+  TARGET_BACKEND_URL="${FUNCTION_URL}"
+  FALLBACK_URL="${API_GATEWAY_URL}"
+  echo "[VERIFIED] Free Function URL is 100% active and healthy (Primary)!"
+elif echo "${GW_PING}" | grep -q '"JBAC Backend API Gateway"'; then
   TARGET_BACKEND_URL="${API_GATEWAY_URL}"
   FALLBACK_URL="${FUNCTION_URL}"
   echo "[VERIFIED] API Gateway is 100% active and healthy!"
-elif echo "${FN_PING}" | grep -q '"JBAC Backend API Gateway"'; then
-  TARGET_BACKEND_URL="${FUNCTION_URL}"
-  FALLBACK_URL="${API_GATEWAY_URL}"
-  echo "[VERIFIED] Function URL is 100% active and healthy!"
 else
+  TARGET_BACKEND_URL="${API_GATEWAY_URL}"
+  FALLBACK_URL="${FUNCTION_URL}"
   echo "[WARNING] Neither endpoint responded with expected health check. Using API Gateway as default."
 fi
 

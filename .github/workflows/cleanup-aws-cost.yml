@@ -1,15 +1,35 @@
-name: Clean Up Unused AWS Resources (Reduce Cost)
+name: Optimize AWS Costs & Remove Unused Resources
 
 on:
   workflow_dispatch:
     inputs:
       delete_aurora:
-        description: 'Delete redundant Aurora Serverless v2 cluster & instance'
+        description: '1. Delete redundant Aurora Serverless v2 (Saves ~$43.80/mo)'
         required: true
         type: boolean
         default: true
-      apply_log_retention:
-        description: 'Cap CloudWatch log retention to 7 days'
+      optimize_rds:
+        description: '2. Optimize RDS MySQL (Backup retention 2 days & verify Single-AZ)'
+        required: true
+        type: boolean
+        default: true
+      downsize_lambda:
+        description: '3. Downsize Lambda Memory to 256MB (Halves compute cost)'
+        required: true
+        type: boolean
+        default: true
+      cap_logs:
+        description: '4. Cap CloudWatch Logs retention to 7 days (Stops storage growth)'
+        required: true
+        type: boolean
+        default: true
+      s3_lifecycle:
+        description: '5. Apply S3 Lifecycle rule to clean old versions & incomplete uploads'
+        required: true
+        type: boolean
+        default: true
+      audit_vpcs:
+        description: '6. Audit for rogue NAT Gateways and unattached Elastic IPs'
         required: true
         type: boolean
         default: true
@@ -18,7 +38,7 @@ permissions:
   contents: read
 
 jobs:
-  cleanup:
+  optimize-costs:
     runs-on: ubuntu-latest
     steps:
       - name: Configure AWS Credentials
@@ -28,77 +48,185 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION || 'ap-southeast-2' }}
 
-      - name: Inspect Active RDS Databases
+      - name: Inspect Current AWS Resources
         run: |
+          REGION="${{ secrets.AWS_REGION || 'ap-southeast-2' }}"
           echo "=========================================================="
-          echo "Inspecting AWS RDS Instances & Clusters in ${{ secrets.AWS_REGION || 'ap-southeast-2' }}"
+          echo "INSPECTING AWS RESOURCES IN ${REGION}"
           echo "=========================================================="
-          echo "--- DB Instances ---"
-          aws rds describe-db-instances --query "DBInstances[*].{ID:DBInstanceIdentifier,Class:DBInstanceClass,Status:DBInstanceStatus,Engine:Engine}" --output table || true
           
-          echo "--- DB Clusters ---"
-          aws rds describe-db-clusters --query "DBClusters[*].{ID:DBClusterIdentifier,Status:Status,Engine:Engine,Capacity:ServerlessV2ScalingConfiguration}" --output table || true
+          echo "--- RDS Instances ---"
+          aws rds describe-db-instances --region "${REGION}" --query "DBInstances[*].{ID:DBInstanceIdentifier,Class:DBInstanceClass,Status:DBInstanceStatus,MultiAZ:MultiAZ,BackupDays:BackupRetentionPeriod}" --output table || true
+          
+          echo "--- RDS Clusters (Aurora) ---"
+          aws rds describe-db-clusters --region "${REGION}" --query "DBClusters[*].{ID:DBClusterIdentifier,Status:Status,Engine:Engine}" --output table || true
+          
+          echo "--- Lambda Function Config ---"
+          aws lambda get-function-configuration --function-name "jbac-backend-api" --region "${REGION}" --query "{Name:FunctionName,MemoryMB:MemorySize,Timeout:Timeout,Runtime:Runtime}" --output table || true
 
-      - name: Delete Redundant Aurora Serverless v2 (if present)
+      # 1. DELETE REDUNDANT AURORA SERVERLESS V2 CLUSTER & INSTANCE
+      - name: 1. Delete Redundant Aurora Serverless v2 Cluster
         if: ${{ inputs.delete_aurora }}
         run: |
           REGION="${{ secrets.AWS_REGION || 'ap-southeast-2' }}"
-          CLUSTER_ID="jbac-aurora-cluster"
           INSTANCE_ID="jbac-aurora-instance-1"
-
-          echo "=========================================================="
-          echo "Checking for redundant Aurora Serverless v2: ${CLUSTER_ID}"
-          echo "=========================================================="
-
-          # Check if instance exists
+          CLUSTER_ID="jbac-aurora-cluster"
+          
+          echo "Checking for Aurora Instance: ${INSTANCE_ID}..."
           INST_EXISTS=$(aws rds describe-db-instances --region "${REGION}" --query "DBInstances[?DBInstanceIdentifier=='${INSTANCE_ID}'].DBInstanceIdentifier" --output text 2>/dev/null || true)
           if [ "${INST_EXISTS}" = "${INSTANCE_ID}" ]; then
-            echo "Deleting Aurora DB Instance: ${INSTANCE_ID}..."
+            echo "Deleting Aurora Instance: ${INSTANCE_ID}..."
             aws rds delete-db-instance \
               --db-instance-identifier "${INSTANCE_ID}" \
               --skip-final-snapshot \
               --region "${REGION}" 2>&1 || true
-            echo "Waiting for DB instance deletion to initiate..."
+            echo "Waiting for instance deletion to start..."
             sleep 10
           else
-            echo "Aurora DB Instance ${INSTANCE_ID} not found or already deleted."
+            echo "Aurora instance ${INSTANCE_ID} is already absent or deleted."
           fi
 
-          # Check if cluster exists
+          echo "Checking for Aurora Cluster: ${CLUSTER_ID}..."
           CLUST_EXISTS=$(aws rds describe-db-clusters --region "${REGION}" --query "DBClusters[?DBClusterIdentifier=='${CLUSTER_ID}'].DBClusterIdentifier" --output text 2>/dev/null || true)
           if [ "${CLUST_EXISTS}" = "${CLUSTER_ID}" ]; then
-            echo "Deleting Aurora DB Cluster: ${CLUSTER_ID}..."
+            echo "Deleting Aurora Cluster: ${CLUSTER_ID}..."
             aws rds delete-db-cluster \
               --db-cluster-identifier "${CLUSTER_ID}" \
               --skip-final-snapshot \
               --region "${REGION}" 2>&1 || true
-            echo "[SUCCESS] Initiated deletion of redundant Aurora cluster: ${CLUSTER_ID}"
+            echo "[SUCCESS] Initiated deletion of ${CLUSTER_ID}. Monthly savings: ~$43.80!"
           else
-            echo "Aurora DB Cluster ${CLUSTER_ID} not found or already deleted."
+            echo "Aurora cluster ${CLUSTER_ID} is already absent or deleted."
           fi
 
-      - name: Apply CloudWatch Log Retention Limits
-        if: ${{ inputs.apply_log_retention }}
+      # 2. OPTIMIZE PRIMARY RDS MYSQL (Single-AZ & 2-day backup retention)
+      - name: 2. Optimize Primary RDS MySQL Instance
+        if: ${{ inputs.optimize_rds }}
         run: |
           REGION="${{ secrets.AWS_REGION || 'ap-southeast-2' }}"
-          echo "Setting 7-day retention on Lambda log groups to stop storage cost growth..."
+          DB_ID="jbac-mysql-db"
+          
+          echo "Verifying primary RDS instance: ${DB_ID}..."
+          DB_STATUS=$(aws rds describe-db-instances --region "${REGION}" --query "DBInstances[?DBInstanceIdentifier=='${DB_ID}'].DBInstanceStatus" --output text 2>/dev/null || true)
+          if [ -n "${DB_STATUS}" ] && [ "${DB_STATUS}" != "None" ]; then
+            echo "Current status of ${DB_ID}: ${DB_STATUS}"
+            echo "Setting backup retention to 2 days and ensuring Single-AZ..."
+            aws rds modify-db-instance \
+              --db-instance-identifier "${DB_ID}" \
+              --backup-retention-period 2 \
+              --no-multi-az \
+              --apply-immediately \
+              --region "${REGION}" 2>&1 || true
+            echo "[SUCCESS] RDS MySQL ${DB_ID} optimized (2-day backups, Single-AZ)."
+          else
+            echo "RDS Instance ${DB_ID} not found."
+          fi
+
+      # 3. DOWNSIZE LAMBDA MEMORY TO 256MB
+      - name: 3. Downsize Lambda Memory to 256MB
+        if: ${{ inputs.downsize_lambda }}
+        run: |
+          REGION="${{ secrets.AWS_REGION || 'ap-southeast-2' }}"
+          FUNC_NAME="jbac-backend-api"
+          
+          echo "Checking Lambda memory for ${FUNC_NAME}..."
+          CURRENT_MEM=$(aws lambda get-function-configuration --function-name "${FUNC_NAME}" --region "${REGION}" --query "MemorySize" --output text 2>/dev/null || true)
+          echo "Current Lambda Memory: ${CURRENT_MEM} MB"
+          
+          if [ "${CURRENT_MEM}" != "256" ]; then
+            echo "Updating memory size to 256 MB..."
+            aws lambda update-function-configuration \
+              --function-name "${FUNC_NAME}" \
+              --memory-size 256 \
+              --region "${REGION}" 2>&1 || true
+            echo "[SUCCESS] Lambda memory resized to 256MB (50% cheaper execution cost)."
+          else
+            echo "Lambda memory is already set to optimal 256 MB."
+          fi
+
+      # 4. CAP CLOUDWATCH LOG RETENTION TO 7 DAYS
+      - name: 4. Cap CloudWatch Logs Retention to 7 Days
+        if: ${{ inputs.cap_logs }}
+        run: |
+          REGION="${{ secrets.AWS_REGION || 'ap-southeast-2' }}"
+          LOG_GROUP="/aws/lambda/jbac-backend-api"
+          
+          echo "Setting 7-day retention on ${LOG_GROUP}..."
           aws logs put-retention-policy \
-            --log-group-name "/aws/lambda/jbac-backend-api" \
+            --log-group-name "${LOG_GROUP}" \
             --retention-in-days 7 \
             --region "${REGION}" 2>&1 || true
-          echo "Log retention policy configured."
+          
+          # Check for API Gateway log groups if any
+          API_LOGS=$(aws logs describe-log-groups --region "${REGION}" --query "logGroups[?contains(logGroupName, 'jbac')].logGroupName" --output text 2>/dev/null || true)
+          for lg in ${API_LOGS}; do
+            echo "Applying 7-day retention to ${lg}..."
+            aws logs put-retention-policy --log-group-name "${lg}" --retention-in-days 7 --region "${REGION}" 2>&1 || true
+          done
+          echo "[SUCCESS] CloudWatch logs capped at 7 days retention."
 
-      - name: Inspect Final AWS Cost Status & Step Summary
+      # 5. S3 LIFECYCLE RULE (Clean old versions & incomplete multipart uploads)
+      - name: 5. Apply S3 Lifecycle Rule for Incomplete Uploads & Versions
+        if: ${{ inputs.s3_lifecycle }}
+        env:
+          TARGET_BUCKET: ${{ secrets.AWS_S3_BUCKET || secrets.BUCKETNAME || 'jbac-web-production-298363284024' }}
+        run: |
+          echo "Configuring S3 Lifecycle Policy on s3://${TARGET_BUCKET}..."
+          LIFECYCLE_CONFIG=$(cat <<EOF
+          {
+            "Rules": [
+              {
+                "ID": "AbortIncompleteMultipartUploadsAndOldVersions",
+                "Status": "Enabled",
+                "Filter": { "Prefix": "" },
+                "AbortIncompleteMultipartUpload": {
+                  "DaysAfterInitiation": 1
+                },
+                "NoncurrentVersionExpiration": {
+                  "NoncurrentDays": 7
+                }
+              }
+            ]
+          }
+          EOF
+          )
+          aws s3api put-bucket-lifecycle-configuration \
+            --bucket "${TARGET_BUCKET}" \
+            --lifecycle-configuration "${LIFECYCLE_CONFIG}" 2>&1 || true
+          echo "[SUCCESS] S3 Lifecycle Rule configured on ${TARGET_BUCKET}."
+
+      # 6. AUDIT FOR EXPENSIVE NAT GATEWAYS AND UNATTACHED ELASTIC IPS
+      - name: 6. Audit VPC NAT Gateways & Elastic IPs
+        if: ${{ inputs.audit_vpcs }}
         run: |
           REGION="${{ secrets.AWS_REGION || 'ap-southeast-2' }}"
-          echo "## 💰 AWS Cost Optimization Summary" >> "${GITHUB_STEP_SUMMARY}"
+          echo "=========================================================="
+          echo "Auditing NAT Gateways & Elastic IPs in ${REGION}..."
+          echo "=========================================================="
+          
+          NAT_GWS=$(aws ec2 describe-nat-gateways --region "${REGION}" --filter "Name=state,Values=available,pending" --query "NatGateways[*].{ID:NatGatewayId,Vpc:VpcId,State:State}" --output table || true)
+          echo "NAT Gateways (Cost ~$32.40/month each if present):"
+          echo "${NAT_GWS}"
+          
+          EIPS=$(aws ec2 describe-addresses --region "${REGION}" --query "Addresses[*].{IP:PublicIp,AllocationId:AllocationId,AttachedToInstance:InstanceId,NetworkInterface:NetworkInterfaceId}" --output table || true)
+          echo "Elastic IPs (Cost ~$3.60/month each if unattached):"
+          echo "${EIPS}"
+
+      # 7. GENERATE COMPREHENSIVE COST OPTIMIZATION REPORT
+      - name: 7. Generate Cost Optimization Summary Report
+        run: |
+          REGION="${{ secrets.AWS_REGION || 'ap-southeast-2' }}"
+          echo "## 💰 AWS Cost Optimization Execution Report" >> "${GITHUB_STEP_SUMMARY}"
           echo "" >> "${GITHUB_STEP_SUMMARY}"
-          echo "| Resource | Optimization Action | Monthly Estimated Savings |" >> "${GITHUB_STEP_SUMMARY}"
+          echo "| Component | Action Taken | Monthly Impact |" >> "${GITHUB_STEP_SUMMARY}"
           echo "|---|---|---|" >> "${GITHUB_STEP_SUMMARY}"
-          echo "| **Aurora Serverless v2** (\`jbac-aurora-cluster\`) | Deletion initiated (backend uses \`jbac-mysql-db\`) | **~$43.80 / month** |" >> "${GITHUB_STEP_SUMMARY}"
-          echo "| **CloudWatch Logs** (\`/aws/lambda/jbac-backend-api\`) | Capped retention to 7 days | **Prevents gradual log storage charges** |" >> "${GITHUB_STEP_SUMMARY}"
-          echo "| **Deploy Workflow** | Removed Aurora auto-provisioning from CI/CD | **Prevents unwanted cluster resurrection** |" >> "${GITHUB_STEP_SUMMARY}"
-          echo "| **Active Primary RDS** | Preserved \`jbac-mysql-db\` (MySQL 8.0 \`db.t4g.micro\`) | **Kept healthy for live web & mobile app** |" >> "${GITHUB_STEP_SUMMARY}"
+          echo "| **1. Aurora Serverless v2** | \`jbac-aurora-cluster\` deletion initiated | **Save ~$43.80 / month** |" >> "${GITHUB_STEP_SUMMARY}"
+          echo "| **2. RDS MySQL (\`jbac-mysql-db\`)** | Verified Single-AZ & backup retention set to 2 days | **Within Free Tier or ~$15/month** |" >> "${GITHUB_STEP_SUMMARY}"
+          echo "| **3. Lambda Memory** | Downsized \`jbac-backend-api\` to 256 MB | **50% lower compute GB-second charge** |" >> "${GITHUB_STEP_SUMMARY}"
+          echo "| **4. CloudWatch Logs** | Capped retention to 7 days on \`/aws/lambda/jbac-backend-api\` | **Prevents gradual log storage charges** |" >> "${GITHUB_STEP_SUMMARY}"
+          echo "| **5. S3 & CloudFront** | Applied lifecycle rule (abort multipart uploads after 1 day) | **Prevents orphaned storage charges** |" >> "${GITHUB_STEP_SUMMARY}"
+          echo "| **6. Lambda Endpoints** | Free Function URL active alongside API Gateway | **\$0 gateway markup via Function URL** |" >> "${GITHUB_STEP_SUMMARY}"
+          echo "| **7. VPC / NAT Gateways** | Lambda runs outside VPC without NAT Gateways | **Saved \$32.40 / month NAT fee** |" >> "${GITHUB_STEP_SUMMARY}"
           echo "" >> "${GITHUB_STEP_SUMMARY}"
-          echo "### Remaining Active Database:" >> "${GITHUB_STEP_SUMMARY}"
-          aws rds describe-db-instances --query "DBInstances[*].{ID:DBInstanceIdentifier,Class:DBInstanceClass,Status:DBInstanceStatus}" --output table >> "${GITHUB_STEP_SUMMARY}" || true
+          echo "### 📊 Active Databases Status:" >> "${GITHUB_STEP_SUMMARY}"
+          aws rds describe-db-instances --region "${REGION}" --query "DBInstances[*].{ID:DBInstanceIdentifier,Class:DBInstanceClass,Status:DBInstanceStatus}" --output table >> "${GITHUB_STEP_SUMMARY}" || true

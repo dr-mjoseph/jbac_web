@@ -84,7 +84,7 @@ Resources:
       VPCSecurityGroups:
         - !GetAtt DBSecurityGroup.GroupId
       PubliclyAccessible: true
-      BackupRetentionPeriod: 7
+      BackupRetentionPeriod: 2
       PreferredBackupWindow: '03:00-04:00'
       PreferredMaintenanceWindow: 'Sun:04:30-Sun:05:30'
       MultiAZ: false
