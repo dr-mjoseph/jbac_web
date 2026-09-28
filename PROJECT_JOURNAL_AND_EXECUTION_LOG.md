@@ -223,4 +223,24 @@ However, in the mobile application (`jbac_app`), when users registered, logged i
    - Synced latest compiled assets (`www/`) and mirrored source code (`web-src/`) to `C:\Users\rajes\StudioProjects\jbac_app`.
    - Committed and pushed to `dr-mjoseph/jbac_app` on `main`.
 
+---
+
+## 9. AWS Cost Optimization & Redundancy Removal (September 28, 2026)
+
+### Cost Drivers Identified
+1. **Redundant Aurora Serverless v2 (`jbac-aurora-cluster`)**:
+   - Provisioned via `scripts/create_aurora_data_api.sh` in the CI/CD pipeline.
+   - Minimum scaling capacity of 0.5 ACU ran 24/7 in `ap-southeast-2` incurring **~$43.80/month (~$525/year)**.
+   - Completely unused: The active Node.js backend connects directly to MySQL RDS (`jbac-mysql-db`).
+2. **Uncapped CloudWatch Log Storage**:
+   - Lambda log groups (`/aws/lambda/jbac-backend-api`) had no retention expiration policy, allowing logs to accumulate indefinitely.
+
+### Actions Taken
+1. **Removed Auto-Provisioning**: Removed Aurora Serverless creation step from [`.github/workflows/deploy-web-aws.yml`](.github/workflows/deploy-web-aws.yml).
+2. **Automated CloudWatch Log Retention**: Added `aws logs put-retention-policy --retention-in-days 7` in [`scripts/deploy_aws_backend.sh`](scripts/deploy_aws_backend.sh).
+3. **Created One-Click Cleanup Automation**: Added [`.github/workflows/cleanup-aws-cost.yml`](.github/workflows/cleanup-aws-cost.yml) for 1-click execution in GitHub Actions.
+4. **Added Local / CloudShell Scripts**:
+   - Bash / CloudShell: [`scripts/cleanup_unused_aws_resources.sh`](scripts/cleanup_unused_aws_resources.sh)
+   - PowerShell: [`aws/cleanup-unused-aws.ps1`](aws/cleanup-unused-aws.ps1)
+
 
