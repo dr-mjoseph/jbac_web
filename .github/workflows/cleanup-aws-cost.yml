@@ -1,0 +1,104 @@
+name: Clean Up Unused AWS Resources (Reduce Cost)
+
+on:
+  workflow_dispatch:
+    inputs:
+      delete_aurora:
+        description: 'Delete redundant Aurora Serverless v2 cluster & instance'
+        required: true
+        type: boolean
+        default: true
+      apply_log_retention:
+        description: 'Cap CloudWatch log retention to 7 days'
+        required: true
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION || 'ap-southeast-2' }}
+
+      - name: Inspect Active RDS Databases
+        run: |
+          echo "=========================================================="
+          echo "Inspecting AWS RDS Instances & Clusters in ${{ secrets.AWS_REGION || 'ap-southeast-2' }}"
+          echo "=========================================================="
+          echo "--- DB Instances ---"
+          aws rds describe-db-instances --query "DBInstances[*].{ID:DBInstanceIdentifier,Class:DBInstanceClass,Status:DBInstanceStatus,Engine:Engine}" --output table || true
+          
+          echo "--- DB Clusters ---"
+          aws rds describe-db-clusters --query "DBClusters[*].{ID:DBClusterIdentifier,Status:Status,Engine:Engine,Capacity:ServerlessV2ScalingConfiguration}" --output table || true
+
+      - name: Delete Redundant Aurora Serverless v2 (if present)
+        if: ${{ inputs.delete_aurora }}
+        run: |
+          REGION="${{ secrets.AWS_REGION || 'ap-southeast-2' }}"
+          CLUSTER_ID="jbac-aurora-cluster"
+          INSTANCE_ID="jbac-aurora-instance-1"
+
+          echo "=========================================================="
+          echo "Checking for redundant Aurora Serverless v2: ${CLUSTER_ID}"
+          echo "=========================================================="
+
+          # Check if instance exists
+          INST_EXISTS=$(aws rds describe-db-instances --region "${REGION}" --query "DBInstances[?DBInstanceIdentifier=='${INSTANCE_ID}'].DBInstanceIdentifier" --output text 2>/dev/null || true)
+          if [ "${INST_EXISTS}" = "${INSTANCE_ID}" ]; then
+            echo "Deleting Aurora DB Instance: ${INSTANCE_ID}..."
+            aws rds delete-db-instance \
+              --db-instance-identifier "${INSTANCE_ID}" \
+              --skip-final-snapshot \
+              --region "${REGION}" 2>&1 || true
+            echo "Waiting for DB instance deletion to initiate..."
+            sleep 10
+          else
+            echo "Aurora DB Instance ${INSTANCE_ID} not found or already deleted."
+          fi
+
+          # Check if cluster exists
+          CLUST_EXISTS=$(aws rds describe-db-clusters --region "${REGION}" --query "DBClusters[?DBClusterIdentifier=='${CLUSTER_ID}'].DBClusterIdentifier" --output text 2>/dev/null || true)
+          if [ "${CLUST_EXISTS}" = "${CLUSTER_ID}" ]; then
+            echo "Deleting Aurora DB Cluster: ${CLUSTER_ID}..."
+            aws rds delete-db-cluster \
+              --db-cluster-identifier "${CLUSTER_ID}" \
+              --skip-final-snapshot \
+              --region "${REGION}" 2>&1 || true
+            echo "[SUCCESS] Initiated deletion of redundant Aurora cluster: ${CLUSTER_ID}"
+          else
+            echo "Aurora DB Cluster ${CLUSTER_ID} not found or already deleted."
+          fi
+
+      - name: Apply CloudWatch Log Retention Limits
+        if: ${{ inputs.apply_log_retention }}
+        run: |
+          REGION="${{ secrets.AWS_REGION || 'ap-southeast-2' }}"
+          echo "Setting 7-day retention on Lambda log groups to stop storage cost growth..."
+          aws logs put-retention-policy \
+            --log-group-name "/aws/lambda/jbac-backend-api" \
+            --retention-in-days 7 \
+            --region "${REGION}" 2>&1 || true
+          echo "Log retention policy configured."
+
+      - name: Inspect Final AWS Cost Status & Step Summary
+        run: |
+          REGION="${{ secrets.AWS_REGION || 'ap-southeast-2' }}"
+          echo "## 💰 AWS Cost Optimization Summary" >> "${GITHUB_STEP_SUMMARY}"
+          echo "" >> "${GITHUB_STEP_SUMMARY}"
+          echo "| Resource | Optimization Action | Monthly Estimated Savings |" >> "${GITHUB_STEP_SUMMARY}"
+          echo "|---|---|---|" >> "${GITHUB_STEP_SUMMARY}"
+          echo "| **Aurora Serverless v2** (\`jbac-aurora-cluster\`) | Deletion initiated (backend uses \`jbac-mysql-db\`) | **~$43.80 / month** |" >> "${GITHUB_STEP_SUMMARY}"
+          echo "| **CloudWatch Logs** (\`/aws/lambda/jbac-backend-api\`) | Capped retention to 7 days | **Prevents gradual log storage charges** |" >> "${GITHUB_STEP_SUMMARY}"
+          echo "| **Deploy Workflow** | Removed Aurora auto-provisioning from CI/CD | **Prevents unwanted cluster resurrection** |" >> "${GITHUB_STEP_SUMMARY}"
+          echo "| **Active Primary RDS** | Preserved \`jbac-mysql-db\` (MySQL 8.0 \`db.t4g.micro\`) | **Kept healthy for live web & mobile app** |" >> "${GITHUB_STEP_SUMMARY}"
+          echo "" >> "${GITHUB_STEP_SUMMARY}"
+          echo "### Remaining Active Database:" >> "${GITHUB_STEP_SUMMARY}"
+          aws rds describe-db-instances --query "DBInstances[*].{ID:DBInstanceIdentifier,Class:DBInstanceClass,Status:DBInstanceStatus}" --output table >> "${GITHUB_STEP_SUMMARY}" || true

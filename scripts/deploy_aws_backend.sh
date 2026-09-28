@@ -272,6 +272,7 @@ echo "" >> diagnostics.txt
 
 echo "=== CLOUDWATCH LOGS ===" >> diagnostics.txt
 sleep 4
+aws logs put-retention-policy --log-group-name "/aws/lambda/${FUNCTION_NAME}" --retention-in-days 7 --region "${REGION}" 2>&1 || true
 aws logs filter-log-events --log-group-name "/aws/lambda/${FUNCTION_NAME}" --limit 30 --region "${REGION}" --query "events[*].message" --output text >> diagnostics.txt 2>&1 || true
 
 echo "=== LAMBDA RESOURCE POLICY ===" >> diagnostics.txt
