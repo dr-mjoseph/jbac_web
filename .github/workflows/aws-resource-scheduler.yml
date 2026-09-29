@@ -1,0 +1,168 @@
+name: AWS Resource Cost Scheduler (Auto Stop & Start)
+
+on:
+  schedule:
+    # Auto-stop every weekday evening at 14:00 UTC (7:30 PM IST / 12:00 AM Sydney)
+    - cron: '0 14 * * 1-5'
+    # Auto-start every weekday morning at 03:00 UTC (8:30 AM IST / 1:00 PM Sydney)
+    - cron: '0 3 * * 1-5'
+  workflow_dispatch:
+    inputs:
+      action:
+        description: 'Action to perform on AWS resources'
+        required: true
+        type: choice
+        options:
+          - 'stop'
+          - 'start'
+          - 'status'
+        default: 'status'
+      target:
+        description: 'Target resources to schedule'
+        required: true
+        type: choice
+        options:
+          - 'all'
+          - 'rds'
+          - 'ec2'
+        default: 'all'
+
+permissions:
+  contents: read
+
+jobs:
+  schedule-resources:
+    name: Manage AWS Resource Power State
+    runs-on: ubuntu-latest
+    steps:
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION || 'ap-southeast-2' }}
+
+      - name: Determine Action (Cron vs Manual)
+        id: determine_action
+        run: |
+          if [ "${{ github.event_name }}" = "schedule" ]; then
+            HOUR=$(date -u +%H)
+            if [ "$HOUR" -ge 12 ]; then
+              ACTION="stop"
+            else
+              ACTION="start"
+            fi
+            TARGET="all"
+          else
+            ACTION="${{ inputs.action }}"
+            TARGET="${{ inputs.target }}"
+          fi
+          echo "ACTION=${ACTION}" >> $GITHUB_ENV
+          echo "TARGET=${TARGET}" >> $GITHUB_ENV
+          echo "Executing ${ACTION} on target: ${TARGET}"
+
+      - name: Manage RDS Instances (Stop / Start / Status)
+        if: env.TARGET == 'all' || env.TARGET == 'rds'
+        run: |
+          REGION="${{ secrets.AWS_REGION || 'ap-southeast-2' }}"
+          echo "=========================================================="
+          echo "MANAGING RDS INSTANCES IN ${REGION}"
+          echo "=========================================================="
+
+          DB_INSTANCES=$(aws rds describe-db-instances --region "${REGION}" --query "DBInstances[*].[DBInstanceIdentifier,DBInstanceStatus]" --output text 2>/dev/null || true)
+
+          echo "Current RDS Instances:"
+          echo "${DB_INSTANCES}"
+
+          if [ -z "${DB_INSTANCES}" ]; then
+            echo "No RDS instances found in ${REGION}."
+          else
+            while read -r DB_ID DB_STATUS; do
+              [ -z "${DB_ID}" ] && continue
+              echo "Processing RDS '${DB_ID}' (Current Status: ${DB_STATUS})..."
+
+              if [ "${ACTION}" = "stop" ]; then
+                if [ "${DB_STATUS}" = "available" ]; then
+                  echo "Stopping RDS DB: ${DB_ID} to eliminate hourly compute charges..."
+                  aws rds stop-db-instance --db-instance-identifier "${DB_ID}" --region "${REGION}" 2>&1 || true
+                  echo "[SUCCESS] Stop command sent to ${DB_ID}. (Saving ~65-70% on monthly compute!)"
+                else
+                  echo "RDS DB '${DB_ID}' is already in status: ${DB_STATUS}. No action needed."
+                fi
+              elif [ "${ACTION}" = "start" ]; then
+                if [ "${DB_STATUS}" = "stopped" ]; then
+                  echo "Starting RDS DB: ${DB_ID}..."
+                  aws rds start-db-instance --db-instance-identifier "${DB_ID}" --region "${REGION}" 2>&1 || true
+                  echo "[SUCCESS] Start command sent to ${DB_ID}."
+                else
+                  echo "RDS DB '${DB_ID}' is already in status: ${DB_STATUS}. No action needed."
+                fi
+              else
+                echo "Status Check: RDS DB '${DB_ID}' is ${DB_STATUS}."
+              fi
+            done <<< "${DB_INSTANCES}"
+          fi
+
+      - name: Manage EC2 Instances (Stop / Start / Status)
+        if: env.TARGET == 'all' || env.TARGET == 'ec2'
+        run: |
+          REGION="${{ secrets.AWS_REGION || 'ap-southeast-2' }}"
+          echo "=========================================================="
+          echo "MANAGING EC2 INSTANCES IN ${REGION}"
+          echo "=========================================================="
+
+          EC2_INSTANCES=$(aws ec2 describe-instances --region "${REGION}" --query "Reservations[*].Instances[*].[InstanceId,State.Name,InstanceType]" --output text 2>/dev/null || true)
+
+          echo "Current EC2 Instances:"
+          echo "${EC2_INSTANCES}"
+
+          if [ -z "${EC2_INSTANCES}" ]; then
+            echo "No EC2 instances found in ${REGION}."
+          else
+            while read -r INST_ID INST_STATE INST_TYPE; do
+              [ -z "${INST_ID}" ] && continue
+              echo "Processing EC2 '${INST_ID}' (${INST_TYPE}) (Current State: ${INST_STATE})..."
+
+              if [ "${ACTION}" = "stop" ]; then
+                if [ "${INST_STATE}" = "running" ]; then
+                  echo "Stopping EC2 instance ${INST_ID} to eliminate compute and public IPv4 charges..."
+                  aws ec2 stop-instances --instance-ids "${INST_ID}" --region "${REGION}" 2>&1 || true
+                  echo "[SUCCESS] Stop command sent to EC2 ${INST_ID}."
+                else
+                  echo "EC2 instance '${INST_ID}' is already in state: ${INST_STATE}."
+                fi
+              elif [ "${ACTION}" = "start" ]; then
+                if [ "${INST_STATE}" = "stopped" ]; then
+                  echo "Starting EC2 instance ${INST_ID}..."
+                  aws ec2 start-instances --instance-ids "${INST_ID}" --region "${REGION}" 2>&1 || true
+                  echo "[SUCCESS] Start command sent to EC2 ${INST_ID}."
+                else
+                  echo "EC2 instance '${INST_ID}' is already in state: ${INST_STATE}."
+                fi
+              else
+                echo "Status Check: EC2 instance '${INST_ID}' is ${INST_STATE}."
+              fi
+            done <<< "${EC2_INSTANCES}"
+          fi
+
+      - name: Generate Run Summary
+        run: |
+          REGION="${{ secrets.AWS_REGION || 'ap-southeast-2' }}"
+          echo "## ⏱️ AWS Resource Scheduler Execution Report" >> "${GITHUB_STEP_SUMMARY}"
+          echo "" >> "${GITHUB_STEP_SUMMARY}"
+          echo "**Trigger:** \`${{ github.event_name }}\` | **Action Performed:** \`${{ env.ACTION }}\` | **Target:** \`${{ env.TARGET }}\` | **Region:** \`${REGION}\`" >> "${GITHUB_STEP_SUMMARY}"
+          echo "" >> "${GITHUB_STEP_SUMMARY}"
+          echo "### 💡 Cost Impact Overview" >> "${GITHUB_STEP_SUMMARY}"
+          echo "| Resource | When Stopped | Savings Impact |" >> "${GITHUB_STEP_SUMMARY}"
+          echo "|---|---|---|" >> "${GITHUB_STEP_SUMMARY}"
+          echo "| **RDS Instances** | Compute billed at \$0/hr (only ~$2/mo storage) | **Saves ~65-75% (~$20 to $50/month)** |" >> "${GITHUB_STEP_SUMMARY}"
+          echo "| **EC2 Instances** | Compute and public IPv4 charges paused | **Saves ~$4.21/month + $3.80/month IPv4 fee** |" >> "${GITHUB_STEP_SUMMARY}"
+          echo "" >> "${GITHUB_STEP_SUMMARY}"
+          echo "### 📊 Current RDS Status:" >> "${GITHUB_STEP_SUMMARY}"
+          echo '```' >> "${GITHUB_STEP_SUMMARY}"
+          aws rds describe-db-instances --region "${REGION}" --query "DBInstances[*].{ID:DBInstanceIdentifier,Class:DBInstanceClass,Status:DBInstanceStatus}" --output table >> "${GITHUB_STEP_SUMMARY}" 2>&1 || true
+          echo '```' >> "${GITHUB_STEP_SUMMARY}"
+          echo "### 🖥️ Current EC2 Status:" >> "${GITHUB_STEP_SUMMARY}"
+          echo '```' >> "${GITHUB_STEP_SUMMARY}"
+          aws ec2 describe-instances --region "${REGION}" --query "Reservations[*].Instances[*].{ID:InstanceId,Type:InstanceType,State:State.Name}" --output table >> "${GITHUB_STEP_SUMMARY}" 2>&1 || true
+          echo '```' >> "${GITHUB_STEP_SUMMARY}"

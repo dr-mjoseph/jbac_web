@@ -243,4 +243,36 @@ However, in the mobile application (`jbac_app`), when users registered, logged i
    - Bash / CloudShell: [`scripts/cleanup_unused_aws_resources.sh`](scripts/cleanup_unused_aws_resources.sh)
    - PowerShell: [`aws/cleanup-unused-aws.ps1`](aws/cleanup-unused-aws.ps1)
 
+---
+
+## 10. AWS Cost Root-Cause Analysis & GitHub Actions Optimization (September 29, 2026)
+
+### Investigation of $83.55 Forecast Spend
+- **RDS: $73.89** (88.4% of total):
+  - Redundant Aurora Serverless v2 cluster (`jbac-aurora-cluster`) at 0.5 ACU baseline running 24/7 = ~$43.80/month.
+  - Primary MySQL instance (`jbac-mysql-db`) running 24/7 = ~$30.00/month.
+- **EC2 Instances: $4.21**:
+  - Running / idle EC2 instance in the account.
+- **VPC: $3.80**:
+  - AWS charge of $0.005/hour for Public IPv4 addresses (introduced Feb 2024 = $3.65/mo per IP) on EC2 or unattached Elastic IPs.
+- **Other: ~$1.65**: CloudWatch logs ($0.51), Amplify ($0.39), Secrets Manager ($0.29), S3 ($0.13).
+
+### AWS Service Control Policy (SCP) Investigation
+- Attempting to opt into **AWS Compute Optimizer** or **Cost Optimization Hub** returns:
+  `explicit deny in a service control policy: arn:aws:organizations::150474387062:policy/o-5exe5g5ucp/service_control_policy/p-hk4u5xlh`
+- **Root Cause**: The AWS Account (`298363284024`) is a member of AWS Organization `o-5exe5g5ucp`. Organization-level SCP `p-hk4u5xlh` explicitly denies `compute-optimizer:*` and enrollment. In AWS IAM evaluation logic, an explicit Deny in an SCP overrides all account-level admin credentials and cannot be enabled via the AWS console or GitHub Actions.
+- **Resolution**: AWS Compute Optimizer is only a passive reporting tool that provides suggestions. Instead of depending on it, we implemented direct automated remediation and recommendations inside GitHub Actions.
+
+### Solutions Delivered
+1. **Upgraded [`.github/workflows/cleanup-aws-cost.yml`](.github/workflows/cleanup-aws-cost.yml)**:
+   - Built-in Cost Optimization Recommendations report rendered in GitHub Step Summary (replacing Compute Optimizer).
+   - One-click deletion of redundant Aurora Serverless v2 cluster (`jbac-aurora-cluster`) — saves ~$43.80/month.
+   - Auto-stops running EC2 instances and releases unattached Elastic IPs — saves ~$8.00/month.
+   - Enforces Single-AZ and 2-day backups on `jbac-mysql-db`.
+2. **Created [`.github/workflows/aws-resource-scheduler.yml`](.github/workflows/aws-resource-scheduler.yml)**:
+   - Weekday evening auto-stop cron (`0 14 * * 1-5`) and morning auto-start cron (`0 3 * * 1-5`).
+   - One-click manual trigger (`workflow_dispatch`) to Stop, Start, or check Status on demand.
+   - Pausing dev RDS outside testing hours saves an additional 65–70% (~$20/month).
+3. **Projected Bill Reduction**: Drops total monthly cost from **$83.55 down to ~$10 – $15/month** (over 80% to 90% savings).
+
 

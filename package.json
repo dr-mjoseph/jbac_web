@@ -11,6 +11,7 @@
     "sync:mobile": "node scripts/sync-to-mobile.js",
     "deploy:aws": "powershell -ExecutionPolicy Bypass -File ./aws/deploy.ps1",
     "import:db": "powershell -ExecutionPolicy Bypass -File ./aws/import-db.ps1",
+    "cost:clean": "powershell -ExecutionPolicy Bypass -File ./aws/cleanup-unused-aws.ps1",
     "post-build": "node./build/post-build.js"
   },
   "private": true,
