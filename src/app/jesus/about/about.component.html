@@ -119,7 +119,7 @@ style="text-align: right;color: rgb(0, 0, 0);font-weight: 500;font-family: cursi
                     </div>
                     <div class="col-lg-6">
                         <div class="about-img">
-                            <img src="{{item.image}}" alt="image" style="height:252px;width:250px;"
+                            <img [src]="item.image || 'assets/images/Aboutbanner.png'" (error)="$any($event.target).src = 'assets/images/Aboutbanner.png'" alt="image" style="height:252px;width:250px;"
                                 class="prevent-select">
                         </div>
                     </div>

@@ -215,9 +215,10 @@
                                 <ul class="cards">
                                     <li class="cards_item">
                                         <div class="card" tabindex="0">
-                                            <div class="card_image"><img src="{{item.image}}"
-                                                    (click)="openimg(item.image,openmodel)" alt="image"
-                                                    style="height:250px; width:250px;"></div>
+                                            <div class="card_image"><img [src]="item.image || 'assets/images/user.jpg'"
+                                                    (error)="$any($event.target).src = 'assets/images/user.jpg'"
+                                                    (click)="openimg(item.image || 'assets/images/user.jpg',openmodel)" alt="image"
+                                                    style="height:250px; width:250px; object-fit: cover;"></div>
                                             <div class="card_content">
                                                 <div class="card_text">
 

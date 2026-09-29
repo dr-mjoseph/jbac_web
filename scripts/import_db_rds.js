@@ -18,10 +18,13 @@ async function main() {
       port,
       user,
       password,
+      charset: 'utf8mb4',
       multipleStatements: true,
       connectTimeout: 20000
     });
-    console.log('[RDS INIT] Successfully connected to MySQL server!');
+    await connection.query('SET NAMES utf8mb4 COLLATE utf8mb4_unicode_ci;');
+    await connection.query('SET CHARACTER SET utf8mb4;');
+    console.log('[RDS INIT] Successfully connected to MySQL server with utf8mb4 charset!');
   } catch (connErr) {
     console.error('[RDS INIT ERROR] Connection failed:', connErr.message);
     return;

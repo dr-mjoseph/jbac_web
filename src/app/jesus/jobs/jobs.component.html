@@ -172,8 +172,10 @@
                                     <li class="cards_item">
                                         <div class="card" tabindex="0">
                                             <div class="card_image">
-                                                <img src="{{item.image}}" (click)="openimg(item.image,openmodel)"
-                                                    alt="image" style="height:250px; width:250px;">
+                                                <img [src]="item.image || 'assets/images/user.jpg'"
+                                                    (error)="$any($event.target).src = 'assets/images/user.jpg'"
+                                                    (click)="openimg(item.image || 'assets/images/user.jpg', openmodel)"
+                                                    alt="Job Image" style="height:250px; width:250px; object-fit: cover;">
                                             </div>
                                             <div class="card_content">
                                                 <div class="card_text">
@@ -229,8 +231,9 @@
                             <article>
                                 <div class="article-wrapper">
                                     <div class="article-body">
-                                        <img style="height:85%;width:100%;" src="{{item.image}}"
-                                            (click)="openimg(item.image,openmodel)" alt="image" alt="images. ">
+                                        <img style="height:85%;width:100%; object-fit: cover;" [src]="item.image || 'assets/images/user.jpg'"
+                                            (error)="$any($event.target).src = 'assets/images/user.jpg'"
+                                            (click)="openimg(item.image || 'assets/images/user.jpg',openmodel)" alt="image">
                                         <p style="color: black; padding:2%;">
                                             -- <b>{{item.description}}</b>
                                         </p>
