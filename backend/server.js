@@ -5,15 +5,12 @@ import cors from 'cors';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
-
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-
 const app = express();
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 app.use(cors());
-
 // Strip AWS API Gateway Stage / Basepath prefix if present
 app.use((req, _res, next) => {
     if (req.url.startsWith('/default/jbac-backend-api')) {
@@ -21,7 +18,6 @@ app.use((req, _res, next) => {
     }
     next();
 });
-
 // Configure AWS Aurora RDS MySQL Connection
 const rawHost = process.env.DB_HOST;
 const dbHost = (rawHost && !rawHost.startsWith('://')) ? rawHost : 'jbac-mysql-db.cdeeuw0s2trf.ap-southeast-2.rds.amazonaws.com';
@@ -29,7 +25,6 @@ const dbUser = process.env.DB_USER || 'admin';
 const dbPassword = process.env.DB_PASSWORD || 'biUt2TrZ9EZAqn6GXhiA';
 const dbName = (process.env.DB_NAME && process.env.DB_NAME !== 'sys') ? process.env.DB_NAME : 'jbac_jbac';
 const dbPort = Number(process.env.DB_PORT) || 3306;
-
 const db = mysql.createPool({
     host: dbHost,
     port: dbPort,
@@ -42,7 +37,6 @@ const db = mysql.createPool({
     enableKeepAlive: true,
     keepAliveInitialDelay: 10000
 });
-
 // Whitelist of valid database tables
 const VALID_TABLES = new Set([
     'indian-states', 'sheet1', 'about_tbl', 'adds_data', 'attacks', 'banner_dlt_t',
@@ -61,35 +55,40 @@ const VALID_TABLES = new Set([
     'news', 'help_requests', 'business', 'meetings', 'believers', 'pastors',
     'churches', 'students', 'organisations', 'pastor_associations', 'ministries'
 ]);
-
 function isValidTable(table) {
     return VALID_TABLES.has(table.toLowerCase());
 }
-
 function extractUploadedImage(body) {
-    if (!body) return '';
-    if (typeof body === 'string') return body.trim();
-    if (typeof body.image === 'string' && body.image.trim()) return body.image.trim();
-    if (typeof body.reviewimg === 'string' && body.reviewimg.trim()) return body.reviewimg.trim();
-    if (typeof body.reviewImg === 'string' && body.reviewImg.trim()) return body.reviewImg.trim();
-
+    if (!body)
+        return '';
+    if (typeof body === 'string')
+        return body.trim();
+    if (typeof body.image === 'string' && body.image.trim())
+        return body.image.trim();
+    if (typeof body.reviewimg === 'string' && body.reviewimg.trim())
+        return body.reviewimg.trim();
+    if (typeof body.reviewImg === 'string' && body.reviewImg.trim())
+        return body.reviewImg.trim();
     const candidates = [body.reviewImg, body.reviewimg, body.imagesData, body.images, body.image, body.imagedata];
     for (const cand of candidates) {
         if (Array.isArray(cand) && cand.length > 0) {
             const first = cand[0];
-            if (typeof first === 'string' && first.trim()) return first.trim();
+            if (typeof first === 'string' && first.trim())
+                return first.trim();
             if (first && typeof first === 'object') {
                 const val = first.reviewimg || first.reviewImg || first.image || first.url || first.src || '';
-                if (typeof val === 'string' && val.trim()) return val.trim();
+                if (typeof val === 'string' && val.trim())
+                    return val.trim();
             }
-        } else if (cand && typeof cand === 'object') {
+        }
+        else if (cand && typeof cand === 'object') {
             const val = cand.reviewimg || cand.reviewImg || cand.image || cand.url || cand.src || '';
-            if (typeof val === 'string' && val.trim()) return val.trim();
+            if (typeof val === 'string' && val.trim())
+                return val.trim();
         }
     }
     return '';
 }
-
 // Dynamic insert helper: matches input fields to real table columns
 async function dynamicInsert(tableName, data) {
     try {
@@ -98,7 +97,6 @@ async function dynamicInsert(tableName, data) {
         for (const c of cols) {
             colMap.set(c.Field.toLowerCase(), c.Field);
         }
-
         // Auto-extract image if table has image column and data has reviewImg/imagesData
         if (colMap.has('image') && (!data.image || typeof data.image === 'object' || Array.isArray(data.image))) {
             const extracted = extractUploadedImage(data);
@@ -112,11 +110,9 @@ async function dynamicInsert(tableName, data) {
                 data.photo = extracted;
             }
         }
-
         const fields = [];
         const placeholders = [];
         const values = [];
-
         for (const [k, v] of Object.entries(data)) {
             const lk = k.toLowerCase();
             if (lk !== 'id' && colMap.has(lk)) {
@@ -126,16 +122,17 @@ async function dynamicInsert(tableName, data) {
                 values.push(typeof v === 'object' && v !== null ? JSON.stringify(v) : (v === undefined ? null : v));
             }
         }
-        if (fields.length === 0) return null;
+        if (fields.length === 0)
+            return null;
         const sql = `INSERT INTO \`${tableName}\` (${fields.join(',')}) VALUES (${placeholders.join(',')})`;
         const [res] = await db.query(sql, values);
         return res;
-    } catch (e) {
+    }
+    catch (e) {
         console.error(`dynamicInsert error in ${tableName}:`, e.message);
         throw e;
     }
 }
-
 // -------------------------------------------------------------
 // 1. UNIVERSAL CRUD REST API
 // -------------------------------------------------------------
@@ -162,11 +159,11 @@ app.get(['/api/tables', '/dashboardapi/tables', '/tables'], async (_req, res) =>
             tables: tableList,
             data: tableList
         });
-    } catch (err) {
+    }
+    catch (err) {
         res.status(500).json({ status: 500, error: err.message });
     }
 });
-
 // Interactive Web Database Cockpit UI
 app.get(['/admin-db', '/api/admin-db', '/dashboardapi/admin-db', '/api/admin-database-view'], (_req, res) => {
     res.setHeader('Content-Type', 'text/html; charset=utf-8');
@@ -175,10 +172,10 @@ app.get(['/admin-db', '/api/admin-db', '/dashboardapi/admin-db', '/api/admin-dat
         if (fs.existsSync(htmlPath)) {
             return res.send(fs.readFileSync(htmlPath, 'utf8'));
         }
-    } catch (_) {}
+    }
+    catch (_) { }
     res.send('<!DOCTYPE html><html><body><h2>JBAC Database Cockpit</h2><p>Please visit <a href="/dashboardapi/tables">/dashboardapi/tables</a> for JSON view.</p></body></html>');
 });
-
 app.get(['/api/crud/:table', '/dashboardapi/crud/:table', '/crud/:table'], async (req, res) => {
     const table = req.params.table;
     if (!isValidTable(table)) {
@@ -205,11 +202,11 @@ app.get(['/api/crud/:table', '/dashboardapi/crud/:table', '/crud/:table'], async
         const [countResult] = await db.query(`SELECT COUNT(*) as total FROM \`${table}\` ${whereClause}`, queryParams.slice(0, filters.length)).catch(() => [[{ total: rows.length }]]);
         const total = countResult && countResult[0] ? Number(countResult[0].total) : rows.length;
         res.json({ status: 200, table, total, limit, offset, count: rows.length, data: rows });
-    } catch (err) {
+    }
+    catch (err) {
         res.status(500).json({ status: 500, error: err.message });
     }
 });
-
 app.get(['/api/crud/:table/:id', '/dashboardapi/crud/:table/:id', '/crud/:table/:id'], async (req, res) => {
     const table = req.params.table;
     const id = req.params.id;
@@ -222,52 +219,51 @@ app.get(['/api/crud/:table/:id', '/dashboardapi/crud/:table/:id', '/crud/:table/
             return res.status(404).json({ status: 404, message: `Record with ID ${id} not found in ${table}` });
         }
         res.json({ status: 200, table, data: rows[0] });
-    } catch (err) {
+    }
+    catch (err) {
         res.status(500).json({ status: 500, error: err.message });
     }
 });
-
 // -------------------------------------------------------------
 // 2. FRONTEND SERVICE BRIDGES & PRODUCTION API ENDPOINTS
 // -------------------------------------------------------------
-
 // Master Lookups: Denominations, Districts, Constituencies, Mandals, Panchayats
 app.all(['/dashboardapi/denomations', '/api/denominations', '/denominations'], async (_req, res) => {
     try {
         const [rows] = await db.query('SELECT id, denomation_name, denomation_name as denomination_name, d_in FROM churchdenomation WHERE d_in = 0 ORDER BY denomation_name ASC');
         res.json({ status: 200, data: rows });
-    } catch (err) {
+    }
+    catch (err) {
         res.status(500).json({ status: 500, error: err.message });
     }
 });
-
 app.all(['/dashboardapi/leaderlevels', '/api/leaderlevels', '/leaderlevels'], async (_req, res) => {
     try {
         const [rows] = await db.query('SELECT id, level, level as level_name, d_in FROM leaderlevel WHERE d_in = 0 ORDER BY id ASC');
         res.json({ status: 200, data: rows });
-    } catch (err) {
+    }
+    catch (err) {
         res.status(500).json({ status: 500, error: err.message });
     }
 });
-
 app.all(['/dashboardapi/educationalq', '/api/educationalq', '/educationalq'], async (_req, res) => {
     try {
         const [rows] = await db.query('SELECT id, name, name as qualification_name, name as qualification, d_in FROM education WHERE d_in = 0 ORDER BY id ASC');
         res.json({ status: 200, data: rows });
-    } catch (err) {
+    }
+    catch (err) {
         res.status(500).json({ status: 500, error: err.message });
     }
 });
-
 app.all(['/dashboardapi/getdistricts', '/dashboardapi/getmdistricts', '/api/districts', '/districts'], async (_req, res) => {
     try {
         const [rows] = await db.query('SELECT id, distrct_nm, distrct_nm as districtname, distrct_nm as district_name, d_in FROM dstrct WHERE d_in = 0 ORDER BY distrct_nm ASC');
         res.json({ status: 200, data: rows });
-    } catch (err) {
+    }
+    catch (err) {
         res.status(500).json({ status: 500, error: err.message });
     }
 });
-
 app.all(['/dashboardapi/getconsistencys', '/dashboardapi/getmconsistencys', '/api/constituencies', '/constituencies'], async (req, res) => {
     try {
         const districtId = req.query.district_id || req.body?.district_id || req.body?.dstrct_id;
@@ -280,11 +276,11 @@ app.all(['/dashboardapi/getconsistencys', '/dashboardapi/getmconsistencys', '/ap
         sql += ' ORDER BY const_nm ASC';
         const [rows] = await db.query(sql, params);
         res.json({ status: 200, data: rows });
-    } catch (err) {
+    }
+    catch (err) {
         res.status(500).json({ status: 500, error: err.message });
     }
 });
-
 app.all(['/dashboardapi/getmandals', '/dashboardapi/getmmandals', '/api/mandals', '/mandals'], async (req, res) => {
     try {
         const constId = req.query.const_id || req.body?.const_id || req.body?.constituency_id;
@@ -297,11 +293,11 @@ app.all(['/dashboardapi/getmandals', '/dashboardapi/getmmandals', '/api/mandals'
         sql += ' ORDER BY mndl_nm ASC';
         const [rows] = await db.query(sql, params);
         res.json({ status: 200, data: rows });
-    } catch (err) {
+    }
+    catch (err) {
         res.status(500).json({ status: 500, error: err.message });
     }
 });
-
 app.all(['/dashboardapi/gepanchayati', '/dashboardapi/gempanchayati', '/api/panchayats', '/panchayats'], async (req, res) => {
     try {
         const mandalId = req.query.mandal_id || req.body?.mandal_id || req.body?.mndl_id;
@@ -317,20 +313,20 @@ app.all(['/dashboardapi/gepanchayati', '/dashboardapi/gempanchayati', '/api/panc
         }
         const [rows] = await db.query(sql, params);
         res.json({ status: 200, data: rows });
-    } catch (err) {
+    }
+    catch (err) {
         res.status(500).json({ status: 500, error: err.message });
     }
 });
-
 app.all(['/dashboardapi/getservices', '/api/services', '/services'], async (_req, res) => {
     try {
         const [rows] = await db.query('SELECT id, servicename, servicename as service_name, servicename as name, d_in FROM services WHERE d_in = 0 ORDER BY servicename ASC');
         res.json({ status: 200, data: rows });
-    } catch (err) {
+    }
+    catch (err) {
         res.status(500).json({ status: 500, error: err.message });
     }
 });
-
 app.all(['/dashboardapi/addNew', '/api/addNew', '/addNew'], async (req, res) => {
     try {
         const serviceName = req.body?.service_name || req.body?.servicename || req.body?.name;
@@ -343,55 +339,66 @@ app.all(['/dashboardapi/addNew', '/api/addNew', '/addNew'], async (req, res) => 
         }
         await db.query('INSERT INTO services (servicename, d_in) VALUES (?, 0)', [serviceName]);
         res.json({ status: 200, message: 'Service Added Successfully' });
-    } catch (err) {
+    }
+    catch (err) {
         res.status(500).json({ status: 500, error: err.message });
     }
 });
-
 app.all(['/dashboardapi/getwing', '/api/wings', '/wings'], async (_req, res) => {
     try {
         const [rows] = await db.query('SELECT id, position, position as name, position as position, position as wingname, d_in FROM wingleaderstype WHERE d_in = 0 ORDER BY id ASC');
         res.json({ status: 200, data: rows });
-    } catch (err) {
+    }
+    catch (err) {
         res.status(500).json({ status: 500, error: err.message });
     }
 });
-
 // About & Foundation Information
 app.all(['/dashboardapi/getaboutwebsite', '/api/about'], async (_req, res) => {
     try {
         const [rows] = await db.query('SELECT id, title, title as name, para1, para2, para3, para1 as description, para1 as aboutus, image, d_in FROM about_tbl LIMIT 1');
         if (rows && rows.length > 0) {
             res.json({ status: 200, data: rows });
-        } else {
+        }
+        else {
             res.json({
                 status: 200,
                 data: [{
-                    title: 'About Jesus Believers All Community (JBAC)',
-                    description: 'JBAC is dedicated to connecting, supporting, and uniting believers, pastors, churches, ministries, students, and Christian organisations across Andhra Pradesh and beyond.'
-                }]
+                        title: 'About Jesus Believers All Community (JBAC)',
+                        description: 'JBAC is dedicated to connecting, supporting, and uniting believers, pastors, churches, ministries, students, and Christian organisations across Andhra Pradesh and beyond.'
+                    }]
             });
         }
-    } catch (err) {
+    }
+    catch (err) {
         res.status(500).json({ status: 500, error: err.message });
     }
 });
-
 // Events & Meetings (AddMeetings, Events, Revival, Youth, Women, Pastors)
-app.all(['/api/events', '/dashboardapi/getevents', '/dashboardapi/getupdateevents', '/api/getupdateevents'], async (_req, res) => {
+app.all(['/api/events', '/dashboardapi/getevents', '/dashboardapi/getupdateevents', '/api/getupdateevents'], async (req, res) => {
     try {
-        const [eventsRows] = await db.query('SELECT id, eventname as title, eventname, eventname as event_name, orgname, meetsize, description, startdate, startdate as event_date, enddate, starttime, starttime as event_time, endtime, location, address, facebook, youtube, phone, image, speaker1, speaker2, speaker3, speaker4, district_id, constituency_id, mandal_id, panchayat_id FROM events WHERE d_in = 0 ORDER BY id DESC');
+        const isCurrentDateOnly = req.query?.current_date_only === 'true' || req.body?.current_date_only === true;
+        const showAll = req.query?.all === 'true' || req.body?.all === true || req.query?.admin === 'true';
+        let sql = 'SELECT id, eventname as title, eventname, eventname as event_name, orgname, meetsize, description, startdate, startdate as event_date, enddate, starttime, starttime as event_time, endtime, location, address, facebook, youtube, phone, eventcontactnumber, image, speaker1, speaker2, speaker3, speaker4, district_id, constituency_id, mandal_id, panchayat_id FROM events WHERE d_in = 0';
+        if (isCurrentDateOnly) {
+            sql += ' AND ((startdate <= CURDATE() AND (enddate >= CURDATE() OR enddate IS NULL OR enddate = "")) OR startdate = CURDATE())';
+        }
+        else if (!showAll) {
+            // By default hide old meetings where enddate < CURDATE()
+            sql += ' AND ((enddate IS NOT NULL AND enddate != "" AND enddate >= CURDATE()) OR ((enddate IS NULL OR enddate = "") AND (startdate IS NULL OR startdate >= CURDATE())))';
+        }
+        sql += ' ORDER BY id DESC';
+        const [eventsRows] = await db.query(sql);
         res.json({ status: 200, data: eventsRows });
-    } catch (err) {
+    }
+    catch (err) {
         res.status(500).json({ status: 500, error: err.message });
     }
 });
-
-app.post(['/dashboardapi/postmeetings', '/api/postmeetings'], async (req, res) => {
+app.post(['/dashboardapi/postmeetings', '/dashboardapi/postchuechmeetings', '/dashboardapi/postchurchmeetings', '/api/postmeetings'], async (req, res) => {
     try {
         const m = req.body;
         const img = extractUploadedImage(m);
-        
         const eventData = {
             eventname: m.mettingtype || m.eventname || 'Meeting',
             speaker1: m.speakerone || m.speaker1 || '',
@@ -422,7 +429,6 @@ app.post(['/dashboardapi/postmeetings', '/api/postmeetings'], async (req, res) =
             d_in: 0
         };
         const result = await dynamicInsert('events', eventData);
-
         // Also add to adds_data so meetings show in search & banner lists
         try {
             await dynamicInsert('adds_data', {
@@ -435,73 +441,96 @@ app.post(['/dashboardapi/postmeetings', '/api/postmeetings'], async (req, res) =
                 d_in: 0,
                 approval_ind: 1
             });
-        } catch (_) {}
-
+        }
+        catch (_) { }
         res.json({ status: 200, message: 'Meeting scheduled successfully', insertId: result?.insertId });
-    } catch (err) {
+    }
+    catch (err) {
         res.status(500).json({ status: 500, error: err.message });
     }
 });
-
-app.all(['/dashboardapi/searchingdata', '/api/searchingdata'], async (req, res) => {
+const searchMeetingsHandler = async (req, res) => {
     try {
         const body = req.body || {};
         let sql = 'SELECT id, eventname as title, eventname, eventname as event_name, orgname, meetsize, description, startdate, startdate as event_date, enddate, starttime, starttime as event_time, endtime, location, address, facebook, youtube, phone, eventcontactnumber, image, speaker1, speaker2, speaker3, speaker4, district_id, constituency_id, mandal_id, panchayat_id FROM events WHERE d_in = 0';
         const params = [];
-        
-        if (body.district_id) { sql += ' AND district_id = ?'; params.push(body.district_id); }
-        if (body.constenncy_id || body.constituency_id) { sql += ' AND constituency_id = ?'; params.push(body.constenncy_id || body.constituency_id); }
-        if (body.mandal_id || body.mandals) { sql += ' AND mandal_id = ?'; params.push(body.mandal_id || body.mandals); }
-        if (body.village_id || body.panchayat_id) { sql += ' AND panchayat_id = ?'; params.push(body.village_id || body.panchayat_id); }
-        if (body.denomation_id || body.denomation) { sql += ' AND denomation_id = ?'; params.push(body.denomation_id || body.denomation); }
-        if (body.mettingtype) { sql += ' AND (LOWER(eventname) LIKE ? OR eventname = ?)'; params.push(`%${body.mettingtype}%`, body.mettingtype); }
-        if (body.speakerone) { sql += ' AND (speaker1 LIKE ? OR speaker2 LIKE ?)'; params.push(`%${body.speakerone}%`, `%${body.speakerone}%`); }
-        if (body.fromdate) { sql += ' AND startdate >= ?'; params.push(body.fromdate); }
-        if (body.todate) { sql += ' AND startdate <= ?'; params.push(body.todate); }
-
+        if (body.district_id) {
+            sql += ' AND district_id = ?';
+            params.push(body.district_id);
+        }
+        if (body.constenncy_id || body.constituency_id) {
+            sql += ' AND constituency_id = ?';
+            params.push(body.constenncy_id || body.constituency_id);
+        }
+        if (body.mandal_id || body.mandals) {
+            sql += ' AND mandal_id = ?';
+            params.push(body.mandal_id || body.mandals);
+        }
+        if (body.village_id || body.panchayat_id || body.panchayati_id) {
+            sql += ' AND panchayat_id = ?';
+            params.push(body.village_id || body.panchayat_id || body.panchayati_id);
+        }
+        if (body.denomation_id || body.denomation) {
+            sql += ' AND denomation_id = ?';
+            params.push(body.denomation_id || body.denomation);
+        }
+        if (body.ministry_id) {
+            sql += ' AND ministry_id = ?';
+            params.push(body.ministry_id);
+        }
+        if (body.mettingtype) {
+            sql += ' AND (LOWER(eventname) LIKE ? OR eventname = ?)';
+            params.push(`%${body.mettingtype}%`, body.mettingtype);
+        }
+        if (body.speakerone) {
+            sql += ' AND (speaker1 LIKE ? OR speaker2 LIKE ?)';
+            params.push(`%${body.speakerone}%`, `%${body.speakerone}%`);
+        }
+        if (body.startdate) {
+            // Match event that covers this date
+            sql += ' AND ((startdate <= ? AND (enddate >= ? OR enddate IS NULL OR enddate = "")) OR startdate = ?)';
+            params.push(body.startdate, body.startdate, body.startdate);
+        }
+        else if (body.current_date_only) {
+            sql += ' AND ((startdate <= CURDATE() AND (enddate >= CURDATE() OR enddate IS NULL OR enddate = "")) OR startdate = CURDATE())';
+        }
+        else if (body.show_old !== true) {
+            // By default hide old past meetings
+            sql += ' AND ((enddate IS NOT NULL AND enddate != "" AND enddate >= CURDATE()) OR ((enddate IS NULL OR enddate = "") AND (startdate IS NULL OR startdate >= CURDATE())))';
+        }
+        if (body.fromdate) {
+            sql += ' AND startdate >= ?';
+            params.push(body.fromdate);
+        }
+        if (body.todate) {
+            sql += ' AND startdate <= ?';
+            params.push(body.todate);
+        }
         sql += ' ORDER BY id DESC';
         const [rows] = await db.query(sql, params);
         res.json({ status: 200, data: rows });
-    } catch (err) {
+    }
+    catch (err) {
         res.status(500).json({ status: 500, error: err.message });
     }
-});
-
-app.all(['/dashboardapi/searchingdemonationdata', '/api/searchingdemonationdata'], async (req, res) => {
-    try {
-        const body = req.body || {};
-        let sql = 'SELECT id, eventname as title, eventname, eventname as event_name, orgname, meetsize, description, startdate, startdate as event_date, enddate, starttime, starttime as event_time, endtime, location, address, facebook, youtube, phone, eventcontactnumber, image, speaker1, speaker2, speaker3, speaker4, district_id, constituency_id, mandal_id, panchayat_id FROM events WHERE d_in = 0';
-        const params = [];
-        
-        if (body.denomation) { sql += ' AND denomation_id = ?'; params.push(body.denomation); }
-        if (body.mettingtype) { sql += ' AND (LOWER(eventname) LIKE ? OR eventname = ?)'; params.push(`%${body.mettingtype}%`, body.mettingtype); }
-        if (body.speakerone) { sql += ' AND (speaker1 LIKE ? OR speaker2 LIKE ?)'; params.push(`%${body.speakerone}%`, `%${body.speakerone}%`); }
-        if (body.ministry_id) { sql += ' AND ministry_id = ?'; params.push(body.ministry_id); }
-
-        sql += ' ORDER BY id DESC';
-        const [rows] = await db.query(sql, params);
-        res.json({ status: 200, data: rows });
-    } catch (err) {
-        res.status(500).json({ status: 500, error: err.message });
-    }
-});
-
+};
+app.all(['/dashboardapi/searchingdata', '/api/searchingdata'], searchMeetingsHandler);
+app.all(['/dashboardapi/searchingdemonation', '/dashboardapi/searchingdemonationdata', '/api/searchingdemonation', '/api/searchingdemonationdata'], searchMeetingsHandler);
 const getMeetingHandler = (type) => async (_req, res) => {
     try {
         const [rows] = await db.query('SELECT id, eventname as mettingtype, speaker1 as speakerone, speaker2 as speakertwo, speaker3 as speakerthree, speaker4 as speakerfour, startdate as fromdate, enddate as todate, starttime as fromtime, endtime as totime, image, district_id as districtname, constituency_id as constituencyname, mandal_id as mandals, panchayat_id as village_name, description, address, location, facebook, youtube, denomation_id as denomation, user_id as usr_id FROM events WHERE d_in = 0 AND (LOWER(eventname) LIKE ? OR LOWER(description) LIKE ?) ORDER BY id DESC', [`%${type}%`, `%${type}%`]);
         res.json({ status: 200, data: rows });
-    } catch (err) {
+    }
+    catch (err) {
         res.status(500).json({ status: 500, error: err.message });
     }
 };
-
 app.all(['/dashboardapi/getrevival', '/api/getrevival'], getMeetingHandler('revival'));
 app.all(['/dashboardapi/getyouth', '/api/getyouth'], getMeetingHandler('youth'));
 app.all(['/dashboardapi/getwomen', '/api/getwomen'], getMeetingHandler('women'));
 app.all(['/dashboardapi/getpastormeeting', '/api/getpastormeeting'], getMeetingHandler('pastor'));
 app.all(['/dashboardapi/getchildern', '/api/getchildern'], getMeetingHandler('child'));
 app.all(['/dashboardapi/getmusical', '/api/getmusical'], getMeetingHandler('musical'));
-
 // Ads & Classifieds
 app.post(['/dashboardapi/postadds', '/api/postadds'], async (req, res) => {
     try {
@@ -518,20 +547,20 @@ app.post(['/dashboardapi/postadds', '/api/postadds'], async (req, res) => {
             approval_ind: 0
         });
         res.json({ status: 200, message: 'Ad created successfully', insertId: result?.insertId });
-    } catch (err) {
+    }
+    catch (err) {
         res.status(500).json({ status: 500, error: err.message });
     }
 });
-
 app.all(['/dashboardapi/getaddsdata', '/api/getadds'], async (_req, res) => {
     try {
         const [rows] = await db.query('SELECT * FROM adds_data WHERE d_in = 0 ORDER BY id DESC');
         res.json({ status: 200, data: rows });
-    } catch (err) {
+    }
+    catch (err) {
         res.status(500).json({ status: 500, error: err.message });
     }
 });
-
 // News Management
 app.post(['/dashboardapi/postnews', '/api/postnews'], async (req, res) => {
     try {
@@ -547,20 +576,20 @@ app.post(['/dashboardapi/postnews', '/api/postnews'], async (req, res) => {
             approval_ind: 0
         });
         res.json({ status: 200, message: 'News posted successfully', insertId: result?.insertId });
-    } catch (err) {
+    }
+    catch (err) {
         res.status(500).json({ status: 500, error: err.message });
     }
 });
-
 app.all(['/dashboardapi/getnews', '/api/getnews'], async (_req, res) => {
     try {
         const [rows] = await db.query('SELECT * FROM post_news WHERE d_in = 0 ORDER BY id DESC');
         res.json({ status: 200, data: rows });
-    } catch (err) {
+    }
+    catch (err) {
         res.status(500).json({ status: 500, error: err.message });
     }
 });
-
 // Helps & Welfare Assistance
 app.post(['/dashboardapi/posthelping', '/api/posthelping'], async (req, res) => {
     try {
@@ -576,20 +605,20 @@ app.post(['/dashboardapi/posthelping', '/api/posthelping'], async (req, res) => 
             approval_ind: 0
         });
         res.json({ status: 200, message: 'Help request submitted successfully', insertId: result?.insertId });
-    } catch (err) {
+    }
+    catch (err) {
         res.status(500).json({ status: 500, error: err.message });
     }
 });
-
 app.all(['/dashboardapi/gethelps', '/api/gethelps'], async (_req, res) => {
     try {
         const [rows] = await db.query('SELECT * FROM helps WHERE d_in = 0 ORDER BY id DESC');
         res.json({ status: 200, data: rows });
-    } catch (err) {
+    }
+    catch (err) {
         res.status(500).json({ status: 500, error: err.message });
     }
 });
-
 // Believers (signup_form)
 app.post(['/dashboardapi/postbeliversignup', '/api/postbeliver', '/dashboardapi/postbeliver'], async (req, res) => {
     try {
@@ -613,23 +642,24 @@ app.post(['/dashboardapi/postbeliversignup', '/api/postbeliver', '/dashboardapi/
                     otp: b.password,
                     d_in: 0
                 });
-            } catch (_) {}
+            }
+            catch (_) { }
         }
         res.json({ status: 200, message: 'Believer registration successful', insertId: result?.insertId });
-    } catch (err) {
+    }
+    catch (err) {
         res.status(500).json({ status: 500, error: err.message });
     }
 });
-
 app.all(['/dashboardapi/getbelivers', '/dashboardapi/getbeliversdata', '/api/believers'], async (_req, res) => {
     try {
         const [rows] = await db.query('SELECT id, fname, lname, CONCAT(fname, " ", COALESCE(lname, "")) as name, mobile_number, email, district_id, constituency_id, mandal_id, panchayat_id FROM signup_form WHERE d_in = 0 ORDER BY id DESC');
         res.json({ status: 200, data: rows });
-    } catch (err) {
+    }
+    catch (err) {
         res.status(500).json({ status: 500, error: err.message });
     }
 });
-
 // Pastors (pastor_reg)
 app.post(['/dashboardapi/postpastor', '/api/postpastor', '/dashboardapi/postrpastor'], async (req, res) => {
     try {
@@ -652,39 +682,91 @@ app.post(['/dashboardapi/postpastor', '/api/postpastor', '/dashboardapi/postrpas
                     otp: p.password,
                     d_in: 0
                 });
-            } catch (_) {}
+            }
+            catch (_) { }
         }
         res.json({ status: 200, message: 'Pastor registration successful', insertId: result?.insertId });
-    } catch (err) {
+    }
+    catch (err) {
         res.status(500).json({ status: 500, error: err.message });
     }
 });
-
 app.all(['/dashboardapi/getpastor', '/api/pastors'], async (_req, res) => {
     try {
         const [rows] = await db.query('SELECT id, pastorname, pastorname as name, phonenumber, phonenumber as mobile_number, description, district_id, constituency_id, mandal_id, village_id, address FROM pastor_reg WHERE d_in = 0 ORDER BY id DESC');
         res.json({ status: 200, data: rows });
-    } catch (err) {
+    }
+    catch (err) {
         res.status(500).json({ status: 500, error: err.message });
     }
 });
-
-app.all(['/dashboardapi/getpastorsfilters', '/api/getpastorsfilters'], async (req, res) => {
+const searchPastorsHandler = async (req, res) => {
     try {
-        const { districts, constituencyname, mandal_id } = req.body || {};
+        const body = req.body || {};
+        const district = body.district_id || body.districts;
+        const constituency = body.constituency_id || body.constenncy_id || body.constituencyname;
+        const mandal = body.mandal_id || body.mandals;
+        const pastor = body.pastor_id || body.pastorname || body.pastor;
         let sql = 'SELECT id, pastorname, pastorname as name, phonenumber, phonenumber as mobile_number, description, district_id, constituency_id, mandal_id, village_id, address FROM pastor_reg WHERE d_in = 0';
         const params = [];
-        if (districts) { sql += ' AND district_id = ?'; params.push(districts); }
-        if (constituencyname) { sql += ' AND constituency_id = ?'; params.push(constituencyname); }
-        if (mandal_id) { sql += ' AND mandal_id = ?'; params.push(mandal_id); }
+        if (district) {
+            sql += ' AND district_id = ?';
+            params.push(district);
+        }
+        if (constituency) {
+            sql += ' AND constituency_id = ?';
+            params.push(constituency);
+        }
+        if (mandal) {
+            sql += ' AND mandal_id = ?';
+            params.push(mandal);
+        }
+        if (pastor) {
+            sql += ' AND (pastorname LIKE ? OR id = ?)';
+            params.push(`%${pastor}%`, pastor);
+        }
         sql += ' ORDER BY id DESC';
         const [rows] = await db.query(sql, params);
         res.json({ status: 200, data: rows });
-    } catch (err) {
+    }
+    catch (err) {
+        res.status(500).json({ status: 500, error: err.message });
+    }
+};
+app.all(['/dashboardapi/getpastorsfilters', '/api/getpastorsfilters', '/dashboardapi/searchpastors', '/api/searchpastors'], searchPastorsHandler);
+app.all(['/dashboardapi/pastorviewupdates', '/dashboardapi/viewpastorupdates', '/api/pastorviewupdates', '/api/viewpastorupdates'], async (req, res) => {
+    try {
+        const body = req.body || {};
+        const district = body.district_id || body.districts;
+        const constituency = body.constituency_id || body.constenncy_id || body.constituencyname;
+        const mandal = body.mandal_id || body.mandals;
+        const pastor = body.pastor_id || body.pastorname;
+        let sql = 'SELECT * FROM pastor_reg WHERE d_in = 0';
+        const params = [];
+        if (district) {
+            sql += ' AND district_id = ?';
+            params.push(district);
+        }
+        if (constituency) {
+            sql += ' AND constituency_id = ?';
+            params.push(constituency);
+        }
+        if (mandal) {
+            sql += ' AND mandal_id = ?';
+            params.push(mandal);
+        }
+        if (pastor) {
+            sql += ' AND (pastorname LIKE ? OR id = ?)';
+            params.push(`%${pastor}%`, pastor);
+        }
+        sql += ' ORDER BY id DESC LIMIT 1';
+        const [rows] = await db.query(sql, params);
+        res.json({ status: 200, data: rows[0] || {} });
+    }
+    catch (err) {
         res.status(500).json({ status: 500, error: err.message });
     }
 });
-
 // Churches (church_reg)
 app.post(['/dashboardapi/postchurchregister', '/api/postchurchregister'], async (req, res) => {
     try {
@@ -701,39 +783,151 @@ app.post(['/dashboardapi/postchurchregister', '/api/postchurchregister'], async 
                     otp: c.password,
                     d_in: 0
                 });
-            } catch (_) {}
+            }
+            catch (_) { }
         }
         res.json({ status: 200, message: 'Church registration successful', insertId: result?.insertId });
-    } catch (err) {
+    }
+    catch (err) {
         res.status(500).json({ status: 500, error: err.message });
     }
 });
-
 app.all(['/dashboardapi/getchurch', '/dashboardapi/getchurches', '/api/getchurch'], async (_req, res) => {
     try {
-        const [rows] = await db.query('SELECT id, church_name, church_name as churchname, church_name as name, pastor_id, pastor_id as pastorname, pastor_id as pastor_name, contactnumber as phonenumber, contactnumber as mobile_number, district_id, constituency_id, mandal_id, village_id, address FROM church_reg WHERE d_in = 0 ORDER BY id DESC');
+        // Query church_timings joined with church_reg for church details
+        const [timingRows] = await db.query(`
+            SELECT ct.id, 
+                COALESCE(cr.church_name, ct.descriptions, ct.user_name, 'Church') AS church_name,
+                COALESCE(ct.day, 'Sunday') AS day,
+                ct.starttime, ct.endtime,
+                COALESCE(cr.location, '') AS location,
+                COALESCE(cr.youtube, '') AS youtube,
+                COALESCE(cr.facebook, '') AS facebook,
+                COALESCE(ct.district_id, cr.district_id) AS district_id,
+                COALESCE(ct.constituency_id, cr.constituency_id) AS constituency_id,
+                COALESCE(ct.mandal_id, cr.mandal_id) AS mandal_id,
+                COALESCE(ct.village_id, cr.village_id) AS village_id
+            FROM church_timings ct
+            LEFT JOIN church_reg cr ON ct.church_id = cr.id
+            WHERE ct.d_in = 0
+            ORDER BY ct.id DESC
+        `);
+        if (timingRows.length > 0) {
+            return res.json({ status: 200, data: timingRows });
+        }
+        // Fallback to church_reg with default timings if church_timings has no rows
+        const [rows] = await db.query('SELECT id, church_name, "Sunday" as day, "10:00 AM" as starttime, "12:30 PM" as endtime, location, youtube, facebook, district_id, constituency_id, mandal_id, village_id, address FROM church_reg WHERE d_in = 0 ORDER BY id DESC');
         res.json({ status: 200, data: rows });
-    } catch (err) {
+    }
+    catch (err) {
         res.status(500).json({ status: 500, error: err.message });
     }
 });
-
-app.all(['/dashboardapi/getchurchesdatafilters', '/api/getchurchesdatafilters'], async (req, res) => {
+const searchChurchesHandler = async (req, res) => {
     try {
-        const { districts, constituencyname, mandal_id } = req.body || {};
-        let sql = 'SELECT id, church_name, church_name as churchname, church_name as name, pastor_id, pastor_id as pastorname, pastor_id as pastor_name, contactnumber as phonenumber, contactnumber as mobile_number, district_id, constituency_id, mandal_id, village_id, address FROM church_reg WHERE d_in = 0';
+        const body = req.body || {};
+        const district = body.district_id || body.districts;
+        const constituency = body.constenncy_id || body.constituency_id || body.constituencyname;
+        const mandal = body.mandal_id || body.mandals;
+        const village = body.panchayati_id || body.village_id || body.panchayat_id;
+        const day = body.day;
+        let sql = `SELECT ct.id, 
+            COALESCE(cr.church_name, ct.descriptions, ct.user_name, 'Church') AS church_name,
+            COALESCE(ct.day, 'Sunday') AS day,
+            ct.starttime, ct.endtime,
+            COALESCE(cr.location, '') AS location,
+            COALESCE(cr.youtube, '') AS youtube,
+            COALESCE(cr.facebook, '') AS facebook,
+            COALESCE(ct.district_id, cr.district_id) AS district_id,
+            COALESCE(ct.constituency_id, cr.constituency_id) AS constituency_id,
+            COALESCE(ct.mandal_id, cr.mandal_id) AS mandal_id,
+            COALESCE(ct.village_id, cr.village_id) AS village_id
+            FROM church_timings ct
+            LEFT JOIN church_reg cr ON ct.church_id = cr.id
+            WHERE ct.d_in = 0`;
         const params = [];
-        if (districts) { sql += ' AND district_id = ?'; params.push(districts); }
-        if (constituencyname) { sql += ' AND constituency_id = ?'; params.push(constituencyname); }
-        if (mandal_id) { sql += ' AND mandal_id = ?'; params.push(mandal_id); }
-        sql += ' ORDER BY id DESC';
+        if (district) {
+            sql += ' AND (ct.district_id = ? OR cr.district_id = ?)';
+            params.push(district, district);
+        }
+        if (constituency) {
+            sql += ' AND (ct.constituency_id = ? OR cr.constituency_id = ?)';
+            params.push(constituency, constituency);
+        }
+        if (mandal) {
+            sql += ' AND (ct.mandal_id = ? OR cr.mandal_id = ?)';
+            params.push(mandal, mandal);
+        }
+        if (village) {
+            sql += ' AND (ct.village_id = ? OR cr.village_id = ?)';
+            params.push(village, village);
+        }
+        if (day) {
+            sql += ' AND ct.day = ?';
+            params.push(day);
+        }
+        sql += ' ORDER BY ct.id DESC';
         const [rows] = await db.query(sql, params);
+        if (rows.length === 0 && (district || constituency || mandal)) {
+            // Check church_reg fallback
+            let crSql = 'SELECT id, church_name, "Sunday" as day, "10:00 AM" as starttime, "12:30 PM" as endtime, location, youtube, facebook, district_id, constituency_id, mandal_id, village_id FROM church_reg WHERE d_in = 0';
+            const crParams = [];
+            if (district) {
+                crSql += ' AND district_id = ?';
+                crParams.push(district);
+            }
+            if (constituency) {
+                crSql += ' AND constituency_id = ?';
+                crParams.push(constituency);
+            }
+            if (mandal) {
+                crSql += ' AND mandal_id = ?';
+                crParams.push(mandal);
+            }
+            crSql += ' ORDER BY id DESC';
+            const [crRows] = await db.query(crSql, crParams);
+            return res.json({ status: 200, data: crRows });
+        }
         res.json({ status: 200, data: rows });
-    } catch (err) {
+    }
+    catch (err) {
+        res.status(500).json({ status: 500, error: err.message });
+    }
+};
+app.all(['/dashboardapi/getchurchesdatafilters', '/api/getchurchesdatafilters', '/dashboardapi/searchingchurchdata', '/api/searchingchurchdata'], searchChurchesHandler);
+app.all(['/dashboardapi/viewupdates', '/api/viewupdates'], async (req, res) => {
+    try {
+        const body = req.body || {};
+        const district = body.district_id || body.districts;
+        const constituency = body.constituency_id || body.constenncy_id || body.constituencyname;
+        const mandal = body.mandal_id || body.mandals;
+        const church = body.church || body.church_name;
+        let sql = 'SELECT * FROM church_reg WHERE d_in = 0';
+        const params = [];
+        if (district) {
+            sql += ' AND district_id = ?';
+            params.push(district);
+        }
+        if (constituency) {
+            sql += ' AND constituency_id = ?';
+            params.push(constituency);
+        }
+        if (mandal) {
+            sql += ' AND mandal_id = ?';
+            params.push(mandal);
+        }
+        if (church) {
+            sql += ' AND (church_name LIKE ? OR id = ?)';
+            params.push(`%${church}%`, church);
+        }
+        sql += ' ORDER BY id DESC LIMIT 1';
+        const [rows] = await db.query(sql, params);
+        res.json({ status: 200, data: rows[0] || {} });
+    }
+    catch (err) {
         res.status(500).json({ status: 500, error: err.message });
     }
 });
-
 // Students (student_reg)
 app.post(['/dashboardapi/studentsignup', '/api/studentsignup'], async (req, res) => {
     try {
@@ -750,23 +944,24 @@ app.post(['/dashboardapi/studentsignup', '/api/studentsignup'], async (req, res)
                     otp: s.password,
                     d_in: 0
                 });
-            } catch (_) {}
+            }
+            catch (_) { }
         }
         res.json({ status: 200, message: 'Student registration successful', insertId: result?.insertId });
-    } catch (err) {
+    }
+    catch (err) {
         res.status(500).json({ status: 500, error: err.message });
     }
 });
-
 app.all(['/dashboardapi/getstudent', '/api/getstudent'], async (_req, res) => {
     try {
         const [rows] = await db.query('SELECT * FROM student_reg WHERE d_in = 0 ORDER BY id DESC');
         res.json({ status: 200, data: rows });
-    } catch (err) {
+    }
+    catch (err) {
         res.status(500).json({ status: 500, error: err.message });
     }
 });
-
 // Ministries (ministry_signup)
 app.post(['/dashboardapi/postministrysignup', '/api/postministrysignup'], async (req, res) => {
     try {
@@ -783,25 +978,26 @@ app.post(['/dashboardapi/postministrysignup', '/api/postministrysignup'], async 
                     otp: m.password,
                     d_in: 0
                 });
-            } catch (_) {}
+            }
+            catch (_) { }
         }
         res.json({ status: 200, message: 'Ministry registration successful', insertId: result?.insertId });
-    } catch (err) {
+    }
+    catch (err) {
         res.status(500).json({ status: 500, error: err.message });
     }
 });
-
 app.all(['/dashboardapi/getministry', '/api/getministry'], async (_req, res) => {
     try {
         const [rows] = await db.query('SELECT * FROM ministry_signup WHERE d_in = 0 ORDER BY id DESC');
         res.json({ status: 200, data: rows });
-    } catch (err) {
+    }
+    catch (err) {
         res.status(500).json({ status: 500, error: err.message });
     }
 });
-
 // Organisations (independentorganisation_reg)
-app.post(['/dashboardapi/postindepedentorganisation', '/api/postindepedentorganisation'], async (req, res) => {
+app.post(['/dashboardapi/postindepedentorganisation', '/dashboardapi/postindependentorganisation', '/dashboardapi/postindepedentchurch', '/dashboardapi/postindependentchurch', '/api/postindepedentorganisation', '/api/postindependentorganisation'], async (req, res) => {
     try {
         const o = req.body;
         o.d_in = 0;
@@ -816,23 +1012,60 @@ app.post(['/dashboardapi/postindepedentorganisation', '/api/postindepedentorgani
                     otp: o.password,
                     d_in: 0
                 });
-            } catch (_) {}
+            }
+            catch (_) { }
         }
         res.json({ status: 200, message: 'Organisation registration successful', insertId: result?.insertId });
-    } catch (err) {
+    }
+    catch (err) {
         res.status(500).json({ status: 500, error: err.message });
     }
 });
-
-app.all(['/dashboardapi/getorganizations', '/dashboardapi/searchorganization', '/dashboardapi/searchinorganizations', '/api/organizations'], async (_req, res) => {
+app.all(['/dashboardapi/getorganizations', '/dashboardapi/searchorganization', '/dashboardapi/searchinorganizations', '/api/organizations'], async (req, res) => {
     try {
-        const [rows] = await db.query('SELECT * FROM independentorganisation_reg WHERE d_in = 0 ORDER BY id DESC');
+        const body = req.body || {};
+        let sql = 'SELECT * FROM independentorganisation_reg WHERE d_in = 0';
+        const params = [];
+        if (body.denomation_id) {
+            sql += ' AND denomation_id = ?';
+            params.push(body.denomation_id);
+        }
+        if (body.ministry_id) {
+            sql += ' AND ministry_id = ?';
+            params.push(body.ministry_id);
+        }
+        if (body.district_id) {
+            sql += ' AND district_id = ?';
+            params.push(body.district_id);
+        }
+        if (body.constenncy_id || body.constituency_id) {
+            sql += ' AND constituency_id = ?';
+            params.push(body.constenncy_id || body.constituency_id);
+        }
+        if (body.mandal_id || body.mandals) {
+            sql += ' AND mandal_id = ?';
+            params.push(body.mandal_id || body.mandals);
+        }
+        if (body.panchayati_id || body.village_id) {
+            sql += ' AND (panchayat_id = ? OR village_id = ?)';
+            params.push(body.panchayati_id || body.village_id, body.panchayati_id || body.village_id);
+        }
+        if (body.gender) {
+            sql += ' AND gender = ?';
+            params.push(body.gender);
+        }
+        if (body.status) {
+            sql += ' AND status = ?';
+            params.push(body.status);
+        }
+        sql += ' ORDER BY id DESC';
+        const [rows] = await db.query(sql, params);
         res.json({ status: 200, data: rows });
-    } catch (err) {
+    }
+    catch (err) {
         res.status(500).json({ status: 500, error: err.message });
     }
 });
-
 // Pastor Associations (pastors_associations)
 app.post(['/dashboardapi/postpastorassociations', '/api/postpastorassociations'], async (req, res) => {
     try {
@@ -849,23 +1082,24 @@ app.post(['/dashboardapi/postpastorassociations', '/api/postpastorassociations']
                     otp: a.password,
                     d_in: 0
                 });
-            } catch (_) {}
+            }
+            catch (_) { }
         }
         res.json({ status: 200, message: 'Pastor Association registration successful', insertId: result?.insertId });
-    } catch (err) {
+    }
+    catch (err) {
         res.status(500).json({ status: 500, error: err.message });
     }
 });
-
 app.all(['/dashboardapi/getpastorassociation', '/dashboardapi/getpastorassociations', '/dashboardapi/getpastorassci', '/api/pastorassociations'], async (_req, res) => {
     try {
         const [rows] = await db.query('SELECT * FROM pastors_associations WHERE d_in = 0 ORDER BY id DESC');
         res.json({ status: 200, data: rows });
-    } catch (err) {
+    }
+    catch (err) {
         res.status(500).json({ status: 500, error: err.message });
     }
 });
-
 // Jobs (jobs)
 app.post(['/dashboardapi/postjobs', '/api/postjobs'], async (req, res) => {
     try {
@@ -873,20 +1107,36 @@ app.post(['/dashboardapi/postjobs', '/api/postjobs'], async (req, res) => {
         j.d_in = 0;
         const result = await dynamicInsert('jobs', j);
         res.json({ status: 200, message: 'Job created successfully', insertId: result?.insertId });
-    } catch (err) {
+    }
+    catch (err) {
         res.status(500).json({ status: 500, error: err.message });
     }
 });
-
-app.all(['/dashboardapi/getjobs', '/dashboardapi/getjob', '/dashboardapi/searchjob', '/dashboardapi/searchjobswise', '/api/jobs'], async (_req, res) => {
+app.all(['/dashboardapi/getjobs', '/dashboardapi/getjob', '/dashboardapi/searchjob', '/dashboardapi/searchjobswise', '/api/jobs'], async (req, res) => {
     try {
-        const [rows] = await db.query('SELECT * FROM jobs WHERE d_in = 0 ORDER BY id DESC');
+        const body = req.body || {};
+        let sql = 'SELECT * FROM jobs WHERE d_in = 0';
+        const params = [];
+        if (body.colid && body.name) {
+            if (body.colid == 1) { sql += ' AND (jobtitle LIKE ? OR title LIKE ?)'; params.push(`%${body.name}%`, `%${body.name}%`); }
+            else if (body.colid == 2) { sql += ' AND qualification LIKE ?'; params.push(`%${body.name}%`); }
+            else if (body.colid == 3) { sql += ' AND experience = ?'; params.push(body.name); }
+        }
+        if (body.district_id) { sql += ' AND district_id = ?'; params.push(body.district_id); }
+        if (body.constenncy_id || body.constituency_id) { sql += ' AND constituency_id = ?'; params.push(body.constenncy_id || body.constituency_id); }
+        if (body.mandal_id) { sql += ' AND mandal_id = ?'; params.push(body.mandal_id); }
+        if (body.panchayati_id) { sql += ' AND panchayati_id = ?'; params.push(body.panchayati_id); }
+        if (body.jobtitle || body.jobtile || body.title) { sql += ' AND (jobtitle LIKE ? OR title LIKE ?)'; params.push(`%${body.jobtitle || body.jobtile || body.title}%`, `%${body.jobtitle || body.jobtile || body.title}%`); }
+        if (body.qualification || body.qual) { sql += ' AND qualification LIKE ?'; params.push(`%${body.qualification || body.qual}%`); }
+        if (body.experience) { sql += ' AND experience = ?'; params.push(body.experience); }
+        sql += ' ORDER BY id DESC';
+        const [rows] = await db.query(sql, params);
         res.json({ status: 200, data: rows });
-    } catch (err) {
+    }
+    catch (err) {
         res.status(500).json({ status: 500, error: err.message });
     }
 });
-
 // Marriages (marriages)
 app.post(['/dashboardapi/postmarriages', '/dashboardapi/postingmarriages', '/api/postmarriages'], async (req, res) => {
     try {
@@ -894,20 +1144,80 @@ app.post(['/dashboardapi/postmarriages', '/dashboardapi/postingmarriages', '/api
         m.d_in = 0;
         const result = await dynamicInsert('marriages', m);
         res.json({ status: 200, message: 'Marriage profile created successfully', insertId: result?.insertId });
-    } catch (err) {
+    }
+    catch (err) {
         res.status(500).json({ status: 500, error: err.message });
     }
 });
-
-app.all(['/dashboardapi/searchmarriages', '/dashboardapi/Searchmarriages', '/api/marriages'], async (_req, res) => {
+app.all(['/dashboardapi/searchmarriages', '/dashboardapi/Searchmarriages', '/dashboardapi/searchingmarriages', '/api/marriages'], async (req, res) => {
     try {
-        const [rows] = await db.query('SELECT * FROM marriages WHERE d_in = 0 ORDER BY id DESC');
+        const body = req.body || {};
+        let sql = 'SELECT * FROM marriages WHERE d_in = 0';
+        const params = [];
+        // Handle name & columnid from marriages.component.ts:
+        // columnid 1 = gender, 2 = status, 3 = denomination, 4 = caste, 5 = subcaste, 6 = spiritual
+        if (body.columnid && body.name) {
+            if (body.columnid == 1) {
+                sql += ' AND gender = ?';
+                params.push(body.name);
+            }
+            else if (body.columnid == 2) {
+                sql += ' AND status = ?';
+                params.push(body.name);
+            }
+            else if (body.columnid == 3) {
+                sql += ' AND denomation_id = ?';
+                params.push(body.name);
+            }
+            else if (body.columnid == 4) {
+                sql += ' AND caste = ?';
+                params.push(body.name);
+            }
+            else if (body.columnid == 5) {
+                sql += ' AND subcaste = ?';
+                params.push(body.name);
+            }
+            else if (body.columnid == 6) {
+                sql += ' AND (spirituality LIKE ? OR description LIKE ?)';
+                params.push(`%${body.name}%`, `%${body.name}%`);
+            }
+        }
+        if (body.gender) {
+            sql += ' AND gender = ?';
+            params.push(body.gender);
+        }
+        if (body.caste) {
+            sql += ' AND caste = ?';
+            params.push(body.caste);
+        }
+        if (body.district_id) {
+            sql += ' AND district_id = ?';
+            params.push(body.district_id);
+        }
+        if (body.constenncy_id || body.constituency_id) {
+            sql += ' AND constituency_id = ?';
+            params.push(body.constenncy_id || body.constituency_id);
+        }
+        if (body.mandal_id || body.mandals) {
+            sql += ' AND mandal_id = ?';
+            params.push(body.mandal_id || body.mandals);
+        }
+        if (body.village_id || body.panchayat_id || body.panchayati_id) {
+            sql += ' AND (village_id = ? OR panchayat_id = ?)';
+            params.push(body.village_id || body.panchayat_id || body.panchayati_id, body.village_id || body.panchayat_id || body.panchayati_id);
+        }
+        if (body.id) {
+            sql += ' AND id = ?';
+            params.push(body.id);
+        }
+        sql += ' ORDER BY id DESC';
+        const [rows] = await db.query(sql, params);
         res.json({ status: 200, data: rows });
-    } catch (err) {
+    }
+    catch (err) {
         res.status(500).json({ status: 500, error: err.message });
     }
 });
-
 // Business (business_table)
 app.post(['/dashboardapi/postbusiness', '/api/postbusiness'], async (req, res) => {
     try {
@@ -915,20 +1225,56 @@ app.post(['/dashboardapi/postbusiness', '/api/postbusiness'], async (req, res) =
         b.d_in = 0;
         const result = await dynamicInsert('business_table', b);
         res.json({ status: 200, message: 'Business listed successfully', insertId: result?.insertId });
-    } catch (err) {
+    }
+    catch (err) {
         res.status(500).json({ status: 500, error: err.message });
     }
 });
-
-app.all(['/dashboardapi/getbusiness', '/dashboardapi/searchingbusiness', '/api/business'], async (_req, res) => {
+app.all(['/dashboardapi/getbusiness', '/dashboardapi/searchingbusiness', '/api/business'], async (req, res) => {
     try {
-        const [rows] = await db.query('SELECT * FROM business_table WHERE d_in = 0 ORDER BY id DESC');
+        const body = req.body || {};
+        let sql = 'SELECT * FROM business_table WHERE d_in = 0';
+        const params = [];
+        if (body.district_id) {
+            sql += ' AND district_id = ?';
+            params.push(body.district_id);
+        }
+        if (body.constenncy_id || body.constituency_id) {
+            sql += ' AND constituency_id = ?';
+            params.push(body.constenncy_id || body.constituency_id);
+        }
+        if (body.mandal_id || body.mandals) {
+            sql += ' AND mandal_id = ?';
+            params.push(body.mandal_id || body.mandals);
+        }
+        if (body.panchayati_id || body.village_id) {
+            sql += ' AND (panchayat_id = ? OR village_id = ?)';
+            params.push(body.panchayati_id || body.village_id, body.panchayati_id || body.village_id);
+        }
+        if (body.type) {
+            sql += ' AND type = ?';
+            params.push(body.type);
+        }
+        if (body.title) {
+            sql += ' AND title LIKE ?';
+            params.push(`%${body.title}%`);
+        }
+        if (body.denomation_id || body.denomation) {
+            sql += ' AND denomation_id = ?';
+            params.push(body.denomation_id || body.denomation);
+        }
+        if (body.ministry_id) {
+            sql += ' AND ministry_id = ?';
+            params.push(body.ministry_id);
+        }
+        sql += ' ORDER BY id DESC';
+        const [rows] = await db.query(sql, params);
         res.json({ status: 200, data: rows });
-    } catch (err) {
+    }
+    catch (err) {
         res.status(500).json({ status: 500, error: err.message });
     }
 });
-
 // Institutes & Colleges
 app.post(['/dashboardapi/postinsututies', '/api/postinstitutes'], async (req, res) => {
     try {
@@ -936,31 +1282,95 @@ app.post(['/dashboardapi/postinsututies', '/api/postinstitutes'], async (req, re
         i.d_in = 0;
         const result = await dynamicInsert('institutes', i);
         res.json({ status: 200, message: 'Institute registered successfully', insertId: result?.insertId });
-    } catch (err) {
+    }
+    catch (err) {
         res.status(500).json({ status: 500, error: err.message });
     }
 });
-
-app.all(['/dashboardapi/getinstitutes', '/dashboardapi/Searchinstitute', '/api/institutes'], async (_req, res) => {
+app.all(['/dashboardapi/getinstitutes', '/dashboardapi/Searchinstitute', '/api/institutes'], async (req, res) => {
     try {
-        const [rows] = await db.query('SELECT * FROM institutes WHERE d_in = 0 ORDER BY id DESC');
+        const body = req.body || {};
+        let sql = 'SELECT * FROM institutes WHERE d_in = 0';
+        const params = [];
+        if (body.district_id) {
+            sql += ' AND district_id = ?';
+            params.push(body.district_id);
+        }
+        if (body.constenncy_id || body.constituency_id) {
+            sql += ' AND constituency_id = ?';
+            params.push(body.constenncy_id || body.constituency_id);
+        }
+        if (body.mandal_id || body.mandals) {
+            sql += ' AND mandal_id = ?';
+            params.push(body.mandal_id || body.mandals);
+        }
+        if (body.type) {
+            sql += ' AND type = ?';
+            params.push(body.type);
+        }
+        sql += ' ORDER BY id DESC';
+        const [rows] = await db.query(sql, params);
         res.json({ status: 200, data: rows });
-    } catch (err) {
+    }
+    catch (err) {
         res.status(500).json({ status: 500, error: err.message });
     }
 });
-
+// Registration Form (reg_form)
+app.post(['/dashboardapi/postregform', '/api/postregform'], async (req, res) => {
+    try {
+        const body = req.body || {};
+        body.d_in = 0;
+        const result = await dynamicInsert('reg_form', body);
+        res.json({ status: 200, message: 'Registration submitted successfully', insertId: result?.insertId });
+    }
+    catch (err) {
+        res.status(500).json({ status: 500, error: err.message });
+    }
+});
+// User Main Data & Constituency Updates
+app.get(['/dashboardapi/getUserMainData/:id', '/api/getUserMainData/:id'], async (req, res) => {
+    try {
+        const id = req.params.id;
+        const [rows] = await db.query('SELECT * FROM users WHERE id = ?', [id]);
+        res.json({ status: 200, data: rows[0] || {} });
+    }
+    catch (err) {
+        res.status(500).json({ status: 500, error: err.message });
+    }
+});
+app.post(['/dashboardapi/updateconsis/:id', '/api/updateconsis/:id'], async (req, res) => {
+    try {
+        const id = req.params.id;
+        const body = req.body || {};
+        await db.query('UPDATE users SET ? WHERE id = ?', [body, id]);
+        res.json({ status: 200, message: 'Constituency updated successfully' });
+    }
+    catch (err) {
+        res.status(500).json({ status: 500, error: err.message });
+    }
+});
+app.all(['/dashboardapi/viewconstituencyname', '/api/viewconstituencyname'], async (req, res) => {
+    try {
+        const body = req.body || {};
+        const [rows] = await db.query('SELECT * FROM const_lst_t WHERE d_in = 0 AND (id = ? OR const_nm = ?)', [body.id || body.constituency_id, body.const_nm || '']);
+        res.json({ status: 200, data: rows[0] || {} });
+    }
+    catch (err) {
+        res.status(500).json({ status: 500, error: err.message });
+    }
+});
 app.post(['/dashboardapi/postcolleges', '/api/postcolleges'], async (req, res) => {
     try {
         const c = req.body;
         c.d_in = 0;
         const result = await dynamicInsert('colleges', c);
         res.json({ status: 200, message: 'College registered successfully', insertId: result?.insertId });
-    } catch (err) {
+    }
+    catch (err) {
         res.status(500).json({ status: 500, error: err.message });
     }
 });
-
 // Attacks / Incident Reporting
 app.post(['/dashboardapi/postattacks', '/api/postattacks'], async (req, res) => {
     try {
@@ -968,20 +1378,20 @@ app.post(['/dashboardapi/postattacks', '/api/postattacks'], async (req, res) => 
         a.d_in = 0;
         const result = await dynamicInsert('attacks', a);
         res.json({ status: 200, message: 'Incident report submitted successfully', insertId: result?.insertId });
-    } catch (err) {
+    }
+    catch (err) {
         res.status(500).json({ status: 500, error: err.message });
     }
 });
-
 app.all(['/dashboardapi/getatt', '/api/getatt'], async (_req, res) => {
     try {
         const [rows] = await db.query('SELECT * FROM attacks WHERE d_in = 0 ORDER BY id DESC');
         res.json({ status: 200, data: rows });
-    } catch (err) {
+    }
+    catch (err) {
         res.status(500).json({ status: 500, error: err.message });
     }
 });
-
 // Contact Us
 app.post(['/dashboardapi/contact', '/api/contact'], async (req, res) => {
     try {
@@ -1003,11 +1413,11 @@ app.post(['/dashboardapi/contact', '/api/contact'], async (req, res) => {
             d_in: 0
         }).catch(() => null);
         res.json({ status: 200, message: 'Thank you! Your message has been received.' });
-    } catch (err) {
+    }
+    catch (err) {
         res.status(500).json({ status: 500, error: err.message });
     }
 });
-
 // Authentication & Users
 app.post(['/dashboardapi/passwordwebsitelogin', '/api/login'], async (req, res) => {
     try {
@@ -1015,11 +1425,9 @@ app.post(['/dashboardapi/passwordwebsitelogin', '/api/login'], async (req, res) 
         const phone = String(mobile_number || mobilenumber || phonenumber || number || '').trim();
         const pwd = String(password || '').trim();
         const cat = category !== undefined && category !== null ? String(category).trim() : '';
-
         if (!phone || !pwd) {
             return res.json({ status: 400, message: 'Missing phone or password' });
         }
-
         const formatUser = (user, defaultCatId, defaultCatName) => {
             return {
                 id: user.id,
@@ -1031,7 +1439,6 @@ app.post(['/dashboardapi/passwordwebsitelogin', '/api/login'], async (req, res) 
                 category: defaultCatName
             };
         };
-
         const categoryTables = {
             '1': {
                 name: 'signup_form',
@@ -1083,7 +1490,6 @@ app.post(['/dashboardapi/passwordwebsitelogin', '/api/login'], async (req, res) 
                 phoneQuery: 'SELECT id FROM pastors_associations WHERE phonenumber = ?'
             }
         };
-
         // 1. If category provided, check category table first
         if (cat && categoryTables[cat]) {
             const cfg = categoryTables[cat];
@@ -1092,27 +1498,25 @@ app.post(['/dashboardapi/passwordwebsitelogin', '/api/login'], async (req, res) 
                 return res.json({ status: 200, message: 'Login successful', data: [formatUser(rows[0], cfg.category_id, cfg.category_name)] });
             }
         }
-
         // 2. Check users table
         const [users] = await db.query('SELECT id, name, number as mobile_number, email, otp as password FROM users WHERE number = ? AND otp = ?', [phone, pwd]);
         if (users && users.length > 0) {
             return res.json({ status: 200, message: 'Login successful', data: [formatUser(users[0], cat || '1', 'Believer')] });
         }
-
         // 3. Fallback across all category tables
         for (const [key, cfg] of Object.entries(categoryTables)) {
-            if (cat && key === cat) continue;
+            if (cat && key === cat)
+                continue;
             const [rows] = await db.query(cfg.query, [phone, pwd]);
             if (rows && rows.length > 0) {
                 return res.json({ status: 200, message: 'Login successful', data: [formatUser(rows[0], cfg.category_id, cfg.category_name)] });
             }
         }
-
         // 4. Distinguish wrong password vs unregistered phone
         let phoneFound = false;
         const [userExists] = await db.query('SELECT id FROM users WHERE number = ?', [phone]);
-        if (userExists && userExists.length > 0) phoneFound = true;
-
+        if (userExists && userExists.length > 0)
+            phoneFound = true;
         if (!phoneFound) {
             for (const cfg of Object.values(categoryTables)) {
                 const [pRows] = await db.query(cfg.phoneQuery, [phone]);
@@ -1122,40 +1526,34 @@ app.post(['/dashboardapi/passwordwebsitelogin', '/api/login'], async (req, res) 
                 }
             }
         }
-
         if (phoneFound) {
             return res.json({ status: 600, message: 'Wrong password' });
-        } else {
+        }
+        else {
             return res.json({ status: 250, message: 'Phone number not registered' });
         }
-    } catch (err) {
+    }
+    catch (err) {
         console.error('Login error:', err);
         res.status(500).json({ status: 500, error: err.message });
     }
 });
-
 app.post(['/dashboardapi/postwebsitesignup', '/api/signup'], async (req, res) => {
     try {
         const { name, mobilenumber, mobile_number, mail, email, password, category } = req.body;
         const phone = mobile_number || mobilenumber;
         const userMail = email || mail;
-
         const [existing] = await db.query('SELECT id FROM users WHERE number = ?', [phone]);
         if (existing && existing.length > 0) {
             return res.json({ status: 300, message: 'Account with this phone number already exists!' });
         }
-
-        const [resHeader] = await db.query(
-            'INSERT INTO users (name, number, email, otp, d_in) VALUES (?, ?, ?, ?, 0)',
-            [name, phone, userMail, password]
-        );
-
+        const [resHeader] = await db.query('INSERT INTO users (name, number, email, otp, d_in) VALUES (?, ?, ?, ?, 0)', [name, phone, userMail, password]);
         res.json({ status: 200, message: 'Signup completed successfully', insertId: resHeader.insertId });
-    } catch (err) {
+    }
+    catch (err) {
         res.status(500).json({ status: 500, error: err.message });
     }
 });
-
 app.post(['/dashboardapi/checknumber', '/api/checknumber'], async (req, res) => {
     try {
         const phone = req.body.mobile_number || req.body.number;
@@ -1164,95 +1562,93 @@ app.post(['/dashboardapi/checknumber', '/api/checknumber'], async (req, res) => 
             return res.json({ status: 404, message: 'Phone number not registered' });
         }
         res.json({ status: 200, message: 'Number verified, OTP sent' });
-    } catch (err) {
+    }
+    catch (err) {
         res.status(500).json({ status: 500, error: err.message });
     }
 });
-
 app.post(['/dashboardapi/checkotp', '/api/checkotp'], async (_req, res) => {
     res.json({ status: 200, message: 'OTP verified successfully' });
 });
-
 app.post(['/dashboardapi/createfrgetpassword', '/api/resetpassword'], async (req, res) => {
     try {
         const { mobile_number, password } = req.body;
         await db.query('UPDATE users SET otp = ? WHERE number = ?', [password, mobile_number]);
         await db.query('UPDATE signup_form SET password = ? WHERE mobile_number = ?', [password, mobile_number]);
         res.json({ status: 200, message: 'Password updated successfully' });
-    } catch (err) {
+    }
+    catch (err) {
         res.status(500).json({ status: 500, error: err.message });
     }
 });
-
 // Profile Management
 app.all(['/dashboardapi/getpersonal', '/dashboardapi/geteditdtails', '/dashboardapi/getuserprofilereport'], async (req, res) => {
     try {
         const id = req.body.id || req.body.usr_id;
         const [rows] = await db.query('SELECT * FROM users WHERE id = ?', [id]);
         res.json({ status: 200, data: rows });
-    } catch (err) {
+    }
+    catch (err) {
         res.status(500).json({ status: 500, error: err.message });
     }
 });
-
 app.all(['/dashboardapi/updateprofile', '/dashboardapi/updatebeliver', '/dashboardapi/updatedetails', '/dashboardapi/editbeliver', '/dashboardapi/editchurch', '/dashboardapi/editindependentorgainsation', '/dashboardapi/editministry', '/dashboardapi/editpastor', '/dashboardapi/editpastororgainsation', '/dashboardapi/editpastorsassociations', '/dashboardapi/editstudent'], async (_req, res) => {
     res.json({ status: 200, message: 'Profile updated successfully' });
 });
-
 app.all(['/dashboardapi/deleteboardmember', '/api/deleteboardmember'], async (req, res) => {
     try {
         const id = req.body.id;
-        if (id) await db.query('DELETE FROM wingleader WHERE id = ?', [id]);
+        if (id)
+            await db.query('DELETE FROM wingleader WHERE id = ?', [id]);
         res.json({ status: 200, message: 'Board member removed successfully' });
-    } catch (err) {
+    }
+    catch (err) {
         res.status(500).json({ status: 500, error: err.message });
     }
 });
-
 app.all(['/dashboardapi/getvideourl', '/api/videourl'], async (_req, res) => {
     res.json({
         status: 200,
         data: [{ videourl: 'https://www.youtube.com/embed/live_stream' }]
     });
 });
-
 app.all(['/dashboardapi/getwebsitegallery', '/dashboardapi/getcatewebsitegallery', '/api/gallery'], async (_req, res) => {
     try {
         const [rows] = await db.query('SELECT * FROM gallery WHERE d_in = 0 ORDER BY id DESC');
         res.json({ status: 200, data: rows });
-    } catch (err) {
+    }
+    catch (err) {
         res.status(500).json({ status: 500, error: err.message });
     }
 });
-
 app.all(['/dashboardapi/getadocumentsdataa', '/api/documents'], async (_req, res) => {
     try {
         const [rows] = await db.query('SELECT * FROM docment_tbl WHERE d_in = 0 ORDER BY id DESC');
         res.json({ status: 200, data: rows });
-    } catch (err) {
+    }
+    catch (err) {
         res.status(500).json({ status: 500, error: err.message });
     }
 });
-
 app.all(['/dashboardapi/getLeaderswebsiteData', '/dashboardapi/getLeaderswebsitewing', '/api/leaders'], async (_req, res) => {
     try {
         const [rows] = await db.query('SELECT * FROM wingleaderstype WHERE d_in = 0 ORDER BY id ASC');
         res.json({ status: 200, data: rows });
-    } catch (err) {
+    }
+    catch (err) {
         res.status(500).json({ status: 500, error: err.message });
     }
 });
-
 app.all(['/dashboardapi/postwishform', '/api/postwishform'], async (req, res) => {
     try {
         const w = req.body;
         await dynamicInsert('wish_form', w);
         res.json({ status: 200, message: 'Wish submitted successfully' });
-    } catch (err) {
+    }
+    catch (err) {
         res.status(500).json({ status: 500, error: err.message });
     }
 });
-
 app.all(['/dashboardapi/pattern', '/api/pattern'], async (_req, res) => {
     res.json({
         status: 200,
@@ -1266,7 +1662,6 @@ app.all(['/dashboardapi/pattern', '/api/pattern'], async (_req, res) => {
         ]
     });
 });
-
 app.get('/', (_req, res) => {
     res.json({
         status: 200,
@@ -1281,12 +1676,11 @@ app.get('/', (_req, res) => {
         }
     });
 });
-
 export const handler = serverless(app);
-
 if (!process.env.AWS_LAMBDA_FUNCTION_NAME) {
     const PORT = process.env.PORT || 8081;
     app.listen(PORT, async () => {
         console.log(`JBAC Backend API listening on port ${PORT}`);
     });
 }
+//# sourceMappingURL=server.js.map

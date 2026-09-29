@@ -191,7 +191,7 @@
                             <div class="form-outline">
                                 <label class="form-label">సెలెక్ట్ జిల్లా</label>
                                 <select class="form-control" formControlName="district_id"
-                                    (change)="getconstency($event);" (change)="searchdistric($event);"
+                                    (change)="onDistrictChange($event);"
                                     style="height:37px;width: 273px;">
                                     <option value="" selected disabled>సెలెక్ట్ జిల్లా</option>
                                     <option value="{{item.id}}" *ngFor="let item of districts">
@@ -205,7 +205,7 @@
                             <div class="form-outline">
                                 <label class="form-label">సెలెక్ట్ నియోజకవర్గం </label>
                                 <select class="form-control" formControlName="constenncy_id"
-                                    (change)="getmandals($event);" (change)="searchconstenct($event);"
+                                    (change)="onConstituencyChange($event);"
                                     style="height:37px;width: 273px;">
                                     <option value="" selected disabled>సెలెక్ట్ నియోజకవర్గం </option>
                                     <option value="{{item.id}}" *ngFor="let item of constituency">
@@ -220,7 +220,7 @@
                             <div class="form-outline">
                                 <label class="form-label"> మండలం/మున్సిపాలిటీ</label>
                                 <select class="form-control" formControlName="mandal_id"
-                                    (change)="gepanchayati($event);" (change)="searchmandals($event);"
+                                    (change)="onMandalChange($event);"
                                     style="height:37px;width: 273px;">
                                     <option value="" selected disabled>సెలెక్ట్ మండలం / మున్సిపాలిటీ</option>
                                     <option value="{{item.id}}" *ngFor="let item of mandals">
@@ -234,6 +234,7 @@
                             <div class="form-outline">
                                 <label class="form-label">సెలెక్ట్ పంచాయతీ/వార్డు </label>
                                 <select class="form-control" formControlName="panchayati_id"
+                                    (change)="onPanchayatiChange($event);"
                                     style="height:37px;width: 273px;">
                                     <option value="" selected disabled>సెలెక్ట్ పంచాయతీ/వార్డు</option>
                                     <option value="{{item.id}}" *ngFor="let item of panchayati">
@@ -253,15 +254,16 @@
                         </div>
                          <div class="row">
   
-                        <!-- <div class="col-md-2 mb-4 pb-2">
-                            <br>
-                            <button type="submit" (click)="search('1')" class="default-btn  user-all-btn"><b>సర్చ్
-                                </b>
-                            </button>
-                        </div> -->
                         <div class="col-md-2 mb-4 pb-2">
                             <br>
-                            <button type="submit" (click)="reset()" class="default-btn  user-all-btn"><b>రీసెట్</b>
+                            <button type="button" (click)="search($event)" class="default-btn user-all-btn" style="background-color: #0d6efd; color: white;">
+                                <b>సర్చ్</b>
+                            </button>
+                        </div>
+                        <div class="col-md-2 mb-4 pb-2">
+                            <br>
+                            <button type="button" (click)="reset()" class="default-btn user-all-btn" style="background-color: #6c757d; color: white;">
+                                <b>రీసెట్</b>
                             </button>
                         </div>
                     </div>
@@ -292,9 +294,32 @@
      
         <br>
 
+        <!-- Meeting Tabs: Current Date Only vs Upcoming Meetings -->
+        <div class="row mb-3">
+            <div class="col-12 text-center">
+                <div class="btn-group" role="group" aria-label="Meeting View Tabs">
+                    <button type="button" class="btn" [ngClass]="activeTab === 'today' ? 'btn-danger font-weight-bold active' : 'btn-outline-danger'"
+                        (click)="setMeetingTab('today')" style="min-width: 180px; padding: 10px 18px; font-size: 15px; border-radius: 25px 0 0 25px;">
+                        📅 నేటి మీటింగ్స్ ({{todayEventsCount}})
+                    </button>
+                    <button type="button" class="btn" [ngClass]="activeTab === 'upcoming' ? 'btn-danger font-weight-bold active' : 'btn-outline-danger'"
+                        (click)="setMeetingTab('upcoming')" style="min-width: 180px; padding: 10px 18px; font-size: 15px; border-radius: 0 25px 25px 0;">
+                        🔜 రాబోయే మీటింగ్స్ ({{upcomingEventsCount}})
+                    </button>
+                </div>
+            </div>
+        </div>
+
         <div class="row">
             <div class="col-12">
                 <div class="row">
+                    <div class="col-12 text-center py-5" *ngIf="searchevents.length === 0">
+                        <div class="alert alert-info d-inline-block shadow-sm" style="padding: 20px 40px; border-radius: 12px; font-size: 16px;">
+                            <i class="fa fa-info-circle mr-2"></i>
+                            <b *ngIf="activeTab === 'today'">ఈ రోజుకు ఎటువంటి మీటింగ్స్ లేవు లేదా ఎంచుకున్న ఫిల్టర్‌కు ఫలితాలు లేవు.</b>
+                            <b *ngIf="activeTab === 'upcoming'">రాబోయే మీటింగ్స్ ఏవీ లేవు లేదా ఎంచుకున్న ఫిల్టర్‌కు ఫలితాలు లేవు.</b>
+                        </div>
+                    </div>
                     <div class="col-4" *ngFor="let item of searchevents" style="width:px;">
                         <div class="card" style="width: 244px;">
                             <div class="card-header">

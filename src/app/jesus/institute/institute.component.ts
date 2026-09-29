@@ -106,115 +106,101 @@ export class InstituteComponent {
     })
   }
 
-  searchdistric(event: any) {
-    this.searchdist = event.target.value
-    var data = {
-      district_id: this.searchdist,
-      df: 1
+  onDistrictChange(event: any) {
+    const id = event && event.target ? event.target.value : event;
+    this.searchdist = id;
+    this.serachMeetingform.patchValue({ district_id: id, constenncy_id: '', mandal_id: '', panchayati_id: '' });
+    this.constituency = [];
+    this.mandals = [];
+    this.panchayati = [];
+    if (id) {
+      this.service.getconsistencys().subscribe(res => {
+        if (res && res.data) {
+          this.constituency = res.data.filter((data: any) => data.dstrct_id == id);
+        }
+      });
+      this.service.Searchinstitute({ district_id: id, df: 1 }).subscribe((res: any) => {
+        if (res && res.status == 200 && Array.isArray(res.data)) {
+          this.institutedata = res.data.map((item: any) => ({ ...item, showMore: false }));
+        }
+      });
     }
-    this.service.Searchinstitute(data).subscribe((res: any) => {
-      console.log(res.data);
-
-      this.institutedata = [];
-      if (res.status == 200) {
-        this.institutedata = res.data.map((item: any) => ({
-          ...item, showMore: false
-        }));
-      } else {
-        Swal.fire('server down')
-      }
-    },
-      error => {
-      })
   }
 
-  searchconstenct(event: any) {
-    this.searchconts = event.target.value
-    var data = {
-      district_id: this.searchdist,
-      constenncy_id: this.searchconts,
-      df: 2,
+  onConstituencyChange(event: any) {
+    const id = event && event.target ? event.target.value : event;
+    this.searchconts = id;
+    this.serachMeetingform.patchValue({ constenncy_id: id, mandal_id: '', panchayati_id: '' });
+    this.mandals = [];
+    this.panchayati = [];
+    if (id) {
+      this.service.getmandals().subscribe(res => {
+        if (res && res.data) {
+          this.mandals = res.data.filter((data: any) => data.const_id == id);
+        }
+      });
+      this.service.Searchinstitute({ district_id: this.searchdist, constenncy_id: id, df: 2 }).subscribe((res: any) => {
+        if (res && res.status == 200 && Array.isArray(res.data)) {
+          this.institutedata = res.data.map((item: any) => ({ ...item, showMore: false }));
+        }
+      });
     }
-    this.service.Searchinstitute(data).subscribe((res: any) => {
-      this.institutedata = [];
-      if (res.status == 200) {
-        this.institutedata = res.data.map((item: any) => ({
-          ...item, showMore: false
-        }));
-      } else {
-        Swal.fire('No Data')
-      }
-    },
-      error => {
-      })
   }
 
-  searchmandals(event: any) {
-    this.searchmand = event.target.value
-    var data = {
-      district_id: this.searchdist,
-      constenncy_id: this.searchconts,
-      mandal_id: event.target.value,
-      df: 3,
+  onMandalChange(event: any) {
+    const id = event && event.target ? event.target.value : event;
+    this.searchmand = id;
+    this.serachMeetingform.patchValue({ mandal_id: id, panchayati_id: '' });
+    this.panchayati = [];
+    if (id) {
+      this.service.gepanchayatis().subscribe(res => {
+        if (res && res.status == 200 && res.data) {
+          this.panchayati = res.data.filter((data: any) => data.mndl_id == id);
+        }
+      });
+      this.service.Searchinstitute({ district_id: this.searchdist, constenncy_id: this.searchconts, mandal_id: id, df: 3 }).subscribe((res: any) => {
+        if (res && res.status == 200 && Array.isArray(res.data)) {
+          this.institutedata = res.data.map((item: any) => ({ ...item, showMore: false }));
+        }
+      });
     }
-    this.service.Searchinstitute(data).subscribe((res: any) => {
-      this.institutedata = [];
-      if (res.status == 200) {
-        this.institutedata = res.data.map((item: any) => ({
-          ...item, showMore: false
-        }));
-      } else {
-        Swal.fire('server down')
-      }
-    },
-      error => {
-      })
   }
 
-  searchvillages(event: any) {
-    this.searchvillages
-    var data = {
-      district_id: this.searchdist,
-      constenncy_id: this.searchconts,
-      mandal_id: this.searchmand,
-      village_id: event.target.value,
-      df: 4,
-    }
-    this.service.Searchinstitute(data).subscribe((res: any) => {
-      this.institutedata = [];
-      if (res.status == 200) {
-        this.institutedata = res.data.map((item: any) => ({
-          ...item, showMore: false
-        }));
-      } else {
-        Swal.fire('server down')
+  onPanchayatiChange(event: any) {
+    const id = event && event.target ? event.target.value : event;
+    this.serachMeetingform.patchValue({ panchayati_id: id });
+    this.service.Searchinstitute({ district_id: this.searchdist, constenncy_id: this.searchconts, mandal_id: this.searchmand, village_id: id, panchayati_id: id, df: 4 }).subscribe((res: any) => {
+      if (res && res.status == 200 && Array.isArray(res.data)) {
+        this.institutedata = res.data.map((item: any) => ({ ...item, showMore: false }));
       }
-    },
-      error => {
-      })
+    });
   }
 
+  // Aliases for backwards compatibility
+  searchdistric(event: any) { this.onDistrictChange(event); }
+  searchconstenct(event: any) { this.onConstituencyChange(event); }
+  searchmandals(event: any) { this.onMandalChange(event); }
+  searchvillages(event: any) { this.onPanchayatiChange(event); }
 
   submitted: boolean = false;
   search() {
     this.submitted = true;
-    if (this.serachMeetingform.invalid) {
-      Swal.fire('* ఉన్న తప్పనిసరి  ఫీల్డ్స్ ఎంటర్ చేయండి');
-    } else {
-      this.service.Searchinstitute(this.serachMeetingform.value).subscribe((res: any) => {
+    const vals = this.serachMeetingform.value || {};
+    this.service.Searchinstitute(vals).subscribe({
+      next: (res: any) => {
         this.institutedata = [];
-        if (res.status == 200) {
-          this.institutedata = res.data;
+        if (res.status == 200 && Array.isArray(res.data)) {
+          this.institutedata = res.data.map((item: any) => ({ ...item, showMore: false }));
           this.submitted = false;
         } else {
-          Swal.fire('no data')
+          Swal.fire('No data found');
         }
       },
-        error => {
-        })
-    }
+      error: err => {
+        console.error(err);
+      }
+    });
   }
-
 
   isShowDiv = true;
 
@@ -240,13 +226,29 @@ export class InstituteComponent {
     })
   }
   reset() {
-    this.serachMeetingform.reset();
-    window.location.reload();
+    this.serachMeetingform.reset({
+      district_id: '',
+      constenncy_id: '',
+      mandal_id: '',
+      panchayati_id: '',
+      course_offered: '',
+      denomination_id: '',
+      ministry_id: '',
+      college_type: ''
+    });
+    this.searchdist = '';
+    this.searchconts = '';
+    this.searchmand = '';
+    this.constituency = [];
+    this.mandals = [];
+    this.panchayati = [];
+    this.submitted = false;
+    this.getinstitutes();
   }
   getinstitutes() {
     this.service.institutes().subscribe(res => {
-      this.institutesdata = res.data;
-      console.log(res.data);
+      this.institutesdata = res.data || [];
+      this.institutedata = res.data ? res.data.map((item: any) => ({ ...item, showMore: false })) : [];
     })
   }
   adds: any;

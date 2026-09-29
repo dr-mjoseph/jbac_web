@@ -42,7 +42,7 @@ export class ChurchTimingsComponent {
       this.router.navigate(['/']);
     }
     this.getdistric();
-    // this.churchtimings();
+    this.churchtimings();
     this.getdenomations();
     this.getbeliver();
     this.getadds();
@@ -61,6 +61,7 @@ export class ChurchTimingsComponent {
       console.log(error);
     })
   }
+
   getdistric() {
     this.service.getdistrict().subscribe(res => {
       if (res.status == 202) {
@@ -73,37 +74,54 @@ export class ChurchTimingsComponent {
     })
   }
 
-  getmandals(event: any) {
-    var id = event.target.value;
-    this.service.getmandals().subscribe(res => {
-      if (res.status == 202) {
-        Swal.fire(res.message);
-      } else if (res.status == 200) {
-        this.mandals = res.data.filter((data: any) => data.const_id == id);
-      }
-    }, error => {
-      console.log(error);
-    })
+  onDistrictChange(event: any) {
+    const id = event && event.target ? event.target.value : event;
+    this.searchdist = id;
+    this.searchchurchingform.patchValue({ district_id: id, constenncy_id: '', mandal_id: '', panchayati_id: '' });
+    this.constituency = [];
+    this.mandals = [];
+    this.panchayati = [];
+    if (id) {
+      this.service.getconsistencys().subscribe(res => {
+        if (res && res.data) {
+          this.constituency = res.data.filter((data: any) => data.dstrct_id == id);
+        }
+      });
+    }
   }
 
-  getconstency(event: any) {
-    var id = event.target.value;
-    this.service.getconsistencys().subscribe(res => {
-      this.constituency = res.data.filter((data: any) => data.dstrct_id == id);
-    });
+  onConstituencyChange(event: any) {
+    const id = event && event.target ? event.target.value : event;
+    this.searchconts = id;
+    this.searchchurchingform.patchValue({ constenncy_id: id, mandal_id: '', panchayati_id: '' });
+    this.mandals = [];
+    this.panchayati = [];
+    if (id) {
+      this.service.getmandals().subscribe(res => {
+        if (res && res.data) {
+          this.mandals = res.data.filter((data: any) => data.const_id == id);
+        }
+      });
+    }
   }
 
-  gepanchayati(event: any) {
-    var id = event.target.value;
-    this.service.gepanchayatis().subscribe(res => {
-      if (res.status == 202) {
-        Swal.fire(res.message);
-      } else if (res.status == 200) {
-        this.panchayati = res.data.filter((data: any) => data.mndl_id == id);
-      }
-    }, error => {
-    })
+  onMandalChange(event: any) {
+    const id = event && event.target ? event.target.value : event;
+    this.searchchurchingform.patchValue({ mandal_id: id, panchayati_id: '' });
+    this.panchayati = [];
+    if (id) {
+      this.service.gepanchayatis().subscribe(res => {
+        if (res && res.status == 200 && res.data) {
+          this.panchayati = res.data.filter((data: any) => data.mndl_id == id);
+        }
+      });
+    }
   }
+
+  // Backwards compatibility aliases
+  getconstency(event: any) { this.onDistrictChange(event); }
+  getmandals(event: any) { this.onConstituencyChange(event); }
+  gepanchayati(event: any) { this.onMandalChange(event); }
 
   ministry_id: any;
   day: any;
@@ -121,21 +139,21 @@ export class ChurchTimingsComponent {
 
   search() {
     this.submitted = true;
-    if (this.searchchurchingform.invalid) {
-      Swal.fire('* ఉన్న తప్పనిసరి  ఫీల్డ్స్ ఎంటర్ చేయండి');
-    } else {
-      this.service.searchingchurchdata(this.searchchurchingform.value).subscribe((res: any) => {
+    const formVals = this.searchchurchingform.value;
+    this.service.searchingchurchdata(formVals).subscribe({
+      next: (res: any) => {
         this.church = [];
-        if (res.status == 200) {
+        if (res.status == 200 && Array.isArray(res.data)) {
           this.church = res.data;
           this.submitted = false;
         } else {
-          Swal.fire('no data')
+          Swal.fire('No data found for this filter');
         }
       },
-        error => {
-        })
-    }
+      error: err => {
+        console.error(err);
+      }
+    });
   }
 
   isShowDiv = true;
@@ -150,8 +168,23 @@ export class ChurchTimingsComponent {
   }
 
   reset() {
-    this.searchchurchingform.reset();
-    window.location.reload();
+    this.searchchurchingform.reset({
+      district_id: '',
+      constenncy_id: '',
+      mandal_id: '',
+      typetime: '',
+      panchayati_id: '',
+      denomationid: '',
+      ministry_id: '',
+      day: ''
+    });
+    this.searchdist = '';
+    this.searchconts = '';
+    this.constituency = [];
+    this.mandals = [];
+    this.panchayati = [];
+    this.submitted = false;
+    this.churchtimings();
   }
 
   village_id: any;

@@ -77,55 +77,87 @@ export class ChurchPastorSearchComponent {
 
 
   defaultdata() {
-    var data = { df: 0 }
-    this.service.searchmarriages(data).subscribe((res: any) => {
-      this.getpastorassciationas = [];
-      if (res.status == 200) {
-        this.getpastorassciationas = res.data.map((item: any) => ({
-          ...item, showMore: false
-        }));
-      } else {
-        Swal.fire('server down')
+    var data = { df: 0 };
+    this.service.searchpastors(data).subscribe({
+      next: (res: any) => {
+        this.getpastorassciationas = [];
+        if (res && res.status == 200 && Array.isArray(res.data)) {
+          this.getpastorassciationas = res.data.map((item: any) => ({
+            ...item, showMore: false
+          }));
+        }
+      },
+      error: err => {
+        console.error(err);
       }
-    },
-      error => {
-      })
+    });
   }
+
   getdistric() {
-    this.service.getdistrict().subscribe(res => {
-
-
-      if (res.status == 202) {
-        Swal.fire(res.message);
-      } else if (res.status == 200) {
-        this.districts = res.data;
-      }
-    }, error => {
-    })
+    this.service.getdistrict().subscribe({
+      next: res => {
+        if (res.status == 202) {
+          Swal.fire(res.message);
+        } else if (res.status == 200) {
+          this.districts = res.data;
+        }
+      },
+      error: err => console.error(err)
+    });
   }
+
   searchdist: any;
-  searchdistric(event: any) {
-    this.searchdist = event.target.value
-    var data = {
-      district_id: this.searchdist,
-      df: 1
-    }
-    this.service.searchpastors(data).subscribe((res: any) => {
-      this.getpastorassciationas = [];
-      if (res.status == 200) {
-        this.getpastorassciationas = res.data.map((item: any) => ({
-          ...item, showMore: false
-        }));
-        console.log(this.getpastorassciationas);
 
-      } else {
-        alert('సర్వర్ డౌన్ వుంది, దయచేసి తరువాత ప్రయత్నిచండి')
-      }
-    },
-      error => {
-      })
+  onDistrictChange(event: any) {
+    const id = event && event.target ? event.target.value : event;
+    this.searchdist = id;
+    this.search.patchValue({ district_id: id, constituency_id: '', mandal_id: '', pastor_id: '', church: '' });
+    this.constituency = [];
+    this.mandals = [];
+    this.getpastorassciationas = [];
+    this.getchurchfilter = [];
+    if (id) {
+      this.service.getconsistencys().subscribe(res => {
+        if (res && res.data) {
+          this.constituency = res.data.filter((data: any) => data.dstrct_id == id);
+        }
+      });
+      this.service.searchpastors({ district_id: id, df: 1 }).subscribe((res: any) => {
+        if (res && res.status == 200 && Array.isArray(res.data)) {
+          this.getpastorassciationas = res.data;
+        }
+      });
+    }
   }
 
+  onConstituencyChange(event: any) {
+    const id = event && event.target ? event.target.value : event;
+    this.search.patchValue({ constituency_id: id, mandal_id: '', pastor_id: '', church: '' });
+    this.mandals = [];
+    if (id) {
+      this.service.getmandals().subscribe(res => {
+        if (res && res.data) {
+          this.mandals = res.data.filter((data: any) => data.const_id == id);
+        }
+      });
+    }
+  }
+
+  onMandalChange(event: any) {
+    const id = event && event.target ? event.target.value : event;
+    this.search.patchValue({ mandal_id: id, pastor_id: '', church: '' });
+    if (this.form == 1) {
+      this.pastorfilter();
+    } else if (this.form == 2) {
+      this.getchurchesdata();
+    }
+  }
+
+  // Aliases for template backwards-compatibility
+  searchdistric(event: any) { this.onDistrictChange(event); }
+  getconstency(event: any) { this.onDistrictChange(event); }
+  getmandals(event: any) { this.onConstituencyChange(event); }
+  gepanchayati(event: any) { this.onMandalChange(event); }
 
   // Accept Input As a Number Only
   numericOnly(event: any): boolean {
@@ -135,92 +167,78 @@ export class ChurchPastorSearchComponent {
   }
 
   postinsututies() {
-
   }
 
-  getmandals(event: any) {
-    var id = event.target.value;
-    this.service.getmandals().subscribe(res => {
-      if (res.status == 202) {
-        Swal.fire(res.message);
-      } else if (res.status == 200) {
-        this.mandals = res.data.filter((data: any) => data.const_id == id);
-      }
-    }, error => {
-
-    })
-  }
-
-  getconstency(event: any) {
-    var id = event.target.value;
-    this.service.getconsistencys().subscribe(res => {
-      this.constituency = res.data.filter((data: any) => data.dstrct_id == id);
-
-    });
-  }
-
-  gepanchayati(event: any) {
-    var id = event.target.value;
-    this.service.gepanchayatis().subscribe(res => {
-      if (res.status == 202) {
-        Swal.fire(res.message);
-      } else if (res.status == 200) {
-        this.panchayati = res.data.filter((data: any) => data.mndl_id == id);
-      }
-    }, error => {
-
-    })
-  }
   form: any;
 
   churchchangewe(event: any) {
-    this.form = event.value
+    this.form = event ? (event.value || event) : null;
+    if (this.search.value.district_id && this.search.value.constituency_id && this.search.value.mandal_id) {
+      if (this.form == 1) {
+        this.pastorfilter();
+      } else if (this.form == 2) {
+        this.getchurchesdata();
+      }
+    }
   }
+
   afterchanges: any;
   churchview() {
-    if (this.search.value.district_id == '' || this.search.value.constituency_id == '') {
-      alert("Please Fill the Districts & Constituency")
+    if (!this.search.value.district_id || !this.search.value.constituency_id) {
+      alert("Please Fill the Districts & Constituency");
     } else {
       var data = {
         districts: this.search.value.district_id,
         constituencyname: this.search.value.constituency_id,
         mandal_id: this.search.value.mandal_id,
-        // village_id:this.search.value.village_id,
-
         church: this.search.value.church,
-      }
-      console.log(data);
-      this.service.viewupdates(data).subscribe((res: any) => {
-        console.log(res.data);
-
-        this.afterchanges = res.data;
-        console.log(res.data, 'hello');
-
-        this.search.reset();
-      })
+      };
+      this.service.viewupdates(data).subscribe({
+        next: (res: any) => {
+          this.afterchanges = res.data || [];
+        },
+        error: err => console.error(err)
+      });
     }
   }
+
   afterchangespastor: any;
   pastorview() {
-    if (this.search.value.district_id == '' || this.search.value.constituency_id == '' || this.search.value.mandal_id == '') {
-      alert("Please Fill the Districts & Constituency")
+    if (!this.search.value.district_id || !this.search.value.constituency_id) {
+      alert("Please Fill the Districts & Constituency");
     } else {
       var data = {
         districts: this.search.value.district_id,
         constituencyname: this.search.value.constituency_id,
         mandal_id: this.search.value.mandal_id,
-        // village_id:this.search.value.village_id,
         pastor_id: this.search.value.pastor_id,
-
-      }
-      console.log(data);
-      this.service.viewpastorupdates(data).subscribe((res: any) => {
-        console.log(res.data, 'hello');
-
-        this.afterchangespastor = res.data;
-        this.search.reset();
-      })
+      };
+      this.service.viewpastorupdates(data).subscribe({
+        next: (res: any) => {
+          this.afterchangespastor = res.data || [];
+        },
+        error: err => console.error(err)
+      });
     }
+  }
+
+  reset() {
+    this.search.reset({
+      district_id: '',
+      constituency_id: '',
+      mandal_id: '',
+      pastor_id: '',
+      church: '',
+      checkbox: ''
+    });
+    this.form = null;
+    this.constituency = [];
+    this.mandals = [];
+    this.afterchanges = [];
+    this.afterchangespastor = [];
+    this.getpastorassciationas = [];
+    this.getchurchfilter = [];
+    this.defaultdata();
   }
 
 

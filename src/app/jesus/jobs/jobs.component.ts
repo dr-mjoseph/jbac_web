@@ -22,11 +22,14 @@ export class JobsComponent {
   searchchurchingform: FormGroup;
   constructor(private formBuilder: FormBuilder, private service: ServiceService, private modalService: NgbModal ,  private router: Router) {
     this.searchchurchingform = this.formBuilder.group({
-      district_id: ['', [Validators.required]],
-      constenncy_id: ['', [Validators.required]],
-      mandal_id: ['', [Validators.required]],
-      panchayati_id: ['', [Validators.required]],
-    })
+      district_id: [''],
+      constenncy_id: [''],
+      mandal_id: [''],
+      panchayati_id: [''],
+      jobtile: [''],
+      qual: [''],
+      experience: [''],
+    });
   }
   ngOnInit(): void {
     this.getdistric();
@@ -38,8 +41,6 @@ export class JobsComponent {
       Swal.fire("Login Required")
       this.router.navigate(['/']);
     }
-
-
   }
 
   getdistric() {
@@ -57,128 +58,125 @@ export class JobsComponent {
     })
   }
 
-  getmandals(event: any) {
-    var id = event.target.value;
-    this.service.getmandals().subscribe(res => {
-      if (res.status == 202) {
-        Swal.fire(res.message);
-      } else if (res.status == 200) {
-        this.mandals = res.data.filter((data: any) => data.const_id == id);
-      }
-    }, error => {
-      console.log(error);
-    })
+  onDistrictChange(event: any) {
+    const id = event && event.target ? event.target.value : event;
+    this.searchdist = id;
+    this.searchchurchingform.patchValue({ district_id: id, constenncy_id: '', mandal_id: '', panchayati_id: '' });
+    this.constituency = [];
+    this.mandals = [];
+    this.panchayati = [];
+    if (id) {
+      this.service.getconsistencys().subscribe(res => {
+        if (res && res.data) {
+          this.constituency = res.data.filter((data: any) => data.dstrct_id == id);
+        }
+      });
+      this.applyFilter();
+    }
   }
 
-  getconstency(event: any) {
-    var id = event.target.value;
-    this.service.getconsistencys().subscribe(res => {
-      this.constituency = res.data.filter((data: any) => data.dstrct_id == id);
-    });
+  onConstituencyChange(event: any) {
+    const id = event && event.target ? event.target.value : event;
+    this.searchconts = id;
+    this.searchchurchingform.patchValue({ constenncy_id: id, mandal_id: '', panchayati_id: '' });
+    this.mandals = [];
+    this.panchayati = [];
+    if (id) {
+      this.service.getmandals().subscribe(res => {
+        if (res && res.data) {
+          this.mandals = res.data.filter((data: any) => data.const_id == id);
+        }
+      });
+      this.applyFilter();
+    }
   }
 
-  gepanchayati(event: any) {
-    var id = event.target.value;
-    this.service.gepanchayatis().subscribe(res => {
-      if (res.status == 202) {
-        Swal.fire(res.message);
-      } else if (res.status == 200) {
-        this.panchayati = res.data.filter((data: any) => data.mndl_id == id);
-      }
-    }, error => {
-      console.log(error);
-    })
+  onMandalChange(event: any) {
+    const id = event && event.target ? event.target.value : event;
+    this.searchchurchingform.patchValue({ mandal_id: id, panchayati_id: '' });
+    this.panchayati = [];
+    if (id) {
+      this.service.gepanchayatis().subscribe(res => {
+        if (res && res.data) {
+          this.panchayati = res.data.filter((data: any) => data.mndl_id == id);
+        }
+      });
+      this.applyFilter();
+    }
   }
 
+  onPanchayatiChange(event: any) {
+    const id = event && event.target ? event.target.value : event;
+    this.searchchurchingform.patchValue({ panchayati_id: id });
+    this.applyFilter();
+  }
+
+  getconstency(event: any) { this.onDistrictChange(event); }
+  getmandals(event: any) { this.onConstituencyChange(event); }
+  gepanchayati(event: any) { this.onMandalChange(event); }
+  searchdistric(event: any) { this.onDistrictChange(event); }
+  searchconstenct(event: any) { this.onConstituencyChange(event); }
+  searchmandals(event: any) { this.onMandalChange(event); }
 
   getjobs() {
-    var data = {
-      df: 0
-    }
-    this.service.getjobs(data).subscribe((res: any) => {
+    this.service.getjobs({ df: 0 }).subscribe((res: any) => {
       this.jobs = [];
-      if (res.status == 200) {
-        console.log(res.data);
+      if (res.status == 200 && Array.isArray(res.data)) {
         this.jobs = res.data.map((item: any) => ({
           ...item, showMore: false
         }));
-      } else {
-        Swal.fire('server down')
       }
-    },
-      error => {
-      })
+    }, error => {
+      console.error(error);
+    });
   }
 
-  searchdistric(event: any) {
-    this.searchdist = event.target.value
-    var data = {
-      district_id: this.searchdist,
-      df: 1
-    }
-    this.service.getjobs(data).subscribe((res: any) => {
-      this.jobs = [];
-      if (res.status == 200) {
-        this.jobs = res.data;
-      } else {
-        Swal.fire('server down')
-      }
-    },
-      error => {
-      })
-  }
-
-  searchconstenct(event: any) {
-    this.searchconts = event.target.value
-    var data = {
-      district_id: this.searchdist,
-      constenncy_id: this.searchconts,
-      df: 2,
-    }
-    this.service.getjobs(data).subscribe((res: any) => {
-      this.jobs = [];
-      if (res.status == 200) {
-        this.jobs = res.data;
-      } else {
-        Swal.fire('No Data')
-      }
-    },
-      error => {
-      })
-  }
-
-  searchmandals(event: any) {
-    var data = {
-      district_id: this.searchdist,
-      constenncy_id: this.searchconts,
-      mandal_id: event.target.value,
-      df: 3,
-    }
-    this.service.getjobs(data).subscribe((res: any) => {
-      this.jobs = [];
-      if (res.status == 200) {
-        this.jobs = res.data;
-      } else {
-        Swal.fire('server down')
-      }
-    },
-      error => {
-      })
-  }
-  search() {
+  applyFilter() {
     this.showSpinner = true;
-    this.service.getjobs(this.searchchurchingform.value).subscribe((res: any) => {
-      this.jobs = [];
-      if (res.status == 200) {
+    const formVals = this.searchchurchingform.value || {};
+    const data = {
+      district_id: formVals.district_id || this.searchdist || '',
+      constenncy_id: formVals.constenncy_id || this.searchconts || '',
+      mandal_id: formVals.mandal_id || '',
+      panchayati_id: formVals.panchayati_id || '',
+      jobtile: formVals.jobtile || '',
+      qual: formVals.qual || '',
+      experience: formVals.experience || '',
+    };
+    this.service.getjobs(data).subscribe({
+      next: (res: any) => {
         this.showSpinner = false;
-        this.jobs = res.data;
-      } else {
-        Swal.fire('server down')
+        this.jobs = [];
+        if (res.status == 200 && Array.isArray(res.data)) {
+          this.jobs = res.data.map((item: any) => ({ ...item, showMore: false }));
+        }
+      },
+      error: () => {
+        this.showSpinner = false;
       }
-    },
-      error => {
-        this.showSpinner = false;
-      })
+    });
+  }
+
+  search() {
+    this.applyFilter();
+  }
+
+  reset() {
+    this.searchchurchingform.reset({
+      district_id: '',
+      constenncy_id: '',
+      mandal_id: '',
+      panchayati_id: '',
+      jobtile: '',
+      qual: '',
+      experience: ''
+    });
+    this.searchdist = '';
+    this.searchconts = '';
+    this.constituency = [];
+    this.mandals = [];
+    this.panchayati = [];
+    this.getjobs();
   }
 
   isShowDiv = true;

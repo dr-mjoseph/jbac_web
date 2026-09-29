@@ -136,7 +136,7 @@
                                 <div class="form-outline">
                                     <label class="form-label">Select Districts </label>
                                     <select class="form-control" formControlName="district_id"
-                                        (change)="getconstency($event);" (change)="searchdistric($event);"
+                                        (change)="onDistrictChange($event);"
                                         style="height:37px;width: 273px;">
                                         <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
                                         <option value="{{item.id}}" *ngFor="let item of districts">
@@ -150,7 +150,7 @@
                                 <div class="form-outline">
                                     <label class="form-label">నియోజకవర్గం ఎంచుకోండి </label>
                                     <select class="form-control" formControlName="constenncy_id"
-                                        (change)="getmandals($event);" (change)="searchconstenct($event);"
+                                        (change)="onConstituencyChange($event);"
                                         style="height:37px;width: 273px;">
                                         <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
                                         <option value="{{item.id}}" *ngFor="let item of constituency">
@@ -163,7 +163,7 @@
                                 <div class="form-outline">
                                     <label class="form-label">మండలం ఎంచుకోండి </label>
                                     <select class="form-control" formControlName="mandal_id"
-                                        (change)="gepanchayati($event);" (change)="searchmandals($event);"
+                                        (change)="onMandalChange($event);"
                                         style="height:37px;width: 273px;">
                                         <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
                                         <option value="{{item.id}}" *ngFor="let item of mandals">
@@ -176,7 +176,7 @@
                                 <div class="form-outline">
                                     <label class="form-label">పంచాయతీ ఎంచుకోండి </label>
                                     <select class="form-control" formControlName="panchayati_id"
-                                        (change)="searchvillages($event);" style="height:37px;width: 273px;">
+                                        (change)="onPanchayatiChange($event);" style="height:37px;width: 273px;">
                                         <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
                                         <option value="{{item.id}}" *ngFor="let item of panchayati">
                                             {{item.pnchyt_nm}}

@@ -29,6 +29,8 @@ export class BusinessComponent {
   denomation: any;
   ministryname: any;
   titles: any;
+  searchdist: any;
+  searchconts: any;
   constructor(public service: ServiceService, private modalService: NgbModal, private fromb: FormBuilder, private router: Router) {
     this.serachMeetingform = this.fromb.group({
       district_id: ['', [Validators.required]],
@@ -141,25 +143,7 @@ export class BusinessComponent {
       : string;
   }
 
-  getconstency(event: any) {
-    var id = event.target.value;
-    this.service.getconsistencys().subscribe(res => {
-      this.constituency = res.data.filter((data: any) => data.dstrct_id == id);
-    });
-  }
   panchayati: any;
-  gepanchayati(event: any) {
-    var id = event.target.value;
-    this.service.gepanchayatis().subscribe(res => {
-      if (res.status == 202) {
-        Swal.fire(res.message);
-      } else if (res.status == 200) {
-        this.panchayati = res.data.filter((data: any) => data.mndl_id == id);
-      }
-    }, error => {
-      console.log(error);
-    })
-  }
 
   type: any;
   searchchange(event: any) {
@@ -253,106 +237,99 @@ export class BusinessComponent {
       error => {
       })
   }
-  searchdist: any;
-  searchconts: any;
-
-  searchdistric(event: any) {
-    this.searchdist = event.target.value
-    var data = {
-      
-      district_id: this.searchdist,
-      df: 2
+  onDistrictChange(event: any) {
+    const id = event && event.target ? event.target.value : event;
+    this.searchdist = id;
+    this.searchdenomation.patchValue({ district_id: id, constenncy_id: '', mandal_id: '', panchayati_id: '' });
+    this.constituency = [];
+    this.mandals = [];
+    this.panchayati = [];
+    if (id) {
+      this.service.getconsistencys().subscribe(res => {
+        if (res && res.data) {
+          this.constituency = res.data.filter((data: any) => data.dstrct_id == id);
+        }
+      });
     }
-    this.service.searchingdata(data).subscribe((res: any) => {
-      this.searchevents = [];
-      if (res.status == 200) {
-        this.searchevents = res.data.map((item: any) => ({
-          ...item, showMore: false
-        }));
-      } else {
-        Swal.fire('server down')
-      }
-    },
-      error => {
-      })
+    this.applyFilter();
   }
 
-  searchconstenct(event: any) {
-    this.searchconts = event.target.value
-    var data = {
-      // mettingtype: this.mettingtype,
-      district_id: this.searchdist,
-      constenncy_id: this.searchconts,
-      df: 3,
+  onConstituencyChange(event: any) {
+    const id = event && event.target ? event.target.value : event;
+    this.searchconts = id;
+    this.searchdenomation.patchValue({ constenncy_id: id, mandal_id: '', panchayati_id: '' });
+    this.mandals = [];
+    this.panchayati = [];
+    if (id) {
+      this.service.getmandals().subscribe(res => {
+        if (res && res.data) {
+          this.mandals = res.data.filter((data: any) => data.const_id == id);
+        }
+      });
     }
-    this.service.searchingdata(data).subscribe((res: any) => {
-      this.searchevents = [];
-      if (res.status == 200) {
-        this.searchevents = res.data.map((item: any) => ({
-          ...item, showMore: false
-        }));
-      } else {
-        Swal.fire('No Data')
-      }
-    },
-      error => {
-      })
+    this.applyFilter();
   }
 
-  searchmandals(event: any) {
-    var data = {
-      // mettingtype: this.mettingtype,
-      district_id: this.searchdist,
-      constenncy_id: this.searchconts,
-      mandal_id: event.target.value,
-      df: 4,
+  onMandalChange(event: any) {
+    const id = event && event.target ? event.target.value : event;
+    this.searchdenomation.patchValue({ mandal_id: id, panchayati_id: '' });
+    this.panchayati = [];
+    if (id) {
+      this.service.gepanchayatis().subscribe(res => {
+        if (res && res.status == 200 && res.data) {
+          this.panchayati = res.data.filter((data: any) => data.mndl_id == id);
+        }
+      });
     }
-    this.service.searchingdata(data).subscribe((res: any) => {
-      this.searchevents = [];
-      if (res.status == 200) {
-        this.searchevents = res.data.map((item: any) => ({
-          ...item, showMore: false
-        }));
-      } else {
-        Swal.fire('server down')
-      }
-    },
-      error => {
-      })
+    this.applyFilter();
+  }
+
+  onPanchayatiChange(event: any) {
+    const id = event && event.target ? event.target.value : event;
+    this.searchdenomation.patchValue({ panchayati_id: id });
+    this.applyFilter();
+  }
+
+  // Aliases for template backwards-compatibility
+  searchdistric(event: any) { this.onDistrictChange(event); }
+  searchconstenct(event: any) { this.onConstituencyChange(event); }
+  searchmandals(event: any) { this.onMandalChange(event); }
+  getconstency(event: any) { this.onDistrictChange(event); }
+  gepanchayati(event: any) { this.onMandalChange(event); }
+
+  applyFilter() {
+    const vals = this.searchdenomation.value || {};
+    const payload = {
+      type: vals.mettingtype || this.type || '',
+      denomation: vals.denomation || this.searchdeno || '',
+      title: vals.title || this.titles || '',
+      ministry_id: vals.ministry_id || '',
+      district_id: vals.district_id || this.searchdist || '',
+      constituency_id: vals.constenncy_id || this.searchconts || '',
+      mandal_id: vals.mandal_id || '',
+      panchayati_id: vals.panchayati_id || ''
+    };
+    this.service.searchingbusiness(payload).subscribe({
+      next: (res: any) => {
+        this.searchevents = [];
+        if (res && res.status == 200 && Array.isArray(res.data)) {
+          this.searchevents = res.data.map((item: any) => ({ ...item, showMore: false }));
+        }
+      },
+      error: err => console.error(err)
+    });
   }
 
   search() {
-    this.service.searchingdata(this.serachMeetingform.value).subscribe((res: any) => {
-      this.searchevents = [];
-      if (res.status == 200) {
-        this.searchevents = res.data.map((item: any) => ({
-          ...item, showMore: false
-        }));
-      } else {
-        Swal.fire('server down')
-      }
-    },
-      error => {
-      })
+    this.applyFilter();
   }
 
   searchdenomationalldata() {
-    this.service.searchingdemonationdata(this.serachMeetingform.value).subscribe((res: any) => {
-      this.searchevents = [];
-      if (res.status == 200) {
-        this.searchevents = res.data.map((item: any) => ({
-          ...item, showMore: false
-        }));
-      } else {
-        Swal.fire('server down')
-      }
-    },
-      error => {
-      })
+    this.applyFilter();
   }
+
   searechevents() {
     this.service.getbusiness().subscribe(res => {
-      console.log("dfkgkdj", res.data);
       if (res.status == 202) {
         Swal.fire(res.message);
       } else if (res.status == 200) {
@@ -361,12 +338,32 @@ export class BusinessComponent {
         }));
       }
     }, error => {
-    })
+      console.error(error);
+    });
   }
 
   reset() {
+    this.searchdenomation.reset({
+      mettingtype: '',
+      denomation: '',
+      title: '',
+      ministry_id: '',
+      district_id: '',
+      constenncy_id: '',
+      mandal_id: '',
+      panchayati_id: ''
+    });
     this.serachMeetingform.reset();
-    window.location.reload();
+    this.searchdist = '';
+    this.searchconts = '';
+    this.type = '';
+    this.searchdeno = '';
+    this.titles = '';
+    this.constituency = [];
+    this.mandals = [];
+    this.panchayati = [];
+    this.searchTerm = '';
+    this.searechevents();
   }
 
   searchTerm: any;

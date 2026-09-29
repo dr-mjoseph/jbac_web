@@ -378,16 +378,29 @@ app.all(['/dashboardapi/getaboutwebsite', '/api/about'], async (_req, res) => {
 });
 
 // Events & Meetings (AddMeetings, Events, Revival, Youth, Women, Pastors)
-app.all(['/api/events', '/dashboardapi/getevents', '/dashboardapi/getupdateevents', '/api/getupdateevents'], async (_req, res) => {
+app.all(['/api/events', '/dashboardapi/getevents', '/dashboardapi/getupdateevents', '/api/getupdateevents'], async (req: any, res: any) => {
     try {
-        const [eventsRows] = await db.query('SELECT id, eventname as title, eventname, eventname as event_name, orgname, meetsize, description, startdate, startdate as event_date, enddate, starttime, starttime as event_time, endtime, location, address, facebook, youtube, phone, image, speaker1, speaker2, speaker3, speaker4, district_id, constituency_id, mandal_id, panchayat_id FROM events WHERE d_in = 0 ORDER BY id DESC');
+        const isCurrentDateOnly = req.query?.current_date_only === 'true' || req.body?.current_date_only === true;
+        const showAll = req.query?.all === 'true' || req.body?.all === true || req.query?.admin === 'true';
+
+        let sql = 'SELECT id, eventname as title, eventname, eventname as event_name, orgname, meetsize, description, startdate, startdate as event_date, enddate, starttime, starttime as event_time, endtime, location, address, facebook, youtube, phone, eventcontactnumber, image, speaker1, speaker2, speaker3, speaker4, district_id, constituency_id, mandal_id, panchayat_id FROM events WHERE d_in = 0';
+        
+        if (isCurrentDateOnly) {
+            sql += ' AND ((startdate <= CURDATE() AND (enddate >= CURDATE() OR enddate IS NULL OR enddate = "")) OR startdate = CURDATE())';
+        } else if (!showAll) {
+            // By default hide old meetings where enddate < CURDATE()
+            sql += ' AND ((enddate IS NOT NULL AND enddate != "" AND enddate >= CURDATE()) OR ((enddate IS NULL OR enddate = "") AND (startdate IS NULL OR startdate >= CURDATE())))';
+        }
+
+        sql += ' ORDER BY id DESC';
+        const [eventsRows] = await db.query(sql);
         res.json({ status: 200, data: eventsRows });
-    } catch (err) {
+    } catch (err: any) {
         res.status(500).json({ status: 500, error: err.message });
     }
 });
 
-app.post(['/dashboardapi/postmeetings', '/api/postmeetings'], async (req, res) => {
+app.post(['/dashboardapi/postmeetings', '/dashboardapi/postchuechmeetings', '/dashboardapi/postchurchmeetings', '/api/postmeetings'], async (req: any, res: any) => {
     try {
         const m = req.body;
         const img = extractUploadedImage(m);
@@ -438,53 +451,50 @@ app.post(['/dashboardapi/postmeetings', '/api/postmeetings'], async (req, res) =
         } catch (_) {}
 
         res.json({ status: 200, message: 'Meeting scheduled successfully', insertId: result?.insertId });
-    } catch (err) {
+    } catch (err: any) {
         res.status(500).json({ status: 500, error: err.message });
     }
 });
 
-app.all(['/dashboardapi/searchingdata', '/api/searchingdata'], async (req, res) => {
+const searchMeetingsHandler = async (req: any, res: any) => {
     try {
         const body = req.body || {};
         let sql = 'SELECT id, eventname as title, eventname, eventname as event_name, orgname, meetsize, description, startdate, startdate as event_date, enddate, starttime, starttime as event_time, endtime, location, address, facebook, youtube, phone, eventcontactnumber, image, speaker1, speaker2, speaker3, speaker4, district_id, constituency_id, mandal_id, panchayat_id FROM events WHERE d_in = 0';
-        const params = [];
+        const params: any[] = [];
         
         if (body.district_id) { sql += ' AND district_id = ?'; params.push(body.district_id); }
         if (body.constenncy_id || body.constituency_id) { sql += ' AND constituency_id = ?'; params.push(body.constenncy_id || body.constituency_id); }
         if (body.mandal_id || body.mandals) { sql += ' AND mandal_id = ?'; params.push(body.mandal_id || body.mandals); }
-        if (body.village_id || body.panchayat_id) { sql += ' AND panchayat_id = ?'; params.push(body.village_id || body.panchayat_id); }
+        if (body.village_id || body.panchayat_id || body.panchayati_id) { sql += ' AND panchayat_id = ?'; params.push(body.village_id || body.panchayat_id || body.panchayati_id); }
         if (body.denomation_id || body.denomation) { sql += ' AND denomation_id = ?'; params.push(body.denomation_id || body.denomation); }
+        if (body.ministry_id) { sql += ' AND ministry_id = ?'; params.push(body.ministry_id); }
         if (body.mettingtype) { sql += ' AND (LOWER(eventname) LIKE ? OR eventname = ?)'; params.push(`%${body.mettingtype}%`, body.mettingtype); }
         if (body.speakerone) { sql += ' AND (speaker1 LIKE ? OR speaker2 LIKE ?)'; params.push(`%${body.speakerone}%`, `%${body.speakerone}%`); }
+        
+        if (body.startdate) {
+            // Match event that covers this date
+            sql += ' AND ((startdate <= ? AND (enddate >= ? OR enddate IS NULL OR enddate = "")) OR startdate = ?)';
+            params.push(body.startdate, body.startdate, body.startdate);
+        } else if (body.current_date_only) {
+            sql += ' AND ((startdate <= CURDATE() AND (enddate >= CURDATE() OR enddate IS NULL OR enddate = "")) OR startdate = CURDATE())';
+        } else if (body.show_old !== true) {
+            // By default hide old past meetings
+            sql += ' AND ((enddate IS NOT NULL AND enddate != "" AND enddate >= CURDATE()) OR ((enddate IS NULL OR enddate = "") AND (startdate IS NULL OR startdate >= CURDATE())))';
+        }
+
         if (body.fromdate) { sql += ' AND startdate >= ?'; params.push(body.fromdate); }
         if (body.todate) { sql += ' AND startdate <= ?'; params.push(body.todate); }
 
         sql += ' ORDER BY id DESC';
         const [rows] = await db.query(sql, params);
         res.json({ status: 200, data: rows });
-    } catch (err) {
+    } catch (err: any) {
         res.status(500).json({ status: 500, error: err.message });
     }
-});
+};
 
-app.all(['/dashboardapi/searchingdemonationdata', '/api/searchingdemonationdata'], async (req, res) => {
-    try {
-        const body = req.body || {};
-        let sql = 'SELECT id, eventname as title, eventname, eventname as event_name, orgname, meetsize, description, startdate, startdate as event_date, enddate, starttime, starttime as event_time, endtime, location, address, facebook, youtube, phone, eventcontactnumber, image, speaker1, speaker2, speaker3, speaker4, district_id, constituency_id, mandal_id, panchayat_id FROM events WHERE d_in = 0';
-        const params = [];
-        
-        if (body.denomation) { sql += ' AND denomation_id = ?'; params.push(body.denomation); }
-        if (body.mettingtype) { sql += ' AND (LOWER(eventname) LIKE ? OR eventname = ?)'; params.push(`%${body.mettingtype}%`, body.mettingtype); }
-        if (body.speakerone) { sql += ' AND (speaker1 LIKE ? OR speaker2 LIKE ?)'; params.push(`%${body.speakerone}%`, `%${body.speakerone}%`); }
-        if (body.ministry_id) { sql += ' AND ministry_id = ?'; params.push(body.ministry_id); }
-
-        sql += ' ORDER BY id DESC';
-        const [rows] = await db.query(sql, params);
-        res.json({ status: 200, data: rows });
-    } catch (err) {
-        res.status(500).json({ status: 500, error: err.message });
-    }
-});
+app.all(['/dashboardapi/searchingdata', '/api/searchingdata'], searchMeetingsHandler);
+app.all(['/dashboardapi/searchingdemonation', '/dashboardapi/searchingdemonationdata', '/api/searchingdemonation', '/api/searchingdemonationdata'], searchMeetingsHandler);
 
 const getMeetingHandler = (type) => async (_req, res) => {
     try {
@@ -664,23 +674,53 @@ app.all(['/dashboardapi/getpastor', '/api/pastors'], async (_req, res) => {
     try {
         const [rows] = await db.query('SELECT id, pastorname, pastorname as name, phonenumber, phonenumber as mobile_number, description, district_id, constituency_id, mandal_id, village_id, address FROM pastor_reg WHERE d_in = 0 ORDER BY id DESC');
         res.json({ status: 200, data: rows });
-    } catch (err) {
+    } catch (err: any) {
         res.status(500).json({ status: 500, error: err.message });
     }
 });
 
-app.all(['/dashboardapi/getpastorsfilters', '/api/getpastorsfilters'], async (req, res) => {
+const searchPastorsHandler = async (req: any, res: any) => {
     try {
-        const { districts, constituencyname, mandal_id } = req.body || {};
+        const body = req.body || {};
+        const district = body.district_id || body.districts;
+        const constituency = body.constituency_id || body.constenncy_id || body.constituencyname;
+        const mandal = body.mandal_id || body.mandals;
+        const pastor = body.pastor_id || body.pastorname || body.pastor;
+        
         let sql = 'SELECT id, pastorname, pastorname as name, phonenumber, phonenumber as mobile_number, description, district_id, constituency_id, mandal_id, village_id, address FROM pastor_reg WHERE d_in = 0';
-        const params = [];
-        if (districts) { sql += ' AND district_id = ?'; params.push(districts); }
-        if (constituencyname) { sql += ' AND constituency_id = ?'; params.push(constituencyname); }
-        if (mandal_id) { sql += ' AND mandal_id = ?'; params.push(mandal_id); }
+        const params: any[] = [];
+        if (district) { sql += ' AND district_id = ?'; params.push(district); }
+        if (constituency) { sql += ' AND constituency_id = ?'; params.push(constituency); }
+        if (mandal) { sql += ' AND mandal_id = ?'; params.push(mandal); }
+        if (pastor) { sql += ' AND (pastorname LIKE ? OR id = ?)'; params.push(`%${pastor}%`, pastor); }
         sql += ' ORDER BY id DESC';
         const [rows] = await db.query(sql, params);
         res.json({ status: 200, data: rows });
-    } catch (err) {
+    } catch (err: any) {
+        res.status(500).json({ status: 500, error: err.message });
+    }
+};
+
+app.all(['/dashboardapi/getpastorsfilters', '/api/getpastorsfilters', '/dashboardapi/searchpastors', '/api/searchpastors'], searchPastorsHandler);
+
+app.all(['/dashboardapi/pastorviewupdates', '/dashboardapi/viewpastorupdates', '/api/pastorviewupdates', '/api/viewpastorupdates'], async (req: any, res: any) => {
+    try {
+        const body = req.body || {};
+        const district = body.district_id || body.districts;
+        const constituency = body.constituency_id || body.constenncy_id || body.constituencyname;
+        const mandal = body.mandal_id || body.mandals;
+        const pastor = body.pastor_id || body.pastorname;
+
+        let sql = 'SELECT * FROM pastor_reg WHERE d_in = 0';
+        const params: any[] = [];
+        if (district) { sql += ' AND district_id = ?'; params.push(district); }
+        if (constituency) { sql += ' AND constituency_id = ?'; params.push(constituency); }
+        if (mandal) { sql += ' AND mandal_id = ?'; params.push(mandal); }
+        if (pastor) { sql += ' AND (pastorname LIKE ? OR id = ?)'; params.push(`%${pastor}%`, pastor); }
+        sql += ' ORDER BY id DESC LIMIT 1';
+        const [rows]: any = await db.query(sql, params);
+        res.json({ status: 200, data: rows[0] || {} });
+    } catch (err: any) {
         res.status(500).json({ status: 500, error: err.message });
     }
 });
@@ -711,24 +751,107 @@ app.post(['/dashboardapi/postchurchregister', '/api/postchurchregister'], async 
 
 app.all(['/dashboardapi/getchurch', '/dashboardapi/getchurches', '/api/getchurch'], async (_req: any, res: any) => {
     try {
-        const [rows] = await db.query('SELECT id, church_name, church_name as churchname, church_name as name, pastor_id, pastor_id as pastorname, pastor_id as pastor_name, contactnumber as phonenumber, contactnumber as mobile_number, district_id, constituency_id, mandal_id, village_id, address FROM church_reg WHERE d_in = 0 ORDER BY id DESC');
+        // Query church_timings joined with church_reg for church details
+        const [timingRows]: any = await db.query(`
+            SELECT ct.id, 
+                COALESCE(cr.church_name, ct.descriptions, ct.user_name, 'Church') AS church_name,
+                COALESCE(ct.day, 'Sunday') AS day,
+                ct.starttime, ct.endtime,
+                COALESCE(cr.location, '') AS location,
+                COALESCE(cr.youtube, '') AS youtube,
+                COALESCE(cr.facebook, '') AS facebook,
+                COALESCE(ct.district_id, cr.district_id) AS district_id,
+                COALESCE(ct.constituency_id, cr.constituency_id) AS constituency_id,
+                COALESCE(ct.mandal_id, cr.mandal_id) AS mandal_id,
+                COALESCE(ct.village_id, cr.village_id) AS village_id
+            FROM church_timings ct
+            LEFT JOIN church_reg cr ON ct.church_id = cr.id
+            WHERE ct.d_in = 0
+            ORDER BY ct.id DESC
+        `);
+
+        if (timingRows.length > 0) {
+            return res.json({ status: 200, data: timingRows });
+        }
+
+        // Fallback to church_reg with default timings if church_timings has no rows
+        const [rows] = await db.query('SELECT id, church_name, "Sunday" as day, "10:00 AM" as starttime, "12:30 PM" as endtime, location, youtube, facebook, district_id, constituency_id, mandal_id, village_id, address FROM church_reg WHERE d_in = 0 ORDER BY id DESC');
         res.json({ status: 200, data: rows });
     } catch (err: any) {
         res.status(500).json({ status: 500, error: err.message });
     }
 });
 
-app.all(['/dashboardapi/getchurchesdatafilters', '/api/getchurchesdatafilters'], async (req: any, res: any) => {
+const searchChurchesHandler = async (req: any, res: any) => {
     try {
-        const { districts, constituencyname, mandal_id } = req.body || {};
-        let sql = 'SELECT id, church_name, church_name as churchname, church_name as name, pastor_id, pastor_id as pastorname, pastor_id as pastor_name, contactnumber as phonenumber, contactnumber as mobile_number, district_id, constituency_id, mandal_id, village_id, address FROM church_reg WHERE d_in = 0';
-        const params = [];
-        if (districts) { sql += ' AND district_id = ?'; params.push(districts); }
-        if (constituencyname) { sql += ' AND constituency_id = ?'; params.push(constituencyname); }
-        if (mandal_id) { sql += ' AND mandal_id = ?'; params.push(mandal_id); }
-        sql += ' ORDER BY id DESC';
-        const [rows] = await db.query(sql, params);
+        const body = req.body || {};
+        const district = body.district_id || body.districts;
+        const constituency = body.constenncy_id || body.constituency_id || body.constituencyname;
+        const mandal = body.mandal_id || body.mandals;
+        const village = body.panchayati_id || body.village_id || body.panchayat_id;
+        const day = body.day;
+
+        let sql = `SELECT ct.id, 
+            COALESCE(cr.church_name, ct.descriptions, ct.user_name, 'Church') AS church_name,
+            COALESCE(ct.day, 'Sunday') AS day,
+            ct.starttime, ct.endtime,
+            COALESCE(cr.location, '') AS location,
+            COALESCE(cr.youtube, '') AS youtube,
+            COALESCE(cr.facebook, '') AS facebook,
+            COALESCE(ct.district_id, cr.district_id) AS district_id,
+            COALESCE(ct.constituency_id, cr.constituency_id) AS constituency_id,
+            COALESCE(ct.mandal_id, cr.mandal_id) AS mandal_id,
+            COALESCE(ct.village_id, cr.village_id) AS village_id
+            FROM church_timings ct
+            LEFT JOIN church_reg cr ON ct.church_id = cr.id
+            WHERE ct.d_in = 0`;
+        const params: any[] = [];
+        if (district) { sql += ' AND (ct.district_id = ? OR cr.district_id = ?)'; params.push(district, district); }
+        if (constituency) { sql += ' AND (ct.constituency_id = ? OR cr.constituency_id = ?)'; params.push(constituency, constituency); }
+        if (mandal) { sql += ' AND (ct.mandal_id = ? OR cr.mandal_id = ?)'; params.push(mandal, mandal); }
+        if (village) { sql += ' AND (ct.village_id = ? OR cr.village_id = ?)'; params.push(village, village); }
+        if (day) { sql += ' AND ct.day = ?'; params.push(day); }
+
+        sql += ' ORDER BY ct.id DESC';
+        const [rows]: any = await db.query(sql, params);
+
+        if (rows.length === 0 && (district || constituency || mandal)) {
+            // Check church_reg fallback
+            let crSql = 'SELECT id, church_name, "Sunday" as day, "10:00 AM" as starttime, "12:30 PM" as endtime, location, youtube, facebook, district_id, constituency_id, mandal_id, village_id FROM church_reg WHERE d_in = 0';
+            const crParams: any[] = [];
+            if (district) { crSql += ' AND district_id = ?'; crParams.push(district); }
+            if (constituency) { crSql += ' AND constituency_id = ?'; crParams.push(constituency); }
+            if (mandal) { crSql += ' AND mandal_id = ?'; crParams.push(mandal); }
+            crSql += ' ORDER BY id DESC';
+            const [crRows] = await db.query(crSql, crParams);
+            return res.json({ status: 200, data: crRows });
+        }
+
         res.json({ status: 200, data: rows });
+    } catch (err: any) {
+        res.status(500).json({ status: 500, error: err.message });
+    }
+};
+
+app.all(['/dashboardapi/getchurchesdatafilters', '/api/getchurchesdatafilters', '/dashboardapi/searchingchurchdata', '/api/searchingchurchdata'], searchChurchesHandler);
+
+app.all(['/dashboardapi/viewupdates', '/api/viewupdates'], async (req: any, res: any) => {
+    try {
+        const body = req.body || {};
+        const district = body.district_id || body.districts;
+        const constituency = body.constituency_id || body.constenncy_id || body.constituencyname;
+        const mandal = body.mandal_id || body.mandals;
+        const church = body.church || body.church_name;
+
+        let sql = 'SELECT * FROM church_reg WHERE d_in = 0';
+        const params: any[] = [];
+        if (district) { sql += ' AND district_id = ?'; params.push(district); }
+        if (constituency) { sql += ' AND constituency_id = ?'; params.push(constituency); }
+        if (mandal) { sql += ' AND mandal_id = ?'; params.push(mandal); }
+        if (church) { sql += ' AND (church_name LIKE ? OR id = ?)'; params.push(`%${church}%`, church); }
+        sql += ' ORDER BY id DESC LIMIT 1';
+        const [rows]: any = await db.query(sql, params);
+        res.json({ status: 200, data: rows[0] || {} });
     } catch (err: any) {
         res.status(500).json({ status: 500, error: err.message });
     }
@@ -801,7 +924,7 @@ app.all(['/dashboardapi/getministry', '/api/getministry'], async (_req: any, res
 });
 
 // Organisations (independentorganisation_reg)
-app.post(['/dashboardapi/postindepedentorganisation', '/api/postindepedentorganisation'], async (req: any, res: any) => {
+app.post(['/dashboardapi/postindepedentorganisation', '/dashboardapi/postindependentorganisation', '/dashboardapi/postindepedentchurch', '/dashboardapi/postindependentchurch', '/api/postindepedentorganisation', '/api/postindependentorganisation'], async (req: any, res: any) => {
     try {
         const o = req.body;
         o.d_in = 0;
@@ -824,9 +947,23 @@ app.post(['/dashboardapi/postindepedentorganisation', '/api/postindepedentorgani
     }
 });
 
-app.all(['/dashboardapi/getorganizations', '/dashboardapi/searchorganization', '/dashboardapi/searchinorganizations', '/api/organizations'], async (_req: any, res: any) => {
+app.all(['/dashboardapi/getorganizations', '/dashboardapi/searchorganization', '/dashboardapi/searchinorganizations', '/api/organizations'], async (req: any, res: any) => {
     try {
-        const [rows] = await db.query('SELECT * FROM independentorganisation_reg WHERE d_in = 0 ORDER BY id DESC');
+        const body = req.body || {};
+        let sql = 'SELECT * FROM independentorganisation_reg WHERE d_in = 0';
+        const params: any[] = [];
+        
+        if (body.denomation_id) { sql += ' AND denomation_id = ?'; params.push(body.denomation_id); }
+        if (body.ministry_id) { sql += ' AND ministry_id = ?'; params.push(body.ministry_id); }
+        if (body.district_id) { sql += ' AND district_id = ?'; params.push(body.district_id); }
+        if (body.constenncy_id || body.constituency_id) { sql += ' AND constituency_id = ?'; params.push(body.constenncy_id || body.constituency_id); }
+        if (body.mandal_id || body.mandals) { sql += ' AND mandal_id = ?'; params.push(body.mandal_id || body.mandals); }
+        if (body.panchayati_id || body.village_id) { sql += ' AND (panchayat_id = ? OR village_id = ?)'; params.push(body.panchayati_id || body.village_id, body.panchayati_id || body.village_id); }
+        if (body.gender) { sql += ' AND gender = ?'; params.push(body.gender); }
+        if (body.status) { sql += ' AND status = ?'; params.push(body.status); }
+
+        sql += ' ORDER BY id DESC';
+        const [rows] = await db.query(sql, params);
         res.json({ status: 200, data: rows });
     } catch (err: any) {
         res.status(500).json({ status: 500, error: err.message });
@@ -878,11 +1015,27 @@ app.post(['/dashboardapi/postjobs', '/api/postjobs'], async (req, res) => {
     }
 });
 
-app.all(['/dashboardapi/getjobs', '/dashboardapi/getjob', '/dashboardapi/searchjob', '/dashboardapi/searchjobswise', '/api/jobs'], async (_req, res) => {
+app.all(['/dashboardapi/getjobs', '/dashboardapi/getjob', '/dashboardapi/searchjob', '/dashboardapi/searchjobswise', '/api/jobs'], async (req: any, res: any) => {
     try {
-        const [rows] = await db.query('SELECT * FROM jobs WHERE d_in = 0 ORDER BY id DESC');
+        const body = req.body || {};
+        let sql = 'SELECT * FROM jobs WHERE d_in = 0';
+        const params: any[] = [];
+        if (body.colid && body.name) {
+            if (body.colid == 1) { sql += ' AND (jobtitle LIKE ? OR title LIKE ?)'; params.push(`%${body.name}%`, `%${body.name}%`); }
+            else if (body.colid == 2) { sql += ' AND qualification LIKE ?'; params.push(`%${body.name}%`); }
+            else if (body.colid == 3) { sql += ' AND experience = ?'; params.push(body.name); }
+        }
+        if (body.district_id) { sql += ' AND district_id = ?'; params.push(body.district_id); }
+        if (body.constenncy_id || body.constituency_id) { sql += ' AND constituency_id = ?'; params.push(body.constenncy_id || body.constituency_id); }
+        if (body.mandal_id) { sql += ' AND mandal_id = ?'; params.push(body.mandal_id); }
+        if (body.panchayati_id) { sql += ' AND panchayati_id = ?'; params.push(body.panchayati_id); }
+        if (body.jobtitle || body.jobtile || body.title) { sql += ' AND (jobtitle LIKE ? OR title LIKE ?)'; params.push(`%${body.jobtitle || body.jobtile || body.title}%`, `%${body.jobtitle || body.jobtile || body.title}%`); }
+        if (body.qualification || body.qual) { sql += ' AND qualification LIKE ?'; params.push(`%${body.qualification || body.qual}%`); }
+        if (body.experience) { sql += ' AND experience = ?'; params.push(body.experience); }
+        sql += ' ORDER BY id DESC';
+        const [rows] = await db.query(sql, params);
         res.json({ status: 200, data: rows });
-    } catch (err) {
+    } catch (err: any) {
         res.status(500).json({ status: 500, error: err.message });
     }
 });
@@ -899,11 +1052,34 @@ app.post(['/dashboardapi/postmarriages', '/dashboardapi/postingmarriages', '/api
     }
 });
 
-app.all(['/dashboardapi/searchmarriages', '/dashboardapi/Searchmarriages', '/api/marriages'], async (_req, res) => {
+app.all(['/dashboardapi/searchmarriages', '/dashboardapi/Searchmarriages', '/dashboardapi/searchingmarriages', '/api/marriages'], async (req: any, res: any) => {
     try {
-        const [rows] = await db.query('SELECT * FROM marriages WHERE d_in = 0 ORDER BY id DESC');
+        const body = req.body || {};
+        let sql = 'SELECT * FROM marriages WHERE d_in = 0';
+        const params: any[] = [];
+        
+        // Handle name & columnid from marriages.component.ts:
+        // columnid 1 = gender, 2 = status, 3 = denomination, 4 = caste, 5 = subcaste, 6 = spiritual
+        if (body.columnid && body.name) {
+            if (body.columnid == 1) { sql += ' AND gender = ?'; params.push(body.name); }
+            else if (body.columnid == 2) { sql += ' AND status = ?'; params.push(body.name); }
+            else if (body.columnid == 3) { sql += ' AND denomation_id = ?'; params.push(body.name); }
+            else if (body.columnid == 4) { sql += ' AND caste = ?'; params.push(body.name); }
+            else if (body.columnid == 5) { sql += ' AND subcaste = ?'; params.push(body.name); }
+            else if (body.columnid == 6) { sql += ' AND (spirituality LIKE ? OR description LIKE ?)'; params.push(`%${body.name}%`, `%${body.name}%`); }
+        }
+        if (body.gender) { sql += ' AND gender = ?'; params.push(body.gender); }
+        if (body.caste) { sql += ' AND caste = ?'; params.push(body.caste); }
+        if (body.district_id) { sql += ' AND district_id = ?'; params.push(body.district_id); }
+        if (body.constenncy_id || body.constituency_id) { sql += ' AND constituency_id = ?'; params.push(body.constenncy_id || body.constituency_id); }
+        if (body.mandal_id || body.mandals) { sql += ' AND mandal_id = ?'; params.push(body.mandal_id || body.mandals); }
+        if (body.village_id || body.panchayat_id || body.panchayati_id) { sql += ' AND (village_id = ? OR panchayat_id = ?)'; params.push(body.village_id || body.panchayat_id || body.panchayati_id, body.village_id || body.panchayat_id || body.panchayati_id); }
+        if (body.id) { sql += ' AND id = ?'; params.push(body.id); }
+
+        sql += ' ORDER BY id DESC';
+        const [rows] = await db.query(sql, params);
         res.json({ status: 200, data: rows });
-    } catch (err) {
+    } catch (err: any) {
         res.status(500).json({ status: 500, error: err.message });
     }
 });
@@ -920,11 +1096,23 @@ app.post(['/dashboardapi/postbusiness', '/api/postbusiness'], async (req, res) =
     }
 });
 
-app.all(['/dashboardapi/getbusiness', '/dashboardapi/searchingbusiness', '/api/business'], async (_req, res) => {
+app.all(['/dashboardapi/getbusiness', '/dashboardapi/searchingbusiness', '/api/business'], async (req: any, res: any) => {
     try {
-        const [rows] = await db.query('SELECT * FROM business_table WHERE d_in = 0 ORDER BY id DESC');
+        const body = req.body || {};
+        let sql = 'SELECT * FROM business_table WHERE d_in = 0';
+        const params: any[] = [];
+        if (body.district_id) { sql += ' AND district_id = ?'; params.push(body.district_id); }
+        if (body.constenncy_id || body.constituency_id) { sql += ' AND constituency_id = ?'; params.push(body.constenncy_id || body.constituency_id); }
+        if (body.mandal_id || body.mandals) { sql += ' AND mandal_id = ?'; params.push(body.mandal_id || body.mandals); }
+        if (body.panchayati_id || body.village_id) { sql += ' AND (panchayat_id = ? OR village_id = ?)'; params.push(body.panchayati_id || body.village_id, body.panchayati_id || body.village_id); }
+        if (body.type) { sql += ' AND type = ?'; params.push(body.type); }
+        if (body.title) { sql += ' AND title LIKE ?'; params.push(`%${body.title}%`); }
+        if (body.denomation_id || body.denomation) { sql += ' AND denomation_id = ?'; params.push(body.denomation_id || body.denomation); }
+        if (body.ministry_id) { sql += ' AND ministry_id = ?'; params.push(body.ministry_id); }
+        sql += ' ORDER BY id DESC';
+        const [rows] = await db.query(sql, params);
         res.json({ status: 200, data: rows });
-    } catch (err) {
+    } catch (err: any) {
         res.status(500).json({ status: 500, error: err.message });
     }
 });
@@ -941,11 +1129,63 @@ app.post(['/dashboardapi/postinsututies', '/api/postinstitutes'], async (req, re
     }
 });
 
-app.all(['/dashboardapi/getinstitutes', '/dashboardapi/Searchinstitute', '/api/institutes'], async (_req, res) => {
+app.all(['/dashboardapi/getinstitutes', '/dashboardapi/Searchinstitute', '/api/institutes'], async (req: any, res: any) => {
     try {
-        const [rows] = await db.query('SELECT * FROM institutes WHERE d_in = 0 ORDER BY id DESC');
+        const body = req.body || {};
+        let sql = 'SELECT * FROM institutes WHERE d_in = 0';
+        const params: any[] = [];
+        if (body.district_id) { sql += ' AND district_id = ?'; params.push(body.district_id); }
+        if (body.constenncy_id || body.constituency_id) { sql += ' AND constituency_id = ?'; params.push(body.constenncy_id || body.constituency_id); }
+        if (body.mandal_id || body.mandals) { sql += ' AND mandal_id = ?'; params.push(body.mandal_id || body.mandals); }
+        if (body.type) { sql += ' AND type = ?'; params.push(body.type); }
+        sql += ' ORDER BY id DESC';
+        const [rows] = await db.query(sql, params);
         res.json({ status: 200, data: rows });
-    } catch (err) {
+    } catch (err: any) {
+        res.status(500).json({ status: 500, error: err.message });
+    }
+});
+
+// Registration Form (reg_form)
+app.post(['/dashboardapi/postregform', '/api/postregform'], async (req: any, res: any) => {
+    try {
+        const body = req.body || {};
+        body.d_in = 0;
+        const result = await dynamicInsert('reg_form', body);
+        res.json({ status: 200, message: 'Registration submitted successfully', insertId: result?.insertId });
+    } catch (err: any) {
+        res.status(500).json({ status: 500, error: err.message });
+    }
+});
+
+// User Main Data & Constituency Updates
+app.get(['/dashboardapi/getUserMainData/:id', '/api/getUserMainData/:id'], async (req: any, res: any) => {
+    try {
+        const id = req.params.id;
+        const [rows]: any = await db.query('SELECT * FROM users WHERE id = ?', [id]);
+        res.json({ status: 200, data: rows[0] || {} });
+    } catch (err: any) {
+        res.status(500).json({ status: 500, error: err.message });
+    }
+});
+
+app.post(['/dashboardapi/updateconsis/:id', '/api/updateconsis/:id'], async (req: any, res: any) => {
+    try {
+        const id = req.params.id;
+        const body = req.body || {};
+        await db.query('UPDATE users SET ? WHERE id = ?', [body, id]);
+        res.json({ status: 200, message: 'Constituency updated successfully' });
+    } catch (err: any) {
+        res.status(500).json({ status: 500, error: err.message });
+    }
+});
+
+app.all(['/dashboardapi/viewconstituencyname', '/api/viewconstituencyname'], async (req: any, res: any) => {
+    try {
+        const body = req.body || {};
+        const [rows]: any = await db.query('SELECT * FROM const_lst_t WHERE d_in = 0 AND (id = ? OR const_nm = ?)', [body.id || body.constituency_id, body.const_nm || '']);
+        res.json({ status: 200, data: rows[0] || {} });
+    } catch (err: any) {
         res.status(500).json({ status: 500, error: err.message });
     }
 });

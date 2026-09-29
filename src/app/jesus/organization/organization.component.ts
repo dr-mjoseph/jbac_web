@@ -37,12 +37,11 @@ export class OrganizationComponent {
     this.serachMeetingform = this.fromb.group({
       denomation_id: [''],
       ministry_id: [''],
-      gender: [''],
-      status: [''],
-      district_id: ['', [Validators.required]],
-      constenncy_id: ['', [Validators.required]],
-      mandal_id: ['', [Validators.required]],
-      panchayati_id: ['', [Validators.required]],
+      service_name: [''],
+      district_id: [''],
+      constenncy_id: [''],
+      mandal_id: [''],
+      panchayati_id: [''],
     })
 
     this.getdistric();
@@ -202,9 +201,6 @@ export class OrganizationComponent {
     })
   }
 
-  reset() {
-    this.serachMeetingform.reset();
-  }
 
   serachcaste(event: any) {
     this.denomation_id = event.target.value
@@ -275,6 +271,27 @@ export class OrganizationComponent {
       })
   }
 
+  onDenominationChange(event: any) {
+    const id = event && event.target ? event.target.value : event;
+    this.denomation_id = id;
+    this.serachMeetingform.patchValue({ denomation_id: id });
+    this.applyFilter();
+  }
+
+  onMinistryChange(event: any) {
+    const id = event && event.target ? event.target.value : event;
+    this.ministry_id = id;
+    this.serachMeetingform.patchValue({ ministry_id: id });
+    this.applyFilter();
+  }
+
+  onServiceChange(event: any) {
+    const id = event && event.target ? event.target.value : event;
+    this.service_name = id;
+    this.serachMeetingform.patchValue({ service_name: id });
+    this.applyFilter();
+  }
+
   denomation_id: any;
   titles: any;
   serachgenders(event: any, tableid: any) {
@@ -288,131 +305,124 @@ export class OrganizationComponent {
       this.marriagedata = res.data;
     })
   }
-  district_id:any;
-  searchdistric(event: any) {
-    this.district_id = event.target.value
-    var data = {
-      denomation_id: this.denomation_id,
-      ministry_id: this.ministry_id,
-      service_name: this.service_name,
-      district_id: this.district_id,
-      df: 4
-    }
-    console.log(data);
-    
-    this.service.searchorganization(data).subscribe((res: any) => {
-      this.marriagedata = [];
-      if (res.status == 200) {
-        this.marriagedata = res.data.map((item: any) => ({
-          ...item, showMore: false
-        }));
-        console.log(this.marriagedata);
+  district_id: any;
+  constenncy_id: any;
+  mandal_id: any;
+  panchayati_id: any;
 
-      } else {
-        alert('సర్వర్ డౌన్ వుంది, దయచేసి తరువాత ప్రయత్నిచండి')
-      }
-    },
-      error => {
-      })
-  }
-  constenncy_id:any;
-  searchconstenct(event: any) {
-    this.constenncy_id = event.target.value
-    var data = {
-      denomation_id: this.denomation_id,
-      ministry_id: this.ministry_id,
-      service_name: this.service_name,
-      district_id: this.district_id,
-      constenncy_id: this.constenncy_id,
-      df: 5,
+  onDistrictChange(event: any) {
+    const id = event && event.target ? event.target.value : event;
+    this.district_id = id;
+    this.searchdist = id;
+    this.serachMeetingform.patchValue({ district_id: id, constenncy_id: '', mandal_id: '', panchayati_id: '' });
+    this.constituency = [];
+    this.mandals = [];
+    this.panchayati = [];
+    if (id) {
+      this.service.getconsistencys().subscribe(res => {
+        if (res && res.data) {
+          this.constituency = res.data.filter((data: any) => data.dstrct_id == id);
+        }
+      });
+      this.applyFilter();
     }
-    console.log(data);
-    
-    this.service.searchorganization(data).subscribe((res: any) => {
-      this.marriagedata = [];
-      if (res.status == 200) {
-        this.marriagedata = res.data.map((item: any) => ({
-          ...item, showMore: false
-        }));
-      } else {
-        Swal.fire('No Data')
-      }
-    },
-      error => {
-      })
   }
-  mandal_id:any;
-  searchmandals(event: any) {
-    this.mandal_id = event.target.value
-    var data = {
-      denomation_id: this.denomation_id,
-      ministry_id: this.ministry_id,
-      service_name: this.service_name,
-      district_id: this.district_id,
-      constenncy_id: this.searchconts,
-      mandal_id: this.mandal_id,
-      df: 6,
+
+  onConstituencyChange(event: any) {
+    const id = event && event.target ? event.target.value : event;
+    this.constenncy_id = id;
+    this.searchconts = id;
+    this.serachMeetingform.patchValue({ constenncy_id: id, mandal_id: '', panchayati_id: '' });
+    this.mandals = [];
+    this.panchayati = [];
+    if (id) {
+      this.service.getmandals().subscribe(res => {
+        if (res && res.data) {
+          this.mandals = res.data.filter((data: any) => data.const_id == id);
+        }
+      });
+      this.applyFilter();
     }
-    this.service.searchorganization(data).subscribe((res: any) => {
-      this.marriagedata = [];
-      if (res.status == 200) {
-        this.marriagedata = res.data.map((item: any) => ({
-          ...item, showMore: false
-        }));
-      } else {
-        alert('సర్వర్ డౌన్ వుంది, దయచేసి తరువాత ప్రయత్నిచండి')
-      }
-    },
-      error => {
-      })
   }
-  panchayati_id:any;
-  searchvillages(event: any) {
-    this.panchayati_id = event.target.value
-    var data = {
-      denomation_id: this.denomation_id,
-      ministry_id: this.ministry_id,
-      service_name: this.service_name,
-      district_id: this.district_id,
-      constenncy_id: this.searchconts,
-      mandal_id: this.mandal_id,
-      panchayati_id:this.panchayati_id,
-      df: 6,
+
+  onMandalChange(event: any) {
+    const id = event && event.target ? event.target.value : event;
+    this.mandal_id = id;
+    this.searchmand = id;
+    this.serachMeetingform.patchValue({ mandal_id: id, panchayati_id: '' });
+    this.panchayati = [];
+    if (id) {
+      this.service.gepanchayatis().subscribe(res => {
+        if (res && res.status == 200 && res.data) {
+          this.panchayati = res.data.filter((data: any) => data.mndl_id == id);
+        }
+      });
+      this.applyFilter();
     }
-    console.log(data);
-    
-    this.service.searchorganization(data).subscribe((res: any) => {
-      this.marriagedata = [];
-      if (res.status == 200) {
-        this.marriagedata = res.data.map((item: any) => ({
-          ...item, showMore: false
-        }));
-      } else {
-        alert('సర్వర్ డౌన్ వుంది, దయచేసి తరువాత ప్రయత్నిచండి')
-      }
-    },
-      error => {
-      })
+  }
+
+  onPanchayatiChange(event: any) {
+    const id = event && event.target ? event.target.value : event;
+    this.panchayati_id = id;
+    this.serachMeetingform.patchValue({ panchayati_id: id });
+    this.applyFilter();
+  }
+
+  // Aliases for template backwards-compatibility
+  searchdistric(event: any) { this.onDistrictChange(event); }
+  searchconstenct(event: any) { this.onConstituencyChange(event); }
+  searchmandals(event: any) { this.onMandalChange(event); }
+  searchvillages(event: any) { this.onPanchayatiChange(event); }
+
+  applyFilter() {
+    const vals = this.serachMeetingform.value || {};
+    const data = {
+      denomation_id: vals.denomation_id || this.denomation_id || '',
+      ministry_id: vals.ministry_id || this.ministry_id || '',
+      service_name: vals.service_name || this.service_name || '',
+      district_id: vals.district_id || this.district_id || this.searchdist || '',
+      constituency_id: vals.constenncy_id || this.constenncy_id || this.searchconts || '',
+      mandal_id: vals.mandal_id || this.mandal_id || this.searchmand || '',
+      panchayati_id: vals.panchayati_id || this.panchayati_id || '',
+    };
+    this.service.searchorganization(data).subscribe({
+      next: (res: any) => {
+        this.marriagedata = [];
+        if (res && res.status == 200 && Array.isArray(res.data)) {
+          this.marriagedata = res.data.map((item: any) => ({ ...item, showMore: false }));
+        }
+      },
+      error: err => console.error(err)
+    });
   }
 
   search() {
-    var data = {
-      id: this.serachMeetingform.value.village_id
-    }
-    console.log(data);
+    this.applyFilter();
+  }
 
-    this.service.searchorganization(data).subscribe((res: any) => {
-      this.marriagedata = [];
-      if (res.status == 200) {
-        this.marriagedata = res.data.map((item: any) => ({
-          ...item, showMore: false
-        }));
-      } else {
-        alert('సర్వర్ డౌన్ వుంది, దయచేసి తరువాత ప్రయత్నిచండి')
-      }
-    },
-      error => {
-      })
+  reset() {
+    this.serachMeetingform.reset({
+      denomation_id: '',
+      ministry_id: '',
+      service_name: '',
+      district_id: '',
+      constenncy_id: '',
+      mandal_id: '',
+      panchayati_id: ''
+    });
+    this.district_id = '';
+    this.constenncy_id = '';
+    this.mandal_id = '';
+    this.panchayati_id = '';
+    this.searchdist = '';
+    this.searchconts = '';
+    this.searchmand = '';
+    this.denomation_id = '';
+    this.service_name = '';
+    this.constituency = [];
+    this.mandals = [];
+    this.panchayati = [];
+    this.defaultdata();
   }
   ///////////////////mobile view///////////////
   login: boolean = true;

@@ -42,7 +42,7 @@
                                     <label class="form-label" for="pattern_name">Denomation
                                         <span style="color:red; -webkit-text-stroke-width:thick;">*</span></label>
                                     <select class="form-control" formControlName="denomation_id"
-                                        (change)="serachcaste($event);" (change)="serachgenders($event,1);">
+                                        (change)="onDenominationChange($event);">
                                         <option value="" selected disabled>Select the Denomation </option>
                                         <option *ngFor="let i of denomation" value="{{i.id}}">
                                             {{i.denomation_name}}</option>
@@ -53,7 +53,7 @@
                                 <div class="form-outline">
                                     <label class="form-label">Ministry </label>
                                     <select class="form-control" formControlName="ministry_id"
-                                        (change)="serachgenders($event,2);" (change)="serachgender($event);">
+                                        (change)="onMinistryChange($event);">
                                         <option value="" selected disabled>Select the Ministry </option>
                                         <option *ngFor="let i of ministryname" value="{{i.id}}">
                                             {{i.ministryname}}</option>
@@ -65,7 +65,7 @@
                                 <div class="form-outline">
                                     <label class="form-label">Service Name</label>
                                     <select class="form-control" formControlName="service_name"
-                                        (change)="serachgenders($event,3);" (change)="servicessearch($event);">
+                                        (change)="onServiceChange($event);">
                                         <option value="" selected disabled>Select the Service </option>
                                         <option *ngFor="let item of services" value="{{item.id}}" >
                                             {{item.servicename}}
@@ -84,8 +84,8 @@
                                 <div class="form-outline">
                                     <label class="form-label">Select Districts </label>
                                     <select class="form-control" formControlName="district_id"
-                                        (change)="getconstency($event);" (change)="searchdistric($event);"
-                                        style="height:37px;width: 273px;" (change)="serachgenders($event,4);">
+                                        (change)="onDistrictChange($event);"
+                                        style="height:37px;width: 273px;">
                                         <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
                                         <option value="{{item.id}}" *ngFor="let item of districts">
                                             {{item.distrct_nm}}
@@ -98,8 +98,8 @@
                                 <div class="form-outline">
                                     <label class="form-label">నియోజకవర్గం ఎంచుకోండి </label>
                                     <select class="form-control" formControlName="constenncy_id"
-                                        (change)="getmandals($event);" (change)="searchconstenct($event);"
-                                        style="height:37px;width: 273px;" (change)="serachgenders($event,5);">
+                                        (change)="onConstituencyChange($event);"
+                                        style="height:37px;width: 273px;">
                                         <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
                                         <option value="{{item.id}}" *ngFor="let item of constituency">
                                             {{item.const_nm}}
@@ -111,8 +111,8 @@
                                 <div class="form-outline">
                                     <label class="form-label">మండలం ఎంచుకోండి </label>
                                     <select class="form-control" formControlName="mandal_id"
-                                        (change)="gepanchayati($event);" (change)="searchmandals($event);"
-                                        style="height:37px;width: 273px;" (change)="serachgenders($event,6);">
+                                        (change)="onMandalChange($event);"
+                                        style="height:37px;width: 273px;">
                                         <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
                                         <option value="{{item.id}}" *ngFor="let item of mandals">
                                             {{item.mndl_nm}}
@@ -124,8 +124,7 @@
                                 <div class="form-outline">
                                     <label class="form-label">పంచాయతీ ఎంచుకోండి </label>
                                     <select class="form-control" formControlName="panchayati_id"
-                                        (change)="searchvillages($event);" style="height:37px;width: 273px;"
-                                        (change)="serachgenders($event,7);">
+                                        (change)="onPanchayatiChange($event);" style="height:37px;width: 273px;">
                                         <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
                                         <option value="{{item.id}}" *ngFor="let item of panchayati">
                                             {{item.pnchyt_nm}}
