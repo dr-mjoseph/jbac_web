@@ -715,11 +715,11 @@ export class AddbusinessComponent {
 
   gepanchayati(event: any) {
     var id = event.target.value;
-    this.service.gepanchayatis().subscribe(res => {
+    this.service.gepanchayatis(id).subscribe(res => {
       if (res.status == 202) {
         Swal.fire(res.message);
-      } else if (res.status == 200) {
-        this.panchayati = res.data.filter((data: any) => data.mndl_id == id);
+      } else if (res.status == 200 && res.data) {
+        this.panchayati = res.data.filter((data: any) => !id || data.mndl_id == id);
       }
     }, error => {
 

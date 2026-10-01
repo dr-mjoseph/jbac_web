@@ -257,7 +257,7 @@ app.all(['/dashboardapi/educationalq', '/api/educationalq', '/educationalq'], as
 });
 app.all(['/dashboardapi/getdistricts', '/dashboardapi/getmdistricts', '/api/districts', '/districts'], async (_req, res) => {
     try {
-        const [rows] = await db.query('SELECT id, distrct_nm, distrct_nm as districtname, distrct_nm as district_name, d_in FROM dstrct WHERE d_in = 0 ORDER BY distrct_nm ASC');
+        const [rows] = await db.query('SELECT id, distrct_nm, distrct_nm as districtname, distrct_nm as district_name, d_in FROM dstrct WHERE d_in = 0 AND distrct_nm IS NOT NULL AND TRIM(distrct_nm) != "" ORDER BY distrct_nm ASC');
         res.json({ status: 200, data: rows });
     }
     catch (err) {
@@ -267,7 +267,7 @@ app.all(['/dashboardapi/getdistricts', '/dashboardapi/getmdistricts', '/api/dist
 app.all(['/dashboardapi/getconsistencys', '/dashboardapi/getmconsistencys', '/api/constituencies', '/constituencies'], async (req, res) => {
     try {
         const districtId = req.query.district_id || req.body?.district_id || req.body?.dstrct_id;
-        let sql = 'SELECT id, const_nm, const_nm as constituencyname, const_nm as name, dstrct_id, d_in FROM const_dtl_t WHERE d_in = 0';
+        let sql = 'SELECT id, const_nm, const_nm as constituencyname, const_nm as name, dstrct_id, d_in FROM const_dtl_t WHERE d_in = 0 AND const_nm IS NOT NULL AND TRIM(const_nm) != ""';
         const params = [];
         if (districtId) {
             sql += ' AND dstrct_id = ?';
@@ -284,11 +284,16 @@ app.all(['/dashboardapi/getconsistencys', '/dashboardapi/getmconsistencys', '/ap
 app.all(['/dashboardapi/getmandals', '/dashboardapi/getmmandals', '/api/mandals', '/mandals'], async (req, res) => {
     try {
         const constId = req.query.const_id || req.body?.const_id || req.body?.constituency_id;
-        let sql = 'SELECT id, mndl_nm, mndl_nm as mandalname, mndl_nm as name, const_id, dstrct_id, d_in FROM mndls_lst_t WHERE d_in = 0';
+        const districtId = req.query.district_id || req.body?.district_id || req.body?.dstrct_id;
+        let sql = 'SELECT id, mndl_nm, mndl_nm as mandalname, mndl_nm as name, const_id, dstrct_id, d_in FROM mndls_lst_t WHERE d_in = 0 AND mndl_nm IS NOT NULL AND TRIM(mndl_nm) != ""';
         const params = [];
         if (constId) {
             sql += ' AND const_id = ?';
             params.push(constId);
+        }
+        if (districtId) {
+            sql += ' AND dstrct_id = ?';
+            params.push(districtId);
         }
         sql += ' ORDER BY mndl_nm ASC';
         const [rows] = await db.query(sql, params);
@@ -300,17 +305,14 @@ app.all(['/dashboardapi/getmandals', '/dashboardapi/getmmandals', '/api/mandals'
 });
 app.all(['/dashboardapi/gepanchayati', '/dashboardapi/gempanchayati', '/api/panchayats', '/panchayats'], async (req, res) => {
     try {
-        const mandalId = req.query.mandal_id || req.body?.mandal_id || req.body?.mndl_id;
-        let sql = 'SELECT id, pnchyt_nm, pnchyt_nm as panchayatname, pnchyt_nm as name, mndl_id, d_in FROM pnchyt_lst_t WHERE d_in = 0';
+        const mandalId = req.query.mandal_id || req.body?.mandal_id || req.body?.mndl_id || req.query.mndl_id;
+        let sql = 'SELECT id, pnchyt_nm, pnchyt_nm as panchayatname, pnchyt_nm as name, mndl_id, d_in FROM pnchyt_lst_t WHERE d_in = 0 AND pnchyt_nm IS NOT NULL AND TRIM(pnchyt_nm) != ""';
         const params = [];
         if (mandalId) {
             sql += ' AND mndl_id = ?';
             params.push(mandalId);
         }
         sql += ' ORDER BY pnchyt_nm ASC';
-        if (!mandalId) {
-            sql += ' LIMIT 1000';
-        }
         const [rows] = await db.query(sql, params);
         res.json({ status: 200, data: rows });
     }
@@ -1118,17 +1120,47 @@ app.all(['/dashboardapi/getjobs', '/dashboardapi/getjob', '/dashboardapi/searchj
         let sql = 'SELECT * FROM jobs WHERE d_in = 0';
         const params = [];
         if (body.colid && body.name) {
-            if (body.colid == 1) { sql += ' AND (jobtitle LIKE ? OR title LIKE ?)'; params.push(`%${body.name}%`, `%${body.name}%`); }
-            else if (body.colid == 2) { sql += ' AND qualification LIKE ?'; params.push(`%${body.name}%`); }
-            else if (body.colid == 3) { sql += ' AND experience = ?'; params.push(body.name); }
+            if (body.colid == 1) {
+                sql += ' AND (jobtitle LIKE ? OR title LIKE ?)';
+                params.push(`%${body.name}%`, `%${body.name}%`);
+            }
+            else if (body.colid == 2) {
+                sql += ' AND qualification LIKE ?';
+                params.push(`%${body.name}%`);
+            }
+            else if (body.colid == 3) {
+                sql += ' AND experience = ?';
+                params.push(body.name);
+            }
         }
-        if (body.district_id) { sql += ' AND district_id = ?'; params.push(body.district_id); }
-        if (body.constenncy_id || body.constituency_id) { sql += ' AND constituency_id = ?'; params.push(body.constenncy_id || body.constituency_id); }
-        if (body.mandal_id) { sql += ' AND mandal_id = ?'; params.push(body.mandal_id); }
-        if (body.panchayati_id) { sql += ' AND panchayati_id = ?'; params.push(body.panchayati_id); }
-        if (body.jobtitle || body.jobtile || body.title) { sql += ' AND (jobtitle LIKE ? OR title LIKE ?)'; params.push(`%${body.jobtitle || body.jobtile || body.title}%`, `%${body.jobtitle || body.jobtile || body.title}%`); }
-        if (body.qualification || body.qual) { sql += ' AND qualification LIKE ?'; params.push(`%${body.qualification || body.qual}%`); }
-        if (body.experience) { sql += ' AND experience = ?'; params.push(body.experience); }
+        if (body.district_id) {
+            sql += ' AND district_id = ?';
+            params.push(body.district_id);
+        }
+        if (body.constenncy_id || body.constituency_id) {
+            sql += ' AND constituency_id = ?';
+            params.push(body.constenncy_id || body.constituency_id);
+        }
+        if (body.mandal_id) {
+            sql += ' AND mandal_id = ?';
+            params.push(body.mandal_id);
+        }
+        if (body.panchayati_id) {
+            sql += ' AND panchayati_id = ?';
+            params.push(body.panchayati_id);
+        }
+        if (body.jobtitle || body.jobtile || body.title) {
+            sql += ' AND (jobtitle LIKE ? OR title LIKE ?)';
+            params.push(`%${body.jobtitle || body.jobtile || body.title}%`, `%${body.jobtitle || body.jobtile || body.title}%`);
+        }
+        if (body.qualification || body.qual) {
+            sql += ' AND qualification LIKE ?';
+            params.push(`%${body.qualification || body.qual}%`);
+        }
+        if (body.experience) {
+            sql += ' AND experience = ?';
+            params.push(body.experience);
+        }
         sql += ' ORDER BY id DESC';
         const [rows] = await db.query(sql, params);
         res.json({ status: 200, data: rows });

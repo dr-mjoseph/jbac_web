@@ -161,32 +161,44 @@ postwishform(data: any) {
       return error;
     }));
   }
-  getmandals() {
-    var data = {}
+  getmandals(constId?: any) {
+    var data: any = {};
+    if (constId !== undefined && constId !== null && constId !== '') {
+      data = typeof constId === 'object' && constId !== null ? constId : { const_id: constId };
+    }
     return this.http.post<any>(this.testApi + `getmandals`, data).pipe(map(res => {
       return res;
     }, (error: any) => {
       return error;
     }));
   }
-  getmmandals() {
-    var data = {}
+  getmmandals(constId?: any) {
+    var data: any = {};
+    if (constId !== undefined && constId !== null && constId !== '') {
+      data = typeof constId === 'object' && constId !== null ? constId : { const_id: constId };
+    }
     return this.http.post<any>(this.testApi + `getmmandals`, data).pipe(map(res => {
       return res;
     }, (error: any) => {
       return error;
     }));
   }
-  gepanchayatis() {
-    var data = {}
+  gepanchayatis(mandalId?: any) {
+    var data: any = {};
+    if (mandalId !== undefined && mandalId !== null && mandalId !== '') {
+      data = typeof mandalId === 'object' && mandalId !== null ? mandalId : { mandal_id: mandalId };
+    }
     return this.http.post<any>(this.testApi + `gepanchayati`, data).pipe(map(res => {
       return res;
     }, (error: any) => {
       return error;
     }));
   }
-  gempanchayatis() {
-    var data = {}
+  gempanchayatis(mandalId?: any) {
+    var data: any = {};
+    if (mandalId !== undefined && mandalId !== null && mandalId !== '') {
+      data = typeof mandalId === 'object' && mandalId !== null ? mandalId : { mandal_id: mandalId };
+    }
     return this.http.post<any>(this.testApi + `gepanchayati`, data).pipe(map(res => {
       return res;
     }, (error: any) => {
@@ -240,16 +252,22 @@ postwishform(data: any) {
   }
 
 
-  getconsistencys() {
-    var data = {}
+  getconsistencys(districtId?: any) {
+    var data: any = {};
+    if (districtId !== undefined && districtId !== null && districtId !== '') {
+      data = typeof districtId === 'object' && districtId !== null ? districtId : { district_id: districtId };
+    }
     return this.http.post<any>(this.testApi + `getconsistencys`, data).pipe(map(res => {
       return res;
     }, (error: any) => {
       return error;
     }));
   }
-  getmconsistencys() {
-    var data = {}
+  getmconsistencys(districtId?: any) {
+    var data: any = {};
+    if (districtId !== undefined && districtId !== null && districtId !== '') {
+      data = typeof districtId === 'object' && districtId !== null ? districtId : { district_id: districtId };
+    }
     return this.http.post<any>(this.testApi + `getmconsistencys`, data).pipe(map(res => {
       return res;
     }, (error: any) => {

@@ -383,9 +383,9 @@ export class EventsComponent {
     this.searchdenomation.patchValue({ mandal_id: id, panchayati_id: '' });
     this.panchayati = [];
     if (id) {
-      this.service.gepanchayatis().subscribe(res => {
+      this.service.gepanchayatis(id).subscribe(res => {
         if (res && res.status == 200 && res.data) {
-          this.panchayati = res.data.filter((data: any) => data.mndl_id == id);
+          this.panchayati = res.data.filter((data: any) => !id || data.mndl_id == id);
         }
       });
     }

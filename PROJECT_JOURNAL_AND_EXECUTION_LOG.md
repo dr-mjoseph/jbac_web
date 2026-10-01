@@ -311,5 +311,50 @@ However, in the mobile application (`jbac_app`), when users registered, logged i
 - **Method 3 (AWS RDS Console)**: AWS Console -> RDS -> Databases (Sydney region `ap-southeast-2`) -> `jbac-mysql-db`.
 - **Method 4 (Desktop Client)**: DBeaver, MySQL Workbench, or Navicat connected to `jbac-mysql-db.cdeeuw0s2trf.ap-southeast-2.rds.amazonaws.com:3306`.
 
+---
 
+## 12. Geographic Hierarchy & Location Cascade Fix Across All Registration Forms (October 1, 2026)
+
+### Context & User Issue
+- When registering across forms (e.g., Student Registration `studentregister`, Believer Registration, Pastor Registration, etc.), users encountered an alert modal:
+  `"సమాచారం: ఎంచుకున్న మండలానికి పంచాయతీలు / వార్డులు లభ్యం కావడంలేదు."` (*"Panchayats / wards not available for the selected mandal"*).
+- The user suspected that the administrative geographic data (Districts, Constituencies/Niyojakavargams, Mandals, Panchayaths) was not completely fetched or restored from the old cPanel DB.
+
+### Database Integrity & Verification
+- Checked database records in `database/jbac_structure.sql` and AWS RDS MySQL:
+  - **Districts (`dstrct`)**: 26 districts (100% complete)
+  - **Constituencies (`const_dtl_t`)**: 175 constituencies (100% complete)
+  - **Mandals (`mndls_lst_t`)**: 836 mandals (100% complete)
+  - **Panchayaths & Wards (`pnchyt_lst_t`)**: 17,244 records (100% complete)
+- Specifically inspected **Gudivada Municipality** (`mndl_id: 845`) under Krishna District -> Gudivada Constituency:
+  - All 39 municipal wards (1st Ward to 39th Ward) are present and intact in the database.
+
+### Root Cause Analysis
+1. **Hardcoded Limit in Backend API**:
+   - In `backend/server.ts` & `backend/server.js`, `/dashboardapi/gepanchayati` contained:
+     `if (!mandalId) { sql += ' LIMIT 1000'; }`
+   - When no `mandal_id` was provided by the caller, MySQL returned only the first 1,000 alphabetical rows out of 17,244. Because Telugu names starting with "వా" (Wards) appear towards the end of the Telugu alphabetical order, all Gudivada wards and thousands of other panchayats were truncated.
+2. **Frontend Was Not Passing Filter Parameters**:
+   - `service.service.ts` had `gepanchayatis()` calling `POST /dashboardapi/gepanchayati` with an empty `{}` body.
+   - All 18 frontend registration/update components were calling `this.service.gepanchayatis()` without passing the selected mandal ID in `gepanchayati(event)`.
+   - When users selected a mandal, the frontend did a local array filter (`this.panchayathis.filter((p: any) => p.mndl_id == event.target.value)`), but because only the first 1,000 records existed in memory, mandals outside the first 1,000 returned 0 matches, triggering the error modal.
+3. **Empty Data Artifacts**:
+   - 28 records in `mndls_lst_t` had empty strings (`mndl_nm = ''`), floating to the top of dropdown lists.
+
+### Implementation & Fixes
+1. **Backend Optimizations (`backend/server.ts` & `backend/server.js`)**:
+   - **`gepanchayati`**: Removed `LIMIT 1000`. Added filter `pnchyt_nm IS NOT NULL AND TRIM(pnchyt_nm) != ""`. Supported `mandal_id` parameter from query or body so queries are fast and return only the requested mandal's panchayats.
+   - **`getmandals`**: Added filter `mndl_nm IS NOT NULL AND TRIM(mndl_nm) != ""` and supported `const_id` filtering.
+   - **`getconsistencys`**: Added filter `const_nm IS NOT NULL AND TRIM(const_nm) != ""` and supported `district_id` filtering.
+   - **`getdistricts`**: Added filter `distrct_nm IS NOT NULL AND TRIM(distrct_nm) != ""`.
+2. **Angular Service Updates (`src/app/jesus/service.service.ts`)**:
+   - Updated `gepanchayatis(mandalId?: any)` and `gempanchayatis(mandalId?: any)` to forward `{ mandal_id: mandalId }`.
+   - Updated `getmandals(constId?: any)` and `getconsistencys(districtId?: any)` to accept optional ID parameters.
+3. **Component Cascade Integration**:
+   - Updated all 18 registration, update, and search components to pass `id` into `this.service.gepanchayatis(id)`:
+     - `studentregister`, `pastorregister`, `pastorassociationregister`, `churchregister`, `organisationregister`, `ministryregister`, `believerregister`, `signup`, `namodu`, `entry`, `wish`, `jobs`, `update`, `profile`, `addbusiness`, `addmeetings`, `events`, `organization`.
+   - Each dropdown selection now fetches only the precise subset of panchayats/wards, eliminating payload latency and ensuring 100% accurate results.
+4. **Build & Deployment Packaging**:
+   - Verified clean Angular build (`ng build --configuration development`).
+   - Repackaged `backend/backend-deploy.zip` with the updated Lambda server bundle.
 

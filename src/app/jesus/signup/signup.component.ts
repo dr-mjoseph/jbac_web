@@ -393,10 +393,8 @@ export class SignupComponent {
 
   gepanchayati(event: any) {
     var id = event.target.value;
-    this.service.gepanchayatis().subscribe(res => {
-      this.panchayati = res.data.filter((data: any) => data.mndl_id == id);
-
-
+    this.service.gepanchayatis(id).subscribe(res => {
+      this.panchayati = res.data ? res.data.filter((data: any) => !id || data.mndl_id == id) : [];
     })
   }
   getpastorsdatas: any;

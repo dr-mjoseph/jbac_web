@@ -430,10 +430,10 @@ export class StudentregisterComponent {
 
     this.showSpinner = true; // Show loading spinner
 
-    this.service.gepanchayatis().subscribe(
+    this.service.gepanchayatis(id).subscribe(
       (res: any) => {
         if (res && res.data && res.data.length > 0) {
-          this.panchayati = res.data.filter((data: any) => data.mndl_id == id);
+          this.panchayati = res.data.filter((data: any) => !id || data.mndl_id == id);
 
           if (this.panchayati.length === 0) {
             Swal.fire({
@@ -487,10 +487,10 @@ export class StudentregisterComponent {
 
     this.showSpinner = true; // Show loading spinner
 
-    this.service.gepanchayatis().subscribe(
+    this.service.gepanchayatis(id).subscribe(
       (res: any) => {
         if (res && res.data && res.data.length > 0) {
-          this.panchayati1 = res.data.filter((data: any) => data.mndl_id == id);
+          this.panchayati1 = res.data.filter((data: any) => !id || data.mndl_id == id);
 
           if (this.panchayati1.length === 0) {
             Swal.fire({
@@ -508,7 +508,7 @@ export class StudentregisterComponent {
         }
 
         this.showSpinner = false; // Hide loading spinner
-        console.log('Panchayati Data:', this.panchayati);
+        console.log('Panchayati Data:', this.panchayati1);
       },
       (error) => {
         console.error('Error fetching panchayati:', error);

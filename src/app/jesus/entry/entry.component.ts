@@ -351,10 +351,10 @@ getmandals(event: any) {
   
     this.showSpinner = true; // Show loading spinner
   
-    this.service.gepanchayatis().subscribe(
+    this.service.gepanchayatis(id).subscribe(
       (res: any) => {
         if (res && res.data && res.data.length > 0) {
-          this.panchayati = res.data.filter((data: any) => data.mndl_id == id);
+          this.panchayati = res.data.filter((data: any) => !id || data.mndl_id == id);
   
           if (this.panchayati.length === 0) {
             Swal.fire({
