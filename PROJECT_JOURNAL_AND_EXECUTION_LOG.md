@@ -275,4 +275,41 @@ However, in the mobile application (`jbac_app`), when users registered, logged i
    - Pausing dev RDS outside testing hours saves an additional 65–70% (~$20/month).
 3. **Projected Bill Reduction**: Drops total monthly cost from **$83.55 down to ~$10 – $15/month** (over 80% to 90% savings).
 
+---
+
+## 11. Live cPanel Database Extraction & AWS RDS Sync Pipeline (October 1, 2026)
+
+### Context & User Request
+1. User provided credentials for their live production cPanel host (`68.178.175.219:2083`, user `jbac`).
+2. Requested searching for the database, extracting the live production data, and syncing to AWS database.
+3. Asked where to view and check database data now that the redundant Aurora Serverless DB was deleted.
+
+### Database Discovery & Live Extraction
+1. **cPanel Authentication & UAPI Integration**:
+   - Authenticated against cPanel endpoint (`https://68.178.175.219:2083/login/?login_only=1`).
+   - Queried cPanel UAPI `Mysql/list_databases`.
+   - Identified live database: `jbac_jbac` (5.93 MB, user `jbac_jbac_jp`, 60 relational tables).
+2. **Automated Live Backup Extraction**:
+   - Streamed full compressed `.sql.gz` dump directly via authenticated cPanel session.
+   - Decompressed and inspected: 60 tables, containing latest real-world registrations, events, and community signups.
+3. **Diff Analysis vs Local Repo SQL**:
+   - cPanel dump contains new live production rows: `events` (+3 new events), `reg_form` (+1 registration), `signup_form` (+1 believer signup), `independentorganisation_reg` (+1 organization), `pastors_associations` (+1 association).
+4. **Standardization & Compatibility**:
+   - Fixed foreign key relation typo (`REFERENCES dstrct1` -> `REFERENCES dstrct`).
+   - Prepended safe recreation headers (`DROP DATABASE IF EXISTS`, `SET FOREIGN_KEY_CHECKS = 0`, UTF-8 Telugu charset).
+   - Injected all 21 compatibility views (`denominations`, `churches`, `pastors`, `meetings`, `ads`, `news`, etc.).
+   - Updated local master SQL dump at [`database/jbac_structure.sql`](database/jbac_structure.sql).
+
+### Automated Sync Tool & npm Script
+1. Created automated synchronization pipeline [`scripts/sync_cpanel_to_rds.mjs`](scripts/sync_cpanel_to_rds.mjs).
+2. Added convenient npm shortcut: `npm run sync:cpanel`.
+3. Auto-downloads live data from cPanel, formats schema, and streams directly into AWS RDS when available.
+
+### Where Database Data Can Be Checked
+- **Method 1 (cPanel phpMyAdmin)**: Log into `https://68.178.175.219:2083` -> Databases -> **phpMyAdmin** -> select `jbac_jbac`.
+- **Method 2 (Admin Web Cockpit)**: Open [`backend/admin_db.html`](backend/admin_db.html) in any web browser to view, search, and browse tables with image previews.
+- **Method 3 (AWS RDS Console)**: AWS Console -> RDS -> Databases (Sydney region `ap-southeast-2`) -> `jbac-mysql-db`.
+- **Method 4 (Desktop Client)**: DBeaver, MySQL Workbench, or Navicat connected to `jbac-mysql-db.cdeeuw0s2trf.ap-southeast-2.rds.amazonaws.com:3306`.
+
+
 

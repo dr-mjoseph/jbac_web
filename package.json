@@ -9,6 +9,7 @@
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "sync:mobile": "node scripts/sync-to-mobile.js",
+    "sync:cpanel": "node scripts/sync_cpanel_to_rds.mjs",
     "deploy:aws": "powershell -ExecutionPolicy Bypass -File ./aws/deploy.ps1",
     "import:db": "powershell -ExecutionPolicy Bypass -File ./aws/import-db.ps1",
     "cost:clean": "powershell -ExecutionPolicy Bypass -File ./aws/cleanup-unused-aws.ps1",
