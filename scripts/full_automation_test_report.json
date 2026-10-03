@@ -1,0 +1,6129 @@
+{
+  "timestamp": "2026-10-03T17:11:20.709Z",
+  "webApp": {
+    "routesTested": 57,
+    "routesWithErrors": 57,
+    "totalDropdownsTested": 116,
+    "emptyDropdowns": 63,
+    "totalButtonsTested": 165,
+    "totalFormsTested": 74,
+    "totalFileUploadsTested": 25,
+    "details": [
+      {
+        "route": "/",
+        "url": "http://127.0.0.1:4200/",
+        "consoleErrors": [
+          "Failed to load resource: the server responded with a status of 403 ()"
+        ],
+        "networkErrors": [
+          "GET https://kit.fontawesome.com/a076d05399.js - net::ERR_ABORTED"
+        ],
+        "dropdowns": [],
+        "buttons": [
+          {
+            "text": "Login",
+            "type": "submit",
+            "disabled": false
+          }
+        ],
+        "forms": [
+          {
+            "formIndex": 0,
+            "inputCount": 4,
+            "fields": [
+              "log",
+              "pwd",
+              "rememberme",
+              "submit"
+            ]
+          }
+        ],
+        "fileUploads": [],
+        "issues": [
+          "Console Errors: Failed to load resource: the server responded with a status of 403 ()"
+        ]
+      },
+      {
+        "route": "/about",
+        "url": "http://127.0.0.1:4200/about",
+        "consoleErrors": [
+          "Failed to load resource: the server responded with a status of 403 ()"
+        ],
+        "networkErrors": [
+          "GET https://kit.fontawesome.com/a076d05399.js - net::ERR_ABORTED",
+          "POST https://www.youtube.com/api/stats/qoe?cpn=9Po7FdOGm_X6icRx&el=embedded&ns=yt&fexp=v1%2C100673025%2C-76668381%2C27058999%2C34656%2C124674%2C117689%2C9252%2C16509%2C23206%2C100702%2C15105%2C25059%2C4174%2C30446%2C18706%2C26008%2C13015%2C14666%2C1422%2C6620%2C2784%2C23826%2C9500%2C1840%2C24119%2C32526%2C38192%2C20589%2C4199%2C30114%2C9181%2C32875%2C20108%2C6032%2C1168%2C372%2C7758%2C18832%2C11374%2C4115%2C11462%2C26847%2C1352%2C13723%2C4366%2C9716%2C3614%2C26539%2C3843%2C17160%2C1340%2C6470%2C4434%2C3241%2C4%2C17339%2C9038%2C1537%2C5824%2C20492%2C1%2C2058%2C10221%2C5675%2C15388%2C9179%2C6387%2C3306%2C4595%2C9279%2C3640%2C9%2C5316%2C1326%2C940%2C4783%2C5469%2C3423%2C12240%2C12476%2C816%2C589%2C7182%2C3374&cl=990399410&seq=1&event=streamingstats&docid=xKb9CQvHYUQ&cbr=HeadlessChrome&cbrver=154.0.0.0&c=WEB_EMBEDDED_PLAYER&cver=2.20261002.01.00&cplayer=UNIPLAYER&cos=Windows&cosver=10.0&cplatform=DESKTOP&vps=0.000:N,0.000:ER&cmt=0.000:0.000,0.000:0.000&error=0.000:auth::0.000:0;a6s.0;r.Video_unavailable&vis=0.000:0&bh=0.000:0.000&qclc=ChA5UG83RmRPR21fWDZpY1J4EAE - net::ERR_ABORTED"
+        ],
+        "dropdowns": [],
+        "buttons": [
+          {
+            "text": "Login",
+            "type": "submit",
+            "disabled": false
+          }
+        ],
+        "forms": [
+          {
+            "formIndex": 0,
+            "inputCount": 4,
+            "fields": [
+              "log",
+              "pwd",
+              "rememberme",
+              "submit"
+            ]
+          }
+        ],
+        "fileUploads": [],
+        "issues": [
+          "Console Errors: Failed to load resource: the server responded with a status of 403 ()"
+        ]
+      },
+      {
+        "route": "/events",
+        "url": "http://127.0.0.1:4200/events",
+        "consoleErrors": [
+          "Failed to load resource: the server responded with a status of 403 ()",
+          "Failed to load resource: the server responded with a status of 503 ()",
+          "Failed to load resource: the server responded with a status of 503 ()"
+        ],
+        "networkErrors": [
+          "GET https://kit.fontawesome.com/a076d05399.js - net::ERR_ABORTED"
+        ],
+        "dropdowns": [],
+        "buttons": [
+          {
+            "text": "Login",
+            "type": "submit",
+            "disabled": false
+          },
+          {
+            "text": "ఫిల్టర్స్ సర్చ్",
+            "type": "button",
+            "disabled": false
+          },
+          {
+            "text": "📅 నేటి మీటింగ్స్ (0)",
+            "type": "button",
+            "disabled": false
+          },
+          {
+            "text": "🔜 రాబోయే మీటింగ్స్ (2)",
+            "type": "button",
+            "disabled": false
+          }
+        ],
+        "forms": [
+          {
+            "formIndex": 0,
+            "inputCount": 4,
+            "fields": [
+              "log",
+              "pwd",
+              "rememberme",
+              "submit"
+            ]
+          }
+        ],
+        "fileUploads": [],
+        "issues": [
+          "Console Errors: Failed to load resource: the server responded with a status of 403 () | Failed to load resource: the server responded with a status of 503 () | Failed to load resource: the server responded with a status of 503 ()"
+        ]
+      },
+      {
+        "route": "/services",
+        "url": "http://127.0.0.1:4200/services",
+        "consoleErrors": [
+          "Failed to load resource: the server responded with a status of 403 ()",
+          "Failed to load resource: net::ERR_BLOCKED_BY_RESPONSE.NotSameOrigin"
+        ],
+        "networkErrors": [
+          "GET https://kit.fontawesome.com/a076d05399.js - net::ERR_ABORTED",
+          "GET https://placehold.it/370x288 - net::ERR_BLOCKED_BY_RESPONSE.NotSameOrigin"
+        ],
+        "dropdowns": [
+          {
+            "tagName": "select",
+            "name": "swal2-select",
+            "optionCount": 0,
+            "options": [],
+            "isEmpty": true
+          }
+        ],
+        "buttons": [
+          {
+            "text": "Login",
+            "type": "submit",
+            "disabled": false
+          },
+          {
+            "text": "×",
+            "type": "button",
+            "disabled": false
+          },
+          {
+            "text": "OK",
+            "type": "button",
+            "disabled": false
+          },
+          {
+            "text": "No",
+            "type": "button",
+            "disabled": false
+          },
+          {
+            "text": "Cancel",
+            "type": "button",
+            "disabled": false
+          }
+        ],
+        "forms": [
+          {
+            "formIndex": 0,
+            "inputCount": 4,
+            "fields": [
+              "log",
+              "pwd",
+              "rememberme",
+              "submit"
+            ]
+          }
+        ],
+        "fileUploads": [
+          {
+            "name": "file-upload",
+            "accept": "all",
+            "disabled": false
+          }
+        ],
+        "issues": [
+          "Empty Dropdown: 'swal2-select' has no available options!",
+          "Console Errors: Failed to load resource: the server responded with a status of 403 () | Failed to load resource: net::ERR_BLOCKED_BY_RESPONSE.NotSameOrigin"
+        ]
+      },
+      {
+        "route": "/gallery",
+        "url": "http://127.0.0.1:4200/gallery",
+        "consoleErrors": [
+          "Failed to load resource: the server responded with a status of 403 ()"
+        ],
+        "networkErrors": [
+          "GET https://kit.fontawesome.com/a076d05399.js - net::ERR_ABORTED"
+        ],
+        "dropdowns": [],
+        "buttons": [
+          {
+            "text": "Login",
+            "type": "submit",
+            "disabled": false
+          }
+        ],
+        "forms": [
+          {
+            "formIndex": 0,
+            "inputCount": 4,
+            "fields": [
+              "log",
+              "pwd",
+              "rememberme",
+              "submit"
+            ]
+          }
+        ],
+        "fileUploads": [],
+        "issues": [
+          "Console Errors: Failed to load resource: the server responded with a status of 403 ()"
+        ]
+      },
+      {
+        "route": "/colleges",
+        "url": "http://127.0.0.1:4200/colleges",
+        "consoleErrors": [
+          "Failed to load resource: the server responded with a status of 403 ()"
+        ],
+        "networkErrors": [
+          "GET https://kit.fontawesome.com/a076d05399.js - net::ERR_ABORTED"
+        ],
+        "dropdowns": [],
+        "buttons": [
+          {
+            "text": "Login",
+            "type": "submit",
+            "disabled": false
+          },
+          {
+            "text": "Bible colleges",
+            "type": "button",
+            "disabled": false
+          },
+          {
+            "text": "Play Schools",
+            "type": "button",
+            "disabled": false
+          },
+          {
+            "text": "Primary Schools",
+            "type": "button",
+            "disabled": false
+          },
+          {
+            "text": "High Schools",
+            "type": "button",
+            "disabled": false
+          },
+          {
+            "text": "Inter Schools",
+            "type": "button",
+            "disabled": false
+          },
+          {
+            "text": "Degree / Engineering",
+            "type": "button",
+            "disabled": false
+          },
+          {
+            "text": "PG Colleges",
+            "type": "button",
+            "disabled": false
+          }
+        ],
+        "forms": [
+          {
+            "formIndex": 0,
+            "inputCount": 4,
+            "fields": [
+              "log",
+              "pwd",
+              "rememberme",
+              "submit"
+            ]
+          }
+        ],
+        "fileUploads": [],
+        "issues": [
+          "Console Errors: Failed to load resource: the server responded with a status of 403 ()"
+        ]
+      },
+      {
+        "route": "/profile",
+        "url": "http://127.0.0.1:4200/profile",
+        "consoleErrors": [
+          "Failed to load resource: the server responded with a status of 403 ()"
+        ],
+        "networkErrors": [
+          "GET https://kit.fontawesome.com/a076d05399.js - net::ERR_ABORTED"
+        ],
+        "dropdowns": [
+          {
+            "tagName": "select",
+            "name": "swal2-select",
+            "optionCount": 0,
+            "options": [],
+            "isEmpty": true
+          }
+        ],
+        "buttons": [
+          {
+            "text": "Login",
+            "type": "submit",
+            "disabled": false
+          },
+          {
+            "text": "×",
+            "type": "button",
+            "disabled": false
+          },
+          {
+            "text": "OK",
+            "type": "button",
+            "disabled": false
+          },
+          {
+            "text": "No",
+            "type": "button",
+            "disabled": false
+          },
+          {
+            "text": "Cancel",
+            "type": "button",
+            "disabled": false
+          }
+        ],
+        "forms": [
+          {
+            "formIndex": 0,
+            "inputCount": 4,
+            "fields": [
+              "log",
+              "pwd",
+              "rememberme",
+              "submit"
+            ]
+          }
+        ],
+        "fileUploads": [
+          {
+            "name": "file-upload",
+            "accept": "all",
+            "disabled": false
+          }
+        ],
+        "issues": [
+          "Empty Dropdown: 'swal2-select' has no available options!",
+          "Console Errors: Failed to load resource: the server responded with a status of 403 ()"
+        ]
+      },
+      {
+        "route": "/login",
+        "url": "http://127.0.0.1:4200/login",
+        "consoleErrors": [
+          "Failed to load resource: the server responded with a status of 403 ()"
+        ],
+        "networkErrors": [
+          "GET https://kit.fontawesome.com/a076d05399.js - net::ERR_ABORTED"
+        ],
+        "dropdowns": [
+          {
+            "tagName": "select",
+            "name": "category",
+            "optionCount": 8,
+            "options": [
+              {
+                "text": "ఇక్కడ క్లిక్ చేసి ఎంచుకోండి",
+                "value": ""
+              },
+              {
+                "text": "విశ్వాసి",
+                "value": "1"
+              },
+              {
+                "text": "పాస్టర్",
+                "value": "4"
+              },
+              {
+                "text": "విద్యార్థి",
+                "value": "2"
+              },
+              {
+                "text": "పాస్టర్ల అసోసియేషన్",
+                "value": "7"
+              },
+              {
+                "text": "మినిస్ట్రీస్",
+                "value": "3"
+              },
+              {
+                "text": "చర్చి",
+                "value": "5"
+              },
+              {
+                "text": "క్రిస్టియన్ ఆర్గనైజెషన్ / కంపెనీ",
+                "value": "6"
+              }
+            ],
+            "isEmpty": false
+          }
+        ],
+        "buttons": [
+          {
+            "text": "Login",
+            "type": "submit",
+            "disabled": false
+          },
+          {
+            "text": "Login",
+            "type": "submit",
+            "disabled": false
+          }
+        ],
+        "forms": [
+          {
+            "formIndex": 0,
+            "inputCount": 4,
+            "fields": [
+              "log",
+              "pwd",
+              "rememberme",
+              "submit"
+            ]
+          },
+          {
+            "formIndex": 1,
+            "inputCount": 3,
+            "fields": [
+              "category",
+              "mobile_number",
+              "password"
+            ]
+          }
+        ],
+        "fileUploads": [],
+        "issues": [
+          "Console Errors: Failed to load resource: the server responded with a status of 403 ()"
+        ]
+      },
+      {
+        "route": "/attacks",
+        "url": "http://127.0.0.1:4200/attacks",
+        "consoleErrors": [
+          "Failed to load resource: the server responded with a status of 403 ()"
+        ],
+        "networkErrors": [
+          "GET https://kit.fontawesome.com/a076d05399.js - net::ERR_ABORTED"
+        ],
+        "dropdowns": [
+          {
+            "tagName": "select",
+            "name": "swal2-select",
+            "optionCount": 0,
+            "options": [],
+            "isEmpty": true
+          }
+        ],
+        "buttons": [
+          {
+            "text": "Login",
+            "type": "submit",
+            "disabled": false
+          },
+          {
+            "text": "×",
+            "type": "button",
+            "disabled": false
+          },
+          {
+            "text": "OK",
+            "type": "button",
+            "disabled": false
+          },
+          {
+            "text": "No",
+            "type": "button",
+            "disabled": false
+          },
+          {
+            "text": "Cancel",
+            "type": "button",
+            "disabled": false
+          }
+        ],
+        "forms": [
+          {
+            "formIndex": 0,
+            "inputCount": 4,
+            "fields": [
+              "log",
+              "pwd",
+              "rememberme",
+              "submit"
+            ]
+          }
+        ],
+        "fileUploads": [
+          {
+            "name": "file-upload",
+            "accept": "all",
+            "disabled": false
+          }
+        ],
+        "issues": [
+          "Empty Dropdown: 'swal2-select' has no available options!",
+          "Console Errors: Failed to load resource: the server responded with a status of 403 ()"
+        ]
+      },
+      {
+        "route": "/injustice",
+        "url": "http://127.0.0.1:4200/injustice",
+        "consoleErrors": [
+          "Failed to load resource: the server responded with a status of 403 ()"
+        ],
+        "networkErrors": [
+          "GET https://kit.fontawesome.com/a076d05399.js - net::ERR_ABORTED"
+        ],
+        "dropdowns": [],
+        "buttons": [
+          {
+            "text": "Login",
+            "type": "submit",
+            "disabled": false
+          }
+        ],
+        "forms": [
+          {
+            "formIndex": 0,
+            "inputCount": 4,
+            "fields": [
+              "log",
+              "pwd",
+              "rememberme",
+              "submit"
+            ]
+          }
+        ],
+        "fileUploads": [],
+        "issues": [
+          "Console Errors: Failed to load resource: the server responded with a status of 403 ()"
+        ]
+      },
+      {
+        "route": "/marriages",
+        "url": "http://127.0.0.1:4200/marriages",
+        "consoleErrors": [
+          "Failed to load resource: the server responded with a status of 403 ()"
+        ],
+        "networkErrors": [
+          "GET https://kit.fontawesome.com/a076d05399.js - net::ERR_ABORTED"
+        ],
+        "dropdowns": [
+          {
+            "tagName": "select",
+            "name": "swal2-select",
+            "optionCount": 0,
+            "options": [],
+            "isEmpty": true
+          }
+        ],
+        "buttons": [
+          {
+            "text": "Login",
+            "type": "submit",
+            "disabled": false
+          },
+          {
+            "text": "×",
+            "type": "button",
+            "disabled": false
+          },
+          {
+            "text": "OK",
+            "type": "button",
+            "disabled": false
+          },
+          {
+            "text": "No",
+            "type": "button",
+            "disabled": false
+          },
+          {
+            "text": "Cancel",
+            "type": "button",
+            "disabled": false
+          }
+        ],
+        "forms": [
+          {
+            "formIndex": 0,
+            "inputCount": 4,
+            "fields": [
+              "log",
+              "pwd",
+              "rememberme",
+              "submit"
+            ]
+          }
+        ],
+        "fileUploads": [
+          {
+            "name": "file-upload",
+            "accept": "all",
+            "disabled": false
+          }
+        ],
+        "issues": [
+          "Empty Dropdown: 'swal2-select' has no available options!",
+          "Console Errors: Failed to load resource: the server responded with a status of 403 ()"
+        ]
+      },
+      {
+        "route": "/jobs",
+        "url": "http://127.0.0.1:4200/jobs",
+        "consoleErrors": [
+          "Failed to load resource: the server responded with a status of 403 ()"
+        ],
+        "networkErrors": [
+          "GET https://kit.fontawesome.com/a076d05399.js - net::ERR_ABORTED"
+        ],
+        "dropdowns": [
+          {
+            "tagName": "select",
+            "name": "swal2-select",
+            "optionCount": 0,
+            "options": [],
+            "isEmpty": true
+          }
+        ],
+        "buttons": [
+          {
+            "text": "Login",
+            "type": "submit",
+            "disabled": false
+          },
+          {
+            "text": "×",
+            "type": "button",
+            "disabled": false
+          },
+          {
+            "text": "OK",
+            "type": "button",
+            "disabled": false
+          },
+          {
+            "text": "No",
+            "type": "button",
+            "disabled": false
+          },
+          {
+            "text": "Cancel",
+            "type": "button",
+            "disabled": false
+          }
+        ],
+        "forms": [
+          {
+            "formIndex": 0,
+            "inputCount": 4,
+            "fields": [
+              "log",
+              "pwd",
+              "rememberme",
+              "submit"
+            ]
+          }
+        ],
+        "fileUploads": [
+          {
+            "name": "file-upload",
+            "accept": "all",
+            "disabled": false
+          }
+        ],
+        "issues": [
+          "Empty Dropdown: 'swal2-select' has no available options!",
+          "Console Errors: Failed to load resource: the server responded with a status of 403 ()"
+        ]
+      },
+      {
+        "route": "/business",
+        "url": "http://127.0.0.1:4200/business",
+        "consoleErrors": [
+          "Failed to load resource: the server responded with a status of 403 ()"
+        ],
+        "networkErrors": [
+          "GET https://kit.fontawesome.com/a076d05399.js - net::ERR_ABORTED"
+        ],
+        "dropdowns": [
+          {
+            "tagName": "select",
+            "name": "swal2-select",
+            "optionCount": 0,
+            "options": [],
+            "isEmpty": true
+          }
+        ],
+        "buttons": [
+          {
+            "text": "Login",
+            "type": "submit",
+            "disabled": false
+          },
+          {
+            "text": "×",
+            "type": "button",
+            "disabled": false
+          },
+          {
+            "text": "OK",
+            "type": "button",
+            "disabled": false
+          },
+          {
+            "text": "No",
+            "type": "button",
+            "disabled": false
+          },
+          {
+            "text": "Cancel",
+            "type": "button",
+            "disabled": false
+          }
+        ],
+        "forms": [
+          {
+            "formIndex": 0,
+            "inputCount": 4,
+            "fields": [
+              "log",
+              "pwd",
+              "rememberme",
+              "submit"
+            ]
+          }
+        ],
+        "fileUploads": [
+          {
+            "name": "file-upload",
+            "accept": "all",
+            "disabled": false
+          }
+        ],
+        "issues": [
+          "Empty Dropdown: 'swal2-select' has no available options!",
+          "Console Errors: Failed to load resource: the server responded with a status of 403 ()"
+        ]
+      },
+      {
+        "route": "/church_timings",
+        "url": "http://127.0.0.1:4200/church_timings",
+        "consoleErrors": [
+          "Failed to load resource: the server responded with a status of 403 ()"
+        ],
+        "networkErrors": [
+          "GET https://kit.fontawesome.com/a076d05399.js - net::ERR_ABORTED"
+        ],
+        "dropdowns": [
+          {
+            "tagName": "select",
+            "name": "swal2-select",
+            "optionCount": 0,
+            "options": [],
+            "isEmpty": true
+          }
+        ],
+        "buttons": [
+          {
+            "text": "Login",
+            "type": "submit",
+            "disabled": false
+          },
+          {
+            "text": "×",
+            "type": "button",
+            "disabled": false
+          },
+          {
+            "text": "OK",
+            "type": "button",
+            "disabled": false
+          },
+          {
+            "text": "No",
+            "type": "button",
+            "disabled": false
+          },
+          {
+            "text": "Cancel",
+            "type": "button",
+            "disabled": false
+          }
+        ],
+        "forms": [
+          {
+            "formIndex": 0,
+            "inputCount": 4,
+            "fields": [
+              "log",
+              "pwd",
+              "rememberme",
+              "submit"
+            ]
+          }
+        ],
+        "fileUploads": [
+          {
+            "name": "file-upload",
+            "accept": "all",
+            "disabled": false
+          }
+        ],
+        "issues": [
+          "Empty Dropdown: 'swal2-select' has no available options!",
+          "Console Errors: Failed to load resource: the server responded with a status of 403 ()"
+        ]
+      },
+      {
+        "route": "/contactus",
+        "url": "http://127.0.0.1:4200/contactus",
+        "consoleErrors": [
+          "Failed to load resource: the server responded with a status of 403 ()",
+          "Refused to apply style from 'https://fonts.googleapis.com/css2?family=Inter:wght@400;500[_ngcontent-viv-c37];600[_ngcontent-viv-c37];700&display=swap' because its MIME type ('text/html') is not a supported stylesheet MIME type, and strict MIME checking is enabled."
+        ],
+        "networkErrors": [
+          "GET https://kit.fontawesome.com/a076d05399.js - net::ERR_ABORTED",
+          "GET https://fonts.googleapis.com/css2?family=Inter:wght@400;500[_ngcontent-viv-c37];600[_ngcontent-viv-c37];700&display=swap - net::ERR_ABORTED"
+        ],
+        "dropdowns": [],
+        "buttons": [
+          {
+            "text": "Login",
+            "type": "submit",
+            "disabled": false
+          },
+          {
+            "text": "Submit",
+            "type": "button",
+            "disabled": false
+          }
+        ],
+        "forms": [
+          {
+            "formIndex": 0,
+            "inputCount": 4,
+            "fields": [
+              "log",
+              "pwd",
+              "rememberme",
+              "submit"
+            ]
+          },
+          {
+            "formIndex": 1,
+            "inputCount": 4,
+            "fields": [
+              "name",
+              "e_mail",
+              "subject",
+              "message"
+            ]
+          }
+        ],
+        "fileUploads": [],
+        "issues": [
+          "Console Errors: Failed to load resource: the server responded with a status of 403 () | Refused to apply style from 'https://fonts.googleapis.com/css2?family=Inter:wght@400;500[_ngcontent-viv-c37];600[_ngcontent-viv-c37];700&display=swap' because its MIME type ('text/html') is not a supported stylesheet MIME type, and strict MIME checking is enabled."
+        ]
+      },
+      {
+        "route": "/signup",
+        "url": "http://127.0.0.1:4200/signup",
+        "consoleErrors": [
+          "Failed to load resource: the server responded with a status of 403 ()",
+          "ERROR TypeError: Cannot read properties of null (reading 'scrollIntoView')",
+          "ERROR Error: Cannot find control with name: 'term'",
+          "ERROR Error: Cannot find control with name: 'term'",
+          "ERROR Error: Cannot find control with name: 'term'",
+          "ERROR Error: Cannot find control with name: 'term'",
+          "ERROR Error: Cannot find control with name: 'term'"
+        ],
+        "networkErrors": [
+          "GET https://kit.fontawesome.com/a076d05399.js - net::ERR_ABORTED"
+        ],
+        "dropdowns": [],
+        "buttons": [
+          {
+            "text": "Login",
+            "type": "submit",
+            "disabled": false
+          },
+          {
+            "text": "BELIEVER REGISTER",
+            "type": "button",
+            "disabled": false
+          },
+          {
+            "text": "STUDENT REGISTER",
+            "type": "button",
+            "disabled": false
+          },
+          {
+            "text": "MINISTRY REGISTER",
+            "type": "button",
+            "disabled": false
+          },
+          {
+            "text": "PASTOR REGISTER",
+            "type": "button",
+            "disabled": false
+          },
+          {
+            "text": "CHURCH REGISTER",
+            "type": "button",
+            "disabled": false
+          },
+          {
+            "text": "ORGANISATION",
+            "type": "button",
+            "disabled": false
+          },
+          {
+            "text": "PASTOR ASSOCIATION",
+            "type": "button",
+            "disabled": false
+          }
+        ],
+        "forms": [
+          {
+            "formIndex": 0,
+            "inputCount": 4,
+            "fields": [
+              "log",
+              "pwd",
+              "rememberme",
+              "submit"
+            ]
+          }
+        ],
+        "fileUploads": [],
+        "issues": [
+          "Console Errors: Failed to load resource: the server responded with a status of 403 () | ERROR TypeError: Cannot read properties of null (reading 'scrollIntoView') | ERROR Error: Cannot find control with name: 'term' | ERROR Error: Cannot find control with name: 'term' | ERROR Error: Cannot find control with name: 'term' | ERROR Error: Cannot find control with name: 'term' | ERROR Error: Cannot find control with name: 'term'"
+        ]
+      },
+      {
+        "route": "/institute",
+        "url": "http://127.0.0.1:4200/institute",
+        "consoleErrors": [
+          "Failed to load resource: the server responded with a status of 403 ()"
+        ],
+        "networkErrors": [
+          "GET https://kit.fontawesome.com/a076d05399.js - net::ERR_ABORTED"
+        ],
+        "dropdowns": [
+          {
+            "tagName": "select",
+            "name": "swal2-select",
+            "optionCount": 0,
+            "options": [],
+            "isEmpty": true
+          }
+        ],
+        "buttons": [
+          {
+            "text": "Login",
+            "type": "submit",
+            "disabled": false
+          },
+          {
+            "text": "×",
+            "type": "button",
+            "disabled": false
+          },
+          {
+            "text": "OK",
+            "type": "button",
+            "disabled": false
+          },
+          {
+            "text": "No",
+            "type": "button",
+            "disabled": false
+          },
+          {
+            "text": "Cancel",
+            "type": "button",
+            "disabled": false
+          }
+        ],
+        "forms": [
+          {
+            "formIndex": 0,
+            "inputCount": 4,
+            "fields": [
+              "log",
+              "pwd",
+              "rememberme",
+              "submit"
+            ]
+          }
+        ],
+        "fileUploads": [
+          {
+            "name": "file-upload",
+            "accept": "all",
+            "disabled": false
+          }
+        ],
+        "issues": [
+          "Empty Dropdown: 'swal2-select' has no available options!",
+          "Console Errors: Failed to load resource: the server responded with a status of 403 ()"
+        ]
+      },
+      {
+        "route": "/supp-reg",
+        "url": "http://127.0.0.1:4200/supp-reg",
+        "consoleErrors": [
+          "Failed to load resource: the server responded with a status of 403 ()"
+        ],
+        "networkErrors": [
+          "GET https://kit.fontawesome.com/a076d05399.js - net::ERR_ABORTED"
+        ],
+        "dropdowns": [],
+        "buttons": [
+          {
+            "text": "Login",
+            "type": "submit",
+            "disabled": false
+          }
+        ],
+        "forms": [
+          {
+            "formIndex": 0,
+            "inputCount": 4,
+            "fields": [
+              "log",
+              "pwd",
+              "rememberme",
+              "submit"
+            ]
+          }
+        ],
+        "fileUploads": [],
+        "issues": [
+          "Console Errors: Failed to load resource: the server responded with a status of 403 ()"
+        ]
+      },
+      {
+        "route": "/leaders",
+        "url": "http://127.0.0.1:4200/leaders",
+        "consoleErrors": [
+          "Failed to load resource: the server responded with a status of 403 ()",
+          "ERROR TypeError: Cannot read properties of undefined (reading 'length')",
+          "Failed to load resource: the server responded with a status of 404 ()",
+          "ERROR [object HttpErrorResponse]"
+        ],
+        "networkErrors": [
+          "GET https://kit.fontawesome.com/a076d05399.js - net::ERR_ABORTED"
+        ],
+        "dropdowns": [
+          {
+            "tagName": "select",
+            "name": "swal2-select",
+            "optionCount": 0,
+            "options": [],
+            "isEmpty": true
+          }
+        ],
+        "buttons": [
+          {
+            "text": "Login",
+            "type": "submit",
+            "disabled": false
+          },
+          {
+            "text": "×",
+            "type": "button",
+            "disabled": false
+          },
+          {
+            "text": "OK",
+            "type": "button",
+            "disabled": false
+          },
+          {
+            "text": "No",
+            "type": "button",
+            "disabled": false
+          },
+          {
+            "text": "Cancel",
+            "type": "button",
+            "disabled": false
+          }
+        ],
+        "forms": [
+          {
+            "formIndex": 0,
+            "inputCount": 4,
+            "fields": [
+              "log",
+              "pwd",
+              "rememberme",
+              "submit"
+            ]
+          }
+        ],
+        "fileUploads": [
+          {
+            "name": "file-upload",
+            "accept": "all",
+            "disabled": false
+          }
+        ],
+        "issues": [
+          "Empty Dropdown: 'swal2-select' has no available options!",
+          "Console Errors: Failed to load resource: the server responded with a status of 403 () | ERROR TypeError: Cannot read properties of undefined (reading 'length') | Failed to load resource: the server responded with a status of 404 () | ERROR [object HttpErrorResponse]"
+        ]
+      },
+      {
+        "route": "/update",
+        "url": "http://127.0.0.1:4200/update",
+        "consoleErrors": [
+          "Failed to load resource: the server responded with a status of 403 ()",
+          "ERROR TypeError: Cannot read properties of undefined (reading 'pastorname')"
+        ],
+        "networkErrors": [
+          "GET https://kit.fontawesome.com/a076d05399.js - net::ERR_ABORTED"
+        ],
+        "dropdowns": [
+          {
+            "tagName": "select",
+            "name": "swal2-select",
+            "optionCount": 0,
+            "options": [],
+            "isEmpty": true
+          }
+        ],
+        "buttons": [
+          {
+            "text": "Login",
+            "type": "submit",
+            "disabled": false
+          },
+          {
+            "text": "×",
+            "type": "button",
+            "disabled": false
+          },
+          {
+            "text": "OK",
+            "type": "button",
+            "disabled": false
+          },
+          {
+            "text": "No",
+            "type": "button",
+            "disabled": false
+          },
+          {
+            "text": "Cancel",
+            "type": "button",
+            "disabled": false
+          }
+        ],
+        "forms": [
+          {
+            "formIndex": 0,
+            "inputCount": 4,
+            "fields": [
+              "log",
+              "pwd",
+              "rememberme",
+              "submit"
+            ]
+          }
+        ],
+        "fileUploads": [
+          {
+            "name": "file-upload",
+            "accept": "all",
+            "disabled": false
+          }
+        ],
+        "issues": [
+          "Empty Dropdown: 'swal2-select' has no available options!",
+          "Console Errors: Failed to load resource: the server responded with a status of 403 () | ERROR TypeError: Cannot read properties of undefined (reading 'pastorname')"
+        ]
+      },
+      {
+        "route": "/downloads",
+        "url": "http://127.0.0.1:4200/downloads",
+        "consoleErrors": [
+          "Failed to load resource: the server responded with a status of 403 ()"
+        ],
+        "networkErrors": [
+          "GET https://kit.fontawesome.com/a076d05399.js - net::ERR_ABORTED"
+        ],
+        "dropdowns": [],
+        "buttons": [
+          {
+            "text": "Login",
+            "type": "submit",
+            "disabled": false
+          }
+        ],
+        "forms": [
+          {
+            "formIndex": 0,
+            "inputCount": 4,
+            "fields": [
+              "log",
+              "pwd",
+              "rememberme",
+              "submit"
+            ]
+          }
+        ],
+        "fileUploads": [],
+        "issues": [
+          "Console Errors: Failed to load resource: the server responded with a status of 403 ()"
+        ]
+      },
+      {
+        "route": "/help",
+        "url": "http://127.0.0.1:4200/help",
+        "consoleErrors": [
+          "Failed to load resource: the server responded with a status of 403 ()"
+        ],
+        "networkErrors": [
+          "GET https://kit.fontawesome.com/a076d05399.js - net::ERR_ABORTED"
+        ],
+        "dropdowns": [
+          {
+            "tagName": "select",
+            "name": "swal2-select",
+            "optionCount": 0,
+            "options": [],
+            "isEmpty": true
+          }
+        ],
+        "buttons": [
+          {
+            "text": "Login",
+            "type": "submit",
+            "disabled": false
+          },
+          {
+            "text": "×",
+            "type": "button",
+            "disabled": false
+          },
+          {
+            "text": "OK",
+            "type": "button",
+            "disabled": false
+          },
+          {
+            "text": "No",
+            "type": "button",
+            "disabled": false
+          },
+          {
+            "text": "Cancel",
+            "type": "button",
+            "disabled": false
+          }
+        ],
+        "forms": [
+          {
+            "formIndex": 0,
+            "inputCount": 4,
+            "fields": [
+              "log",
+              "pwd",
+              "rememberme",
+              "submit"
+            ]
+          }
+        ],
+        "fileUploads": [
+          {
+            "name": "file-upload",
+            "accept": "all",
+            "disabled": false
+          }
+        ],
+        "issues": [
+          "Empty Dropdown: 'swal2-select' has no available options!",
+          "Console Errors: Failed to load resource: the server responded with a status of 403 ()"
+        ]
+      },
+      {
+        "route": "/news",
+        "url": "http://127.0.0.1:4200/news",
+        "consoleErrors": [
+          "Failed to load resource: the server responded with a status of 403 ()"
+        ],
+        "networkErrors": [
+          "GET https://kit.fontawesome.com/a076d05399.js - net::ERR_ABORTED"
+        ],
+        "dropdowns": [
+          {
+            "tagName": "select",
+            "name": "news",
+            "optionCount": 12,
+            "options": [
+              {
+                "text": "కేటగిరీ ఎంచుకోండి",
+                "value": ""
+              },
+              {
+                "text": "క్రైస్తవుల మీద దాడులు సంబంధించిన న్యూస్",
+                "value": "క్రైస్తవుల మీద దాడులు"
+              },
+              {
+                "text": "గౌరవ వేతనం, ప్రభుత్వ పథకాలు సంబంధించిన న్యూస్",
+                "value": " గౌరవ వేతనం, ప్రభుత్వ పథకాలు సంబంధించిన న్యూస్"
+              },
+              {
+                "text": "క్రైస్తవులకు సంబంధించిన న్యూస్",
+                "value": "క్రైస్తవులకు సంబంధించిన న్యూస్"
+              },
+              {
+                "text": "జనరల్ న్యూస్",
+                "value": "జనరల్ న్యూస్"
+              },
+              {
+                "text": "దళిత్ క్రిస్టియన్స్ షెడ్యూల్ కాస్ట్ స్టేటస్ న్యూస్",
+                "value": "దళిత్ క్రిస్టియన్స్ షెడ్యూల్ కాస్ట్ స్టేటస్ న్యూస్"
+              },
+              {
+                "text": "చదువుకి సంబంధించి",
+                "value": "చదువుకి సంబంధించి"
+              },
+              {
+                "text": "ట్రైనింగ్ కి సంబంధించి",
+                "value": "ట్రైనింగ్ కి సంబంధించి"
+              },
+              {
+                "text": "ఉద్యోగాలకు సంబంధించి",
+                "value": "ఉద్యోగాలకు సంబంధించి"
+              },
+              {
+                "text": "ఆరోగ్యం కి సంబంధించి",
+                "value": "ఆరోగ్యం కి సంబంధించి"
+              }
+            ],
+            "isEmpty": false
+          }
+        ],
+        "buttons": [
+          {
+            "text": "Login",
+            "type": "submit",
+            "disabled": false
+          },
+          {
+            "text": "సబ్మిట్",
+            "type": "submit",
+            "disabled": false
+          },
+          {
+            "text": "Read More",
+            "type": "button",
+            "disabled": false
+          }
+        ],
+        "forms": [
+          {
+            "formIndex": 0,
+            "inputCount": 4,
+            "fields": [
+              "log",
+              "pwd",
+              "rememberme",
+              "submit"
+            ]
+          },
+          {
+            "formIndex": 1,
+            "inputCount": 2,
+            "fields": [
+              "description",
+              "news"
+            ]
+          }
+        ],
+        "fileUploads": [
+          {
+            "name": "image",
+            "accept": "image/x-png,image/jpeg",
+            "disabled": false
+          }
+        ],
+        "issues": [
+          "Console Errors: Failed to load resource: the server responded with a status of 403 ()"
+        ]
+      },
+      {
+        "route": "/ourhelp",
+        "url": "http://127.0.0.1:4200/ourhelp",
+        "consoleErrors": [
+          "Failed to load resource: the server responded with a status of 403 ()"
+        ],
+        "networkErrors": [
+          "GET https://kit.fontawesome.com/a076d05399.js - net::ERR_ABORTED"
+        ],
+        "dropdowns": [],
+        "buttons": [
+          {
+            "text": "Login",
+            "type": "submit",
+            "disabled": false
+          }
+        ],
+        "forms": [
+          {
+            "formIndex": 0,
+            "inputCount": 4,
+            "fields": [
+              "log",
+              "pwd",
+              "rememberme",
+              "submit"
+            ]
+          }
+        ],
+        "fileUploads": [],
+        "issues": [
+          "Console Errors: Failed to load resource: the server responded with a status of 403 ()"
+        ]
+      },
+      {
+        "route": "/videospage",
+        "url": "http://127.0.0.1:4200/videospage",
+        "consoleErrors": [
+          "Failed to load resource: the server responded with a status of 403 ()",
+          "Failed to load resource: the server responded with a status of 403 ()",
+          "ERROR Error: Uncaught (in promise): Error: NG04002: Cannot match any routes. URL Segment: 'undefined'"
+        ],
+        "networkErrors": [
+          "GET https://kit.fontawesome.com/a076d05399.js - net::ERR_ABORTED",
+          "GET https://kit.fontawesome.com/a076d05399.js - net::ERR_ABORTED"
+        ],
+        "dropdowns": [],
+        "buttons": [
+          {
+            "text": "Login",
+            "type": "submit",
+            "disabled": false
+          }
+        ],
+        "forms": [
+          {
+            "formIndex": 0,
+            "inputCount": 4,
+            "fields": [
+              "log",
+              "pwd",
+              "rememberme",
+              "submit"
+            ]
+          }
+        ],
+        "fileUploads": [],
+        "issues": [
+          "Console Errors: Failed to load resource: the server responded with a status of 403 () | Failed to load resource: the server responded with a status of 403 () | ERROR Error: Uncaught (in promise): Error: NG04002: Cannot match any routes. URL Segment: 'undefined'"
+        ]
+      },
+      {
+        "route": "/attack",
+        "url": "http://127.0.0.1:4200/attack",
+        "consoleErrors": [
+          "Failed to load resource: the server responded with a status of 403 ()"
+        ],
+        "networkErrors": [
+          "GET https://kit.fontawesome.com/a076d05399.js - net::ERR_ABORTED"
+        ],
+        "dropdowns": [
+          {
+            "tagName": "select",
+            "name": "swal2-select",
+            "optionCount": 0,
+            "options": [],
+            "isEmpty": true
+          }
+        ],
+        "buttons": [
+          {
+            "text": "Login",
+            "type": "submit",
+            "disabled": false
+          },
+          {
+            "text": "×",
+            "type": "button",
+            "disabled": false
+          },
+          {
+            "text": "OK",
+            "type": "button",
+            "disabled": false
+          },
+          {
+            "text": "No",
+            "type": "button",
+            "disabled": false
+          },
+          {
+            "text": "Cancel",
+            "type": "button",
+            "disabled": false
+          }
+        ],
+        "forms": [
+          {
+            "formIndex": 0,
+            "inputCount": 4,
+            "fields": [
+              "log",
+              "pwd",
+              "rememberme",
+              "submit"
+            ]
+          }
+        ],
+        "fileUploads": [
+          {
+            "name": "file-upload",
+            "accept": "all",
+            "disabled": false
+          }
+        ],
+        "issues": [
+          "Empty Dropdown: 'swal2-select' has no available options!",
+          "Console Errors: Failed to load resource: the server responded with a status of 403 ()"
+        ]
+      },
+      {
+        "route": "/privacypolicy",
+        "url": "http://127.0.0.1:4200/privacypolicy",
+        "consoleErrors": [
+          "Failed to load resource: the server responded with a status of 403 ()"
+        ],
+        "networkErrors": [
+          "GET https://kit.fontawesome.com/a076d05399.js - net::ERR_ABORTED"
+        ],
+        "dropdowns": [],
+        "buttons": [
+          {
+            "text": "Login",
+            "type": "submit",
+            "disabled": false
+          }
+        ],
+        "forms": [
+          {
+            "formIndex": 0,
+            "inputCount": 4,
+            "fields": [
+              "log",
+              "pwd",
+              "rememberme",
+              "submit"
+            ]
+          }
+        ],
+        "fileUploads": [],
+        "issues": [
+          "Console Errors: Failed to load resource: the server responded with a status of 403 ()"
+        ]
+      },
+      {
+        "route": "/terms",
+        "url": "http://127.0.0.1:4200/terms",
+        "consoleErrors": [
+          "Failed to load resource: the server responded with a status of 403 ()"
+        ],
+        "networkErrors": [
+          "GET https://kit.fontawesome.com/a076d05399.js - net::ERR_ABORTED"
+        ],
+        "dropdowns": [],
+        "buttons": [
+          {
+            "text": "Login",
+            "type": "submit",
+            "disabled": false
+          }
+        ],
+        "forms": [
+          {
+            "formIndex": 0,
+            "inputCount": 4,
+            "fields": [
+              "log",
+              "pwd",
+              "rememberme",
+              "submit"
+            ]
+          }
+        ],
+        "fileUploads": [],
+        "issues": [
+          "Console Errors: Failed to load resource: the server responded with a status of 403 ()"
+        ]
+      },
+      {
+        "route": "/wings",
+        "url": "http://127.0.0.1:4200/wings",
+        "consoleErrors": [
+          "Failed to load resource: the server responded with a status of 403 ()"
+        ],
+        "networkErrors": [
+          "GET https://kit.fontawesome.com/a076d05399.js - net::ERR_ABORTED"
+        ],
+        "dropdowns": [],
+        "buttons": [
+          {
+            "text": "Login",
+            "type": "submit",
+            "disabled": false
+          }
+        ],
+        "forms": [
+          {
+            "formIndex": 0,
+            "inputCount": 4,
+            "fields": [
+              "log",
+              "pwd",
+              "rememberme",
+              "submit"
+            ]
+          }
+        ],
+        "fileUploads": [],
+        "issues": [
+          "Console Errors: Failed to load resource: the server responded with a status of 403 ()"
+        ]
+      },
+      {
+        "route": "/organization",
+        "url": "http://127.0.0.1:4200/organization",
+        "consoleErrors": [
+          "Failed to load resource: the server responded with a status of 403 ()"
+        ],
+        "networkErrors": [
+          "GET https://kit.fontawesome.com/a076d05399.js - net::ERR_ABORTED"
+        ],
+        "dropdowns": [
+          {
+            "tagName": "select",
+            "name": "swal2-select",
+            "optionCount": 0,
+            "options": [],
+            "isEmpty": true
+          }
+        ],
+        "buttons": [
+          {
+            "text": "Login",
+            "type": "submit",
+            "disabled": false
+          },
+          {
+            "text": "×",
+            "type": "button",
+            "disabled": false
+          },
+          {
+            "text": "OK",
+            "type": "button",
+            "disabled": false
+          },
+          {
+            "text": "No",
+            "type": "button",
+            "disabled": false
+          },
+          {
+            "text": "Cancel",
+            "type": "button",
+            "disabled": false
+          }
+        ],
+        "forms": [
+          {
+            "formIndex": 0,
+            "inputCount": 4,
+            "fields": [
+              "log",
+              "pwd",
+              "rememberme",
+              "submit"
+            ]
+          }
+        ],
+        "fileUploads": [
+          {
+            "name": "file-upload",
+            "accept": "all",
+            "disabled": false
+          }
+        ],
+        "issues": [
+          "Empty Dropdown: 'swal2-select' has no available options!",
+          "Console Errors: Failed to load resource: the server responded with a status of 403 ()"
+        ]
+      },
+      {
+        "route": "/webhelp",
+        "url": "http://127.0.0.1:4200/webhelp",
+        "consoleErrors": [
+          "Failed to load resource: the server responded with a status of 403 ()"
+        ],
+        "networkErrors": [
+          "GET https://kit.fontawesome.com/a076d05399.js - net::ERR_ABORTED",
+          "POST https://www.youtube.com/api/stats/qoe?cpn=R-kw5D0GpIsDSY6A&el=embedded&ns=yt&fexp=v1%2C100673025%2C-76668381%2C27058999%2C34656%2C124674%2C117689%2C9252%2C16509%2C23206%2C100702%2C15105%2C25059%2C4174%2C30446%2C18706%2C26008%2C13015%2C14666%2C1422%2C6620%2C2784%2C23826%2C9500%2C1840%2C24119%2C32526%2C38192%2C20589%2C4199%2C30114%2C9181%2C32875%2C20108%2C6032%2C1168%2C372%2C7758%2C18832%2C11374%2C4115%2C11462%2C26847%2C1352%2C13723%2C4366%2C9716%2C3614%2C16650%2C9889%2C3843%2C17160%2C1340%2C6470%2C4434%2C3241%2C4%2C17339%2C9038%2C1537%2C5824%2C20492%2C1%2C2058%2C10221%2C5675%2C15388%2C9179%2C6387%2C3306%2C4595%2C9279%2C3640%2C9%2C5316%2C1326%2C940%2C4783%2C5469%2C3423%2C12240%2C12476%2C816%2C589%2C7182%2C3374&cl=990399410&seq=1&event=streamingstats&docid=TlLUHZIkSE0&cbr=HeadlessChrome&cbrver=154.0.0.0&c=WEB_EMBEDDED_PLAYER&cver=2.20261002.01.00&cplayer=UNIPLAYER&cos=Windows&cosver=10.0&cplatform=DESKTOP&vps=0.000:N,0.000:ER&cmt=0.000:0.000,0.000:0.000&error=0.000:auth::0.000:0;a6s.0;r.Video_unavailable&vis=0.000:0&bh=0.000:0.000&qclc=ChBSLWt3NUQwR3BJc0RTWTZBEAE - net::ERR_ABORTED"
+        ],
+        "dropdowns": [],
+        "buttons": [
+          {
+            "text": "Login",
+            "type": "submit",
+            "disabled": false
+          }
+        ],
+        "forms": [
+          {
+            "formIndex": 0,
+            "inputCount": 4,
+            "fields": [
+              "log",
+              "pwd",
+              "rememberme",
+              "submit"
+            ]
+          }
+        ],
+        "fileUploads": [],
+        "issues": [
+          "Console Errors: Failed to load resource: the server responded with a status of 403 ()"
+        ]
+      },
+      {
+        "route": "/newspage",
+        "url": "http://127.0.0.1:4200/newspage",
+        "consoleErrors": [
+          "Failed to load resource: the server responded with a status of 403 ()"
+        ],
+        "networkErrors": [
+          "GET https://kit.fontawesome.com/a076d05399.js - net::ERR_ABORTED"
+        ],
+        "dropdowns": [],
+        "buttons": [
+          {
+            "text": "Login",
+            "type": "submit",
+            "disabled": false
+          }
+        ],
+        "forms": [
+          {
+            "formIndex": 0,
+            "inputCount": 4,
+            "fields": [
+              "log",
+              "pwd",
+              "rememberme",
+              "submit"
+            ]
+          }
+        ],
+        "fileUploads": [],
+        "issues": [
+          "Console Errors: Failed to load resource: the server responded with a status of 403 ()"
+        ]
+      },
+      {
+        "route": "/josephview",
+        "url": "http://127.0.0.1:4200/josephview",
+        "consoleErrors": [
+          "Failed to load resource: the server responded with a status of 403 ()"
+        ],
+        "networkErrors": [
+          "GET https://kit.fontawesome.com/a076d05399.js - net::ERR_ABORTED"
+        ],
+        "dropdowns": [],
+        "buttons": [
+          {
+            "text": "Login",
+            "type": "submit",
+            "disabled": false
+          }
+        ],
+        "forms": [
+          {
+            "formIndex": 0,
+            "inputCount": 4,
+            "fields": [
+              "log",
+              "pwd",
+              "rememberme",
+              "submit"
+            ]
+          }
+        ],
+        "fileUploads": [],
+        "issues": [
+          "Console Errors: Failed to load resource: the server responded with a status of 403 ()"
+        ]
+      },
+      {
+        "route": "/techsol",
+        "url": "http://127.0.0.1:4200/techsol",
+        "consoleErrors": [
+          "Failed to load resource: the server responded with a status of 403 ()"
+        ],
+        "networkErrors": [
+          "GET https://kit.fontawesome.com/a076d05399.js - net::ERR_ABORTED"
+        ],
+        "dropdowns": [],
+        "buttons": [
+          {
+            "text": "Login",
+            "type": "submit",
+            "disabled": false
+          }
+        ],
+        "forms": [
+          {
+            "formIndex": 0,
+            "inputCount": 4,
+            "fields": [
+              "log",
+              "pwd",
+              "rememberme",
+              "submit"
+            ]
+          }
+        ],
+        "fileUploads": [],
+        "issues": [
+          "Console Errors: Failed to load resource: the server responded with a status of 403 ()"
+        ]
+      },
+      {
+        "route": "/church-pastor-search",
+        "url": "http://127.0.0.1:4200/church-pastor-search",
+        "consoleErrors": [
+          "Failed to load resource: the server responded with a status of 403 ()"
+        ],
+        "networkErrors": [
+          "GET https://kit.fontawesome.com/a076d05399.js - net::ERR_ABORTED"
+        ],
+        "dropdowns": [
+          {
+            "tagName": "select",
+            "name": "district_id",
+            "optionCount": 27,
+            "options": [
+              {
+                "text": "ఇక్కడ క్లిక్ చేసి ఎంచుకోండి",
+                "value": ""
+              },
+              {
+                "text": "అనంతపురం జిల్లా-Anantapur",
+                "value": "7"
+              },
+              {
+                "text": "అనకాపల్లి జిల్లా-Anakapalli",
+                "value": "6"
+              },
+              {
+                "text": "అన్నమయ్య జిల్లా-Annamayya",
+                "value": "8"
+              },
+              {
+                "text": "అల్లూరి సీతారామ రాజు-Alluri Sitharama Raju",
+                "value": "5"
+              },
+              {
+                "text": "ఎన్టీఆర్ జిల్లా-NTR",
+                "value": "21"
+              },
+              {
+                "text": "ఏలూరు జిల్లా-Eluru",
+                "value": "12"
+              },
+              {
+                "text": "కడప జిల్లా-Kadapa",
+                "value": "14"
+              },
+              {
+                "text": "కర్నూలు జిల్లా-Kurnool",
+                "value": "18"
+              },
+              {
+                "text": "కాకినాడ జిల్లా-Kakinada",
+                "value": "15"
+              }
+            ],
+            "isEmpty": false
+          },
+          {
+            "tagName": "select",
+            "name": "constituency_id",
+            "optionCount": 1,
+            "options": [
+              {
+                "text": "ఇక్కడ క్లిక్ చేసి ఎంచుకోండి",
+                "value": ""
+              }
+            ],
+            "isEmpty": true
+          },
+          {
+            "tagName": "select",
+            "name": "mandal_id",
+            "optionCount": 1,
+            "options": [
+              {
+                "text": "ఇక్కడ క్లిక్ చేసి ఎంచుకోండి",
+                "value": ""
+              }
+            ],
+            "isEmpty": true
+          }
+        ],
+        "buttons": [
+          {
+            "text": "Login",
+            "type": "submit",
+            "disabled": false
+          },
+          {
+            "text": "Reset",
+            "type": "button",
+            "disabled": false
+          }
+        ],
+        "forms": [
+          {
+            "formIndex": 0,
+            "inputCount": 4,
+            "fields": [
+              "log",
+              "pwd",
+              "rememberme",
+              "submit"
+            ]
+          },
+          {
+            "formIndex": 1,
+            "inputCount": 5,
+            "fields": [
+              "checkbox",
+              "checkbox",
+              "district_id",
+              "constituency_id",
+              "mandal_id"
+            ]
+          }
+        ],
+        "fileUploads": [],
+        "issues": [
+          "Empty Dropdown: 'constituency_id' has no available options!",
+          "Empty Dropdown: 'mandal_id' has no available options!",
+          "Console Errors: Failed to load resource: the server responded with a status of 403 ()"
+        ]
+      },
+      {
+        "route": "/believerregister",
+        "url": "http://127.0.0.1:4200/believerregister",
+        "consoleErrors": [
+          "Failed to load resource: the server responded with a status of 403 ()",
+          "ERROR Error: Cannot find control with name: 'term'"
+        ],
+        "networkErrors": [
+          "GET https://kit.fontawesome.com/a076d05399.js - net::ERR_ABORTED"
+        ],
+        "dropdowns": [
+          {
+            "tagName": "select",
+            "name": "gender",
+            "optionCount": 4,
+            "options": [
+              {
+                "text": "ఇక్కడ క్లిక్ చేసి సెలెక్ట చేయండి",
+                "value": ""
+              },
+              {
+                "text": "పురుషుడు",
+                "value": "పురుషుడు"
+              },
+              {
+                "text": "స్త్రీ",
+                "value": "స్త్రీ"
+              },
+              {
+                "text": "ట్రాన్స్ జెండర్",
+                "value": "ట్రాన్స్ జెండర్"
+              }
+            ],
+            "isEmpty": false
+          },
+          {
+            "tagName": "select",
+            "name": "spirti",
+            "optionCount": 5,
+            "options": [
+              {
+                "text": "ఇక్కడ క్లిక్ చేసి ఎంచుకోండి",
+                "value": ""
+              },
+              {
+                "text": "Practicing Christian",
+                "value": "practicingchristian"
+              },
+              {
+                "text": "Nominal Christian",
+                "value": "nominalchristian"
+              },
+              {
+                "text": "Festival Christian",
+                "value": "festivalchristian"
+              },
+              {
+                "text": "Just Believing Jesus",
+                "value": "justbelievingjesus"
+              }
+            ],
+            "isEmpty": false
+          },
+          {
+            "tagName": "select",
+            "name": "god",
+            "optionCount": 4,
+            "options": [
+              {
+                "text": "ఇక్కడ క్లిక్ చేసి సెలెక్ట చేయండి",
+                "value": ""
+              },
+              {
+                "text": "ప్రైవేట్ ఉద్యోగం",
+                "value": "ప్రైవేట్"
+              },
+              {
+                "text": "ఓనర్ (సొంతది)",
+                "value": "ఓనర్"
+              },
+              {
+                "text": "గవర్నమెంట్ ఉద్యోగం",
+                "value": "గవర్నమెంట్"
+              }
+            ],
+            "isEmpty": false
+          },
+          {
+            "tagName": "select",
+            "name": "hobbies",
+            "optionCount": 7,
+            "options": [
+              {
+                "text": "ఇక్కడ క్లిక్ చేసి ఎంచుకోండి",
+                "value": ""
+              },
+              {
+                "text": "Singing",
+                "value": "Singing"
+              },
+              {
+                "text": "Designing",
+                "value": "Designing"
+              },
+              {
+                "text": "Writer",
+                "value": "Writer"
+              },
+              {
+                "text": "Reading Books",
+                "value": "readingbooks"
+              },
+              {
+                "text": "Serving people",
+                "value": "servingpeople"
+              },
+              {
+                "text": "Music",
+                "value": "music"
+              }
+            ],
+            "isEmpty": false
+          },
+          {
+            "tagName": "select",
+            "name": "denomination_id",
+            "optionCount": 19,
+            "options": [
+              {
+                "text": "Select the Denomation",
+                "value": ""
+              },
+              {
+                "text": "అసెంబ్లీ ఆఫ్ గాడ్-Assembly of God",
+                "value": "1"
+              },
+              {
+                "text": "ఆర్థడాక్స్-Orthodox",
+                "value": "12"
+              },
+              {
+                "text": "ఇతర డినామినేషన్-Other Denomination",
+                "value": "18"
+              },
+              {
+                "text": "ఎవాంజలికల్ ఫెలోషిప్-Evangilical Fellowship",
+                "value": "7"
+              },
+              {
+                "text": "కాథలిక్కులు-Catholics",
+                "value": "14"
+              },
+              {
+                "text": "గోదావరి డెల్టా మిషన్(GDM)-Godavari Delta Mission",
+                "value": "8"
+              },
+              {
+                "text": "చర్చ్ అఫ్ క్రైస్ట్-Church of Christ",
+                "value": "5"
+              },
+              {
+                "text": "ది పెంటికోస్టల్ మిషన్(TPM)-The Penticostal Mission",
+                "value": "17"
+              },
+              {
+                "text": "పెంతికోస్తు-Penticost",
+                "value": "13"
+              }
+            ],
+            "isEmpty": false
+          },
+          {
+            "tagName": "select",
+            "name": "talent",
+            "optionCount": 5,
+            "options": [
+              {
+                "text": "ఇక్కడ క్లిక్ చేసి ఎంచుకోండి",
+                "value": ""
+              },
+              {
+                "text": "Speaker",
+                "value": "Speaker"
+              },
+              {
+                "text": "Writer",
+                "value": "Writer"
+              },
+              {
+                "text": "Singer",
+                "value": "Singer"
+              },
+              {
+                "text": "Others",
+                "value": "Others"
+              }
+            ],
+            "isEmpty": false
+          },
+          {
+            "tagName": "select",
+            "name": "education",
+            "optionCount": 11,
+            "options": [
+              {
+                "text": "ఇక్కడ క్లిక్ చేసి ఎంచుకోండి",
+                "value": ""
+              },
+              {
+                "text": "1-5",
+                "value": "1-5"
+              },
+              {
+                "text": "6-10",
+                "value": "6-10"
+              },
+              {
+                "text": "ITI",
+                "value": "ITI"
+              },
+              {
+                "text": "Diploma",
+                "value": "Diploma"
+              },
+              {
+                "text": "Inter",
+                "value": "Inter"
+              },
+              {
+                "text": "Degree",
+                "value": "Degree"
+              },
+              {
+                "text": "Medical",
+                "value": "Medical"
+              },
+              {
+                "text": "Engineering",
+                "value": "Engineering"
+              },
+              {
+                "text": "PG",
+                "value": "PG"
+              }
+            ],
+            "isEmpty": false
+          },
+          {
+            "tagName": "select",
+            "name": "designation",
+            "optionCount": 15,
+            "options": [
+              {
+                "text": "ఇక్కడ క్లిక్ చేసి ఎంచుకోండి",
+                "value": ""
+              },
+              {
+                "text": "Private executive",
+                "value": "Private executive"
+              },
+              {
+                "text": "Government executive",
+                "value": "Government executive"
+              },
+              {
+                "text": "Clerk",
+                "value": "Clerk"
+              },
+              {
+                "text": "Labour",
+                "value": "Labour"
+              },
+              {
+                "text": "Teacher",
+                "value": "Teacher"
+              },
+              {
+                "text": "Doctor",
+                "value": "Doctor"
+              },
+              {
+                "text": "Landlord",
+                "value": "Landlord"
+              },
+              {
+                "text": "Farmer",
+                "value": "Farmer"
+              },
+              {
+                "text": "Engineer",
+                "value": "Engineer"
+              }
+            ],
+            "isEmpty": false
+          },
+          {
+            "tagName": "select",
+            "name": "dpartment",
+            "optionCount": 13,
+            "options": [
+              {
+                "text": "ఇక్కడ క్లిక్ చేసి ఎంచుకోండి",
+                "value": ""
+              },
+              {
+                "text": "Real estate",
+                "value": "Real estate"
+              },
+              {
+                "text": "Construction",
+                "value": "Construction"
+              },
+              {
+                "text": "Education",
+                "value": "Education"
+              },
+              {
+                "text": "Police",
+                "value": "Police"
+              },
+              {
+                "text": "Advocate",
+                "value": "Advocate"
+              },
+              {
+                "text": "School",
+                "value": "School"
+              },
+              {
+                "text": "College",
+                "value": "College"
+              },
+              {
+                "text": "Cultivation",
+                "value": "Cultivation"
+              },
+              {
+                "text": "Paper media",
+                "value": "Paper media"
+              }
+            ],
+            "isEmpty": false
+          },
+          {
+            "tagName": "select",
+            "name": "districts",
+            "optionCount": 27,
+            "options": [
+              {
+                "text": "ఇక్కడ క్లిక్ చేసి ఎంచుకోండి",
+                "value": ""
+              },
+              {
+                "text": "అనంతపురం జిల్లా-Anantapur",
+                "value": "7"
+              },
+              {
+                "text": "అనకాపల్లి జిల్లా-Anakapalli",
+                "value": "6"
+              },
+              {
+                "text": "అన్నమయ్య జిల్లా-Annamayya",
+                "value": "8"
+              },
+              {
+                "text": "అల్లూరి సీతారామ రాజు-Alluri Sitharama Raju",
+                "value": "5"
+              },
+              {
+                "text": "ఎన్టీఆర్ జిల్లా-NTR",
+                "value": "21"
+              },
+              {
+                "text": "ఏలూరు జిల్లా-Eluru",
+                "value": "12"
+              },
+              {
+                "text": "కడప జిల్లా-Kadapa",
+                "value": "14"
+              },
+              {
+                "text": "కర్నూలు జిల్లా-Kurnool",
+                "value": "18"
+              },
+              {
+                "text": "కాకినాడ జిల్లా-Kakinada",
+                "value": "15"
+              }
+            ],
+            "isEmpty": false
+          },
+          {
+            "tagName": "select",
+            "name": "constituencyname",
+            "optionCount": 1,
+            "options": [
+              {
+                "text": "ఇక్కడ క్లిక్ చేసి ఎంచుకోండి",
+                "value": ""
+              }
+            ],
+            "isEmpty": true
+          },
+          {
+            "tagName": "select",
+            "name": "mandals",
+            "optionCount": 1,
+            "options": [
+              {
+                "text": "ఇక్కడ క్లిక్ చేసి ఎంచుకోండి",
+                "value": ""
+              }
+            ],
+            "isEmpty": true
+          },
+          {
+            "tagName": "select",
+            "name": "panchayati",
+            "optionCount": 1,
+            "options": [
+              {
+                "text": "ఇక్కడ క్లిక్ చేసి ఎంచుకోండి",
+                "value": ""
+              }
+            ],
+            "isEmpty": true
+          },
+          {
+            "tagName": "select",
+            "name": "pastor",
+            "optionCount": 1,
+            "options": [
+              {
+                "text": "Select Your Pastor",
+                "value": ""
+              }
+            ],
+            "isEmpty": true
+          },
+          {
+            "tagName": "select",
+            "name": "church",
+            "optionCount": 1,
+            "options": [
+              {
+                "text": "Select Church Name",
+                "value": ""
+              }
+            ],
+            "isEmpty": true
+          },
+          {
+            "tagName": "select",
+            "name": "caste",
+            "optionCount": 9,
+            "options": [
+              {
+                "text": "No Caste",
+                "value": "SC"
+              },
+              {
+                "text": "SC",
+                "value": "SC"
+              },
+              {
+                "text": "ST",
+                "value": "ST"
+              },
+              {
+                "text": "BC - A",
+                "value": "BC"
+              },
+              {
+                "text": "BC - B",
+                "value": "BC"
+              },
+              {
+                "text": "BC - C",
+                "value": "BC"
+              },
+              {
+                "text": "BC - D",
+                "value": "BC"
+              },
+              {
+                "text": "BC - E",
+                "value": "BC"
+              },
+              {
+                "text": "OC",
+                "value": "OC"
+              }
+            ],
+            "isEmpty": false
+          }
+        ],
+        "buttons": [
+          {
+            "text": "Login",
+            "type": "submit",
+            "disabled": false
+          },
+          {
+            "text": "Register",
+            "type": "submit",
+            "disabled": false
+          }
+        ],
+        "forms": [
+          {
+            "formIndex": 0,
+            "inputCount": 4,
+            "fields": [
+              "log",
+              "pwd",
+              "rememberme",
+              "submit"
+            ]
+          },
+          {
+            "formIndex": 1,
+            "inputCount": 40,
+            "fields": [
+              "fname",
+              "gender",
+              "mobile_number",
+              "whatsapp",
+              "dob",
+              "email",
+              "spirti",
+              "god",
+              "lifegoal",
+              "hobbies",
+              "status",
+              "status",
+              "status",
+              "denomination_id",
+              "talent",
+              "education",
+              "designation",
+              "dpartment",
+              "districts",
+              "constituencyname",
+              "mandals",
+              "panchayati",
+              "villagename",
+              "wardnumber",
+              "ward",
+              "nri",
+              "nri",
+              "pastor",
+              "church",
+              "leadership",
+              "leadership",
+              "youtube",
+              "lname",
+              "nativeplace",
+              "income",
+              "caste",
+              "subcaste",
+              "password",
+              "retypepassword",
+              "term"
+            ]
+          }
+        ],
+        "fileUploads": [],
+        "issues": [
+          "Empty Dropdown: 'constituencyname' has no available options!",
+          "Empty Dropdown: 'mandals' has no available options!",
+          "Empty Dropdown: 'panchayati' has no available options!",
+          "Empty Dropdown: 'pastor' has no available options!",
+          "Empty Dropdown: 'church' has no available options!",
+          "Console Errors: Failed to load resource: the server responded with a status of 403 () | ERROR Error: Cannot find control with name: 'term'"
+        ]
+      },
+      {
+        "route": "/studentregister",
+        "url": "http://127.0.0.1:4200/studentregister",
+        "consoleErrors": [
+          "Failed to load resource: the server responded with a status of 403 ()"
+        ],
+        "networkErrors": [
+          "GET https://kit.fontawesome.com/a076d05399.js - net::ERR_ABORTED"
+        ],
+        "dropdowns": [
+          {
+            "tagName": "select",
+            "name": "gender",
+            "optionCount": 4,
+            "options": [
+              {
+                "text": "Select Gender",
+                "value": ""
+              },
+              {
+                "text": "Male",
+                "value": "male"
+              },
+              {
+                "text": "Female",
+                "value": "female"
+              },
+              {
+                "text": "Transgender",
+                "value": "others"
+              }
+            ],
+            "isEmpty": false
+          },
+          {
+            "tagName": "select",
+            "name": "denomination_id",
+            "optionCount": 19,
+            "options": [
+              {
+                "text": "Select the Denomation",
+                "value": ""
+              },
+              {
+                "text": "అసెంబ్లీ ఆఫ్ గాడ్-Assembly of God",
+                "value": "1"
+              },
+              {
+                "text": "ఆర్థడాక్స్-Orthodox",
+                "value": "12"
+              },
+              {
+                "text": "ఇతర డినామినేషన్-Other Denomination",
+                "value": "18"
+              },
+              {
+                "text": "ఎవాంజలికల్ ఫెలోషిప్-Evangilical Fellowship",
+                "value": "7"
+              },
+              {
+                "text": "కాథలిక్కులు-Catholics",
+                "value": "14"
+              },
+              {
+                "text": "గోదావరి డెల్టా మిషన్(GDM)-Godavari Delta Mission",
+                "value": "8"
+              },
+              {
+                "text": "చర్చ్ అఫ్ క్రైస్ట్-Church of Christ",
+                "value": "5"
+              },
+              {
+                "text": "ది పెంటికోస్టల్ మిషన్(TPM)-The Penticostal Mission",
+                "value": "17"
+              },
+              {
+                "text": "పెంతికోస్తు-Penticost",
+                "value": "13"
+              }
+            ],
+            "isEmpty": false
+          },
+          {
+            "tagName": "select",
+            "name": "god",
+            "optionCount": 10,
+            "options": [
+              {
+                "text": "Select your Study",
+                "value": ""
+              },
+              {
+                "text": "Schooling(1st Class to 10th Class)",
+                "value": "Schooling"
+              },
+              {
+                "text": "Intermediate",
+                "value": "Intermediate"
+              },
+              {
+                "text": "Diploma",
+                "value": "Diploma"
+              },
+              {
+                "text": "Engineering",
+                "value": "Engineering"
+              },
+              {
+                "text": "ITI",
+                "value": "ITI"
+              },
+              {
+                "text": "Under Graduate",
+                "value": "Under Graduate"
+              },
+              {
+                "text": "Post Graduate",
+                "value": "Post Graduate"
+              },
+              {
+                "text": "Ph.D",
+                "value": "Ph.D"
+              },
+              {
+                "text": "Other",
+                "value": "Other"
+              }
+            ],
+            "isEmpty": false
+          },
+          {
+            "tagName": "select",
+            "name": "study",
+            "optionCount": 24,
+            "options": [
+              {
+                "text": "Select Branch / Group",
+                "value": ""
+              },
+              {
+                "text": "General (Schooling)",
+                "value": "General (Schooling)"
+              },
+              {
+                "text": "MPC",
+                "value": "MPC"
+              },
+              {
+                "text": "BiPC",
+                "value": "BiPC"
+              },
+              {
+                "text": "MBiPC",
+                "value": "MBiPC"
+              },
+              {
+                "text": "Arts",
+                "value": "Arts"
+              },
+              {
+                "text": "Commerce",
+                "value": "Commerce"
+              },
+              {
+                "text": "BBA",
+                "value": "BBA"
+              },
+              {
+                "text": "Hotel Management",
+                "value": "Hotel Management"
+              },
+              {
+                "text": "Nursing",
+                "value": "Nursing"
+              }
+            ],
+            "isEmpty": false
+          },
+          {
+            "tagName": "select",
+            "name": "resdistricts",
+            "optionCount": 27,
+            "options": [
+              {
+                "text": "Click & Select District",
+                "value": ""
+              },
+              {
+                "text": "అనంతపురం జిల్లా-Anantapur",
+                "value": "7"
+              },
+              {
+                "text": "అనకాపల్లి జిల్లా-Anakapalli",
+                "value": "6"
+              },
+              {
+                "text": "అన్నమయ్య జిల్లా-Annamayya",
+                "value": "8"
+              },
+              {
+                "text": "అల్లూరి సీతారామ రాజు-Alluri Sitharama Raju",
+                "value": "5"
+              },
+              {
+                "text": "ఎన్టీఆర్ జిల్లా-NTR",
+                "value": "21"
+              },
+              {
+                "text": "ఏలూరు జిల్లా-Eluru",
+                "value": "12"
+              },
+              {
+                "text": "కడప జిల్లా-Kadapa",
+                "value": "14"
+              },
+              {
+                "text": "కర్నూలు జిల్లా-Kurnool",
+                "value": "18"
+              },
+              {
+                "text": "కాకినాడ జిల్లా-Kakinada",
+                "value": "15"
+              }
+            ],
+            "isEmpty": false
+          },
+          {
+            "tagName": "select",
+            "name": "resconstituencyname",
+            "optionCount": 1,
+            "options": [
+              {
+                "text": "Click & నియోజకవర్గం ఎంచుకోండి",
+                "value": ""
+              }
+            ],
+            "isEmpty": true
+          },
+          {
+            "tagName": "select",
+            "name": "resmandals",
+            "optionCount": 1,
+            "options": [
+              {
+                "text": "Click & Select Mandal",
+                "value": ""
+              }
+            ],
+            "isEmpty": true
+          },
+          {
+            "tagName": "select",
+            "name": "respanchayati",
+            "optionCount": 1,
+            "options": [
+              {
+                "text": "Click & పంచాయతీ ఎంచుకోండి",
+                "value": ""
+              }
+            ],
+            "isEmpty": true
+          },
+          {
+            "tagName": "select",
+            "name": "caste",
+            "optionCount": 10,
+            "options": [
+              {
+                "text": "ఇక్కడ క్లిక్ చేసి ఎంచుకోండి",
+                "value": ""
+              },
+              {
+                "text": "No Caste",
+                "value": "No Caste"
+              },
+              {
+                "text": "SC",
+                "value": "SC"
+              },
+              {
+                "text": "ST",
+                "value": "ST"
+              },
+              {
+                "text": "BC - A",
+                "value": "BC-A"
+              },
+              {
+                "text": "BC - B",
+                "value": "BC-B"
+              },
+              {
+                "text": "BC - C",
+                "value": "BC-C"
+              },
+              {
+                "text": "BC - D",
+                "value": "BC-D"
+              },
+              {
+                "text": "BC - E",
+                "value": "BC-E"
+              },
+              {
+                "text": "OC",
+                "value": "OC"
+              }
+            ],
+            "isEmpty": false
+          }
+        ],
+        "buttons": [
+          {
+            "text": "Login",
+            "type": "submit",
+            "disabled": false
+          },
+          {
+            "text": "సబ్మిట్ (SUBMIT)",
+            "type": "submit",
+            "disabled": false
+          }
+        ],
+        "forms": [
+          {
+            "formIndex": 0,
+            "inputCount": 4,
+            "fields": [
+              "log",
+              "pwd",
+              "rememberme",
+              "submit"
+            ]
+          },
+          {
+            "formIndex": 1,
+            "inputCount": 25,
+            "fields": [
+              "studentname",
+              "gender",
+              "number",
+              "parentnum",
+              "denomination_id",
+              "pastornum",
+              "god",
+              "study",
+              "tmarks",
+              "mmarks",
+              "mother",
+              "mother",
+              "mother",
+              "mother",
+              "mother",
+              "orphon",
+              "resdistricts",
+              "resconstituencyname",
+              "resmandals",
+              "respanchayati",
+              "villagename",
+              "caste",
+              "subcaste",
+              "lifegoal",
+              "aboutyourself"
+            ]
+          }
+        ],
+        "fileUploads": [],
+        "issues": [
+          "Empty Dropdown: 'resconstituencyname' has no available options!",
+          "Empty Dropdown: 'resmandals' has no available options!",
+          "Empty Dropdown: 'respanchayati' has no available options!",
+          "Console Errors: Failed to load resource: the server responded with a status of 403 ()"
+        ]
+      },
+      {
+        "route": "/ministryregister",
+        "url": "http://127.0.0.1:4200/ministryregister",
+        "consoleErrors": [
+          "Failed to load resource: the server responded with a status of 403 ()",
+          "ERROR Error: Cannot find control with name: 'term'"
+        ],
+        "networkErrors": [
+          "GET https://kit.fontawesome.com/a076d05399.js - net::ERR_ABORTED"
+        ],
+        "dropdowns": [
+          {
+            "tagName": "select",
+            "name": "denomation",
+            "optionCount": 19,
+            "options": [
+              {
+                "text": "ఇక్కడ క్లిక్ చేసి ఎంచుకోండి",
+                "value": ""
+              },
+              {
+                "text": "అసెంబ్లీ ఆఫ్ గాడ్-Assembly of God",
+                "value": "1"
+              },
+              {
+                "text": "ఆర్థడాక్స్-Orthodox",
+                "value": "12"
+              },
+              {
+                "text": "ఇతర డినామినేషన్-Other Denomination",
+                "value": "18"
+              },
+              {
+                "text": "ఎవాంజలికల్ ఫెలోషిప్-Evangilical Fellowship",
+                "value": "7"
+              },
+              {
+                "text": "కాథలిక్కులు-Catholics",
+                "value": "14"
+              },
+              {
+                "text": "గోదావరి డెల్టా మిషన్(GDM)-Godavari Delta Mission",
+                "value": "8"
+              },
+              {
+                "text": "చర్చ్ అఫ్ క్రైస్ట్-Church of Christ",
+                "value": "5"
+              },
+              {
+                "text": "ది పెంటికోస్టల్ మిషన్(TPM)-The Penticostal Mission",
+                "value": "17"
+              },
+              {
+                "text": "పెంతికోస్తు-Penticost",
+                "value": "13"
+              }
+            ],
+            "isEmpty": false
+          },
+          {
+            "tagName": "select",
+            "name": "district_id",
+            "optionCount": 27,
+            "options": [
+              {
+                "text": "ఇక్కడ క్లిక్ చేసి ఎంచుకోండి",
+                "value": ""
+              },
+              {
+                "text": "అనంతపురం జిల్లా-Anantapur",
+                "value": "7"
+              },
+              {
+                "text": "అనకాపల్లి జిల్లా-Anakapalli",
+                "value": "6"
+              },
+              {
+                "text": "అన్నమయ్య జిల్లా-Annamayya",
+                "value": "8"
+              },
+              {
+                "text": "అల్లూరి సీతారామ రాజు-Alluri Sitharama Raju",
+                "value": "5"
+              },
+              {
+                "text": "ఎన్టీఆర్ జిల్లా-NTR",
+                "value": "21"
+              },
+              {
+                "text": "ఏలూరు జిల్లా-Eluru",
+                "value": "12"
+              },
+              {
+                "text": "కడప జిల్లా-Kadapa",
+                "value": "14"
+              },
+              {
+                "text": "కర్నూలు జిల్లా-Kurnool",
+                "value": "18"
+              },
+              {
+                "text": "కాకినాడ జిల్లా-Kakinada",
+                "value": "15"
+              }
+            ],
+            "isEmpty": false
+          },
+          {
+            "tagName": "select",
+            "name": "constituency_id",
+            "optionCount": 1,
+            "options": [
+              {
+                "text": "ఇక్కడ క్లిక్ చేసి ఎంచుకోండి",
+                "value": ""
+              }
+            ],
+            "isEmpty": true
+          },
+          {
+            "tagName": "select",
+            "name": "mandal_id",
+            "optionCount": 1,
+            "options": [
+              {
+                "text": "ఇక్కడ క్లిక్ చేసి ఎంచుకోండి",
+                "value": ""
+              }
+            ],
+            "isEmpty": true
+          },
+          {
+            "tagName": "select",
+            "name": "panchayat_id",
+            "optionCount": 1,
+            "options": [
+              {
+                "text": "ఇక్కడ క్లిక్ చేసి ఎంచుకోండి",
+                "value": ""
+              }
+            ],
+            "isEmpty": true
+          },
+          {
+            "tagName": "select",
+            "name": "pastor",
+            "optionCount": 1,
+            "options": [
+              {
+                "text": "Select Your Pastor",
+                "value": ""
+              }
+            ],
+            "isEmpty": true
+          }
+        ],
+        "buttons": [
+          {
+            "text": "Login",
+            "type": "submit",
+            "disabled": false
+          },
+          {
+            "text": "Register",
+            "type": "submit",
+            "disabled": false
+          }
+        ],
+        "forms": [
+          {
+            "formIndex": 0,
+            "inputCount": 4,
+            "fields": [
+              "log",
+              "pwd",
+              "rememberme",
+              "submit"
+            ]
+          },
+          {
+            "formIndex": 1,
+            "inputCount": 16,
+            "fields": [
+              "firstname",
+              "denomation",
+              "ministryemail",
+              "ministrywebsite",
+              "number_ofchurches",
+              "number_ofmembers",
+              "district_id",
+              "constituency_id",
+              "mandal_id",
+              "panchayat_id",
+              "pastor",
+              "headnmber",
+              "description",
+              "term",
+              "password",
+              "retypepassword"
+            ]
+          }
+        ],
+        "fileUploads": [],
+        "issues": [
+          "Empty Dropdown: 'constituency_id' has no available options!",
+          "Empty Dropdown: 'mandal_id' has no available options!",
+          "Empty Dropdown: 'panchayat_id' has no available options!",
+          "Empty Dropdown: 'pastor' has no available options!",
+          "Console Errors: Failed to load resource: the server responded with a status of 403 () | ERROR Error: Cannot find control with name: 'term'"
+        ]
+      },
+      {
+        "route": "/pastorregister",
+        "url": "http://127.0.0.1:4200/pastorregister",
+        "consoleErrors": [
+          "Failed to load resource: the server responded with a status of 403 ()",
+          "ERROR TypeError: control.registerOnChange is not a function",
+          "ERROR TypeError: control.registerOnChange is not a function",
+          "ERROR TypeError: control.registerOnChange is not a function",
+          "ERROR TypeError: control.registerOnChange is not a function",
+          "ERROR TypeError: control.registerOnChange is not a function",
+          "ERROR TypeError: control.registerOnChange is not a function"
+        ],
+        "networkErrors": [
+          "GET https://kit.fontawesome.com/a076d05399.js - net::ERR_ABORTED"
+        ],
+        "dropdowns": [
+          {
+            "tagName": "select",
+            "name": "gender",
+            "optionCount": 4,
+            "options": [
+              {
+                "text": "ఇక్కడ క్లిక్ చేసి జెండర్ ఎంచుకోండి",
+                "value": ""
+              },
+              {
+                "text": "పురుషుడు",
+                "value": "పురుషుడు"
+              },
+              {
+                "text": "స్త్రీ",
+                "value": "స్త్రీ"
+              },
+              {
+                "text": "ట్రాన్సజెండర్",
+                "value": "ట్రాన్సజెండర్"
+              }
+            ],
+            "isEmpty": false
+          },
+          {
+            "tagName": "select",
+            "name": "education",
+            "optionCount": 12,
+            "options": [
+              {
+                "text": "ఇక్కడ క్లిక్ చేసి ఎంచుకోండి",
+                "value": ""
+              },
+              {
+                "text": "చదువుకోలేదు",
+                "value": "1"
+              },
+              {
+                "text": "1వ తరగతి నుండి 5వ తరగతి మధ్యలో",
+                "value": "2"
+              },
+              {
+                "text": "6వ తరగతి నుండి 10వ తరగతి మధ్యలో",
+                "value": "3"
+              },
+              {
+                "text": "ఐటిఐ-ITI",
+                "value": "4"
+              },
+              {
+                "text": "జాబ్ ఓరియెంటెడ్ కోర్స్",
+                "value": "5"
+              },
+              {
+                "text": "ఇంటర్",
+                "value": "6"
+              },
+              {
+                "text": "డిప్లొమా ఇంజనీరింగ్",
+                "value": "7"
+              },
+              {
+                "text": "డిగ్రీ-Graduate",
+                "value": "8"
+              },
+              {
+                "text": "Post Graduate",
+                "value": "9"
+              }
+            ],
+            "isEmpty": false
+          },
+          {
+            "tagName": "select",
+            "name": "district_id",
+            "optionCount": 27,
+            "options": [
+              {
+                "text": "ఇక్కడ క్లిక్ చేసి ఎంచుకోండి",
+                "value": ""
+              },
+              {
+                "text": "అనంతపురం జిల్లా-Anantapur",
+                "value": "7"
+              },
+              {
+                "text": "అనకాపల్లి జిల్లా-Anakapalli",
+                "value": "6"
+              },
+              {
+                "text": "అన్నమయ్య జిల్లా-Annamayya",
+                "value": "8"
+              },
+              {
+                "text": "అల్లూరి సీతారామ రాజు-Alluri Sitharama Raju",
+                "value": "5"
+              },
+              {
+                "text": "ఎన్టీఆర్ జిల్లా-NTR",
+                "value": "21"
+              },
+              {
+                "text": "ఏలూరు జిల్లా-Eluru",
+                "value": "12"
+              },
+              {
+                "text": "కడప జిల్లా-Kadapa",
+                "value": "14"
+              },
+              {
+                "text": "కర్నూలు జిల్లా-Kurnool",
+                "value": "18"
+              },
+              {
+                "text": "కాకినాడ జిల్లా-Kakinada",
+                "value": "15"
+              }
+            ],
+            "isEmpty": false
+          },
+          {
+            "tagName": "select",
+            "name": "constituency_id",
+            "optionCount": 1,
+            "options": [
+              {
+                "text": "ఇక్కడ క్లిక్ చేసి ఎంచుకోండి",
+                "value": ""
+              }
+            ],
+            "isEmpty": true
+          },
+          {
+            "tagName": "select",
+            "name": "mandal_id",
+            "optionCount": 1,
+            "options": [
+              {
+                "text": "ఇక్కడ క్లిక్ చేసి ఎంచుకోండి",
+                "value": ""
+              }
+            ],
+            "isEmpty": true
+          },
+          {
+            "tagName": "select",
+            "name": "panchayat_id",
+            "optionCount": 1,
+            "options": [
+              {
+                "text": "ఇక్కడ క్లిక్ చేసి ఎంచుకోండి",
+                "value": ""
+              }
+            ],
+            "isEmpty": true
+          },
+          {
+            "tagName": "select",
+            "name": "denomination_id",
+            "optionCount": 19,
+            "options": [
+              {
+                "text": "ఇక్కడ క్లిక్ చేసి ఎంచుకోండి",
+                "value": ""
+              },
+              {
+                "text": "అసెంబ్లీ ఆఫ్ గాడ్-Assembly of God",
+                "value": "1"
+              },
+              {
+                "text": "ఆర్థడాక్స్-Orthodox",
+                "value": "12"
+              },
+              {
+                "text": "ఇతర డినామినేషన్-Other Denomination",
+                "value": "18"
+              },
+              {
+                "text": "ఎవాంజలికల్ ఫెలోషిప్-Evangilical Fellowship",
+                "value": "7"
+              },
+              {
+                "text": "కాథలిక్కులు-Catholics",
+                "value": "14"
+              },
+              {
+                "text": "గోదావరి డెల్టా మిషన్(GDM)-Godavari Delta Mission",
+                "value": "8"
+              },
+              {
+                "text": "చర్చ్ అఫ్ క్రైస్ట్-Church of Christ",
+                "value": "5"
+              },
+              {
+                "text": "ది పెంటికోస్టల్ మిషన్(TPM)-The Penticostal Mission",
+                "value": "17"
+              },
+              {
+                "text": "పెంతికోస్తు-Penticost",
+                "value": "13"
+              }
+            ],
+            "isEmpty": false
+          },
+          {
+            "tagName": "select",
+            "name": "caste",
+            "optionCount": 13,
+            "options": [
+              {
+                "text": "ఇక్కడ క్లిక్ చేసి ఎంచుకోండి",
+                "value": ""
+              },
+              {
+                "text": "కులం లేదు",
+                "value": "No Caste"
+              },
+              {
+                "text": "ఓసీ (OC)",
+                "value": "OC"
+              },
+              {
+                "text": "ఎస్టి (ST)",
+                "value": "ST"
+              },
+              {
+                "text": "ఎస్సి - ఏ (SC - A)",
+                "value": "SC - A"
+              },
+              {
+                "text": "ఎస్సి - బి (SC - B)",
+                "value": "SC - B"
+              },
+              {
+                "text": "ఎస్సి - సి (SC - C)",
+                "value": "SC - C"
+              },
+              {
+                "text": "ఎస్సి - డి (SC - D)",
+                "value": "SC - D"
+              },
+              {
+                "text": "బిసి - ఏ (BC - A)",
+                "value": "BC - A"
+              },
+              {
+                "text": "బిసి - బి (BC - B)",
+                "value": "BC - B"
+              }
+            ],
+            "isEmpty": false
+          }
+        ],
+        "buttons": [
+          {
+            "text": "Login",
+            "type": "submit",
+            "disabled": false
+          },
+          {
+            "text": "రిజిస్టర్",
+            "type": "submit",
+            "disabled": false
+          }
+        ],
+        "forms": [
+          {
+            "formIndex": 0,
+            "inputCount": 4,
+            "fields": [
+              "log",
+              "pwd",
+              "rememberme",
+              "submit"
+            ]
+          },
+          {
+            "formIndex": 1,
+            "inputCount": 28,
+            "fields": [
+              "pastorname",
+              "gender",
+              "phonenumber",
+              "phonenumber2",
+              "pa_phonenumber",
+              "password",
+              "education",
+              "district_id",
+              "constituency_id",
+              "mandal_id",
+              "panchayat_id",
+              "villagename",
+              "ward",
+              "pastortype",
+              "pastortype",
+              "denomination_id",
+              "leaders",
+              "leaders",
+              "caste",
+              "subcaste",
+              "god",
+              "god",
+              "god",
+              "god",
+              "god",
+              "god",
+              "nativeplace",
+              "retypepassword"
+            ]
+          }
+        ],
+        "fileUploads": [],
+        "issues": [
+          "Empty Dropdown: 'constituency_id' has no available options!",
+          "Empty Dropdown: 'mandal_id' has no available options!",
+          "Empty Dropdown: 'panchayat_id' has no available options!",
+          "Console Errors: Failed to load resource: the server responded with a status of 403 () | ERROR TypeError: control.registerOnChange is not a function | ERROR TypeError: control.registerOnChange is not a function | ERROR TypeError: control.registerOnChange is not a function | ERROR TypeError: control.registerOnChange is not a function | ERROR TypeError: control.registerOnChange is not a function | ERROR TypeError: control.registerOnChange is not a function"
+        ]
+      },
+      {
+        "route": "/churchregister",
+        "url": "http://127.0.0.1:4200/churchregister",
+        "consoleErrors": [
+          "Failed to load resource: the server responded with a status of 403 ()",
+          "ERROR Error: Cannot find control with name: 'term'"
+        ],
+        "networkErrors": [
+          "GET https://kit.fontawesome.com/a076d05399.js - net::ERR_ABORTED"
+        ],
+        "dropdowns": [
+          {
+            "tagName": "select",
+            "name": "denomination_id",
+            "optionCount": 19,
+            "options": [
+              {
+                "text": "Select the Denomation",
+                "value": ""
+              },
+              {
+                "text": "అసెంబ్లీ ఆఫ్ గాడ్-Assembly of God",
+                "value": "1"
+              },
+              {
+                "text": "ఆర్థడాక్స్-Orthodox",
+                "value": "12"
+              },
+              {
+                "text": "ఇతర డినామినేషన్-Other Denomination",
+                "value": "18"
+              },
+              {
+                "text": "ఎవాంజలికల్ ఫెలోషిప్-Evangilical Fellowship",
+                "value": "7"
+              },
+              {
+                "text": "కాథలిక్కులు-Catholics",
+                "value": "14"
+              },
+              {
+                "text": "గోదావరి డెల్టా మిషన్(GDM)-Godavari Delta Mission",
+                "value": "8"
+              },
+              {
+                "text": "చర్చ్ అఫ్ క్రైస్ట్-Church of Christ",
+                "value": "5"
+              },
+              {
+                "text": "ది పెంటికోస్టల్ మిషన్(TPM)-The Penticostal Mission",
+                "value": "17"
+              },
+              {
+                "text": "పెంతికోస్తు-Penticost",
+                "value": "13"
+              }
+            ],
+            "isEmpty": false
+          },
+          {
+            "tagName": "select",
+            "name": "district_id",
+            "optionCount": 27,
+            "options": [
+              {
+                "text": "ఇక్కడ క్లిక్ చేసి ఎంచుకోండి",
+                "value": ""
+              },
+              {
+                "text": "అనంతపురం జిల్లా-Anantapur",
+                "value": "7"
+              },
+              {
+                "text": "అనకాపల్లి జిల్లా-Anakapalli",
+                "value": "6"
+              },
+              {
+                "text": "అన్నమయ్య జిల్లా-Annamayya",
+                "value": "8"
+              },
+              {
+                "text": "అల్లూరి సీతారామ రాజు-Alluri Sitharama Raju",
+                "value": "5"
+              },
+              {
+                "text": "ఎన్టీఆర్ జిల్లా-NTR",
+                "value": "21"
+              },
+              {
+                "text": "ఏలూరు జిల్లా-Eluru",
+                "value": "12"
+              },
+              {
+                "text": "కడప జిల్లా-Kadapa",
+                "value": "14"
+              },
+              {
+                "text": "కర్నూలు జిల్లా-Kurnool",
+                "value": "18"
+              },
+              {
+                "text": "కాకినాడ జిల్లా-Kakinada",
+                "value": "15"
+              }
+            ],
+            "isEmpty": false
+          },
+          {
+            "tagName": "select",
+            "name": "constituency_id",
+            "optionCount": 1,
+            "options": [
+              {
+                "text": "ఇక్కడ క్లిక్ చేసి ఎంచుకోండి",
+                "value": ""
+              }
+            ],
+            "isEmpty": true
+          },
+          {
+            "tagName": "select",
+            "name": "mandal_id",
+            "optionCount": 1,
+            "options": [
+              {
+                "text": "ఇక్కడ క్లిక్ చేసి ఎంచుకోండి",
+                "value": ""
+              }
+            ],
+            "isEmpty": true
+          },
+          {
+            "tagName": "select",
+            "name": "village_id",
+            "optionCount": 1,
+            "options": [
+              {
+                "text": "ఇక్కడ క్లిక్ చేసి ఎంచుకోండి",
+                "value": ""
+              }
+            ],
+            "isEmpty": true
+          },
+          {
+            "tagName": "select",
+            "name": "pastor_id",
+            "optionCount": 1,
+            "options": [
+              {
+                "text": "Select the pastor",
+                "value": ""
+              }
+            ],
+            "isEmpty": true
+          }
+        ],
+        "buttons": [
+          {
+            "text": "Login",
+            "type": "submit",
+            "disabled": false
+          },
+          {
+            "text": "Register",
+            "type": "submit",
+            "disabled": false
+          }
+        ],
+        "forms": [
+          {
+            "formIndex": 0,
+            "inputCount": 4,
+            "fields": [
+              "log",
+              "pwd",
+              "rememberme",
+              "submit"
+            ]
+          },
+          {
+            "formIndex": 1,
+            "inputCount": 20,
+            "fields": [
+              "church_name",
+              "contactnumber",
+              "total_members",
+              "denomination_id",
+              "churchtype",
+              "churchtype",
+              "district_id",
+              "constituency_id",
+              "mandal_id",
+              "village_id",
+              "location",
+              "street",
+              "pastor_id",
+              "facebook",
+              "youtube",
+              "village_name",
+              "description",
+              "password",
+              "retypepassword",
+              "term"
+            ]
+          }
+        ],
+        "fileUploads": [],
+        "issues": [
+          "Empty Dropdown: 'constituency_id' has no available options!",
+          "Empty Dropdown: 'mandal_id' has no available options!",
+          "Empty Dropdown: 'village_id' has no available options!",
+          "Empty Dropdown: 'pastor_id' has no available options!",
+          "Console Errors: Failed to load resource: the server responded with a status of 403 () | ERROR Error: Cannot find control with name: 'term'"
+        ]
+      },
+      {
+        "route": "/organisationregister",
+        "url": "http://127.0.0.1:4200/organisationregister",
+        "consoleErrors": [
+          "Failed to load resource: the server responded with a status of 403 ()",
+          "ERROR Error: Cannot find control with name: 'term'"
+        ],
+        "networkErrors": [
+          "GET https://kit.fontawesome.com/a076d05399.js - net::ERR_ABORTED"
+        ],
+        "dropdowns": [
+          {
+            "tagName": "select",
+            "name": "service_name",
+            "optionCount": 29,
+            "options": [
+              {
+                "text": "ఇక్కడ క్లిక్ చేసి ఎంచుకోండి",
+                "value": ""
+              },
+              {
+                "text": "Bible College",
+                "value": "1"
+              },
+              {
+                "text": "Books Publications",
+                "value": "2"
+              },
+              {
+                "text": "Children Ministry",
+                "value": "3"
+              },
+              {
+                "text": "Childrens Home",
+                "value": "4"
+              },
+              {
+                "text": "Christian Book Stalls",
+                "value": "5"
+              },
+              {
+                "text": "Church Plantation",
+                "value": "6"
+              },
+              {
+                "text": "Community Development Programs",
+                "value": "7"
+              },
+              {
+                "text": "Community Protection",
+                "value": "8"
+              },
+              {
+                "text": "First Service",
+                "value": "24"
+              }
+            ],
+            "isEmpty": false
+          },
+          {
+            "tagName": "select",
+            "name": "districts",
+            "optionCount": 27,
+            "options": [
+              {
+                "text": "ఇక్కడ క్లిక్ చేసి ఎంచుకోండి",
+                "value": ""
+              },
+              {
+                "text": "అనంతపురం జిల్లా-Anantapur",
+                "value": "7"
+              },
+              {
+                "text": "అనకాపల్లి జిల్లా-Anakapalli",
+                "value": "6"
+              },
+              {
+                "text": "అన్నమయ్య జిల్లా-Annamayya",
+                "value": "8"
+              },
+              {
+                "text": "అల్లూరి సీతారామ రాజు-Alluri Sitharama Raju",
+                "value": "5"
+              },
+              {
+                "text": "ఎన్టీఆర్ జిల్లా-NTR",
+                "value": "21"
+              },
+              {
+                "text": "ఏలూరు జిల్లా-Eluru",
+                "value": "12"
+              },
+              {
+                "text": "కడప జిల్లా-Kadapa",
+                "value": "14"
+              },
+              {
+                "text": "కర్నూలు జిల్లా-Kurnool",
+                "value": "18"
+              },
+              {
+                "text": "కాకినాడ జిల్లా-Kakinada",
+                "value": "15"
+              }
+            ],
+            "isEmpty": false
+          },
+          {
+            "tagName": "select",
+            "name": "constituencyname",
+            "optionCount": 1,
+            "options": [
+              {
+                "text": "ఇక్కడ క్లిక్ చేసి ఎంచుకోండి",
+                "value": ""
+              }
+            ],
+            "isEmpty": true
+          },
+          {
+            "tagName": "select",
+            "name": "mandals",
+            "optionCount": 1,
+            "options": [
+              {
+                "text": "ఇక్కడ క్లిక్ చేసి ఎంచుకోండి",
+                "value": ""
+              }
+            ],
+            "isEmpty": true
+          },
+          {
+            "tagName": "select",
+            "name": "panchayati",
+            "optionCount": 1,
+            "options": [
+              {
+                "text": "ఇక్కడ క్లిక్ చేసి ఎంచుకోండి",
+                "value": ""
+              }
+            ],
+            "isEmpty": true
+          },
+          {
+            "tagName": "select",
+            "name": "denomation",
+            "optionCount": 19,
+            "options": [
+              {
+                "text": "ఇక్కడ క్లిక్ చేసి ఎంచుకోండి",
+                "value": ""
+              },
+              {
+                "text": "అసెంబ్లీ ఆఫ్ గాడ్-Assembly of God",
+                "value": "1"
+              },
+              {
+                "text": "ఆర్థడాక్స్-Orthodox",
+                "value": "12"
+              },
+              {
+                "text": "ఇతర డినామినేషన్-Other Denomination",
+                "value": "18"
+              },
+              {
+                "text": "ఎవాంజలికల్ ఫెలోషిప్-Evangilical Fellowship",
+                "value": "7"
+              },
+              {
+                "text": "కాథలిక్కులు-Catholics",
+                "value": "14"
+              },
+              {
+                "text": "గోదావరి డెల్టా మిషన్(GDM)-Godavari Delta Mission",
+                "value": "8"
+              },
+              {
+                "text": "చర్చ్ అఫ్ క్రైస్ట్-Church of Christ",
+                "value": "5"
+              },
+              {
+                "text": "ది పెంటికోస్టల్ మిషన్(TPM)-The Penticostal Mission",
+                "value": "17"
+              },
+              {
+                "text": "పెంతికోస్తు-Penticost",
+                "value": "13"
+              }
+            ],
+            "isEmpty": false
+          }
+        ],
+        "buttons": [
+          {
+            "text": "Login",
+            "type": "submit",
+            "disabled": false
+          },
+          {
+            "text": "Register",
+            "type": "submit",
+            "disabled": false
+          }
+        ],
+        "forms": [
+          {
+            "formIndex": 0,
+            "inputCount": 4,
+            "fields": [
+              "log",
+              "pwd",
+              "rememberme",
+              "submit"
+            ]
+          },
+          {
+            "formIndex": 1,
+            "inputCount": 21,
+            "fields": [
+              "organisation_name",
+              "checkbox",
+              "checkbox",
+              "org_address",
+              "location",
+              "contact_num",
+              "email",
+              "website",
+              "service_name",
+              "organizationtype",
+              "organizationtype",
+              "districts",
+              "constituencyname",
+              "mandals",
+              "panchayati",
+              "villagename",
+              "ward",
+              "denomation",
+              "password",
+              "retypepassword",
+              "term"
+            ]
+          }
+        ],
+        "fileUploads": [],
+        "issues": [
+          "Empty Dropdown: 'constituencyname' has no available options!",
+          "Empty Dropdown: 'mandals' has no available options!",
+          "Empty Dropdown: 'panchayati' has no available options!",
+          "Console Errors: Failed to load resource: the server responded with a status of 403 () | ERROR Error: Cannot find control with name: 'term'"
+        ]
+      },
+      {
+        "route": "/pastorassociationregister",
+        "url": "http://127.0.0.1:4200/pastorassociationregister",
+        "consoleErrors": [
+          "Failed to load resource: the server responded with a status of 403 ()"
+        ],
+        "networkErrors": [
+          "GET https://kit.fontawesome.com/a076d05399.js - net::ERR_ABORTED"
+        ],
+        "dropdowns": [
+          {
+            "tagName": "select",
+            "name": "pa_president",
+            "optionCount": 3,
+            "options": [
+              {
+                "text": "ఇక్కడ క్లిక్ చేసి ఎంచుకోండి",
+                "value": ""
+              },
+              {
+                "text": "మాజీ",
+                "value": "మాజీ"
+              },
+              {
+                "text": "ప్రస్తుత",
+                "value": "ప్రస్తుత"
+              }
+            ],
+            "isEmpty": false
+          },
+          {
+            "tagName": "select",
+            "name": "level",
+            "optionCount": 8,
+            "options": [
+              {
+                "text": "ఇక్కడ క్లిక్ చేసి ఎంచుకోండి",
+                "value": ""
+              },
+              {
+                "text": "మండల స్థాయి",
+                "value": "మండల స్థాయి"
+              },
+              {
+                "text": "టౌన్ స్థాయి",
+                "value": "టౌన్ స్థాయి"
+              },
+              {
+                "text": "నియోజకవర్గ స్థాయి",
+                "value": "నియోజకవర్గ స్థాయి"
+              },
+              {
+                "text": "జిల్లా స్థాయి",
+                "value": "జిల్లా స్థాయి"
+              },
+              {
+                "text": "రాష్ట్ర స్థాయి",
+                "value": "రాష్ట్ర స్థాయి"
+              },
+              {
+                "text": "జాతీయ స్థాయి",
+                "value": "జాతీయ స్థాయి"
+              },
+              {
+                "text": "అంతర్జాతీయ స్థాయి",
+                "value": "అంతర్జాతీయ స్థాయి"
+              }
+            ],
+            "isEmpty": false
+          },
+          {
+            "tagName": "select",
+            "name": "pa_secretory",
+            "optionCount": 8,
+            "options": [
+              {
+                "text": "ఇక్కడ క్లిక్ చేసి ఎంచుకోండి",
+                "value": ""
+              },
+              {
+                "text": "ప్రెసిడెంట్",
+                "value": "ప్రెసిడెంట్"
+              },
+              {
+                "text": "వైస్ ప్రెసిడెంట్",
+                "value": "వైస్ ప్రెసిడెంట్"
+              },
+              {
+                "text": "గౌరవ ప్రెసిడెంట్",
+                "value": "గౌరవ ప్రెసిడెంట్"
+              },
+              {
+                "text": "సెక్రెటరీ",
+                "value": "సెక్రెటరీ"
+              },
+              {
+                "text": "ట్రెజరర్",
+                "value": "ట్రెజరర్"
+              },
+              {
+                "text": "ఎగ్జిక్యూటివ్ మెంబెర్",
+                "value": "ఎగ్జిక్యూటివ్ మెంబెర్"
+              },
+              {
+                "text": "ఇతర స్థాయి",
+                "value": "ఇతర స్థాయి"
+              }
+            ],
+            "isEmpty": false
+          },
+          {
+            "tagName": "select",
+            "name": "district_id",
+            "optionCount": 27,
+            "options": [
+              {
+                "text": "ఇక్కడ క్లిక్ చేసి జిల్లా ఎంచుకోండి",
+                "value": ""
+              },
+              {
+                "text": "అనంతపురం జిల్లా-Anantapur",
+                "value": "7"
+              },
+              {
+                "text": "అనకాపల్లి జిల్లా-Anakapalli",
+                "value": "6"
+              },
+              {
+                "text": "అన్నమయ్య జిల్లా-Annamayya",
+                "value": "8"
+              },
+              {
+                "text": "అల్లూరి సీతారామ రాజు-Alluri Sitharama Raju",
+                "value": "5"
+              },
+              {
+                "text": "ఎన్టీఆర్ జిల్లా-NTR",
+                "value": "21"
+              },
+              {
+                "text": "ఏలూరు జిల్లా-Eluru",
+                "value": "12"
+              },
+              {
+                "text": "కడప జిల్లా-Kadapa",
+                "value": "14"
+              },
+              {
+                "text": "కర్నూలు జిల్లా-Kurnool",
+                "value": "18"
+              },
+              {
+                "text": "కాకినాడ జిల్లా-Kakinada",
+                "value": "15"
+              }
+            ],
+            "isEmpty": false
+          },
+          {
+            "tagName": "select",
+            "name": "constituency_id",
+            "optionCount": 1,
+            "options": [
+              {
+                "text": "ఇక్కడ క్లిక్ చేసి నియోజకవర్గం ఎంచుకోండి",
+                "value": ""
+              }
+            ],
+            "isEmpty": true
+          },
+          {
+            "tagName": "select",
+            "name": "mandal_id",
+            "optionCount": 1,
+            "options": [
+              {
+                "text": "ఇక్కడ క్లిక్ చేసి మండలం ఎంచుకోండి",
+                "value": ""
+              }
+            ],
+            "isEmpty": true
+          },
+          {
+            "tagName": "select",
+            "name": "village_id",
+            "optionCount": 1,
+            "options": [
+              {
+                "text": "ఇక్కడ క్లిక్ చేసి ఎంచుకోండి",
+                "value": ""
+              }
+            ],
+            "isEmpty": true
+          }
+        ],
+        "buttons": [
+          {
+            "text": "Login",
+            "type": "submit",
+            "disabled": false
+          },
+          {
+            "text": "నమోదు చేయండి",
+            "type": "submit",
+            "disabled": false
+          }
+        ],
+        "forms": [
+          {
+            "formIndex": 0,
+            "inputCount": 4,
+            "fields": [
+              "log",
+              "pwd",
+              "rememberme",
+              "submit"
+            ]
+          },
+          {
+            "formIndex": 1,
+            "inputCount": 14,
+            "fields": [
+              "pa_name",
+              "totalleadrs",
+              "headname",
+              "pa_president",
+              "level",
+              "pa_secretory",
+              "phonenumber",
+              "whatsapp_number",
+              "district_id",
+              "constituency_id",
+              "mandal_id",
+              "village_id",
+              "address",
+              "description"
+            ]
+          }
+        ],
+        "fileUploads": [],
+        "issues": [
+          "Empty Dropdown: 'constituency_id' has no available options!",
+          "Empty Dropdown: 'mandal_id' has no available options!",
+          "Empty Dropdown: 'village_id' has no available options!",
+          "Console Errors: Failed to load resource: the server responded with a status of 403 ()"
+        ]
+      },
+      {
+        "route": "/addads",
+        "url": "http://127.0.0.1:4200/addads",
+        "consoleErrors": [
+          "Failed to load resource: the server responded with a status of 403 ()"
+        ],
+        "networkErrors": [
+          "GET https://kit.fontawesome.com/a076d05399.js - net::ERR_ABORTED"
+        ],
+        "dropdowns": [
+          {
+            "tagName": "select",
+            "name": "swal2-select",
+            "optionCount": 0,
+            "options": [],
+            "isEmpty": true
+          }
+        ],
+        "buttons": [
+          {
+            "text": "Login",
+            "type": "submit",
+            "disabled": false
+          },
+          {
+            "text": "×",
+            "type": "button",
+            "disabled": false
+          },
+          {
+            "text": "OK",
+            "type": "button",
+            "disabled": false
+          },
+          {
+            "text": "No",
+            "type": "button",
+            "disabled": false
+          },
+          {
+            "text": "Cancel",
+            "type": "button",
+            "disabled": false
+          }
+        ],
+        "forms": [
+          {
+            "formIndex": 0,
+            "inputCount": 4,
+            "fields": [
+              "log",
+              "pwd",
+              "rememberme",
+              "submit"
+            ]
+          }
+        ],
+        "fileUploads": [
+          {
+            "name": "file-upload",
+            "accept": "all",
+            "disabled": false
+          }
+        ],
+        "issues": [
+          "Empty Dropdown: 'swal2-select' has no available options!",
+          "Console Errors: Failed to load resource: the server responded with a status of 403 ()"
+        ]
+      },
+      {
+        "route": "/addattacks",
+        "url": "http://127.0.0.1:4200/addattacks",
+        "consoleErrors": [
+          "Failed to load resource: the server responded with a status of 403 ()",
+          "ERROR Error: Cannot find control with name: 'category'",
+          "Uncaught Exception: Cannot read properties of undefined (reading 'top')",
+          "ERROR Error: Cannot find control with name: 'prob_category'"
+        ],
+        "networkErrors": [
+          "GET https://kit.fontawesome.com/a076d05399.js - net::ERR_ABORTED"
+        ],
+        "dropdowns": [
+          {
+            "tagName": "select",
+            "name": "category",
+            "optionCount": 8,
+            "options": [
+              {
+                "text": "ఇక్కడ క్లిక్ చేసి ఎంచుకోండి",
+                "value": ""
+              },
+              {
+                "text": "విశ్వాసి",
+                "value": "విశ్వాసి"
+              },
+              {
+                "text": "పాస్టర్",
+                "value": "పాస్టర్"
+              },
+              {
+                "text": "చర్చి",
+                "value": "చర్చి"
+              },
+              {
+                "text": "విద్యార్థి",
+                "value": "విద్యార్థి"
+              },
+              {
+                "text": "పాస్టర్ల అసోసియేషన్",
+                "value": "పాస్టర్ల అసోసియేషన్ "
+              },
+              {
+                "text": "మినిస్ట్రీస్",
+                "value": "మినిస్ట్రీస్"
+              },
+              {
+                "text": "క్రిస్టియన్ ఆర్గనైజెషన్ / కంపెనీ",
+                "value": "రిస్టియన్ ఆర్గనైజెషన్ / కంపెనీ"
+              }
+            ],
+            "isEmpty": false
+          },
+          {
+            "tagName": "select",
+            "name": "prob_category",
+            "optionCount": 11,
+            "options": [
+              {
+                "text": "ఇక్కడ క్లిక్ చేసి ఎంచుకోండి",
+                "value": ""
+              },
+              {
+                "text": "బిసి-సి సర్టిఫికేట్ ఇమ్మంటే ఇవ్వడం లేదు",
+                "value": "బిసి-సి ఇవ్వడం లేదు"
+              },
+              {
+                "text": "ఓసి(OC) లకు క్రిస్టియన్ మైనారిటీ సర్టిఫికేట్ ఇమ్మంటే ఇవ్వడం లేదు",
+                "value": "క్రిస్టియన్ మైనారిటీ ఇవ్వడం లేదు"
+              },
+              {
+                "text": "యేసుప్రభు అంటే ఇష్టమనే ఎస్ సి(SC) కులస్తులకు, ఎస్ సి సర్టిఫికేట్ ఇమ్మంటే ఇవ్వడం లేదు",
+                "value": "ఎస్ సి సర్టిఫికేట్ ఇవ్వడం లేదు"
+              },
+              {
+                "text": "యేసుని నమ్మే ఎస్ సి(SC) కులస్తులను ఇబ్బంది పెడుతున్నారు",
+                "value": "(SC) కులస్తులను ఇబ్బంది పెడుతున్నారు "
+              },
+              {
+                "text": "చర్చి దగ్గర సమస్య సృష్టిస్తున్నారు",
+                "value": "చర్చి సమస్య "
+              },
+              {
+                "text": "సువార్త చేసేట ప్పుడు సమస్య సృష్టిస్తున్నారు",
+                "value": "సువార్త  సమస్య "
+              },
+              {
+                "text": "బంధువులు / ఊరివారు / స్నేహితులు వెలివేస్తున్నారు",
+                "value": "వెలివేస్తున్నారు"
+              },
+              {
+                "text": "మా క్రైస్తవుల మద్యనే సమస్య వుంది",
+                "value": "మా క్రైస్తవుల మద్యనే సమస్య వుంది "
+              },
+              {
+                "text": "పనిచేసేచోట సమస్య / చదువుకునేచోట క్రిస్మస్ / ప్రార్ధన పెట్టుకోనీయ లేదు",
+                "value": "పనిచేసేచోట / చదువుకునేచోట సమస్య "
+              }
+            ],
+            "isEmpty": false
+          },
+          {
+            "tagName": "select",
+            "name": "district_id",
+            "optionCount": 27,
+            "options": [
+              {
+                "text": "క్లిక్ చేసి జిల్లా సెలెక్ట్ చేయండి",
+                "value": ""
+              },
+              {
+                "text": "అనంతపురం జిల్లా-Anantapur",
+                "value": "7"
+              },
+              {
+                "text": "అనకాపల్లి జిల్లా-Anakapalli",
+                "value": "6"
+              },
+              {
+                "text": "అన్నమయ్య జిల్లా-Annamayya",
+                "value": "8"
+              },
+              {
+                "text": "అల్లూరి సీతారామ రాజు-Alluri Sitharama Raju",
+                "value": "5"
+              },
+              {
+                "text": "ఎన్టీఆర్ జిల్లా-NTR",
+                "value": "21"
+              },
+              {
+                "text": "ఏలూరు జిల్లా-Eluru",
+                "value": "12"
+              },
+              {
+                "text": "కడప జిల్లా-Kadapa",
+                "value": "14"
+              },
+              {
+                "text": "కర్నూలు జిల్లా-Kurnool",
+                "value": "18"
+              },
+              {
+                "text": "కాకినాడ జిల్లా-Kakinada",
+                "value": "15"
+              }
+            ],
+            "isEmpty": false
+          },
+          {
+            "tagName": "select",
+            "name": "constituency_id",
+            "optionCount": 1,
+            "options": [
+              {
+                "text": "క్లిక్ చేసి నియోజకవర్గం సెలెక్ట్ చేయండి",
+                "value": ""
+              }
+            ],
+            "isEmpty": true
+          },
+          {
+            "tagName": "select",
+            "name": "mandal_id",
+            "optionCount": 1,
+            "options": [
+              {
+                "text": "క్లిక్ చేసి మండలంను సెలెక్ట్ చేయండి",
+                "value": ""
+              }
+            ],
+            "isEmpty": true
+          },
+          {
+            "tagName": "select",
+            "name": "village_id",
+            "optionCount": 1,
+            "options": [
+              {
+                "text": "క్లిక్ చేసి పంచాయితీ సెలెక్ట్ చేయండి",
+                "value": ""
+              }
+            ],
+            "isEmpty": true
+          }
+        ],
+        "buttons": [
+          {
+            "text": "Login",
+            "type": "submit",
+            "disabled": false
+          },
+          {
+            "text": "సబ్మిట్ చేయము",
+            "type": "submit",
+            "disabled": false
+          }
+        ],
+        "forms": [
+          {
+            "formIndex": 0,
+            "inputCount": 4,
+            "fields": [
+              "log",
+              "pwd",
+              "rememberme",
+              "submit"
+            ]
+          },
+          {
+            "formIndex": 1,
+            "inputCount": 11,
+            "fields": [
+              "category",
+              "prob_category",
+              "victim1num",
+              "victim1name",
+              "youtubevidlink",
+              "noteondescription",
+              "district_id",
+              "constituency_id",
+              "mandal_id",
+              "village_id",
+              "address"
+            ]
+          }
+        ],
+        "fileUploads": [
+          {
+            "name": "image",
+            "accept": "all",
+            "disabled": false
+          },
+          {
+            "name": "videoa",
+            "accept": "all",
+            "disabled": false
+          },
+          {
+            "name": "document",
+            "accept": "all",
+            "disabled": false
+          },
+          {
+            "name": "audio",
+            "accept": "all",
+            "disabled": false
+          }
+        ],
+        "issues": [
+          "Empty Dropdown: 'constituency_id' has no available options!",
+          "Empty Dropdown: 'mandal_id' has no available options!",
+          "Empty Dropdown: 'village_id' has no available options!",
+          "Console Errors: Failed to load resource: the server responded with a status of 403 () | ERROR Error: Cannot find control with name: 'category' | Uncaught Exception: Cannot read properties of undefined (reading 'top') | ERROR Error: Cannot find control with name: 'prob_category'"
+        ]
+      },
+      {
+        "route": "/addbusiness",
+        "url": "http://127.0.0.1:4200/addbusiness",
+        "consoleErrors": [
+          "Failed to load resource: the server responded with a status of 403 ()"
+        ],
+        "networkErrors": [
+          "GET https://kit.fontawesome.com/a076d05399.js - net::ERR_ABORTED"
+        ],
+        "dropdowns": [
+          {
+            "tagName": "select",
+            "name": "swal2-select",
+            "optionCount": 0,
+            "options": [],
+            "isEmpty": true
+          }
+        ],
+        "buttons": [
+          {
+            "text": "Login",
+            "type": "submit",
+            "disabled": false
+          },
+          {
+            "text": "×",
+            "type": "button",
+            "disabled": false
+          },
+          {
+            "text": "OK",
+            "type": "button",
+            "disabled": false
+          },
+          {
+            "text": "No",
+            "type": "button",
+            "disabled": false
+          },
+          {
+            "text": "Cancel",
+            "type": "button",
+            "disabled": false
+          }
+        ],
+        "forms": [
+          {
+            "formIndex": 0,
+            "inputCount": 4,
+            "fields": [
+              "log",
+              "pwd",
+              "rememberme",
+              "submit"
+            ]
+          }
+        ],
+        "fileUploads": [
+          {
+            "name": "file-upload",
+            "accept": "all",
+            "disabled": false
+          }
+        ],
+        "issues": [
+          "Empty Dropdown: 'swal2-select' has no available options!",
+          "Console Errors: Failed to load resource: the server responded with a status of 403 ()"
+        ]
+      },
+      {
+        "route": "/addchurchtimings",
+        "url": "http://127.0.0.1:4200/addchurchtimings",
+        "consoleErrors": [
+          "Failed to load resource: the server responded with a status of 403 ()"
+        ],
+        "networkErrors": [
+          "GET https://kit.fontawesome.com/a076d05399.js - net::ERR_ABORTED"
+        ],
+        "dropdowns": [
+          {
+            "tagName": "select",
+            "name": "swal2-select",
+            "optionCount": 0,
+            "options": [],
+            "isEmpty": true
+          }
+        ],
+        "buttons": [
+          {
+            "text": "Login",
+            "type": "submit",
+            "disabled": false
+          },
+          {
+            "text": "×",
+            "type": "button",
+            "disabled": false
+          },
+          {
+            "text": "OK",
+            "type": "button",
+            "disabled": false
+          },
+          {
+            "text": "No",
+            "type": "button",
+            "disabled": false
+          },
+          {
+            "text": "Cancel",
+            "type": "button",
+            "disabled": false
+          }
+        ],
+        "forms": [
+          {
+            "formIndex": 0,
+            "inputCount": 4,
+            "fields": [
+              "log",
+              "pwd",
+              "rememberme",
+              "submit"
+            ]
+          }
+        ],
+        "fileUploads": [
+          {
+            "name": "file-upload",
+            "accept": "all",
+            "disabled": false
+          }
+        ],
+        "issues": [
+          "Empty Dropdown: 'swal2-select' has no available options!",
+          "Console Errors: Failed to load resource: the server responded with a status of 403 ()"
+        ]
+      },
+      {
+        "route": "/addinstitute",
+        "url": "http://127.0.0.1:4200/addinstitute",
+        "consoleErrors": [
+          "Failed to load resource: the server responded with a status of 403 ()"
+        ],
+        "networkErrors": [
+          "GET https://kit.fontawesome.com/a076d05399.js - net::ERR_ABORTED"
+        ],
+        "dropdowns": [
+          {
+            "tagName": "select",
+            "name": "swal2-select",
+            "optionCount": 0,
+            "options": [],
+            "isEmpty": true
+          }
+        ],
+        "buttons": [
+          {
+            "text": "Login",
+            "type": "submit",
+            "disabled": false
+          },
+          {
+            "text": "×",
+            "type": "button",
+            "disabled": false
+          },
+          {
+            "text": "OK",
+            "type": "button",
+            "disabled": false
+          },
+          {
+            "text": "No",
+            "type": "button",
+            "disabled": false
+          },
+          {
+            "text": "Cancel",
+            "type": "button",
+            "disabled": false
+          }
+        ],
+        "forms": [
+          {
+            "formIndex": 0,
+            "inputCount": 4,
+            "fields": [
+              "log",
+              "pwd",
+              "rememberme",
+              "submit"
+            ]
+          }
+        ],
+        "fileUploads": [
+          {
+            "name": "file-upload",
+            "accept": "all",
+            "disabled": false
+          }
+        ],
+        "issues": [
+          "Empty Dropdown: 'swal2-select' has no available options!",
+          "Console Errors: Failed to load resource: the server responded with a status of 403 ()"
+        ]
+      },
+      {
+        "route": "/addjobs",
+        "url": "http://127.0.0.1:4200/addjobs",
+        "consoleErrors": [
+          "Failed to load resource: the server responded with a status of 403 ()"
+        ],
+        "networkErrors": [
+          "GET https://kit.fontawesome.com/a076d05399.js - net::ERR_ABORTED"
+        ],
+        "dropdowns": [
+          {
+            "tagName": "select",
+            "name": "experience_t",
+            "optionCount": 7,
+            "options": [
+              {
+                "text": "ఇక్కడ క్లిక్ చేసి సెలెక్ట్ చేయండి",
+                "value": ""
+              },
+              {
+                "text": "అనుభవం లేదు",
+                "value": "అనుభవం-లేదు"
+              },
+              {
+                "text": "వంట అనుభవం వుంది",
+                "value": "వంట అనుభవం"
+              },
+              {
+                "text": "ఇల్లు శుభ్రం అనుభవం వుంది",
+                "value": "ఇల్లు శుభ్రం"
+              },
+              {
+                "text": "పిల్లలను చూడడం అనుభవం వుంది",
+                "value": "పిల్లలను చూడడం"
+              },
+              {
+                "text": "పైన అన్ని చేయగలను",
+                "value": "పైన అన్ని చేయగలను"
+              },
+              {
+                "text": "పైన వాటిలో లేదు వేరే వాటిలో వున్నది",
+                "value": "పైన వాటిలో లేదు వేరే వాటిలో వున్నది"
+              }
+            ],
+            "isEmpty": false
+          },
+          {
+            "tagName": "select",
+            "name": "experience",
+            "optionCount": 7,
+            "options": [
+              {
+                "text": "ఇక్కడ క్లిక్ చేసి సెలెక్ట్ చేయండి",
+                "value": ""
+              },
+              {
+                "text": "అనుభవం లేదు",
+                "value": "అనుభవం లేదు"
+              },
+              {
+                "text": "1 సంవత్సరం",
+                "value": "1 సంవత్సరం"
+              },
+              {
+                "text": "2 సంవత్సరాలు",
+                "value": "2 సంవత్సరాలు"
+              },
+              {
+                "text": "3 సంవత్సరాలు",
+                "value": "3 సంవత్సరాలు"
+              },
+              {
+                "text": "4 సంవత్సరాలు",
+                "value": "4 సంవత్సరాలు"
+              },
+              {
+                "text": "5 సంవత్సరాలు కంటె ఎక్కువ",
+                "value": "5 సంవత్సరాలు కంటె ఎక్కువ"
+              }
+            ],
+            "isEmpty": false
+          },
+          {
+            "tagName": "select",
+            "name": "qualification",
+            "optionCount": 15,
+            "options": [
+              {
+                "text": "ఇక్కడ క్లిక్ చేసి సెలెక్ట్ చేయండి",
+                "value": ""
+              },
+              {
+                "text": "చదువుకోలేదు",
+                "value": "చదువుకోలేదు"
+              },
+              {
+                "text": "చదవగలను",
+                "value": "చదవగలను"
+              },
+              {
+                "text": "2 వ తరగతి",
+                "value": "2 వ తరగతి"
+              },
+              {
+                "text": "3 వ తరగతి",
+                "value": "3 వ తరగతి"
+              },
+              {
+                "text": "4 వ తరగతి",
+                "value": "4 వ తరగతి"
+              },
+              {
+                "text": "5 వ తరగతి",
+                "value": "5 వ తరగతి"
+              },
+              {
+                "text": "6 వ తరగతి",
+                "value": "6 వ తరగతి"
+              },
+              {
+                "text": "7 వ తరగతి",
+                "value": "7 వ తరగతి"
+              },
+              {
+                "text": "8 వ తరగతి",
+                "value": "8 వ తరగతి"
+              }
+            ],
+            "isEmpty": false
+          },
+          {
+            "tagName": "select",
+            "name": "districtname",
+            "optionCount": 27,
+            "options": [
+              {
+                "text": "ఇక్కడ క్లిక్ చేసి సెలెక్ట్ చేయండి",
+                "value": ""
+              },
+              {
+                "text": "అనంతపురం జిల్లా-Anantapur",
+                "value": "7"
+              },
+              {
+                "text": "అనకాపల్లి జిల్లా-Anakapalli",
+                "value": "6"
+              },
+              {
+                "text": "అన్నమయ్య జిల్లా-Annamayya",
+                "value": "8"
+              },
+              {
+                "text": "అల్లూరి సీతారామ రాజు-Alluri Sitharama Raju",
+                "value": "5"
+              },
+              {
+                "text": "ఎన్టీఆర్ జిల్లా-NTR",
+                "value": "21"
+              },
+              {
+                "text": "ఏలూరు జిల్లా-Eluru",
+                "value": "12"
+              },
+              {
+                "text": "కడప జిల్లా-Kadapa",
+                "value": "14"
+              },
+              {
+                "text": "కర్నూలు జిల్లా-Kurnool",
+                "value": "18"
+              },
+              {
+                "text": "కాకినాడ జిల్లా-Kakinada",
+                "value": "15"
+              }
+            ],
+            "isEmpty": false
+          },
+          {
+            "tagName": "select",
+            "name": "constituencyname",
+            "optionCount": 1,
+            "options": [
+              {
+                "text": "ఇక్కడ క్లిక్ చేసి సెలెక్ట్ చేయండి",
+                "value": ""
+              }
+            ],
+            "isEmpty": true
+          },
+          {
+            "tagName": "select",
+            "name": "mandals",
+            "optionCount": 1,
+            "options": [
+              {
+                "text": "ఇక్కడ క్లిక్ చేసి సెలెక్ట్ చేయండి",
+                "value": ""
+              }
+            ],
+            "isEmpty": true
+          },
+          {
+            "tagName": "select",
+            "name": "village_name",
+            "optionCount": 1,
+            "options": [
+              {
+                "text": "ఇక్కడ క్లిక్ చేసి సెలెక్ట్ చేయండి",
+                "value": ""
+              }
+            ],
+            "isEmpty": true
+          }
+        ],
+        "buttons": [
+          {
+            "text": "Login",
+            "type": "submit",
+            "disabled": false
+          },
+          {
+            "text": "రిజిస్టర్",
+            "type": "submit",
+            "disabled": false
+          }
+        ],
+        "forms": [
+          {
+            "formIndex": 0,
+            "inputCount": 4,
+            "fields": [
+              "log",
+              "pwd",
+              "rememberme",
+              "submit"
+            ]
+          },
+          {
+            "formIndex": 1,
+            "inputCount": 13,
+            "fields": [
+              "jobname",
+              "number1",
+              "location",
+              "salary",
+              "experience_t",
+              "experience",
+              "qualification",
+              "description",
+              "districtname",
+              "constituencyname",
+              "mandals",
+              "village_name",
+              "google_location"
+            ]
+          }
+        ],
+        "fileUploads": [],
+        "issues": [
+          "Empty Dropdown: 'constituencyname' has no available options!",
+          "Empty Dropdown: 'mandals' has no available options!",
+          "Empty Dropdown: 'village_name' has no available options!",
+          "Console Errors: Failed to load resource: the server responded with a status of 403 ()"
+        ]
+      },
+      {
+        "route": "/addmarriages",
+        "url": "http://127.0.0.1:4200/addmarriages",
+        "consoleErrors": [
+          "Failed to load resource: the server responded with a status of 403 ()"
+        ],
+        "networkErrors": [
+          "GET https://kit.fontawesome.com/a076d05399.js - net::ERR_ABORTED"
+        ],
+        "dropdowns": [
+          {
+            "tagName": "select",
+            "name": "swal2-select",
+            "optionCount": 0,
+            "options": [],
+            "isEmpty": true
+          }
+        ],
+        "buttons": [
+          {
+            "text": "Login",
+            "type": "submit",
+            "disabled": false
+          },
+          {
+            "text": "×",
+            "type": "button",
+            "disabled": false
+          },
+          {
+            "text": "OK",
+            "type": "button",
+            "disabled": false
+          },
+          {
+            "text": "No",
+            "type": "button",
+            "disabled": false
+          },
+          {
+            "text": "Cancel",
+            "type": "button",
+            "disabled": false
+          }
+        ],
+        "forms": [
+          {
+            "formIndex": 0,
+            "inputCount": 4,
+            "fields": [
+              "log",
+              "pwd",
+              "rememberme",
+              "submit"
+            ]
+          }
+        ],
+        "fileUploads": [
+          {
+            "name": "file-upload",
+            "accept": "all",
+            "disabled": false
+          }
+        ],
+        "issues": [
+          "Empty Dropdown: 'swal2-select' has no available options!",
+          "Console Errors: Failed to load resource: the server responded with a status of 403 ()"
+        ]
+      },
+      {
+        "route": "/addmeetings",
+        "url": "http://127.0.0.1:4200/addmeetings",
+        "consoleErrors": [
+          "Failed to load resource: the server responded with a status of 403 ()"
+        ],
+        "networkErrors": [
+          "GET https://kit.fontawesome.com/a076d05399.js - net::ERR_ABORTED"
+        ],
+        "dropdowns": [
+          {
+            "tagName": "select",
+            "name": "mettingtype",
+            "optionCount": 13,
+            "options": [
+              {
+                "text": "సెలెక్ట్ కూటముల టైపు",
+                "value": ""
+              },
+              {
+                "text": "VBS",
+                "value": "VBS"
+              },
+              {
+                "text": "ఉజ్జీవ కూటములు",
+                "value": "ఉజ్జీవ కూటములు"
+              },
+              {
+                "text": "సువార్త కూటములు",
+                "value": "సువార్త కూటములు"
+              },
+              {
+                "text": "స్వస్థత కూటములు",
+                "value": "స్వస్థత కూటములు"
+              },
+              {
+                "text": "ఉజ్జీవ స్వస్థత కూటములు",
+                "value": "ఉజ్జీవ స్వస్థత కూటములు"
+              },
+              {
+                "text": "యూత్ మీటింగ్స్",
+                "value": "యూత్ మీటింగ్స్ కూటములు"
+              },
+              {
+                "text": "క్రైస్తవ నాయకుల కూటములు",
+                "value": "క్రైస్తవ నాయకుల కూటములు"
+              },
+              {
+                "text": "స్త్రీల కూటములు",
+                "value": "స్త్రీల కూటములు"
+              },
+              {
+                "text": "పాస్టర్ ఫెలోషిప్ కూటములు",
+                "value": "పాస్టర్ ఫెలోషిప్ కూటములు"
+              }
+            ],
+            "isEmpty": false
+          },
+          {
+            "tagName": "select",
+            "name": "denomation",
+            "optionCount": 19,
+            "options": [
+              {
+                "text": "సెలెక్ట్ డినామినేషన్ మోడల్‌",
+                "value": ""
+              },
+              {
+                "text": "అసెంబ్లీ ఆఫ్ గాడ్-Assembly of God",
+                "value": "1"
+              },
+              {
+                "text": "ఆర్థడాక్స్-Orthodox",
+                "value": "12"
+              },
+              {
+                "text": "ఇతర డినామినేషన్-Other Denomination",
+                "value": "18"
+              },
+              {
+                "text": "ఎవాంజలికల్ ఫెలోషిప్-Evangilical Fellowship",
+                "value": "7"
+              },
+              {
+                "text": "కాథలిక్కులు-Catholics",
+                "value": "14"
+              },
+              {
+                "text": "గోదావరి డెల్టా మిషన్(GDM)-Godavari Delta Mission",
+                "value": "8"
+              },
+              {
+                "text": "చర్చ్ అఫ్ క్రైస్ట్-Church of Christ",
+                "value": "5"
+              },
+              {
+                "text": "ది పెంటికోస్టల్ మిషన్(TPM)-The Penticostal Mission",
+                "value": "17"
+              },
+              {
+                "text": "పెంతికోస్తు-Penticost",
+                "value": "13"
+              }
+            ],
+            "isEmpty": false
+          },
+          {
+            "tagName": "select",
+            "name": "districtname",
+            "optionCount": 27,
+            "options": [
+              {
+                "text": "సెలెక్ట్ జిల్లా",
+                "value": ""
+              },
+              {
+                "text": "అనంతపురం జిల్లా-Anantapur",
+                "value": "7"
+              },
+              {
+                "text": "అనకాపల్లి జిల్లా-Anakapalli",
+                "value": "6"
+              },
+              {
+                "text": "అన్నమయ్య జిల్లా-Annamayya",
+                "value": "8"
+              },
+              {
+                "text": "అల్లూరి సీతారామ రాజు-Alluri Sitharama Raju",
+                "value": "5"
+              },
+              {
+                "text": "ఎన్టీఆర్ జిల్లా-NTR",
+                "value": "21"
+              },
+              {
+                "text": "ఏలూరు జిల్లా-Eluru",
+                "value": "12"
+              },
+              {
+                "text": "కడప జిల్లా-Kadapa",
+                "value": "14"
+              },
+              {
+                "text": "కర్నూలు జిల్లా-Kurnool",
+                "value": "18"
+              },
+              {
+                "text": "కాకినాడ జిల్లా-Kakinada",
+                "value": "15"
+              }
+            ],
+            "isEmpty": false
+          },
+          {
+            "tagName": "select",
+            "name": "constituencyname",
+            "optionCount": 1,
+            "options": [
+              {
+                "text": "సెలెక్ట్ నియోజకవర్గం",
+                "value": ""
+              }
+            ],
+            "isEmpty": true
+          },
+          {
+            "tagName": "select",
+            "name": "mandals",
+            "optionCount": 1,
+            "options": [
+              {
+                "text": "సెలెక్ట్ మండలం / మున్సిపాలిటీ",
+                "value": ""
+              }
+            ],
+            "isEmpty": true
+          },
+          {
+            "tagName": "select",
+            "name": "village_name",
+            "optionCount": 1,
+            "options": [
+              {
+                "text": "సెలెక్ట్ పంచాయతీ/వార్డు",
+                "value": ""
+              }
+            ],
+            "isEmpty": true
+          }
+        ],
+        "buttons": [
+          {
+            "text": "Login",
+            "type": "submit",
+            "disabled": false
+          },
+          {
+            "text": "కరెంటు లొకేషన్ నమోదు కోసం క్లిక్",
+            "type": "button",
+            "disabled": false
+          },
+          {
+            "text": "సబ్మిట్",
+            "type": "submit",
+            "disabled": false
+          }
+        ],
+        "forms": [
+          {
+            "formIndex": 0,
+            "inputCount": 4,
+            "fields": [
+              "log",
+              "pwd",
+              "rememberme",
+              "submit"
+            ]
+          },
+          {
+            "formIndex": 1,
+            "inputCount": 17,
+            "fields": [
+              "mettingtype",
+              "denomation",
+              "fromdate",
+              "todate",
+              "description",
+              "orgname",
+              "meetsize",
+              "orgphone",
+              "evntphone",
+              "youtube",
+              "facebook",
+              "districtname",
+              "constituencyname",
+              "mandals",
+              "village_name",
+              "location",
+              "address"
+            ]
+          }
+        ],
+        "fileUploads": [
+          {
+            "name": "image",
+            "accept": "image/x-png,image/jpeg",
+            "disabled": false
+          }
+        ],
+        "issues": [
+          "Empty Dropdown: 'constituencyname' has no available options!",
+          "Empty Dropdown: 'mandals' has no available options!",
+          "Empty Dropdown: 'village_name' has no available options!",
+          "Console Errors: Failed to load resource: the server responded with a status of 403 ()"
+        ]
+      },
+      {
+        "route": "/survey-news",
+        "url": "http://127.0.0.1:4200/survey-news",
+        "consoleErrors": [
+          "Failed to load resource: the server responded with a status of 403 ()"
+        ],
+        "networkErrors": [
+          "GET https://kit.fontawesome.com/a076d05399.js - net::ERR_ABORTED"
+        ],
+        "dropdowns": [],
+        "buttons": [
+          {
+            "text": "Login",
+            "type": "submit",
+            "disabled": false
+          }
+        ],
+        "forms": [
+          {
+            "formIndex": 0,
+            "inputCount": 4,
+            "fields": [
+              "log",
+              "pwd",
+              "rememberme",
+              "submit"
+            ]
+          }
+        ],
+        "fileUploads": [],
+        "issues": [
+          "Console Errors: Failed to load resource: the server responded with a status of 403 ()"
+        ]
+      },
+      {
+        "route": "/churchgo",
+        "url": "http://127.0.0.1:4200/churchgo",
+        "consoleErrors": [
+          "Failed to load resource: the server responded with a status of 403 ()"
+        ],
+        "networkErrors": [
+          "GET https://kit.fontawesome.com/a076d05399.js - net::ERR_ABORTED",
+          "POST https://www.youtube.com/api/stats/qoe?cpn=b60iW1BDHRgdw9nx&el=embedded&ns=yt&fexp=v1%2C100673025%2C-76668381%2C27058999%2C34656%2C124674%2C117689%2C9252%2C16509%2C23206%2C100702%2C15105%2C25059%2C4174%2C30446%2C18706%2C26008%2C13015%2C14666%2C1422%2C6620%2C2784%2C23826%2C9500%2C1840%2C24119%2C32526%2C38192%2C20589%2C4199%2C30114%2C9181%2C32875%2C20108%2C6032%2C1168%2C372%2C7758%2C18832%2C11374%2C4115%2C11462%2C26847%2C1352%2C13723%2C4366%2C9716%2C3614%2C16649%2C9890%2C3843%2C17160%2C1340%2C6470%2C4434%2C3241%2C4%2C17339%2C9038%2C1537%2C5824%2C20492%2C1%2C2058%2C10221%2C5675%2C15388%2C9179%2C6387%2C3306%2C4595%2C9279%2C3640%2C9%2C5316%2C1326%2C940%2C4783%2C5469%2C3423%2C12240%2C12476%2C816%2C589%2C7182%2C3374&cl=990399410&seq=1&event=streamingstats&docid=MjDV1hHkPkY&cbr=HeadlessChrome&cbrver=154.0.0.0&c=WEB_EMBEDDED_PLAYER&cver=2.20261002.01.00&cplayer=UNIPLAYER&cos=Windows&cosver=10.0&cplatform=DESKTOP&vps=0.000:N,0.000:ER&cmt=0.000:0.000,0.000:0.000&error=0.000:auth::0.000:0;a6s.0;r.Video_unavailable&vis=0.000:0&bh=0.000:0.000&qclc=ChBiNjBpVzFCREhSZ2R3OW54EAE - net::ERR_ABORTED"
+        ],
+        "dropdowns": [],
+        "buttons": [
+          {
+            "text": "Login",
+            "type": "submit",
+            "disabled": false
+          }
+        ],
+        "forms": [
+          {
+            "formIndex": 0,
+            "inputCount": 4,
+            "fields": [
+              "log",
+              "pwd",
+              "rememberme",
+              "submit"
+            ]
+          }
+        ],
+        "fileUploads": [],
+        "issues": [
+          "Console Errors: Failed to load resource: the server responded with a status of 403 ()"
+        ]
+      },
+      {
+        "route": "/apchristianpolitics",
+        "url": "http://127.0.0.1:4200/apchristianpolitics",
+        "consoleErrors": [
+          "Failed to load resource: the server responded with a status of 403 ()"
+        ],
+        "networkErrors": [
+          "GET https://kit.fontawesome.com/a076d05399.js - net::ERR_ABORTED"
+        ],
+        "dropdowns": [],
+        "buttons": [
+          {
+            "text": "Login",
+            "type": "submit",
+            "disabled": false
+          }
+        ],
+        "forms": [
+          {
+            "formIndex": 0,
+            "inputCount": 4,
+            "fields": [
+              "log",
+              "pwd",
+              "rememberme",
+              "submit"
+            ]
+          }
+        ],
+        "fileUploads": [],
+        "issues": [
+          "Console Errors: Failed to load resource: the server responded with a status of 403 ()"
+        ]
+      },
+      {
+        "route": "/christianattackvideo",
+        "url": "http://127.0.0.1:4200/christianattackvideo",
+        "consoleErrors": [
+          "Failed to load resource: the server responded with a status of 403 ()"
+        ],
+        "networkErrors": [
+          "GET https://kit.fontawesome.com/a076d05399.js - net::ERR_ABORTED"
+        ],
+        "dropdowns": [],
+        "buttons": [
+          {
+            "text": "Login",
+            "type": "submit",
+            "disabled": false
+          }
+        ],
+        "forms": [
+          {
+            "formIndex": 0,
+            "inputCount": 4,
+            "fields": [
+              "log",
+              "pwd",
+              "rememberme",
+              "submit"
+            ]
+          }
+        ],
+        "fileUploads": [],
+        "issues": [
+          "Console Errors: Failed to load resource: the server responded with a status of 403 ()"
+        ]
+      },
+      {
+        "route": "/entry",
+        "url": "http://127.0.0.1:4200/entry",
+        "consoleErrors": [
+          "Failed to load resource: the server responded with a status of 403 ()"
+        ],
+        "networkErrors": [
+          "GET https://kit.fontawesome.com/a076d05399.js - net::ERR_ABORTED"
+        ],
+        "dropdowns": [
+          {
+            "tagName": "select",
+            "name": "category",
+            "optionCount": 10,
+            "options": [
+              {
+                "text": "ఇక్కడ క్లిక్ చేసి ఎంచుకోండి",
+                "value": ""
+              },
+              {
+                "text": "విశ్వాసి",
+                "value": "విశ్వాసి"
+              },
+              {
+                "text": "పాస్టర్",
+                "value": "పాస్టర్"
+              },
+              {
+                "text": "చర్చి",
+                "value": "చర్చి"
+              },
+              {
+                "text": "విద్యార్థి",
+                "value": "విద్యార్థి"
+              },
+              {
+                "text": "పాస్టర్ల అసోసియేషన్",
+                "value": "పాస్టర్ల అసోసియేషన్ "
+              },
+              {
+                "text": "ఆఫీస్ / కంపెనీ",
+                "value": "ఆఫీస్ / కంపెనీ"
+              },
+              {
+                "text": "మినిస్ట్రీస్",
+                "value": "మినిస్ట్రీస్"
+              },
+              {
+                "text": "క్రిస్టియన్ ఆర్గనైజెషన్ / కంపెనీ",
+                "value": "రిస్టియన్ ఆర్గనైజెషన్ / కంపెనీ"
+              },
+              {
+                "text": "ఇతరులు",
+                "value": "ఇతరులు"
+              }
+            ],
+            "isEmpty": false
+          },
+          {
+            "tagName": "select",
+            "name": "district_id",
+            "optionCount": 27,
+            "options": [
+              {
+                "text": "ఇక్కడ క్లిక్ చేసి జిల్లా ఎంచుకోండి",
+                "value": ""
+              },
+              {
+                "text": "అనంతపురం జిల్లా-Anantapur",
+                "value": "7"
+              },
+              {
+                "text": "అనకాపల్లి జిల్లా-Anakapalli",
+                "value": "6"
+              },
+              {
+                "text": "అన్నమయ్య జిల్లా-Annamayya",
+                "value": "8"
+              },
+              {
+                "text": "అల్లూరి సీతారామ రాజు-Alluri Sitharama Raju",
+                "value": "5"
+              },
+              {
+                "text": "ఎన్టీఆర్ జిల్లా-NTR",
+                "value": "21"
+              },
+              {
+                "text": "ఏలూరు జిల్లా-Eluru",
+                "value": "12"
+              },
+              {
+                "text": "కడప జిల్లా-Kadapa",
+                "value": "14"
+              },
+              {
+                "text": "కర్నూలు జిల్లా-Kurnool",
+                "value": "18"
+              },
+              {
+                "text": "కాకినాడ జిల్లా-Kakinada",
+                "value": "15"
+              }
+            ],
+            "isEmpty": false
+          },
+          {
+            "tagName": "select",
+            "name": "constituency_id",
+            "optionCount": 1,
+            "options": [
+              {
+                "text": "ఇక్కడ క్లిక్ చేసి నియోజకవర్గం ఎంచుకోండి",
+                "value": ""
+              }
+            ],
+            "isEmpty": true
+          },
+          {
+            "tagName": "select",
+            "name": "mandal_id",
+            "optionCount": 1,
+            "options": [
+              {
+                "text": "ఇక్కడ క్లిక్ చేసి మండలం ఎంచుకోండి",
+                "value": ""
+              }
+            ],
+            "isEmpty": true
+          },
+          {
+            "tagName": "select",
+            "name": "village_id",
+            "optionCount": 1,
+            "options": [
+              {
+                "text": "ఇక్కడ క్లిక్ చేసి పంచాయితీ ఎంచుకోండి",
+                "value": ""
+              }
+            ],
+            "isEmpty": true
+          }
+        ],
+        "buttons": [
+          {
+            "text": "Login",
+            "type": "submit",
+            "disabled": false
+          },
+          {
+            "text": "సబ్మిట్ (SUBMIT)",
+            "type": "submit",
+            "disabled": false
+          }
+        ],
+        "forms": [
+          {
+            "formIndex": 0,
+            "inputCount": 4,
+            "fields": [
+              "log",
+              "pwd",
+              "rememberme",
+              "submit"
+            ]
+          },
+          {
+            "formIndex": 1,
+            "inputCount": 10,
+            "fields": [
+              "category",
+              "name",
+              "phnumber",
+              "whatsapnum",
+              "district_id",
+              "constituency_id",
+              "mandal_id",
+              "village_id",
+              "address",
+              "description"
+            ]
+          }
+        ],
+        "fileUploads": [],
+        "issues": [
+          "Empty Dropdown: 'constituency_id' has no available options!",
+          "Empty Dropdown: 'mandal_id' has no available options!",
+          "Empty Dropdown: 'village_id' has no available options!",
+          "Console Errors: Failed to load resource: the server responded with a status of 403 ()"
+        ]
+      },
+      {
+        "route": "/namodu",
+        "url": "http://127.0.0.1:4200/namodu",
+        "consoleErrors": [
+          "Failed to load resource: the server responded with a status of 403 ()"
+        ],
+        "networkErrors": [
+          "GET https://kit.fontawesome.com/a076d05399.js - net::ERR_ABORTED"
+        ],
+        "dropdowns": [
+          {
+            "tagName": "select",
+            "name": "category",
+            "optionCount": 8,
+            "options": [
+              {
+                "text": "ఇక్కడ క్లిక్ చేసి ఎంచుకోండి",
+                "value": ""
+              },
+              {
+                "text": "విశ్వాసి",
+                "value": "1"
+              },
+              {
+                "text": "పాస్టర్",
+                "value": "4"
+              },
+              {
+                "text": "చర్చి",
+                "value": "5"
+              },
+              {
+                "text": "విద్యార్థి",
+                "value": "2"
+              },
+              {
+                "text": "పాస్టర్ల అసోసియేషన్",
+                "value": "7"
+              },
+              {
+                "text": "మినిస్ట్రీస్",
+                "value": "3"
+              },
+              {
+                "text": "క్రిస్టియన్ ఆర్గనైజెషన్ / కంపెనీ",
+                "value": "6"
+              }
+            ],
+            "isEmpty": false
+          },
+          {
+            "tagName": "select",
+            "name": "district_id",
+            "optionCount": 27,
+            "options": [
+              {
+                "text": "ఇక్కడ క్లిక్ చేసి జిల్లా ఎంచుకోండి",
+                "value": ""
+              },
+              {
+                "text": "అనంతపురం జిల్లా-Anantapur",
+                "value": "7"
+              },
+              {
+                "text": "అనకాపల్లి జిల్లా-Anakapalli",
+                "value": "6"
+              },
+              {
+                "text": "అన్నమయ్య జిల్లా-Annamayya",
+                "value": "8"
+              },
+              {
+                "text": "అల్లూరి సీతారామ రాజు-Alluri Sitharama Raju",
+                "value": "5"
+              },
+              {
+                "text": "ఎన్టీఆర్ జిల్లా-NTR",
+                "value": "21"
+              },
+              {
+                "text": "ఏలూరు జిల్లా-Eluru",
+                "value": "12"
+              },
+              {
+                "text": "కడప జిల్లా-Kadapa",
+                "value": "14"
+              },
+              {
+                "text": "కర్నూలు జిల్లా-Kurnool",
+                "value": "18"
+              },
+              {
+                "text": "కాకినాడ జిల్లా-Kakinada",
+                "value": "15"
+              }
+            ],
+            "isEmpty": false
+          },
+          {
+            "tagName": "select",
+            "name": "constituency_id",
+            "optionCount": 1,
+            "options": [
+              {
+                "text": "ఇక్కడ క్లిక్ చేసి నియోజకవర్గం ఎంచుకోండి",
+                "value": ""
+              }
+            ],
+            "isEmpty": true
+          },
+          {
+            "tagName": "select",
+            "name": "mandal_id",
+            "optionCount": 1,
+            "options": [
+              {
+                "text": "ఇక్కడ క్లిక్ చేసి మండలం ఎంచుకోండి",
+                "value": ""
+              }
+            ],
+            "isEmpty": true
+          },
+          {
+            "tagName": "select",
+            "name": "village_id",
+            "optionCount": 1,
+            "options": [
+              {
+                "text": "ఇక్కడ క్లిక్ చేసి పంచాయితీ ఎంచుకోండి",
+                "value": ""
+              }
+            ],
+            "isEmpty": true
+          }
+        ],
+        "buttons": [
+          {
+            "text": "Login",
+            "type": "submit",
+            "disabled": false
+          },
+          {
+            "text": "సబ్మిట్ (SUBMIT)",
+            "type": "submit",
+            "disabled": false
+          }
+        ],
+        "forms": [
+          {
+            "formIndex": 0,
+            "inputCount": 4,
+            "fields": [
+              "log",
+              "pwd",
+              "rememberme",
+              "submit"
+            ]
+          },
+          {
+            "formIndex": 1,
+            "inputCount": 10,
+            "fields": [
+              "category",
+              "name",
+              "number",
+              "password",
+              "district_id",
+              "constituency_id",
+              "mandal_id",
+              "village_id",
+              "address",
+              "description"
+            ]
+          }
+        ],
+        "fileUploads": [],
+        "issues": [
+          "Empty Dropdown: 'constituency_id' has no available options!",
+          "Empty Dropdown: 'mandal_id' has no available options!",
+          "Empty Dropdown: 'village_id' has no available options!",
+          "Console Errors: Failed to load resource: the server responded with a status of 403 ()"
+        ]
+      },
+      {
+        "route": "/wish",
+        "url": "http://127.0.0.1:4200/wish",
+        "consoleErrors": [
+          "Failed to load resource: the server responded with a status of 403 ()"
+        ],
+        "networkErrors": [
+          "GET https://kit.fontawesome.com/a076d05399.js - net::ERR_ABORTED"
+        ],
+        "dropdowns": [
+          {
+            "tagName": "select",
+            "name": "category",
+            "optionCount": 10,
+            "options": [
+              {
+                "text": "ఇక్కడ క్లిక్ చేసి ఎంచుకోండి",
+                "value": ""
+              },
+              {
+                "text": "విశ్వాసి",
+                "value": "విశ్వాసి"
+              },
+              {
+                "text": "పాస్టర్",
+                "value": "పాస్టర్"
+              },
+              {
+                "text": "చర్చి",
+                "value": "చర్చి"
+              },
+              {
+                "text": "విద్యార్థి",
+                "value": "విద్యార్థి"
+              },
+              {
+                "text": "పాస్టర్ల అసోసియేషన్",
+                "value": "పాస్టర్ల అసోసియేషన్ "
+              },
+              {
+                "text": "ఆఫీస్ / కంపెనీ",
+                "value": "ఆఫీస్ / కంపెనీ"
+              },
+              {
+                "text": "మినిస్ట్రీస్",
+                "value": "మినిస్ట్రీస్"
+              },
+              {
+                "text": "క్రిస్టియన్ ఆర్గనైజెషన్ / కంపెనీ",
+                "value": "రిస్టియన్ ఆర్గనైజెషన్ / కంపెనీ"
+              },
+              {
+                "text": "ఇతరులు",
+                "value": "ఇతరులు"
+              }
+            ],
+            "isEmpty": false
+          },
+          {
+            "tagName": "select",
+            "name": "denomation",
+            "optionCount": 19,
+            "options": [
+              {
+                "text": "ఇక్కడ క్లిక్ చేసి సెలెక్ట్ చేయండి",
+                "value": ""
+              },
+              {
+                "text": "అసెంబ్లీ ఆఫ్ గాడ్-Assembly of God",
+                "value": "1"
+              },
+              {
+                "text": "ఆర్థడాక్స్-Orthodox",
+                "value": "12"
+              },
+              {
+                "text": "ఇతర డినామినేషన్-Other Denomination",
+                "value": "18"
+              },
+              {
+                "text": "ఎవాంజలికల్ ఫెలోషిప్-Evangilical Fellowship",
+                "value": "7"
+              },
+              {
+                "text": "కాథలిక్కులు-Catholics",
+                "value": "14"
+              },
+              {
+                "text": "గోదావరి డెల్టా మిషన్(GDM)-Godavari Delta Mission",
+                "value": "8"
+              },
+              {
+                "text": "చర్చ్ అఫ్ క్రైస్ట్-Church of Christ",
+                "value": "5"
+              },
+              {
+                "text": "ది పెంటికోస్టల్ మిషన్(TPM)-The Penticostal Mission",
+                "value": "17"
+              },
+              {
+                "text": "పెంతికోస్తు-Penticost",
+                "value": "13"
+              }
+            ],
+            "isEmpty": false
+          },
+          {
+            "tagName": "select",
+            "name": "district_id",
+            "optionCount": 27,
+            "options": [
+              {
+                "text": "ఇక్కడ క్లిక్ చేసి జిల్లా ఎంచుకోండి",
+                "value": ""
+              },
+              {
+                "text": "అనంతపురం జిల్లా-Anantapur",
+                "value": "7"
+              },
+              {
+                "text": "అనకాపల్లి జిల్లా-Anakapalli",
+                "value": "6"
+              },
+              {
+                "text": "అన్నమయ్య జిల్లా-Annamayya",
+                "value": "8"
+              },
+              {
+                "text": "అల్లూరి సీతారామ రాజు-Alluri Sitharama Raju",
+                "value": "5"
+              },
+              {
+                "text": "ఎన్టీఆర్ జిల్లా-NTR",
+                "value": "21"
+              },
+              {
+                "text": "ఏలూరు జిల్లా-Eluru",
+                "value": "12"
+              },
+              {
+                "text": "కడప జిల్లా-Kadapa",
+                "value": "14"
+              },
+              {
+                "text": "కర్నూలు జిల్లా-Kurnool",
+                "value": "18"
+              },
+              {
+                "text": "కాకినాడ జిల్లా-Kakinada",
+                "value": "15"
+              }
+            ],
+            "isEmpty": false
+          },
+          {
+            "tagName": "select",
+            "name": "constituency_id",
+            "optionCount": 1,
+            "options": [
+              {
+                "text": "ఇక్కడ క్లిక్ చేసి నియోజకవర్గం ఎంచుకోండి",
+                "value": ""
+              }
+            ],
+            "isEmpty": true
+          },
+          {
+            "tagName": "select",
+            "name": "mandal_id",
+            "optionCount": 1,
+            "options": [
+              {
+                "text": "ఇక్కడ క్లిక్ చేసి మండలం ఎంచుకోండి",
+                "value": ""
+              }
+            ],
+            "isEmpty": true
+          },
+          {
+            "tagName": "select",
+            "name": "village_id",
+            "optionCount": 1,
+            "options": [
+              {
+                "text": "ఇక్కడ క్లిక్ చేసి పంచాయితీ ఎంచుకోండి",
+                "value": ""
+              }
+            ],
+            "isEmpty": true
+          }
+        ],
+        "buttons": [
+          {
+            "text": "Login",
+            "type": "submit",
+            "disabled": false
+          },
+          {
+            "text": "సబ్మిట్ (SUBMIT)",
+            "type": "submit",
+            "disabled": false
+          }
+        ],
+        "forms": [
+          {
+            "formIndex": 0,
+            "inputCount": 4,
+            "fields": [
+              "log",
+              "pwd",
+              "rememberme",
+              "submit"
+            ]
+          },
+          {
+            "formIndex": 1,
+            "inputCount": 13,
+            "fields": [
+              "category",
+              "name",
+              "phnumber",
+              "whatsapnum",
+              "churchname",
+              "denomation",
+              "number_ofmembers",
+              "district_id",
+              "constituency_id",
+              "mandal_id",
+              "village_id",
+              "address",
+              "description"
+            ]
+          }
+        ],
+        "fileUploads": [
+          {
+            "name": "image",
+            "accept": "image/x-png,image/jpeg",
+            "disabled": false
+          }
+        ],
+        "issues": [
+          "Empty Dropdown: 'constituency_id' has no available options!",
+          "Empty Dropdown: 'mandal_id' has no available options!",
+          "Empty Dropdown: 'village_id' has no available options!",
+          "Console Errors: Failed to load resource: the server responded with a status of 403 ()"
+        ]
+      }
+    ]
+  },
+  "mobileApp": {
+    "bootSuccess": true,
+    "consoleErrors": [
+      "Uncaught: Unexpected token '<'",
+      "Failed to load resource: the server responded with a status of 404 ()",
+      "ERROR [object HttpErrorResponse]",
+      "Failed to load resource: the server responded with a status of 404 ()",
+      "ERROR [object HttpErrorResponse]"
+    ],
+    "networkFailures": [],
+    "elements": {
+      "hasIonApp": true,
+      "headerText": "JBAC-AP",
+      "hasContent": true,
+      "cardCount": 8,
+      "buttonCount": 7,
+      "selectCount": 5,
+      "buttonsSample": [
+        "button",
+        "button",
+        "button",
+        "button",
+        "button",
+        "button",
+        "సబ్మిట్"
+      ],
+      "cardsSample": [
+        "మీ క్యాటగిరి ఎంచుకోండి\nఇక్కడ క",
+        "మీ పేరు(ఇంటి పేరు తో సహా)",
+        "మీ ఫోన్ నంబర్ (10 అంకెలు మాత్ర",
+        "సెట్ పాస్వర్డ్ (కనీసము 4 నుంచి",
+        "జిల్లా\nఇక్కడ క్లిక్ చేసి జిల్ల",
+        "నియోజకవర్గం\nఇక్కడ క్లిక్ చేసి ",
+        "మండలం / మున్సిపాలిటీ\nఇక్కడ క్ల",
+        "పంచాయితీ / వార్డ్ నంబర్\nఇక్కడ "
+      ]
+    }
+  }
+}

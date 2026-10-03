@@ -1,0 +1,1992 @@
+{
+  "webIssues": [
+    {
+      "component": "believerregister",
+      "forms": [
+        "beliverform"
+      ],
+      "dropdowns": [
+        {
+          "name": "gender",
+          "sourceArray": null,
+          "changeHandler": null
+        },
+        {
+          "name": "spirti",
+          "sourceArray": null,
+          "changeHandler": null
+        },
+        {
+          "name": "god",
+          "sourceArray": null,
+          "changeHandler": null
+        },
+        {
+          "name": "hobbies",
+          "sourceArray": null,
+          "changeHandler": null
+        },
+        {
+          "name": "denomination_id",
+          "sourceArray": "denomation",
+          "changeHandler": null
+        },
+        {
+          "name": "talent",
+          "sourceArray": null,
+          "changeHandler": null
+        },
+        {
+          "name": "education",
+          "sourceArray": null,
+          "changeHandler": null
+        },
+        {
+          "name": "designation",
+          "sourceArray": null,
+          "changeHandler": null
+        },
+        {
+          "name": "dpartment",
+          "sourceArray": null,
+          "changeHandler": null
+        },
+        {
+          "name": "districts",
+          "sourceArray": "districts",
+          "changeHandler": "getconstency($event);"
+        },
+        {
+          "name": "constituencyname",
+          "sourceArray": "constituency",
+          "changeHandler": "getmandals($event);"
+        },
+        {
+          "name": "mandals",
+          "sourceArray": "mandals",
+          "changeHandler": "gepanchayati($event);"
+        },
+        {
+          "name": "panchayati",
+          "sourceArray": "panchayati",
+          "changeHandler": null
+        },
+        {
+          "name": "pastor",
+          "sourceArray": "getpastorsdatas",
+          "changeHandler": null
+        },
+        {
+          "name": "church",
+          "sourceArray": "getchurchfilter",
+          "changeHandler": null
+        },
+        {
+          "name": "generaltype",
+          "sourceArray": null,
+          "changeHandler": "onsubward($event)"
+        },
+        {
+          "name": "wingtype",
+          "sourceArray": "wings",
+          "changeHandler": null
+        },
+        {
+          "name": "wingtypes",
+          "sourceArray": null,
+          "changeHandler": null
+        },
+        {
+          "name": "caste",
+          "sourceArray": null,
+          "changeHandler": null
+        }
+      ],
+      "buttons": [
+        {
+          "action": "postbeliversignup()"
+        }
+      ],
+      "fileUploads": [],
+      "issues": [
+        "Dropdown 'wingtype': source array 'wings' is declared but NEVER assigned/populated in TS!"
+      ]
+    },
+    {
+      "component": "church-pastor-search",
+      "forms": [
+        "search"
+      ],
+      "dropdowns": [
+        {
+          "name": "district_id",
+          "sourceArray": "districts",
+          "changeHandler": "onDistrictChange($event);"
+        },
+        {
+          "name": "constituency_id",
+          "sourceArray": "constituency",
+          "changeHandler": "onConstituencyChange($event);"
+        },
+        {
+          "name": "mandal_id",
+          "sourceArray": "mandals",
+          "changeHandler": "onMandalChange($event);"
+        },
+        {
+          "name": "village_id",
+          "sourceArray": "panchayati",
+          "changeHandler": null
+        },
+        {
+          "name": "pastor_id",
+          "sourceArray": "getpastorassciationas",
+          "changeHandler": null
+        },
+        {
+          "name": "church",
+          "sourceArray": "getchurchfilter",
+          "changeHandler": null
+        }
+      ],
+      "buttons": [
+        {
+          "action": "pastorview()"
+        },
+        {
+          "action": "churchview()"
+        },
+        {
+          "action": "reset()"
+        }
+      ],
+      "fileUploads": [],
+      "issues": [
+        "Dropdown 'village_id': source array 'panchayati' is declared but NEVER assigned/populated in TS!"
+      ]
+    },
+    {
+      "component": "josephview",
+      "forms": [],
+      "dropdowns": [],
+      "buttons": [
+        {
+          "action": "proofmodalDismis()"
+        }
+      ],
+      "fileUploads": [],
+      "issues": [
+        "Button click handler 'proofmodalDismis' not implemented in TS!"
+      ]
+    },
+    {
+      "component": "profile",
+      "forms": [
+        "addingmeetings",
+        "addingchurchtimimngs",
+        "addinginsututies",
+        "addingcolleges",
+        "addingmarriages",
+        "jobsadding",
+        "attacksform",
+        "addsadding",
+        "addingbusiness"
+      ],
+      "dropdowns": [
+        {
+          "name": "mettingtype",
+          "sourceArray": null,
+          "changeHandler": null
+        },
+        {
+          "name": "denomation",
+          "sourceArray": "denomation",
+          "changeHandler": null
+        },
+        {
+          "name": "ministry_id",
+          "sourceArray": "ministryname",
+          "changeHandler": null
+        },
+        {
+          "name": "districtname",
+          "sourceArray": "districts",
+          "changeHandler": "getconstency($event);"
+        },
+        {
+          "name": "constituencyname",
+          "sourceArray": "constituency",
+          "changeHandler": "getmandals($event);"
+        },
+        {
+          "name": "mandals",
+          "sourceArray": "mandals",
+          "changeHandler": "gepanchayati($event);"
+        },
+        {
+          "name": "village_name",
+          "sourceArray": "panchayati",
+          "changeHandler": null
+        },
+        {
+          "name": "speakerone",
+          "sourceArray": "getpastoras",
+          "changeHandler": null
+        },
+        {
+          "name": "speakertwo",
+          "sourceArray": "getpastoras",
+          "changeHandler": null
+        },
+        {
+          "name": "speakerthree",
+          "sourceArray": "getpastoras",
+          "changeHandler": null
+        },
+        {
+          "name": "speakerfour",
+          "sourceArray": "getpastoras",
+          "changeHandler": null
+        },
+        {
+          "name": "day",
+          "sourceArray": null,
+          "changeHandler": null
+        },
+        {
+          "name": "service_name",
+          "sourceArray": null,
+          "changeHandler": null
+        },
+        {
+          "name": "district_id",
+          "sourceArray": "districts",
+          "changeHandler": "getconstency($event);"
+        },
+        {
+          "name": "constituency_id",
+          "sourceArray": "constituency",
+          "changeHandler": "getmandals($event);"
+        },
+        {
+          "name": "mandal_id",
+          "sourceArray": "mandals",
+          "changeHandler": "gepanchayati($event);"
+        },
+        {
+          "name": "village_id",
+          "sourceArray": "panchayati",
+          "changeHandler": null
+        },
+        {
+          "name": "church",
+          "sourceArray": "getchurchstudentfilter",
+          "changeHandler": null
+        },
+        {
+          "name": "believer_id",
+          "sourceArray": "bliversdata",
+          "changeHandler": null
+        },
+        {
+          "name": "ministry_id",
+          "sourceArray": "ministryname",
+          "changeHandler": null
+        },
+        {
+          "name": "collegetype",
+          "sourceArray": null,
+          "changeHandler": null
+        },
+        {
+          "name": "district_id",
+          "sourceArray": "districts",
+          "changeHandler": "getconstency($event);"
+        },
+        {
+          "name": "constituency_id",
+          "sourceArray": "constituency",
+          "changeHandler": "getmandals($event);"
+        },
+        {
+          "name": "pastor_id",
+          "sourceArray": "getpastorassciationas",
+          "changeHandler": null
+        },
+        {
+          "name": "mandal_id",
+          "sourceArray": "mandals",
+          "changeHandler": "gepanchayati($event);"
+        },
+        {
+          "name": "village_id",
+          "sourceArray": "panchayati",
+          "changeHandler": null
+        },
+        {
+          "name": "church",
+          "sourceArray": "church",
+          "changeHandler": null
+        },
+        {
+          "name": "districtname",
+          "sourceArray": "districts",
+          "changeHandler": "getconstency($event);"
+        },
+        {
+          "name": "constituencyname",
+          "sourceArray": "constituency",
+          "changeHandler": "getmandals($event);"
+        },
+        {
+          "name": "mandals",
+          "sourceArray": "mandals",
+          "changeHandler": "gepanchayati($event);"
+        },
+        {
+          "name": "village_name",
+          "sourceArray": "panchayati",
+          "changeHandler": null
+        },
+        {
+          "name": "believer_id",
+          "sourceArray": "bliversdata",
+          "changeHandler": null
+        },
+        {
+          "name": "denomation_id",
+          "sourceArray": "denomation",
+          "changeHandler": null
+        },
+        {
+          "name": "ministry_id",
+          "sourceArray": "ministryname",
+          "changeHandler": null
+        },
+        {
+          "name": "caste",
+          "sourceArray": null,
+          "changeHandler": null
+        },
+        {
+          "name": "gender",
+          "sourceArray": null,
+          "changeHandler": null
+        },
+        {
+          "name": "spirti",
+          "sourceArray": null,
+          "changeHandler": null
+        },
+        {
+          "name": "districtname",
+          "sourceArray": "districts",
+          "changeHandler": "getconstency($event);"
+        },
+        {
+          "name": "constituencyname",
+          "sourceArray": "constituency",
+          "changeHandler": "getmandals($event);"
+        },
+        {
+          "name": "mandals",
+          "sourceArray": "mandals",
+          "changeHandler": "gepanchayati($event);"
+        },
+        {
+          "name": "village_name",
+          "sourceArray": "panchayati",
+          "changeHandler": null
+        },
+        {
+          "name": "pastor_id",
+          "sourceArray": "pastoras",
+          "changeHandler": null
+        },
+        {
+          "name": "experience",
+          "sourceArray": null,
+          "changeHandler": null
+        },
+        {
+          "name": "districtname",
+          "sourceArray": "districts",
+          "changeHandler": "getconstency($event);"
+        },
+        {
+          "name": "constituencyname",
+          "sourceArray": "constituency",
+          "changeHandler": "getmandals($event);"
+        },
+        {
+          "name": "mandals",
+          "sourceArray": "mandals",
+          "changeHandler": "gepanchayati($event);"
+        },
+        {
+          "name": "village_name",
+          "sourceArray": "panchayati",
+          "changeHandler": null
+        },
+        {
+          "name": "district_id",
+          "sourceArray": "districts",
+          "changeHandler": "getconstency($event);"
+        },
+        {
+          "name": "constituency_id",
+          "sourceArray": "constituency",
+          "changeHandler": "getmandals($event);"
+        },
+        {
+          "name": "mandal_id",
+          "sourceArray": "mandals",
+          "changeHandler": "gepanchayati($event);"
+        },
+        {
+          "name": "village_id",
+          "sourceArray": "panchayati",
+          "changeHandler": null
+        },
+        {
+          "name": "type",
+          "sourceArray": null,
+          "changeHandler": null
+        },
+        {
+          "name": "type",
+          "sourceArray": null,
+          "changeHandler": null
+        },
+        {
+          "name": "title",
+          "sourceArray": null,
+          "changeHandler": null
+        },
+        {
+          "name": "denomation",
+          "sourceArray": "denomation",
+          "changeHandler": null
+        },
+        {
+          "name": "ministry_id",
+          "sourceArray": "ministryname",
+          "changeHandler": null
+        },
+        {
+          "name": "districtname",
+          "sourceArray": "districts",
+          "changeHandler": "getconstency($event);"
+        },
+        {
+          "name": "constituencyname",
+          "sourceArray": "constituency",
+          "changeHandler": "getmandals($event);"
+        },
+        {
+          "name": "mandals",
+          "sourceArray": "mandals",
+          "changeHandler": "gepanchayati($event);"
+        },
+        {
+          "name": "village_name",
+          "sourceArray": "panchayati",
+          "changeHandler": null
+        }
+      ],
+      "buttons": [
+        {
+          "action": "formshow(3)"
+        },
+        {
+          "action": "formshow(4)"
+        },
+        {
+          "action": "formshow(1)"
+        },
+        {
+          "action": "formshow(10)"
+        },
+        {
+          "action": "formshow(6)"
+        },
+        {
+          "action": "formshow(8)"
+        },
+        {
+          "action": "formshow(7)"
+        },
+        {
+          "action": "formshow(9)"
+        },
+        {
+          "action": "postmeetings()"
+        },
+        {
+          "action": "postchurchtimings()"
+        },
+        {
+          "action": "postinsututies()"
+        },
+        {
+          "action": "postcolleges()"
+        },
+        {
+          "action": "postmarriages()"
+        },
+        {
+          "action": "postjobs()"
+        },
+        {
+          "action": "postattacks()"
+        },
+        {
+          "action": "postadds()"
+        },
+        {
+          "action": "postbusiness()"
+        },
+        {
+          "action": "modalDismiss()"
+        },
+        {
+          "action": "addNewSubmit()"
+        }
+      ],
+      "fileUploads": [
+        {
+          "tag": "<input class=\"image\" type=\"file\" id=\"formFile\"\r\n                                                accept=\"image/x-png,image/jpeg\" formControlName=\"image\"\r\n                                                (change)=\"onImageChange($event)\"\r\n                                                [ngClass]=\"{'is-invalid': submitted && t['image'].errors }\" />",
+          "handler": "onImageChange($event)"
+        },
+        {
+          "tag": "<input type=\"file\" formControlName=\"image\" class=\"form-control\"\r\n                                                    (change)=\"onImageChangeins($event)\" />",
+          "handler": "onImageChangeins($event)"
+        },
+        {
+          "tag": "<input type=\"file\" formControlName=\"image\" class=\"form-control\" />",
+          "handler": null
+        },
+        {
+          "tag": "<input type=\"file\" formControlName=\"image\"\r\n                                                    (change)=\"onImageChange($event)\" class=\"form-control\" />",
+          "handler": "onImageChange($event)"
+        },
+        {
+          "tag": "<input class=\"image\" type=\"file\" id=\"formFile\"\r\n                                                accept=\"image/x-png,image/jpeg\" formControlName=\"image\"\r\n                                                (change)=\"onImageChange($event)\" />",
+          "handler": "onImageChange($event)"
+        },
+        {
+          "tag": "<input type=\"file\" id=\"imageup\" *ngIf=\"imagesData.length < 3\"\r\n                                                    (change)=\"onImageChange1($event)\" formControlName=\"image\">",
+          "handler": "onImageChange1($event)"
+        },
+        {
+          "tag": "<input class=\"image\" type=\"file\" id=\"formFile\"\r\n                                                accept=\"image/x-png,image/jpeg\" formControlName=\"image\"\r\n                                                (change)=\"onImageChange($event)\"\r\n                                                [ngClass]=\"{'is-invalid': submitted && r['image'].errors }\" />",
+          "handler": "onImageChange($event)"
+        },
+        {
+          "tag": "<input class=\"image\" type=\"file\" id=\"formFile\"\r\n                                                accept=\"image/x-png,image/jpeg\" formControlName=\"image\"\r\n                                                (change)=\"onImageChange($event)\"\r\n                                                [ngClass]=\"{'is-invalid': submitted && j['image'].errors }\" />",
+          "handler": "onImageChange($event)"
+        }
+      ],
+      "issues": [
+        "File upload input has NO (change) event listener! File cannot be uploaded."
+      ]
+    },
+    {
+      "component": "signup",
+      "forms": [
+        "beliverform",
+        "studentform",
+        "ministryform",
+        "pastorform",
+        "churchregsiterform",
+        "independentorgainsationform",
+        "pastorsassociations"
+      ],
+      "dropdowns": [
+        {
+          "name": "gender",
+          "sourceArray": null,
+          "changeHandler": null
+        },
+        {
+          "name": "spirti",
+          "sourceArray": null,
+          "changeHandler": null
+        },
+        {
+          "name": "god",
+          "sourceArray": null,
+          "changeHandler": null
+        },
+        {
+          "name": "hobbies",
+          "sourceArray": null,
+          "changeHandler": null
+        },
+        {
+          "name": "denomination_id",
+          "sourceArray": "denomation",
+          "changeHandler": null
+        },
+        {
+          "name": "talent",
+          "sourceArray": null,
+          "changeHandler": null
+        },
+        {
+          "name": "education",
+          "sourceArray": null,
+          "changeHandler": null
+        },
+        {
+          "name": "designation",
+          "sourceArray": null,
+          "changeHandler": null
+        },
+        {
+          "name": "dpartment",
+          "sourceArray": null,
+          "changeHandler": null
+        },
+        {
+          "name": "districts",
+          "sourceArray": "districts",
+          "changeHandler": "getconstency($event);"
+        },
+        {
+          "name": "constituencyname",
+          "sourceArray": "constituency",
+          "changeHandler": "getmandals($event);"
+        },
+        {
+          "name": "mandals",
+          "sourceArray": "mandals",
+          "changeHandler": "gepanchayati($event);"
+        },
+        {
+          "name": "panchayati",
+          "sourceArray": "panchayati",
+          "changeHandler": null
+        },
+        {
+          "name": "pastor",
+          "sourceArray": "getpastorsdatas",
+          "changeHandler": null
+        },
+        {
+          "name": "church",
+          "sourceArray": "getchurchfilter",
+          "changeHandler": null
+        },
+        {
+          "name": "generaltype",
+          "sourceArray": null,
+          "changeHandler": "onsubward($event)"
+        },
+        {
+          "name": "wingtype",
+          "sourceArray": "wings",
+          "changeHandler": null
+        },
+        {
+          "name": "wingtypes",
+          "sourceArray": null,
+          "changeHandler": null
+        },
+        {
+          "name": "caste",
+          "sourceArray": null,
+          "changeHandler": null
+        },
+        {
+          "name": "gender",
+          "sourceArray": null,
+          "changeHandler": null
+        },
+        {
+          "name": "god",
+          "sourceArray": null,
+          "changeHandler": null
+        },
+        {
+          "name": "hobbies",
+          "sourceArray": null,
+          "changeHandler": null
+        },
+        {
+          "name": "talent",
+          "sourceArray": null,
+          "changeHandler": null
+        },
+        {
+          "name": "study",
+          "sourceArray": null,
+          "changeHandler": null
+        },
+        {
+          "name": "spirti",
+          "sourceArray": null,
+          "changeHandler": null
+        },
+        {
+          "name": "denomination_id",
+          "sourceArray": "denomation",
+          "changeHandler": null
+        },
+        {
+          "name": "district_id",
+          "sourceArray": "districts",
+          "changeHandler": "getconstency($event);"
+        },
+        {
+          "name": "constituency_id",
+          "sourceArray": "constituency",
+          "changeHandler": "getmandals($event);"
+        },
+        {
+          "name": "mandal_id",
+          "sourceArray": "mandals",
+          "changeHandler": "gepanchayati($event);"
+        },
+        {
+          "name": "village_id",
+          "sourceArray": "panchayati",
+          "changeHandler": null
+        },
+        {
+          "name": "resdistricts",
+          "sourceArray": "districts",
+          "changeHandler": "getconstency($event);"
+        },
+        {
+          "name": "resconstituencyname",
+          "sourceArray": "constituency",
+          "changeHandler": "getmandals($event);"
+        },
+        {
+          "name": "resmandals",
+          "sourceArray": "mandals",
+          "changeHandler": "gepanchayati($event);"
+        },
+        {
+          "name": "respanchayati",
+          "sourceArray": "panchayati",
+          "changeHandler": null
+        },
+        {
+          "name": "pastor",
+          "sourceArray": "getstudentspastors",
+          "changeHandler": null
+        },
+        {
+          "name": "church",
+          "sourceArray": "getchurchstudentfilter",
+          "changeHandler": null
+        },
+        {
+          "name": "generaltype",
+          "sourceArray": null,
+          "changeHandler": null
+        },
+        {
+          "name": "wingtype",
+          "sourceArray": "wings",
+          "changeHandler": null
+        },
+        {
+          "name": "wingtypes",
+          "sourceArray": null,
+          "changeHandler": null
+        },
+        {
+          "name": "caste",
+          "sourceArray": null,
+          "changeHandler": null
+        },
+        {
+          "name": "denomation",
+          "sourceArray": "denomation",
+          "changeHandler": null
+        },
+        {
+          "name": "district_id",
+          "sourceArray": "districts",
+          "changeHandler": "getconstency($event);"
+        },
+        {
+          "name": "constituency_id",
+          "sourceArray": "constituency",
+          "changeHandler": "getmandals($event);"
+        },
+        {
+          "name": "mandal_id",
+          "sourceArray": "mandals",
+          "changeHandler": "gepanchayati($event);"
+        },
+        {
+          "name": "panchayat_id",
+          "sourceArray": "panchayati",
+          "changeHandler": null
+        },
+        {
+          "name": "pastor",
+          "sourceArray": "getministrypastors",
+          "changeHandler": null
+        },
+        {
+          "name": "gender",
+          "sourceArray": null,
+          "changeHandler": null
+        },
+        {
+          "name": "denomination_id",
+          "sourceArray": "denomation",
+          "changeHandler": null
+        },
+        {
+          "name": "designation",
+          "sourceArray": null,
+          "changeHandler": null
+        },
+        {
+          "name": "talent",
+          "sourceArray": null,
+          "changeHandler": null
+        },
+        {
+          "name": "education",
+          "sourceArray": null,
+          "changeHandler": null
+        },
+        {
+          "name": "district_id",
+          "sourceArray": "districts",
+          "changeHandler": "getconstency($event);"
+        },
+        {
+          "name": "constituency_id",
+          "sourceArray": "constituency",
+          "changeHandler": "getmandals($event);"
+        },
+        {
+          "name": "mandal_id",
+          "sourceArray": "mandals",
+          "changeHandler": "gepanchayati($event);"
+        },
+        {
+          "name": "panchayat_id",
+          "sourceArray": "panchayati",
+          "changeHandler": null
+        },
+        {
+          "name": "generaltype",
+          "sourceArray": null,
+          "changeHandler": "onsubward($event)"
+        },
+        {
+          "name": "wingtype",
+          "sourceArray": "wings",
+          "changeHandler": null
+        },
+        {
+          "name": "wingtypes",
+          "sourceArray": null,
+          "changeHandler": null
+        },
+        {
+          "name": "caste",
+          "sourceArray": null,
+          "changeHandler": null
+        },
+        {
+          "name": "god",
+          "sourceArray": null,
+          "changeHandler": null
+        },
+        {
+          "name": "denomination_id",
+          "sourceArray": "denomation",
+          "changeHandler": null
+        },
+        {
+          "name": "ministry_id",
+          "sourceArray": "ministryname",
+          "changeHandler": null
+        },
+        {
+          "name": "district_id",
+          "sourceArray": "districts",
+          "changeHandler": "getconstency($event);"
+        },
+        {
+          "name": "constituency_id",
+          "sourceArray": "constituency",
+          "changeHandler": "getmandals($event);"
+        },
+        {
+          "name": "mandal_id",
+          "sourceArray": "mandals",
+          "changeHandler": "gepanchayati($event);"
+        },
+        {
+          "name": "village_id",
+          "sourceArray": "panchayati",
+          "changeHandler": null
+        },
+        {
+          "name": "pastor_id",
+          "sourceArray": "getchurchpastors",
+          "changeHandler": null
+        },
+        {
+          "name": "believer_id",
+          "sourceArray": "bliversdata",
+          "changeHandler": null
+        },
+        {
+          "name": "service_name",
+          "sourceArray": "services",
+          "changeHandler": "addNew($event,serviceadding)"
+        },
+        {
+          "name": "ministry_id",
+          "sourceArray": "ministryname",
+          "changeHandler": null
+        },
+        {
+          "name": "districts",
+          "sourceArray": "districts",
+          "changeHandler": "getconstency($event);"
+        },
+        {
+          "name": "constituencyname",
+          "sourceArray": "constituency",
+          "changeHandler": "getmandals($event);"
+        },
+        {
+          "name": "mandals",
+          "sourceArray": "mandals",
+          "changeHandler": "gepanchayati($event);"
+        },
+        {
+          "name": "panchayati",
+          "sourceArray": "panchayati",
+          "changeHandler": null
+        },
+        {
+          "name": "pastor_id",
+          "sourceArray": "getorganizationpastors",
+          "changeHandler": null
+        },
+        {
+          "name": "denomation",
+          "sourceArray": "denomation",
+          "changeHandler": null
+        },
+        {
+          "name": "level",
+          "sourceArray": null,
+          "changeHandler": null
+        },
+        {
+          "name": "district_id",
+          "sourceArray": "districts",
+          "changeHandler": "getconstency($event);"
+        },
+        {
+          "name": "constituency_id",
+          "sourceArray": "constituency",
+          "changeHandler": "getmandals($event);"
+        },
+        {
+          "name": "mandal_id",
+          "sourceArray": "mandals",
+          "changeHandler": "gepanchayati($event);"
+        },
+        {
+          "name": "village_id",
+          "sourceArray": "panchayati",
+          "changeHandler": null
+        },
+        {
+          "name": "pastor_id",
+          "sourceArray": "getpastorassciationas",
+          "changeHandler": null
+        },
+        {
+          "name": "Type_of_payment",
+          "sourceArray": null,
+          "changeHandler": null
+        }
+      ],
+      "buttons": [
+        {
+          "action": "formshow(1);scroll()"
+        },
+        {
+          "action": "formshow(2);scroll();"
+        },
+        {
+          "action": "formshow(3);scroll()"
+        },
+        {
+          "action": "formshow(4);scroll()"
+        },
+        {
+          "action": "formshow(5);scroll()"
+        },
+        {
+          "action": "formshow(6);scroll()"
+        },
+        {
+          "action": "formshow(8);scroll()"
+        },
+        {
+          "action": "postbeliversignup()"
+        },
+        {
+          "action": "poststudentsignup()"
+        },
+        {
+          "action": "postministrysignup()"
+        },
+        {
+          "action": "postpastorsignup()"
+        },
+        {
+          "action": "postchurchregister()"
+        },
+        {
+          "action": "postindepedentorganisation()"
+        },
+        {
+          "action": "postpastorassociations()"
+        },
+        {
+          "action": "modalDismiss()"
+        },
+        {
+          "action": "addNewSubmit()"
+        }
+      ],
+      "fileUploads": [],
+      "issues": [
+        "Dropdown 'Type_of_payment': has NO *ngFor and NO <option> tags! (Empty dropdown)"
+      ]
+    },
+    {
+      "component": "supp-reg",
+      "forms": [
+        "supprtreg"
+      ],
+      "dropdowns": [
+        {
+          "name": "webtype",
+          "sourceArray": null,
+          "changeHandler": null
+        }
+      ],
+      "buttons": [],
+      "fileUploads": [],
+      "issues": [
+        "FormGroup 'supprtreg' used in HTML but not declared in TS!"
+      ]
+    }
+  ],
+  "mobileIssues": [
+    {
+      "page": "addinstitute",
+      "dropdowns": [
+        {
+          "name": "believer_id",
+          "sourceArray": "bliversdata",
+          "changeHandler": null
+        },
+        {
+          "name": "ministry_id",
+          "sourceArray": "ministryname",
+          "changeHandler": null
+        },
+        {
+          "name": "collegetype",
+          "sourceArray": null,
+          "changeHandler": null
+        },
+        {
+          "name": "ministry_id",
+          "sourceArray": "ministryname",
+          "changeHandler": null
+        },
+        {
+          "name": "district_id",
+          "sourceArray": "districts",
+          "changeHandler": "getconstency($event)"
+        },
+        {
+          "name": "constituency_id",
+          "sourceArray": "constituency",
+          "changeHandler": "getmandals($event)"
+        },
+        {
+          "name": "mandal_id",
+          "sourceArray": "mandals",
+          "changeHandler": "gepanchayati($event)"
+        },
+        {
+          "name": "village_id",
+          "sourceArray": "panchayati",
+          "changeHandler": null
+        },
+        {
+          "name": "pastor_id",
+          "sourceArray": "getpastorassciationas",
+          "changeHandler": null
+        }
+      ],
+      "buttons": [
+        {
+          "action": "gotohome()"
+        },
+        {
+          "action": "postinsututies()"
+        }
+      ],
+      "issues": [
+        "Mobile Dropdown 'pastor_id': source array 'getpastorassciationas' not declared in addinstitute.ts!"
+      ]
+    },
+    {
+      "page": "addmarriage",
+      "dropdowns": [
+        {
+          "name": "ministry_id",
+          "sourceArray": "ministryname",
+          "changeHandler": null
+        },
+        {
+          "name": "caste",
+          "sourceArray": null,
+          "changeHandler": null
+        },
+        {
+          "name": "gender",
+          "sourceArray": null,
+          "changeHandler": null
+        },
+        {
+          "name": "believer_id",
+          "sourceArray": "bliversdata",
+          "changeHandler": null
+        },
+        {
+          "name": "denomation_id",
+          "sourceArray": "denomation",
+          "changeHandler": null
+        },
+        {
+          "name": "ministry_id",
+          "sourceArray": "ministryname",
+          "changeHandler": null
+        },
+        {
+          "name": "spirti",
+          "sourceArray": null,
+          "changeHandler": null
+        },
+        {
+          "name": "districtname",
+          "sourceArray": "districts",
+          "changeHandler": "getconstency($event)"
+        },
+        {
+          "name": "constituencyname",
+          "sourceArray": "constituency",
+          "changeHandler": "getmandals($event)"
+        },
+        {
+          "name": "mandals",
+          "sourceArray": "mandals",
+          "changeHandler": "gepanchayati($event)"
+        },
+        {
+          "name": "village_name",
+          "sourceArray": "panchayati",
+          "changeHandler": null
+        },
+        {
+          "name": "pastor_id",
+          "sourceArray": "pastoras",
+          "changeHandler": null
+        }
+      ],
+      "buttons": [
+        {
+          "action": "gotohome()"
+        },
+        {
+          "action": "postmarriages()"
+        }
+      ],
+      "issues": [
+        "Mobile Dropdown 'pastor_id': source array 'pastoras' not declared in addmarriage.ts!"
+      ]
+    },
+    {
+      "page": "believer",
+      "dropdowns": [
+        {
+          "name": "gender",
+          "sourceArray": null,
+          "changeHandler": null
+        },
+        {
+          "name": "spirit",
+          "sourceArray": null,
+          "changeHandler": null
+        },
+        {
+          "name": "god",
+          "sourceArray": null,
+          "changeHandler": null
+        },
+        {
+          "name": "hobbies",
+          "sourceArray": null,
+          "changeHandler": null
+        },
+        {
+          "name": "status",
+          "sourceArray": null,
+          "changeHandler": null
+        },
+        {
+          "name": "denomination_id",
+          "sourceArray": "denomation",
+          "changeHandler": null
+        },
+        {
+          "name": "talent",
+          "sourceArray": null,
+          "changeHandler": null
+        },
+        {
+          "name": "education",
+          "sourceArray": null,
+          "changeHandler": null
+        },
+        {
+          "name": "designation",
+          "sourceArray": null,
+          "changeHandler": null
+        },
+        {
+          "name": "dpartment",
+          "sourceArray": null,
+          "changeHandler": null
+        },
+        {
+          "name": "districts",
+          "sourceArray": "districts",
+          "changeHandler": "getconstency($event)"
+        },
+        {
+          "name": "constituencyname",
+          "sourceArray": "constituency",
+          "changeHandler": "getmandals($event)"
+        },
+        {
+          "name": "mandals",
+          "sourceArray": "mandals",
+          "changeHandler": "gepanchayati($event);"
+        },
+        {
+          "name": "panchayati",
+          "sourceArray": "panchayati",
+          "changeHandler": null
+        },
+        {
+          "name": "nri",
+          "sourceArray": null,
+          "changeHandler": null
+        },
+        {
+          "name": "pastor",
+          "sourceArray": "getpastorsdatas",
+          "changeHandler": "getpastorsdata()"
+        },
+        {
+          "name": "church",
+          "sourceArray": "getchurchfilter",
+          "changeHandler": "getchurchesdata()"
+        },
+        {
+          "name": "generaltype",
+          "sourceArray": null,
+          "changeHandler": null
+        },
+        {
+          "name": "wingtype",
+          "sourceArray": "wings",
+          "changeHandler": null
+        },
+        {
+          "name": "caste",
+          "sourceArray": null,
+          "changeHandler": null
+        }
+      ],
+      "buttons": [
+        {
+          "action": "gotohome()"
+        },
+        {
+          "action": "postbeliversignup()"
+        }
+      ],
+      "issues": [
+        "Mobile Dropdown 'church': source array 'getchurchfilter' not declared in believer.ts!",
+        "Mobile Dropdown 'church': change handler 'getchurchesdata' not defined in believer.ts!",
+        "Mobile Dropdown 'wingtype': source array 'wings' is NEVER populated/assigned in believer.ts!"
+      ]
+    },
+    {
+      "page": "institute",
+      "dropdowns": [
+        {
+          "name": "denomination_id",
+          "sourceArray": "denomation",
+          "changeHandler": null
+        },
+        {
+          "name": "ministry_id",
+          "sourceArray": "ministryname",
+          "changeHandler": null
+        },
+        {
+          "name": "course_offered",
+          "sourceArray": "institutesdata",
+          "changeHandler": null
+        },
+        {
+          "name": "college_type",
+          "sourceArray": "institutesdata",
+          "changeHandler": null
+        },
+        {
+          "name": "district_id",
+          "sourceArray": "districts",
+          "changeHandler": "getconstituency($event)"
+        },
+        {
+          "name": "constenncy_id",
+          "sourceArray": "constituency",
+          "changeHandler": "getmandals($event)"
+        },
+        {
+          "name": "mandal_id",
+          "sourceArray": "mandals",
+          "changeHandler": "getpanchayati($event)"
+        },
+        {
+          "name": "panchayati_id",
+          "sourceArray": "panchayati",
+          "changeHandler": null
+        }
+      ],
+      "buttons": [
+        {
+          "action": "gotohome()"
+        },
+        {
+          "action": "toggleDisplayDiv()"
+        }
+      ],
+      "issues": [
+        "Mobile Button click handler 'toggleDisplayDiv' not implemented in institute.ts!"
+      ]
+    },
+    {
+      "page": "organisation",
+      "dropdowns": [
+        {
+          "name": "believer_id",
+          "sourceArray": "bliversdata",
+          "changeHandler": null
+        },
+        {
+          "name": "service_name",
+          "sourceArray": "services",
+          "changeHandler": null
+        },
+        {
+          "name": "ministry_id",
+          "sourceArray": "ministryname",
+          "changeHandler": null
+        },
+        {
+          "name": "districts",
+          "sourceArray": "districts",
+          "changeHandler": "getconstency($event)"
+        },
+        {
+          "name": "constituencyname",
+          "sourceArray": "constituency",
+          "changeHandler": "getmandals($event)"
+        },
+        {
+          "name": "mandals",
+          "sourceArray": "mandals",
+          "changeHandler": "gepanchayati($event)"
+        },
+        {
+          "name": "panchayati",
+          "sourceArray": "panchayati",
+          "changeHandler": null
+        },
+        {
+          "name": "pastor_id",
+          "sourceArray": "getorganizationpastors",
+          "changeHandler": null
+        },
+        {
+          "name": "denomation",
+          "sourceArray": "denomation",
+          "changeHandler": null
+        }
+      ],
+      "buttons": [
+        {
+          "action": "gotohome()"
+        },
+        {
+          "action": "postindepedentorganisation()"
+        }
+      ],
+      "issues": [
+        "Mobile Dropdown 'pastor_id': source array 'getorganizationpastors' not declared in organisation.ts!"
+      ]
+    },
+    {
+      "page": "profile",
+      "dropdowns": [
+        {
+          "name": "gender",
+          "sourceArray": null,
+          "changeHandler": null
+        },
+        {
+          "name": "spirti",
+          "sourceArray": null,
+          "changeHandler": null
+        },
+        {
+          "name": "god",
+          "sourceArray": null,
+          "changeHandler": null
+        },
+        {
+          "name": "talent",
+          "sourceArray": null,
+          "changeHandler": null
+        },
+        {
+          "name": "hobbies",
+          "sourceArray": null,
+          "changeHandler": null
+        },
+        {
+          "name": "status",
+          "sourceArray": null,
+          "changeHandler": null
+        },
+        {
+          "name": "denomination_id",
+          "sourceArray": "denomation",
+          "changeHandler": null
+        },
+        {
+          "name": "education",
+          "sourceArray": null,
+          "changeHandler": null
+        },
+        {
+          "name": "designation",
+          "sourceArray": null,
+          "changeHandler": null
+        },
+        {
+          "name": "dpartment",
+          "sourceArray": null,
+          "changeHandler": null
+        },
+        {
+          "name": "districts",
+          "sourceArray": "districts",
+          "changeHandler": "getconstency($event)"
+        },
+        {
+          "name": "constituencyname",
+          "sourceArray": "constituency",
+          "changeHandler": "getmandals($event)"
+        },
+        {
+          "name": "mandals",
+          "sourceArray": "mandals",
+          "changeHandler": "gepanchayati($event);"
+        },
+        {
+          "name": "panchayati",
+          "sourceArray": "panchayati",
+          "changeHandler": null
+        },
+        {
+          "name": "nri",
+          "sourceArray": null,
+          "changeHandler": null
+        },
+        {
+          "name": "pastor",
+          "sourceArray": "getpastorsdatas",
+          "changeHandler": "getpastorsdata()"
+        },
+        {
+          "name": "church",
+          "sourceArray": "getchurchfilter",
+          "changeHandler": "getchurchesdata()"
+        },
+        {
+          "name": "generaltype",
+          "sourceArray": null,
+          "changeHandler": null
+        },
+        {
+          "name": "wingtype",
+          "sourceArray": "wings",
+          "changeHandler": null
+        },
+        {
+          "name": "caste",
+          "sourceArray": null,
+          "changeHandler": null
+        },
+        {
+          "name": "gender",
+          "sourceArray": null,
+          "changeHandler": null
+        },
+        {
+          "name": "god",
+          "sourceArray": null,
+          "changeHandler": null
+        },
+        {
+          "name": "hobbies",
+          "sourceArray": null,
+          "changeHandler": null
+        },
+        {
+          "name": "talent",
+          "sourceArray": null,
+          "changeHandler": null
+        },
+        {
+          "name": "study",
+          "sourceArray": null,
+          "changeHandler": null
+        },
+        {
+          "name": "spirti",
+          "sourceArray": null,
+          "changeHandler": null
+        },
+        {
+          "name": "denomination_id",
+          "sourceArray": "denomation",
+          "changeHandler": null
+        },
+        {
+          "name": "district_id",
+          "sourceArray": "districts",
+          "changeHandler": "getconstency($event);"
+        },
+        {
+          "name": "constituency_id",
+          "sourceArray": "constituency",
+          "changeHandler": "getmandals($event);"
+        },
+        {
+          "name": "mandal_id",
+          "sourceArray": "mandals",
+          "changeHandler": "gepanchayati($event);"
+        },
+        {
+          "name": "village_id",
+          "sourceArray": "panchayati",
+          "changeHandler": null
+        },
+        {
+          "name": "resdistricts",
+          "sourceArray": "districts",
+          "changeHandler": "getconstency($event)"
+        },
+        {
+          "name": "resconstituencyname",
+          "sourceArray": "constituency",
+          "changeHandler": "getmandals($event)"
+        },
+        {
+          "name": "resmandals",
+          "sourceArray": "mandals",
+          "changeHandler": "gepanchayati($event)"
+        },
+        {
+          "name": "respanchayati",
+          "sourceArray": "panchayati",
+          "changeHandler": null
+        },
+        {
+          "name": "pastor",
+          "sourceArray": "getstudentspastors",
+          "changeHandler": "getpastorssdata()"
+        },
+        {
+          "name": "church",
+          "sourceArray": "getchurchstudentfilter",
+          "changeHandler": "getchurchesstudentdata()"
+        },
+        {
+          "name": "generaltype",
+          "sourceArray": null,
+          "changeHandler": null
+        },
+        {
+          "name": "wingtype",
+          "sourceArray": "wings",
+          "changeHandler": null
+        },
+        {
+          "name": "caste",
+          "sourceArray": null,
+          "changeHandler": null
+        },
+        {
+          "name": "denomation_id",
+          "sourceArray": "denomation",
+          "changeHandler": null
+        },
+        {
+          "name": "district_id",
+          "sourceArray": "districts",
+          "changeHandler": "getconstency($event);"
+        },
+        {
+          "name": "constituency_id",
+          "sourceArray": "constituency",
+          "changeHandler": "getmandals($event);"
+        },
+        {
+          "name": "mandal_id",
+          "sourceArray": "mandals",
+          "changeHandler": "gepanchayati($event);"
+        },
+        {
+          "name": "panchayat_id",
+          "sourceArray": "panchayati",
+          "changeHandler": null
+        },
+        {
+          "name": "pastor",
+          "sourceArray": "getministrypastors",
+          "changeHandler": null
+        },
+        {
+          "name": "gender",
+          "sourceArray": null,
+          "changeHandler": null
+        },
+        {
+          "name": "denomination_id",
+          "sourceArray": "denomation",
+          "changeHandler": null
+        },
+        {
+          "name": "designation",
+          "sourceArray": null,
+          "changeHandler": null
+        },
+        {
+          "name": "talent",
+          "sourceArray": null,
+          "changeHandler": null
+        },
+        {
+          "name": "education",
+          "sourceArray": null,
+          "changeHandler": null
+        },
+        {
+          "name": "district_id",
+          "sourceArray": "districts",
+          "changeHandler": "getconstency($event)"
+        },
+        {
+          "name": "constituency_id",
+          "sourceArray": "constituency",
+          "changeHandler": "getmandals($event)"
+        },
+        {
+          "name": "mandal_id",
+          "sourceArray": "mandals",
+          "changeHandler": "gepanchayati($event)"
+        },
+        {
+          "name": "panchayat_id",
+          "sourceArray": "panchayati",
+          "changeHandler": null
+        },
+        {
+          "name": "generaltype",
+          "sourceArray": null,
+          "changeHandler": "onsubward($event)"
+        },
+        {
+          "name": "wingtype",
+          "sourceArray": null,
+          "changeHandler": null
+        },
+        {
+          "name": "wingtypes",
+          "sourceArray": null,
+          "changeHandler": null
+        },
+        {
+          "name": "caste",
+          "sourceArray": null,
+          "changeHandler": null
+        },
+        {
+          "name": "god",
+          "sourceArray": null,
+          "changeHandler": null
+        },
+        {
+          "name": "denomination_id",
+          "sourceArray": "denomation",
+          "changeHandler": null
+        },
+        {
+          "name": "ministry_id",
+          "sourceArray": "ministryname",
+          "changeHandler": null
+        },
+        {
+          "name": "district_id",
+          "sourceArray": "districts",
+          "changeHandler": "getconstency($event)"
+        },
+        {
+          "name": "constituency_id",
+          "sourceArray": "constituency",
+          "changeHandler": "getmandals($event)"
+        },
+        {
+          "name": "mandal_id",
+          "sourceArray": "mandals",
+          "changeHandler": "gepanchayati($event)"
+        },
+        {
+          "name": "village_id",
+          "sourceArray": "panchayati",
+          "changeHandler": null
+        },
+        {
+          "name": "pastor_id",
+          "sourceArray": "getchurchpastors",
+          "changeHandler": null
+        },
+        {
+          "name": "believer_id",
+          "sourceArray": "bliversdata",
+          "changeHandler": null
+        },
+        {
+          "name": "service_name",
+          "sourceArray": "services",
+          "changeHandler": null
+        },
+        {
+          "name": "ministry_id",
+          "sourceArray": "ministryname",
+          "changeHandler": null
+        },
+        {
+          "name": "districts",
+          "sourceArray": "districts",
+          "changeHandler": "getconstency($event)"
+        },
+        {
+          "name": "constituencyname",
+          "sourceArray": "constituency",
+          "changeHandler": "getmandals($event)"
+        },
+        {
+          "name": "mandals",
+          "sourceArray": "mandals",
+          "changeHandler": "gepanchayati($event)"
+        },
+        {
+          "name": "panchayati",
+          "sourceArray": "panchayati",
+          "changeHandler": null
+        },
+        {
+          "name": "pastor_id",
+          "sourceArray": "getorganizationpastors",
+          "changeHandler": null
+        },
+        {
+          "name": "denomation",
+          "sourceArray": "denomation",
+          "changeHandler": null
+        },
+        {
+          "name": "level",
+          "sourceArray": null,
+          "changeHandler": null
+        },
+        {
+          "name": "district_id",
+          "sourceArray": "districts",
+          "changeHandler": "getconstency($event)"
+        },
+        {
+          "name": "constituency_id",
+          "sourceArray": "constituency",
+          "changeHandler": "getmandals($event)"
+        },
+        {
+          "name": "mandal_id",
+          "sourceArray": "mandals",
+          "changeHandler": "gepanchayati($event)"
+        },
+        {
+          "name": "village_id",
+          "sourceArray": "panchayati",
+          "changeHandler": null
+        },
+        {
+          "name": "pastor_id",
+          "sourceArray": "getpastorassciationas",
+          "changeHandler": null
+        }
+      ],
+      "buttons": [
+        {
+          "action": "gotohome()"
+        },
+        {
+          "action": "editbeliver()"
+        },
+        {
+          "action": "editstudent()"
+        },
+        {
+          "action": "postministryupdate()"
+        },
+        {
+          "action": "editpastor()"
+        },
+        {
+          "action": "editchurch()"
+        },
+        {
+          "action": "editindependentorgainsation()"
+        },
+        {
+          "action": "editassciation()"
+        }
+      ],
+      "issues": [
+        "Mobile Dropdown 'pastor': source array 'getpastorsdatas' not declared in profile.ts!",
+        "Mobile Dropdown 'pastor': change handler 'getpastorsdata' not defined in profile.ts!",
+        "Mobile Dropdown 'church': source array 'getchurchfilter' not declared in profile.ts!",
+        "Mobile Dropdown 'church': change handler 'getchurchesdata' not defined in profile.ts!",
+        "Mobile Dropdown 'pastor': source array 'getstudentspastors' not declared in profile.ts!",
+        "Mobile Dropdown 'pastor': change handler 'getpastorssdata' not defined in profile.ts!",
+        "Mobile Dropdown 'church': source array 'getchurchstudentfilter' not declared in profile.ts!",
+        "Mobile Dropdown 'church': change handler 'getchurchesstudentdata' not defined in profile.ts!",
+        "Mobile Dropdown 'pastor': source array 'getministrypastors' not declared in profile.ts!",
+        "Mobile Dropdown 'ministry_id': source array 'ministryname' is NEVER populated/assigned in profile.ts!",
+        "Mobile Dropdown 'pastor_id': source array 'getchurchpastors' not declared in profile.ts!",
+        "Mobile Dropdown 'ministry_id': source array 'ministryname' is NEVER populated/assigned in profile.ts!",
+        "Mobile Dropdown 'pastor_id': source array 'getorganizationpastors' not declared in profile.ts!",
+        "Mobile Dropdown 'pastor_id': source array 'getpastorassciationas' not declared in profile.ts!"
+      ]
+    },
+    {
+      "page": "searchhouse",
+      "dropdowns": [
+        {
+          "name": "type",
+          "sourceArray": null,
+          "changeHandler": "searchchange($event)"
+        },
+        {
+          "name": "denomation",
+          "sourceArray": "denomation",
+          "changeHandler": "searchdenomationdata($event)"
+        },
+        {
+          "name": "title",
+          "sourceArray": null,
+          "changeHandler": "searchspeak($event)"
+        },
+        {
+          "name": "ministry_id",
+          "sourceArray": "ministryname",
+          "changeHandler": "ministry($event)"
+        },
+        {
+          "name": "district_id",
+          "sourceArray": "districts",
+          "changeHandler": "getconstency($event)"
+        },
+        {
+          "name": "constenncy_id",
+          "sourceArray": "constituency",
+          "changeHandler": "getmandals($event)"
+        },
+        {
+          "name": "mandal_id",
+          "sourceArray": "mandals",
+          "changeHandler": "gepanchayati($event)"
+        },
+        {
+          "name": "panchayati_id",
+          "sourceArray": "panchayati",
+          "changeHandler": null
+        }
+      ],
+      "buttons": [
+        {
+          "action": "gotohome()"
+        },
+        {
+          "action": "search()"
+        },
+        {
+          "action": "callNumber('+91' + item.number)"
+        },
+        {
+          "action": "item.showMore = !item.showMore"
+        },
+        {
+          "action": "item.showMore = !item.showMore"
+        }
+      ],
+      "issues": [
+        "Mobile Button click handler 'callNumber' not implemented in searchhouse.ts!"
+      ]
+    }
+  ]
+}

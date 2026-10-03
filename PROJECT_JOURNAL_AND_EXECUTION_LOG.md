@@ -423,5 +423,56 @@ However, in the mobile application (`jbac_app`), when users registered, logged i
    - Committed and pushed changes to `https://github.com/dr-mjoseph/jbac_app.git` on `main`.
    - Pulled and verified consistency in both local directories: `C:\Users\rajes\StudioProjects\jbac_app` and `C:\Users\rajes\StudioProjects\jbac_app1`.
 
+---
 
+## 15. Full-Stack Automated Testing & Comprehensive Audit of Web, Mobile, and Backend API Ecosystem (October 3, 2026)
 
+### Context & Objectives
+The user observed issues across both web and mobile applications:
+- Certain features and buttons not functioning or throwing errors.
+- Several dropdown lists showing empty data or not appearing.
+- Field validation and upload discrepancies across registration, update, and search flows.
+
+The objective was to write automated test scripts covering every button, feature, form, login, registration, file upload, input field, dropdown list, and clickable across web and mobile, execute the automated test run, deliver a diagnosis report, and document all findings.
+
+### Automated Testing Architecture & Test Engines Created
+1. **API & Database Validation Engine ([`scripts/extract_and_test_all_endpoints.js`](scripts/extract_and_test_all_endpoints.js))**:
+   - Automatically parsed all REST calls from [`src/app/jesus/service.service.ts`](src/app/jesus/service.service.ts) and mobile [`src/providers/service/service.ts`](../jbac_app/src/providers/service/service.ts).
+   - Executed live HTTP calls against AWS API Gateway & RDS MySQL for all 111 unique endpoints.
+   - Generated [`scripts/endpoint_test_report.json`](scripts/endpoint_test_report.json).
+2. **Static AST & Template Integrity Auditor ([`scripts/audit_all_components_and_templates.js`](scripts/audit_all_components_and_templates.js))**:
+   - Inspected all 60 Angular web components and 50 Ionic mobile pages.
+   - Evaluated FormGroups, `formControlName` bindings, `<select>` / `<ion-select>` arrays, button `(click)` handlers, and `<input type="file">` listeners.
+   - Generated [`scripts/static_audit_issues.json`](scripts/static_audit_issues.json).
+3. **Headless Chrome Browser Automation Runner ([`scripts/full_e2e_automation_test.js`](scripts/full_e2e_automation_test.js))**:
+   - Booted local SPA server for web distribution (`dist/churchwebsite` on port 4200) and mobile app distribution (`www` on port 8100).
+   - Orchestrated headless Chrome via `puppeteer-core` crawling all 57 web routes and mobile viewports.
+   - Evaluated DOM dropdown options, buttons, inputs, file uploads, console errors, and network failures.
+   - Generated [`scripts/full_automation_test_report.json`](scripts/full_automation_test_report.json).
+
+### Summary of Discovered Deficiencies & Root Causes
+
+#### 1. Empty Dropdown Listings
+- **Meeting Categories Filter Returns 0 Items**: `getyouth`, `getrevival`, `getwomen`, `getpastormeeting`, `getchildern`, `getmusical` query English keywords (`%youth%`, `%revival%`), whereas database event titles and descriptions are in Telugu (`యూత్`, `ఉజ్జీవ`, `మహిళ`, `పాస్టర్`, `పిల్లల`, `సంగీత`).
+- **Believer Registration Wing Dropdown**: `believerregister.component.ts` (web) and `believer.ts` (mobile) declare `wings: any;` but never invoke `this.service.getwing()`, leaving the dropdown unpopulated.
+- **Church & Pastor Search Village Dropdown**: `church-pastor-search.component.ts` `onMandalChange()` omits calling `this.service.gepanchayatis(id)`, leaving `this.panchayati` empty.
+- **Mobile Dropdown Variables Missing**: In `addinstitute.ts` (`getpastorassciationas`), `addmarriage.ts` (`pastoras`), `organisation.ts` (`getorganizationpastors`), and `believer.ts` (`getchurchfilter`), the bound array variables are undeclared in the TypeScript controller.
+
+#### 2. Angular Reactive Form Crashes (`Cannot find control: 'term'`)
+- Across 9 forms (`signup`, `ministryregister`, `churchregister`, `pastorregister`, `studentregister`, `pastorassociationregister`, `organisationregister`, `namodu`, `entry`), the template specifies `<input formControlName="term">`, while `term: ['', ...]` was commented out in the component's `FormBuilder.group`. This triggers Angular runtime exceptions and halts change detection.
+
+#### 3. Backend Endpoint Errors (404 and 500)
+- `viewconstituencyname` (500 Error): Queries non-existent table `const_lst_t` instead of `const_dtl_t`.
+- Mobile Auth & Service Endpoints (404 Not Found): `checknumberpassword` (mobile forgot password), `upadtedpassword` (password update), `getcount` / `updatecount` (visitor counter), `getUserMainData` (wing leader profile), and `postinfo` (info submission).
+- `postjobs` (500 Error): Foreign key constraint fails when `constituency_id` is an empty string `""` instead of `null`.
+- `postwebsitesignup` (500 Error): `Column 'email' cannot be null` in MySQL strict mode when user omits optional email.
+
+#### 4. Broken Buttons & Upload Listeners
+- `josephview.component.html`: Modal close button calls `(click)="proofmodalDismis()"`, which is unimplemented in `josephview.component.ts`.
+- `profile.component.html`: Line 1118 file upload input `<input type="file" formControlName="image">` lacks a `(change)` event listener, preventing file capture.
+- Mobile `searchhouse.html`: Phone dial button calls `(click)="callNumber(...)"`, which is unimplemented in `searchhouse.ts`.
+- Mobile `institute.html`: Toggle link calls `(click)="toggleDisplayDiv()"`, which is unimplemented in `institute.ts`.
+- Mobile `believer.ts`: `getpastorsdata()` accesses `this.beliverform.value` instead of `this.form.value`, throwing a fatal runtime TypeError.
+
+### Documentation & Report Artifacts
+- Full detailed artifact generated at: [`comprehensive_test_automation_report.md`](file:///C:/Users/rajes/.gemini/antigravity-ide/brain/0f3bab5b-6c7d-4e2f-833e-50beebba4953/comprehensive_test_automation_report.md).

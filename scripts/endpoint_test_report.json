@@ -1,0 +1,1001 @@
+[
+  {
+    "endpoint": "Searchinstitute",
+    "status": 200,
+    "isArray": true,
+    "itemCount": 18,
+    "rawLength": 8534,
+    "sample": "{\"status\":200,\"data\":[{\"id\":18,\"cts\":\"2026-09-11 00:50:25\",\"institutename\":\"Bethel\",\"location\":null,\"address\":null,\"district_id\":5,\"constituency_id\":2",
+    "error": false
+  },
+  {
+    "endpoint": "Searchmarriages",
+    "status": 200,
+    "isArray": true,
+    "itemCount": 0,
+    "rawLength": 24,
+    "sample": "{\"status\":200,\"data\":[]}",
+    "error": false
+  },
+  {
+    "endpoint": "addNew",
+    "status": 200,
+    "isArray": false,
+    "itemCount": 0,
+    "rawLength": 62,
+    "sample": "{\"status\":300,\"message\":\"Please provide a valid service name\"}",
+    "error": false
+  },
+  {
+    "endpoint": "checknumber",
+    "status": 200,
+    "isArray": false,
+    "itemCount": 0,
+    "rawLength": 54,
+    "sample": "{\"status\":404,\"message\":\"Phone number not registered\"}",
+    "error": true
+  },
+  {
+    "endpoint": "checknumberpassword",
+    "status": 404,
+    "isArray": false,
+    "itemCount": 0,
+    "rawLength": 172,
+    "sample": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n<meta charset=\"utf-8\">\n<title>Error</title>\n</head>\n<body>\n<pre>Cannot POST /dashboardapi/checknumberpassword<",
+    "error": true
+  },
+  {
+    "endpoint": "checkotp",
+    "status": 200,
+    "isArray": false,
+    "itemCount": 0,
+    "rawLength": 52,
+    "sample": "{\"status\":200,\"message\":\"OTP verified successfully\"}",
+    "error": false
+  },
+  {
+    "endpoint": "contact",
+    "status": 200,
+    "isArray": false,
+    "itemCount": 0,
+    "rawLength": 69,
+    "sample": "{\"status\":200,\"message\":\"Thank you! Your message has been received.\"}",
+    "error": false
+  },
+  {
+    "endpoint": "createfrgetpassword",
+    "status": 200,
+    "isArray": false,
+    "itemCount": 0,
+    "rawLength": 56,
+    "sample": "{\"status\":200,\"message\":\"Password updated successfully\"}",
+    "error": false
+  },
+  {
+    "endpoint": "deleteboardmember",
+    "status": 200,
+    "isArray": false,
+    "itemCount": 0,
+    "rawLength": 60,
+    "sample": "{\"status\":200,\"message\":\"Board member removed successfully\"}",
+    "error": false
+  },
+  {
+    "endpoint": "denomations",
+    "status": 200,
+    "isArray": true,
+    "itemCount": 18,
+    "rawLength": 2124,
+    "sample": "{\"status\":200,\"data\":[{\"id\":1,\"denomation_name\":\"అసెంబ్లీ ఆఫ్ గాడ్-Assembly of God\",\"denomination_name\":\"అసెంబ్లీ ఆఫ్ గాడ్-Assembly of God\",\"d_in\":0},",
+    "error": false
+  },
+  {
+    "endpoint": "editbeliver",
+    "status": 200,
+    "isArray": false,
+    "itemCount": 0,
+    "rawLength": 55,
+    "sample": "{\"status\":200,\"message\":\"Profile updated successfully\"}",
+    "error": false
+  },
+  {
+    "endpoint": "editchurch",
+    "status": 200,
+    "isArray": false,
+    "itemCount": 0,
+    "rawLength": 55,
+    "sample": "{\"status\":200,\"message\":\"Profile updated successfully\"}",
+    "error": false
+  },
+  {
+    "endpoint": "editindependentorgainsation",
+    "status": 200,
+    "isArray": false,
+    "itemCount": 0,
+    "rawLength": 55,
+    "sample": "{\"status\":200,\"message\":\"Profile updated successfully\"}",
+    "error": false
+  },
+  {
+    "endpoint": "editministry",
+    "status": 200,
+    "isArray": false,
+    "itemCount": 0,
+    "rawLength": 55,
+    "sample": "{\"status\":200,\"message\":\"Profile updated successfully\"}",
+    "error": false
+  },
+  {
+    "endpoint": "editpastor",
+    "status": 200,
+    "isArray": false,
+    "itemCount": 0,
+    "rawLength": 55,
+    "sample": "{\"status\":200,\"message\":\"Profile updated successfully\"}",
+    "error": false
+  },
+  {
+    "endpoint": "editpastororgainsation",
+    "status": 200,
+    "isArray": false,
+    "itemCount": 0,
+    "rawLength": 55,
+    "sample": "{\"status\":200,\"message\":\"Profile updated successfully\"}",
+    "error": false
+  },
+  {
+    "endpoint": "editstudent",
+    "status": 200,
+    "isArray": false,
+    "itemCount": 0,
+    "rawLength": 55,
+    "sample": "{\"status\":200,\"message\":\"Profile updated successfully\"}",
+    "error": false
+  },
+  {
+    "endpoint": "educationalq",
+    "status": 200,
+    "isArray": true,
+    "itemCount": 11,
+    "rawLength": 1322,
+    "sample": "{\"status\":200,\"data\":[{\"id\":1,\"name\":\"చదువుకోలేదు\",\"qualification_name\":\"చదువుకోలేదు\",\"qualification\":\"చదువుకోలేదు\",\"d_in\":0},{\"id\":2,\"name\":\"1వ తరగతి",
+    "error": false
+  },
+  {
+    "endpoint": "gepanchayati",
+    "status": 200,
+    "isArray": true,
+    "itemCount": 17244,
+    "rawLength": 2643124,
+    "sample": "{\"status\":200,\"data\":[{\"id\":12273,\"pnchyt_nm\":\"102.ఈ.రామిరెడ్డిగారిపల్లె -102.E.RAMIREDDYGARIPALLE\",\"panchayatname\":\"102.ఈ.రామిరెడ్డిగారిపల్లె -102.E.",
+    "error": false
+  },
+  {
+    "endpoint": "getLeaderswebsiteData",
+    "status": 200,
+    "isArray": true,
+    "itemCount": 23,
+    "rawLength": 1848,
+    "sample": "{\"status\":200,\"data\":[{\"id\":1,\"i_ts\":\"2023-05-23 06:48:06\",\"position\":\"స్టూడెంట్ వింగ్\",\"d_in\":0},{\"id\":2,\"i_ts\":\"2023-05-23 06:54:16\",\"position\":\"బ్య",
+    "error": false
+  },
+  {
+    "endpoint": "getLeaderswebsitewing",
+    "status": 200,
+    "isArray": true,
+    "itemCount": 23,
+    "rawLength": 1848,
+    "sample": "{\"status\":200,\"data\":[{\"id\":1,\"i_ts\":\"2023-05-23 06:48:06\",\"position\":\"స్టూడెంట్ వింగ్\",\"d_in\":0},{\"id\":2,\"i_ts\":\"2023-05-23 06:54:16\",\"position\":\"బ్య",
+    "error": false
+  },
+  {
+    "endpoint": "getUserMainData",
+    "status": 404,
+    "isArray": false,
+    "itemCount": 0,
+    "rawLength": 168,
+    "sample": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n<meta charset=\"utf-8\">\n<title>Error</title>\n</head>\n<body>\n<pre>Cannot POST /dashboardapi/getUserMainData</pre",
+    "error": true
+  },
+  {
+    "endpoint": "getUserMainData/",
+    "status": 404,
+    "isArray": false,
+    "itemCount": 0,
+    "rawLength": 169,
+    "sample": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n<meta charset=\"utf-8\">\n<title>Error</title>\n</head>\n<body>\n<pre>Cannot POST /dashboardapi/getUserMainData/</pr",
+    "error": true
+  },
+  {
+    "endpoint": "getaboutwebsite",
+    "status": 200,
+    "isArray": true,
+    "itemCount": 1,
+    "rawLength": 8403,
+    "sample": "{\"status\":200,\"data\":[{\"id\":7,\"title\":\"ప్రొఫెసర్ డాక్టర్ జోసెఫ్ పి.మోసిగంటి\",\"name\":\"ప్రొఫెసర్ డాక్టర్ జోసెఫ్ పి.మోసిగంటి\",\"para1\":\"ప్రొఫెసర్ డాక్టర్ ",
+    "error": false
+  },
+  {
+    "endpoint": "getaddsdata",
+    "status": 200,
+    "isArray": true,
+    "itemCount": 20,
+    "rawLength": 346451,
+    "sample": "{\"status\":200,\"data\":[{\"id\":33,\"cts\":null,\"type\":\"Meetings\",\"title\":\"adgfdh\",\"description\":\"evening 6pm\",\"image\":\"data:image/jpeg;base64,/9j/4AAQSkZJR",
+    "error": false
+  },
+  {
+    "endpoint": "getadocumentsdataa",
+    "status": 200,
+    "isArray": true,
+    "itemCount": 2,
+    "rawLength": 279,
+    "sample": "{\"status\":200,\"data\":[{\"id\":2,\"cts\":null,\"title\":\"జోసెఫ్ గారి JPG ఇమేజ్ కొరకు\",\"document\":\"https://jbac.in/websiteimages/3054981759254071463.jpg\",\"d_i",
+    "error": false
+  },
+  {
+    "endpoint": "getatt",
+    "status": 200,
+    "isArray": true,
+    "itemCount": 0,
+    "rawLength": 24,
+    "sample": "{\"status\":200,\"data\":[]}",
+    "error": false
+  },
+  {
+    "endpoint": "getbelivers",
+    "status": 200,
+    "isArray": true,
+    "itemCount": 183,
+    "rawLength": 38348,
+    "sample": "{\"status\":200,\"data\":[{\"id\":211,\"fname\":\"justy immanuel\",\"lname\":null,\"name\":\"justy immanuel \",\"mobile_number\":\"9281506386\",\"email\":null,\"district_id\"",
+    "error": false
+  },
+  {
+    "endpoint": "getbeliversdata",
+    "status": 200,
+    "isArray": true,
+    "itemCount": 183,
+    "rawLength": 38348,
+    "sample": "{\"status\":200,\"data\":[{\"id\":211,\"fname\":\"justy immanuel\",\"lname\":null,\"name\":\"justy immanuel \",\"mobile_number\":\"9281506386\",\"email\":null,\"district_id\"",
+    "error": false
+  },
+  {
+    "endpoint": "getbusiness",
+    "status": 200,
+    "isArray": true,
+    "itemCount": 1,
+    "rawLength": 320,
+    "sample": "{\"status\":200,\"data\":[{\"id\":1,\"cts\":\"2024-05-23 10:47:56\",\"type\":\"Sales\",\"title\":\"2bhk\",\"description\":\"teste\",\"number\":\"3636345646\",\"usr_id\":\"2\",\"usr_",
+    "error": false
+  },
+  {
+    "endpoint": "getcatewebsitegallery",
+    "status": 200,
+    "isArray": true,
+    "itemCount": 27,
+    "rawLength": 5267,
+    "sample": "{\"status\":200,\"data\":[{\"id\":27,\"cts\":null,\"category_id\":9,\"categoryname\":\"with bureaucrats\",\"image\":\"https://jbac.in/websiteimages/5779571711217318289",
+    "error": false
+  },
+  {
+    "endpoint": "getchildern",
+    "status": 200,
+    "isArray": true,
+    "itemCount": 0,
+    "rawLength": 24,
+    "sample": "{\"status\":200,\"data\":[]}",
+    "error": false
+  },
+  {
+    "endpoint": "getchurch",
+    "status": 200,
+    "isArray": true,
+    "itemCount": 16,
+    "rawLength": 3760,
+    "sample": "{\"status\":200,\"data\":[{\"id\":17,\"church_name\":\"Test description\",\"day\":\"Sunday\",\"starttime\":\"09:00\",\"endtime\":\"11:00\",\"location\":\"\",\"youtube\":\"\",\"faceb",
+    "error": false
+  },
+  {
+    "endpoint": "getchurches",
+    "status": 200,
+    "isArray": true,
+    "itemCount": 16,
+    "rawLength": 3760,
+    "sample": "{\"status\":200,\"data\":[{\"id\":17,\"church_name\":\"Test description\",\"day\":\"Sunday\",\"starttime\":\"09:00\",\"endtime\":\"11:00\",\"location\":\"\",\"youtube\":\"\",\"faceb",
+    "error": false
+  },
+  {
+    "endpoint": "getchurchesdatafilters",
+    "status": 200,
+    "isArray": true,
+    "itemCount": 16,
+    "rawLength": 3760,
+    "sample": "{\"status\":200,\"data\":[{\"id\":17,\"church_name\":\"Test description\",\"day\":\"Sunday\",\"starttime\":\"09:00\",\"endtime\":\"11:00\",\"location\":\"\",\"youtube\":\"\",\"faceb",
+    "error": false
+  },
+  {
+    "endpoint": "getconsistencys",
+    "status": 200,
+    "isArray": true,
+    "itemCount": 175,
+    "rawLength": 24290,
+    "sample": "{\"status\":200,\"data\":[{\"id\":717,\"const_nm\":\"అద్దంకి-Addanki\",\"constituencyname\":\"అద్దంకి-Addanki\",\"name\":\"అద్దంకి-Addanki\",\"dstrct_id\":9,\"d_in\":0},{\"i",
+    "error": false
+  },
+  {
+    "endpoint": "getcount",
+    "status": 404,
+    "isArray": false,
+    "itemCount": 0,
+    "rawLength": 161,
+    "sample": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n<meta charset=\"utf-8\">\n<title>Error</title>\n</head>\n<body>\n<pre>Cannot POST /dashboardapi/getcount</pre>\n</bod",
+    "error": true
+  },
+  {
+    "endpoint": "getdistricts",
+    "status": 200,
+    "isArray": true,
+    "itemCount": 26,
+    "rawLength": 3966,
+    "sample": "{\"status\":200,\"data\":[{\"id\":7,\"distrct_nm\":\"అనంతపురం జిల్లా-Anantapur\",\"districtname\":\"అనంతపురం జిల్లా-Anantapur\",\"district_name\":\"అనంతపురం జిల్లా-Ana",
+    "error": false
+  },
+  {
+    "endpoint": "geteditdtails",
+    "status": 200,
+    "isArray": true,
+    "itemCount": 0,
+    "rawLength": 24,
+    "sample": "{\"status\":200,\"data\":[]}",
+    "error": false
+  },
+  {
+    "endpoint": "gethelps",
+    "status": 200,
+    "isArray": true,
+    "itemCount": 35,
+    "rawLength": 9000,
+    "sample": "{\"status\":200,\"data\":[{\"id\":39,\"cts\":null,\"description\":\"Pastors honerorim\",\"image\":\"\",\"user_id\":1315,\"name\":\"Perli Jaya Paul \",\"mobile_number\":\"99084",
+    "error": false
+  },
+  {
+    "endpoint": "getinstitutes",
+    "status": 200,
+    "isArray": true,
+    "itemCount": 18,
+    "rawLength": 8534,
+    "sample": "{\"status\":200,\"data\":[{\"id\":18,\"cts\":\"2026-09-11 00:50:25\",\"institutename\":\"Bethel\",\"location\":null,\"address\":null,\"district_id\":5,\"constituency_id\":2",
+    "error": false
+  },
+  {
+    "endpoint": "getjob",
+    "status": 200,
+    "isArray": true,
+    "itemCount": 24,
+    "rawLength": 12670,
+    "sample": "{\"status\":200,\"data\":[{\"id\":52,\"i_ts\":\"2025-02-06 19:41:03\",\"jobtitle\":\"Satish\",\"qualification\":\"డిగ్రీ\",\"experience_type\":\"పైన వాటిలో లేదు వేరే వాటిల",
+    "error": false
+  },
+  {
+    "endpoint": "getmandals",
+    "status": 200,
+    "isArray": true,
+    "itemCount": 808,
+    "rawLength": 139270,
+    "sample": "{\"status\":200,\"data\":[{\"id\":272,\"mndl_nm\":\"I. పోలవరం- I. Polavaram\",\"mandalname\":\"I. పోలవరం- I. Polavaram\",\"name\":\"I. పోలవరం- I. Polavaram\",\"const_id\"",
+    "error": false
+  },
+  {
+    "endpoint": "getmconsistencys",
+    "status": 200,
+    "isArray": true,
+    "itemCount": 175,
+    "rawLength": 24289,
+    "sample": "{\"status\":200,\"data\":[{\"id\":717,\"const_nm\":\"అద్దంకి-Addanki\",\"constituencyname\":\"అద్దంకి-Addanki\",\"name\":\"అద్దంకి-Addanki\",\"dstrct_id\":9,\"d_in\":0},{\"i",
+    "error": false
+  },
+  {
+    "endpoint": "getmdistricts",
+    "status": 200,
+    "isArray": true,
+    "itemCount": 26,
+    "rawLength": 3966,
+    "sample": "{\"status\":200,\"data\":[{\"id\":7,\"distrct_nm\":\"అనంతపురం జిల్లా-Anantapur\",\"districtname\":\"అనంతపురం జిల్లా-Anantapur\",\"district_name\":\"అనంతపురం జిల్లా-Ana",
+    "error": false
+  },
+  {
+    "endpoint": "getmmandals",
+    "status": 200,
+    "isArray": true,
+    "itemCount": 808,
+    "rawLength": 139270,
+    "sample": "{\"status\":200,\"data\":[{\"id\":272,\"mndl_nm\":\"I. పోలవరం- I. Polavaram\",\"mandalname\":\"I. పోలవరం- I. Polavaram\",\"name\":\"I. పోలవరం- I. Polavaram\",\"const_id\"",
+    "error": false
+  },
+  {
+    "endpoint": "getmusical",
+    "status": 200,
+    "isArray": true,
+    "itemCount": 0,
+    "rawLength": 24,
+    "sample": "{\"status\":200,\"data\":[]}",
+    "error": false
+  },
+  {
+    "endpoint": "getnews",
+    "status": 200,
+    "isArray": true,
+    "itemCount": 91,
+    "rawLength": 29810,
+    "sample": "{\"status\":200,\"data\":[{\"id\":290,\"cts\":\"2026-08-28 07:59:45\",\"description\":\"\",\"image\":\"\",\"news\":\"ఉద్యోగాలకు సంబంధించి\",\"user_id\":null,\"name\":null,\"mobi",
+    "error": false
+  },
+  {
+    "endpoint": "getorganizations",
+    "status": 200,
+    "isArray": true,
+    "itemCount": 42,
+    "rawLength": 22521,
+    "sample": "{\"status\":200,\"data\":[{\"id\":47,\"ctsdate\":null,\"organisation_name\":\"life enlightenment foundation\",\"description\":null,\"believer_id\":\"\",\"pastor_id\":\"\",\"",
+    "error": false
+  },
+  {
+    "endpoint": "getpastor",
+    "status": 200,
+    "isArray": true,
+    "itemCount": 846,
+    "rawLength": 215290,
+    "sample": "{\"status\":200,\"data\":[{\"id\":1391,\"pastorname\":\"Velpula vijayaraju \",\"name\":\"Velpula vijayaraju \",\"phonenumber\":\"9573673794\",\"mobile_number\":\"957367379",
+    "error": false
+  },
+  {
+    "endpoint": "getpastorassociation",
+    "status": 200,
+    "isArray": true,
+    "itemCount": 319,
+    "rawLength": 145334,
+    "sample": "{\"status\":200,\"data\":[{\"id\":360,\"cts\":\"2026-09-10 16:23:02\",\"paname\":\"sudheer\",\"headname\":\"undefined\",\"phonenumber\":\"9154545454\",\"description\":\"null\",",
+    "error": false
+  },
+  {
+    "endpoint": "getpastormeeting",
+    "status": 200,
+    "isArray": true,
+    "itemCount": 0,
+    "rawLength": 24,
+    "sample": "{\"status\":200,\"data\":[]}",
+    "error": false
+  },
+  {
+    "endpoint": "getpastorsfilters",
+    "status": 200,
+    "isArray": true,
+    "itemCount": 846,
+    "rawLength": 215285,
+    "sample": "{\"status\":200,\"data\":[{\"id\":1391,\"pastorname\":\"Velpula vijayaraju \",\"name\":\"Velpula vijayaraju \",\"phonenumber\":\"9573673794\",\"mobile_number\":\"957367379",
+    "error": false
+  },
+  {
+    "endpoint": "getpersonal",
+    "status": 200,
+    "isArray": true,
+    "itemCount": 0,
+    "rawLength": 24,
+    "sample": "{\"status\":200,\"data\":[]}",
+    "error": false
+  },
+  {
+    "endpoint": "getrevival",
+    "status": 200,
+    "isArray": true,
+    "itemCount": 0,
+    "rawLength": 24,
+    "sample": "{\"status\":200,\"data\":[]}",
+    "error": false
+  },
+  {
+    "endpoint": "getservices",
+    "status": 200,
+    "isArray": true,
+    "itemCount": 27,
+    "rawLength": 3122,
+    "sample": "{\"status\":200,\"data\":[{\"id\":1,\"servicename\":\"Bible College\",\"service_name\":\"Bible College\",\"name\":\"Bible College\",\"d_in\":0},{\"id\":2,\"servicename\":\"Boo",
+    "error": false
+  },
+  {
+    "endpoint": "getupdateevents",
+    "status": 200,
+    "isArray": true,
+    "itemCount": 2,
+    "rawLength": 1525,
+    "sample": "{\"status\":200,\"data\":[{\"id\":157,\"title\":\"ఉజ్జీవ కూటములు\",\"eventname\":\"ఉజ్జీవ కూటములు\",\"event_name\":\"ఉజ్జీవ కూటములు\",\"orgname\":\"Pastor Mosa Abraham \",\"",
+    "error": false
+  },
+  {
+    "endpoint": "getuserprofilereport",
+    "status": 200,
+    "isArray": true,
+    "itemCount": 0,
+    "rawLength": 24,
+    "sample": "{\"status\":200,\"data\":[]}",
+    "error": false
+  },
+  {
+    "endpoint": "getvideourl",
+    "status": 200,
+    "isArray": true,
+    "itemCount": 1,
+    "rawLength": 80,
+    "sample": "{\"status\":200,\"data\":[{\"videourl\":\"https://www.youtube.com/embed/live_stream\"}]}",
+    "error": false
+  },
+  {
+    "endpoint": "getwebsitegallery",
+    "status": 200,
+    "isArray": true,
+    "itemCount": 27,
+    "rawLength": 5267,
+    "sample": "{\"status\":200,\"data\":[{\"id\":27,\"cts\":null,\"category_id\":9,\"categoryname\":\"with bureaucrats\",\"image\":\"https://jbac.in/websiteimages/5779571711217318289",
+    "error": false
+  },
+  {
+    "endpoint": "getwing",
+    "status": 200,
+    "isArray": true,
+    "itemCount": 23,
+    "rawLength": 2551,
+    "sample": "{\"status\":200,\"data\":[{\"id\":1,\"position\":\"స్టూడెంట్ వింగ్\",\"name\":\"స్టూడెంట్ వింగ్\",\"wingname\":\"స్టూడెంట్ వింగ్\",\"d_in\":0},{\"id\":2,\"position\":\"బ్యూరోక",
+    "error": false
+  },
+  {
+    "endpoint": "getwomen",
+    "status": 200,
+    "isArray": true,
+    "itemCount": 0,
+    "rawLength": 24,
+    "sample": "{\"status\":200,\"data\":[]}",
+    "error": false
+  },
+  {
+    "endpoint": "getyouth",
+    "status": 200,
+    "isArray": true,
+    "itemCount": 0,
+    "rawLength": 24,
+    "sample": "{\"status\":200,\"data\":[]}",
+    "error": false
+  },
+  {
+    "endpoint": "leaderlevels",
+    "status": 200,
+    "isArray": true,
+    "itemCount": 10,
+    "rawLength": 780,
+    "sample": "{\"status\":200,\"data\":[{\"id\":1,\"level\":\"జిల్లా నాయకుడు\",\"level_name\":\"జిల్లా నాయకుడు\",\"d_in\":0},{\"id\":2,\"level\":\"నియోజకవర్గం నాయకుడు\",\"level_name\":\"నియ",
+    "error": false
+  },
+  {
+    "endpoint": "passwordwebsitelogin",
+    "status": 200,
+    "isArray": false,
+    "itemCount": 0,
+    "rawLength": 52,
+    "sample": "{\"status\":400,\"message\":\"Missing phone or password\"}",
+    "error": true
+  },
+  {
+    "endpoint": "pastorviewupdates",
+    "status": 200,
+    "isArray": false,
+    "itemCount": 0,
+    "rawLength": 1044,
+    "sample": "{\"status\":200,\"data\":{\"id\":1391,\"i_ts\":\"2026-09-08 09:38:57\",\"pastorname\":\"Velpula vijayaraju \",\"phonenumber\":\"9573673794\",\"description\":null,\"gender\"",
+    "error": false
+  },
+  {
+    "endpoint": "pattern",
+    "status": 200,
+    "isArray": true,
+    "itemCount": 6,
+    "rawLength": 479,
+    "sample": "{\"status\":200,\"data\":[{\"id\":1,\"pattern_name\":\"Episcopal / Bishopric Pattern\",\"name\":\"Episcopal\"},{\"id\":2,\"pattern_name\":\"Presbyterian Pattern\",\"name\":",
+    "error": false
+  },
+  {
+    "endpoint": "postadds",
+    "status": 200,
+    "isArray": false,
+    "itemCount": 0,
+    "rawLength": 64,
+    "sample": "{\"status\":200,\"message\":\"Ad created successfully\",\"insertId\":34}",
+    "error": false
+  },
+  {
+    "endpoint": "postattacks",
+    "status": 200,
+    "isArray": false,
+    "itemCount": 0,
+    "rawLength": 78,
+    "sample": "{\"status\":200,\"message\":\"Incident report submitted successfully\",\"insertId\":1}",
+    "error": false
+  },
+  {
+    "endpoint": "postbeliversignup",
+    "status": 200,
+    "isArray": false,
+    "itemCount": 0,
+    "rawLength": 74,
+    "sample": "{\"status\":200,\"message\":\"Believer registration successful\",\"insertId\":212}",
+    "error": false
+  },
+  {
+    "endpoint": "postbusiness",
+    "status": 200,
+    "isArray": false,
+    "itemCount": 0,
+    "rawLength": 68,
+    "sample": "{\"status\":200,\"message\":\"Business listed successfully\",\"insertId\":2}",
+    "error": false
+  },
+  {
+    "endpoint": "postchuechmeetings",
+    "status": 200,
+    "isArray": false,
+    "itemCount": 0,
+    "rawLength": 72,
+    "sample": "{\"status\":200,\"message\":\"Meeting scheduled successfully\",\"insertId\":167}",
+    "error": false
+  },
+  {
+    "endpoint": "postchurchregister",
+    "status": 200,
+    "isArray": false,
+    "itemCount": 0,
+    "rawLength": 72,
+    "sample": "{\"status\":200,\"message\":\"Church registration successful\",\"insertId\":534}",
+    "error": false
+  },
+  {
+    "endpoint": "postcolleges",
+    "status": 200,
+    "isArray": false,
+    "itemCount": 0,
+    "rawLength": 71,
+    "sample": "{\"status\":200,\"message\":\"College registered successfully\",\"insertId\":1}",
+    "error": false
+  },
+  {
+    "endpoint": "posthelping",
+    "status": 200,
+    "isArray": false,
+    "itemCount": 0,
+    "rawLength": 76,
+    "sample": "{\"status\":200,\"message\":\"Help request submitted successfully\",\"insertId\":40}",
+    "error": false
+  },
+  {
+    "endpoint": "postindepedentchurch",
+    "status": 200,
+    "isArray": false,
+    "itemCount": 0,
+    "rawLength": 77,
+    "sample": "{\"status\":200,\"message\":\"Organisation registration successful\",\"insertId\":48}",
+    "error": false
+  },
+  {
+    "endpoint": "postindepedentorganisation",
+    "status": 200,
+    "isArray": false,
+    "itemCount": 0,
+    "rawLength": 77,
+    "sample": "{\"status\":200,\"message\":\"Organisation registration successful\",\"insertId\":49}",
+    "error": false
+  },
+  {
+    "endpoint": "postinfo",
+    "status": 404,
+    "isArray": false,
+    "itemCount": 0,
+    "rawLength": 161,
+    "sample": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n<meta charset=\"utf-8\">\n<title>Error</title>\n</head>\n<body>\n<pre>Cannot POST /dashboardapi/postinfo</pre>\n</bod",
+    "error": true
+  },
+  {
+    "endpoint": "postingmarriages",
+    "status": 200,
+    "isArray": false,
+    "itemCount": 0,
+    "rawLength": 77,
+    "sample": "{\"status\":200,\"message\":\"Marriage profile created successfully\",\"insertId\":9}",
+    "error": false
+  },
+  {
+    "endpoint": "postinsututies",
+    "status": 200,
+    "isArray": false,
+    "itemCount": 0,
+    "rawLength": 74,
+    "sample": "{\"status\":200,\"message\":\"Institute registered successfully\",\"insertId\":20}",
+    "error": false
+  },
+  {
+    "endpoint": "postjobs",
+    "status": 500,
+    "isArray": false,
+    "itemCount": 0,
+    "rawLength": 200,
+    "sample": "{\"status\":500,\"error\":\"Cannot add or update a child row: a foreign key constraint fails (`jbac_jbac`.`jobs`, CONSTRAINT `jobs_ibfk_2` FOREIGN KEY (`co",
+    "error": true
+  },
+  {
+    "endpoint": "postmarriages",
+    "status": 200,
+    "isArray": false,
+    "itemCount": 0,
+    "rawLength": 78,
+    "sample": "{\"status\":200,\"message\":\"Marriage profile created successfully\",\"insertId\":10}",
+    "error": false
+  },
+  {
+    "endpoint": "postmeetings",
+    "status": 200,
+    "isArray": false,
+    "itemCount": 0,
+    "rawLength": 72,
+    "sample": "{\"status\":200,\"message\":\"Meeting scheduled successfully\",\"insertId\":168}",
+    "error": false
+  },
+  {
+    "endpoint": "postministrysignup",
+    "status": 200,
+    "isArray": false,
+    "itemCount": 0,
+    "rawLength": 74,
+    "sample": "{\"status\":200,\"message\":\"Ministry registration successful\",\"insertId\":270}",
+    "error": false
+  },
+  {
+    "endpoint": "postnews",
+    "status": 200,
+    "isArray": false,
+    "itemCount": 0,
+    "rawLength": 66,
+    "sample": "{\"status\":200,\"message\":\"News posted successfully\",\"insertId\":291}",
+    "error": false
+  },
+  {
+    "endpoint": "postpastor",
+    "status": 200,
+    "isArray": false,
+    "itemCount": 0,
+    "rawLength": 73,
+    "sample": "{\"status\":200,\"message\":\"Pastor registration successful\",\"insertId\":1392}",
+    "error": false
+  },
+  {
+    "endpoint": "postpastorassociations",
+    "status": 200,
+    "isArray": false,
+    "itemCount": 0,
+    "rawLength": 84,
+    "sample": "{\"status\":200,\"message\":\"Pastor Association registration successful\",\"insertId\":361}",
+    "error": false
+  },
+  {
+    "endpoint": "postregform",
+    "status": 200,
+    "isArray": false,
+    "itemCount": 0,
+    "rawLength": 62,
+    "sample": "{\"status\":200,\"message\":\"Registration submitted successfully\"}",
+    "error": false
+  },
+  {
+    "endpoint": "postwebsitesignup",
+    "status": 500,
+    "isArray": false,
+    "itemCount": 0,
+    "rawLength": 54,
+    "sample": "{\"status\":500,\"error\":\"Column 'email' cannot be null\"}",
+    "error": true
+  },
+  {
+    "endpoint": "postwishform",
+    "status": 200,
+    "isArray": false,
+    "itemCount": 0,
+    "rawLength": 54,
+    "sample": "{\"status\":200,\"message\":\"Wish submitted successfully\"}",
+    "error": false
+  },
+  {
+    "endpoint": "searchingbusiness",
+    "status": 200,
+    "isArray": true,
+    "itemCount": 2,
+    "rawLength": 576,
+    "sample": "{\"status\":200,\"data\":[{\"id\":2,\"cts\":null,\"type\":null,\"title\":null,\"description\":null,\"number\":null,\"usr_id\":null,\"usr_name\":\"\",\"image\":null,\"denomatio",
+    "error": false
+  },
+  {
+    "endpoint": "searchingchurchdata",
+    "status": 200,
+    "isArray": true,
+    "itemCount": 16,
+    "rawLength": 3760,
+    "sample": "{\"status\":200,\"data\":[{\"id\":17,\"church_name\":\"Test description\",\"day\":\"Sunday\",\"starttime\":\"09:00\",\"endtime\":\"11:00\",\"location\":\"\",\"youtube\":\"\",\"faceb",
+    "error": false
+  },
+  {
+    "endpoint": "searchingdata",
+    "status": 200,
+    "isArray": true,
+    "itemCount": 4,
+    "rawLength": 2419,
+    "sample": "{\"status\":200,\"data\":[{\"id\":168,\"title\":\"Meeting\",\"eventname\":\"Meeting\",\"event_name\":\"Meeting\",\"orgname\":\"\",\"meetsize\":\"\",\"description\":\"\",\"startdate\"",
+    "error": false
+  },
+  {
+    "endpoint": "searchingdemonation",
+    "status": 200,
+    "isArray": true,
+    "itemCount": 4,
+    "rawLength": 2419,
+    "sample": "{\"status\":200,\"data\":[{\"id\":168,\"title\":\"Meeting\",\"eventname\":\"Meeting\",\"event_name\":\"Meeting\",\"orgname\":\"\",\"meetsize\":\"\",\"description\":\"\",\"startdate\"",
+    "error": false
+  },
+  {
+    "endpoint": "searchingmarriages",
+    "status": 200,
+    "isArray": true,
+    "itemCount": 2,
+    "rawLength": 964,
+    "sample": "{\"status\":200,\"data\":[{\"id\":10,\"i_ts\":null,\"image\":null,\"description\":null,\"d_in\":0,\"user_id\":null,\"height\":\"\",\"color\":null,\"work\":null,\"status\":null,",
+    "error": false
+  },
+  {
+    "endpoint": "searchinorganizations",
+    "status": 200,
+    "isArray": true,
+    "itemCount": 44,
+    "rawLength": 23379,
+    "sample": "{\"status\":200,\"data\":[{\"id\":49,\"ctsdate\":null,\"organisation_name\":null,\"description\":null,\"believer_id\":null,\"pastor_id\":null,\"location\":null,\"contact",
+    "error": false
+  },
+  {
+    "endpoint": "searchjob",
+    "status": 200,
+    "isArray": true,
+    "itemCount": 24,
+    "rawLength": 12668,
+    "sample": "{\"status\":200,\"data\":[{\"id\":52,\"i_ts\":\"2025-02-06 19:41:03\",\"jobtitle\":\"Satish\",\"qualification\":\"డిగ్రీ\",\"experience_type\":\"పైన వాటిలో లేదు వేరే వాటిల",
+    "error": false
+  },
+  {
+    "endpoint": "searchjobswise",
+    "status": 200,
+    "isArray": true,
+    "itemCount": 24,
+    "rawLength": 12668,
+    "sample": "{\"status\":200,\"data\":[{\"id\":52,\"i_ts\":\"2025-02-06 19:41:03\",\"jobtitle\":\"Satish\",\"qualification\":\"డిగ్రీ\",\"experience_type\":\"పైన వాటిలో లేదు వేరే వాటిల",
+    "error": false
+  },
+  {
+    "endpoint": "searchorganization",
+    "status": 200,
+    "isArray": true,
+    "itemCount": 44,
+    "rawLength": 23379,
+    "sample": "{\"status\":200,\"data\":[{\"id\":49,\"ctsdate\":null,\"organisation_name\":null,\"description\":null,\"believer_id\":null,\"pastor_id\":null,\"location\":null,\"contact",
+    "error": false
+  },
+  {
+    "endpoint": "searchpastors",
+    "status": 200,
+    "isArray": true,
+    "itemCount": 847,
+    "rawLength": 215480,
+    "sample": "{\"status\":200,\"data\":[{\"id\":1392,\"pastorname\":null,\"name\":null,\"phonenumber\":null,\"mobile_number\":null,\"description\":null,\"district_id\":null,\"constitu",
+    "error": false
+  },
+  {
+    "endpoint": "studentsignup",
+    "status": 200,
+    "isArray": false,
+    "itemCount": 0,
+    "rawLength": 73,
+    "sample": "{\"status\":200,\"message\":\"Student registration successful\",\"insertId\":392}",
+    "error": false
+  },
+  {
+    "endpoint": "upadtedpassword",
+    "status": 404,
+    "isArray": false,
+    "itemCount": 0,
+    "rawLength": 168,
+    "sample": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n<meta charset=\"utf-8\">\n<title>Error</title>\n</head>\n<body>\n<pre>Cannot POST /dashboardapi/upadtedpassword</pre",
+    "error": true
+  },
+  {
+    "endpoint": "updatebeliver",
+    "status": 200,
+    "isArray": false,
+    "itemCount": 0,
+    "rawLength": 55,
+    "sample": "{\"status\":200,\"message\":\"Profile updated successfully\"}",
+    "error": false
+  },
+  {
+    "endpoint": "updateconsis",
+    "status": 404,
+    "isArray": false,
+    "itemCount": 0,
+    "rawLength": 165,
+    "sample": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n<meta charset=\"utf-8\">\n<title>Error</title>\n</head>\n<body>\n<pre>Cannot POST /dashboardapi/updateconsis</pre>\n<",
+    "error": true
+  },
+  {
+    "endpoint": "updateconsis/",
+    "status": 404,
+    "isArray": false,
+    "itemCount": 0,
+    "rawLength": 166,
+    "sample": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n<meta charset=\"utf-8\">\n<title>Error</title>\n</head>\n<body>\n<pre>Cannot POST /dashboardapi/updateconsis/</pre>\n",
+    "error": true
+  },
+  {
+    "endpoint": "updatecount",
+    "status": 404,
+    "isArray": false,
+    "itemCount": 0,
+    "rawLength": 164,
+    "sample": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n<meta charset=\"utf-8\">\n<title>Error</title>\n</head>\n<body>\n<pre>Cannot POST /dashboardapi/updatecount</pre>\n</",
+    "error": true
+  },
+  {
+    "endpoint": "updatedetails",
+    "status": 200,
+    "isArray": false,
+    "itemCount": 0,
+    "rawLength": 55,
+    "sample": "{\"status\":200,\"message\":\"Profile updated successfully\"}",
+    "error": false
+  },
+  {
+    "endpoint": "updatenewsdataa",
+    "status": 404,
+    "isArray": false,
+    "itemCount": 0,
+    "rawLength": 168,
+    "sample": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n<meta charset=\"utf-8\">\n<title>Error</title>\n</head>\n<body>\n<pre>Cannot POST /dashboardapi/updatenewsdataa</pre",
+    "error": true
+  },
+  {
+    "endpoint": "updateprofile",
+    "status": 200,
+    "isArray": false,
+    "itemCount": 0,
+    "rawLength": 55,
+    "sample": "{\"status\":200,\"message\":\"Profile updated successfully\"}",
+    "error": false
+  },
+  {
+    "endpoint": "viewconstituencyname",
+    "status": 500,
+    "isArray": false,
+    "itemCount": 0,
+    "rawLength": 68,
+    "sample": "{\"status\":500,\"error\":\"Table 'jbac_jbac.const_lst_t' doesn't exist\"}",
+    "error": true
+  },
+  {
+    "endpoint": "viewupdates",
+    "status": 200,
+    "isArray": false,
+    "itemCount": 0,
+    "rawLength": 437,
+    "sample": "{\"status\":200,\"data\":{\"id\":534,\"cts\":null,\"church_name\":null,\"description\":null,\"denomination_id\":0,\"total_members\":null,\"district_id\":null,\"constitue",
+    "error": false
+  }
+]
