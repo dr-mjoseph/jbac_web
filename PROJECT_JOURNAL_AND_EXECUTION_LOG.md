@@ -358,3 +358,27 @@ However, in the mobile application (`jbac_app`), when users registered, logged i
    - Verified clean Angular build (`ng build --configuration development`).
    - Repackaged `backend/backend-deploy.zip` with the updated Lambda server bundle.
 
+---
+
+## 13. AWS RDS MySQL 8.0 → 8.4 Major Version Upgrade Automation (October 2026)
+
+### Context & Objective
+- AWS RDS MySQL 8.0 standard support is reaching end-of-life and transitioning into Extended Support charges.
+- The `jbac-mysql-db` database (Sydney region `ap-southeast-2`) required an upgrade from MySQL 8.0 to MySQL 8.4.
+- Because the instance used a custom MySQL 8.0 parameter group (`jbac-mysql-database-dbparametergroup-jlfzlphtymrh`), major version upgrades required:
+  1. Starting the instance from its cost-saving stopped state.
+  2. Creating a compatible MySQL 8.4 parameter group (`jbac-mysql-84` under family `mysql8.4`) with `utf8mb4` encoding preserved.
+  3. Initiating the major version modification with `--allow-major-version-upgrade` and `--apply-immediately`.
+  4. Updating the CloudFormation template to prevent future drift or rollback.
+
+### Implementation
+1. **GitHub Actions Automation Workflow**:
+   - Created [`.github/workflows/upgrade-rds-mysql-84.yml`](.github/workflows/upgrade-rds-mysql-84.yml) utilizing repository AWS secrets (`AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_REGION: ap-southeast-2`).
+   - Handles auto-starting the DB, waiting for `available` state, provisioning parameter group `jbac-mysql-84` with UTF-8mb4 character set parameters, resolving the latest MySQL 8.4 engine release, and executing the modification.
+2. **CloudFormation Template Alignment**:
+   - Updated [`aws/rds-mysql-template.yml`](aws/rds-mysql-template.yml):
+     - `Family`: `'mysql8.4'`
+     - `EngineVersion`: `'8.4'`
+     - Updated description to MySQL 8.4.
+
+

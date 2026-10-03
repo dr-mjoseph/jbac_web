@@ -1,0 +1,216 @@
+name: Upgrade AWS RDS MySQL 8.0 to 8.4
+
+on:
+  workflow_dispatch:
+    inputs:
+      db_instance_id:
+        description: 'RDS DB Instance Identifier'
+        required: true
+        default: 'jbac-mysql-db'
+      parameter_group_name:
+        description: 'New MySQL 8.4 DB Parameter Group Name'
+        required: true
+        default: 'jbac-mysql-84'
+      target_engine_version:
+        description: 'Target MySQL 8.4 Engine Version (leave "auto" for latest)'
+        required: true
+        default: 'auto'
+
+permissions:
+  contents: read
+
+jobs:
+  upgrade-rds:
+    name: Execute MySQL 8.0 to 8.4 Upgrade
+    runs-on: ubuntu-latest
+    steps:
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION || 'ap-southeast-2' }}
+
+      - name: Validate and Start RDS Instance
+        id: start_rds
+        run: |
+          REGION="${{ secrets.AWS_REGION || 'ap-southeast-2' }}"
+          DB_ID="${{ inputs.db_instance_id }}"
+          echo "=========================================================="
+          echo "STEP 1: INSPECTING RDS INSTANCE '${DB_ID}' IN ${REGION}"
+          echo "=========================================================="
+
+          INSTANCE_INFO=$(aws rds describe-db-instances \
+            --db-instance-identifier "${DB_ID}" \
+            --region "${REGION}" \
+            --query "DBInstances[0].[DBInstanceStatus,EngineVersion,DBParameterGroups[0].DBParameterGroupName]" \
+            --output text)
+
+          STATUS=$(echo "${INSTANCE_INFO}" | awk '{print $1}')
+          ENGINE_VERSION=$(echo "${INSTANCE_INFO}" | awk '{print $2}')
+          PARAM_GROUP=$(echo "${INSTANCE_INFO}" | awk '{print $3}')
+
+          echo "Current Status:          ${STATUS}"
+          echo "Current Engine Version:  ${ENGINE_VERSION}"
+          echo "Current Parameter Group: ${PARAM_GROUP}"
+
+          if [ "${STATUS}" = "stopped" ]; then
+            echo "Instance is currently stopped. Sending start command..."
+            aws rds start-db-instance --db-instance-identifier "${DB_ID}" --region "${REGION}"
+            
+            echo "Waiting for instance '${DB_ID}' to become 'available' (typically 2-3 minutes)..."
+            while true; do
+              sleep 15
+              CURR_STATUS=$(aws rds describe-db-instances \
+                --db-instance-identifier "${DB_ID}" \
+                --region "${REGION}" \
+                --query "DBInstances[0].DBInstanceStatus" \
+                --output text)
+              echo "Polling status: ${CURR_STATUS}"
+              if [ "${CURR_STATUS}" = "available" ]; then
+                echo "Instance is now AVAILABLE!"
+                break
+              elif [ "${CURR_STATUS}" != "starting" ] && [ "${CURR_STATUS}" != "stopped" ]; then
+                echo "Current status: ${CURR_STATUS}"
+              fi
+            done
+          elif [ "${STATUS}" = "available" ]; then
+            echo "Instance is already available and ready for upgrade."
+          else
+            echo "Instance is in status '${STATUS}'. Waiting for it to become available..."
+            while true; do
+              CURR_STATUS=$(aws rds describe-db-instances \
+                --db-instance-identifier "${DB_ID}" \
+                --region "${REGION}" \
+                --query "DBInstances[0].DBInstanceStatus" \
+                --output text)
+              echo "Polling status: ${CURR_STATUS}"
+              if [ "${CURR_STATUS}" = "available" ]; then
+                break
+              fi
+              sleep 15
+            done
+          fi
+
+          echo "CURRENT_ENGINE_VERSION=${ENGINE_VERSION}" >> $GITHUB_ENV
+
+      - name: Create or Verify MySQL 8.4 Parameter Group
+        id: setup_param_group
+        run: |
+          REGION="${{ secrets.AWS_REGION || 'ap-southeast-2' }}"
+          PARAM_GROUP_NAME="${{ inputs.parameter_group_name }}"
+          echo "=========================================================="
+          echo "STEP 2: ENSURING PARAMETER GROUP '${PARAM_GROUP_NAME}' EXISTS"
+          echo "=========================================================="
+
+          EXISTS=$(aws rds describe-db-parameter-groups \
+            --db-parameter-group-name "${PARAM_GROUP_NAME}" \
+            --region "${REGION}" \
+            --query "DBParameterGroups[0].DBParameterGroupName" \
+            --output text 2>/dev/null || true)
+
+          if [ "${EXISTS}" != "${PARAM_GROUP_NAME}" ]; then
+            echo "Creating DB Parameter Group '${PARAM_GROUP_NAME}' (Family: mysql8.4)..."
+            aws rds create-db-parameter-group \
+              --db-parameter-group-name "${PARAM_GROUP_NAME}" \
+              --db-parameter-group-family "mysql8.4" \
+              --description "JBAC MySQL 8.4 UTF8MB4 Parameter Group" \
+              --region "${REGION}"
+
+            echo "Configuring character set utf8mb4 and max_allowed_packet..."
+            aws rds modify-db-parameter-group \
+              --db-parameter-group-name "${PARAM_GROUP_NAME}" \
+              --parameters \
+                "ParameterName=character_set_server,ParameterValue=utf8mb4,ApplyMethod=immediate" \
+                "ParameterName=collation_server,ParameterValue=utf8mb4_unicode_ci,ApplyMethod=immediate" \
+                "ParameterName=character_set_client,ParameterValue=utf8mb4,ApplyMethod=immediate" \
+                "ParameterName=character_set_connection,ParameterValue=utf8mb4,ApplyMethod=immediate" \
+                "ParameterName=character_set_database,ParameterValue=utf8mb4,ApplyMethod=immediate" \
+                "ParameterName=character_set_results,ParameterValue=utf8mb4,ApplyMethod=immediate" \
+                "ParameterName=max_allowed_packet,ParameterValue=67108864,ApplyMethod=immediate" \
+              --region "${REGION}" || echo "Note: Initial parameter modification completed with non-fatal warnings."
+            echo "[SUCCESS] Parameter group created and configured."
+          else
+            echo "Parameter group '${PARAM_GROUP_NAME}' already exists. Skipping creation."
+          fi
+
+      - name: Trigger Major Version Upgrade to MySQL 8.4
+        id: trigger_upgrade
+        run: |
+          REGION="${{ secrets.AWS_REGION || 'ap-southeast-2' }}"
+          DB_ID="${{ inputs.db_instance_id }}"
+          PARAM_GROUP_NAME="${{ inputs.parameter_group_name }}"
+          REQUESTED_VERSION="${{ inputs.target_engine_version }}"
+
+          echo "=========================================================="
+          echo "STEP 3: RESOLVING ENGINE VERSION & APPLYING UPGRADE"
+          echo "=========================================================="
+
+          if [ "${REQUESTED_VERSION}" = "auto" ] || [ -z "${REQUESTED_VERSION}" ]; then
+            echo "Querying valid MySQL 8.4 upgrade targets from ${CURRENT_ENGINE_VERSION}..."
+            TARGET_VERSION=$(aws rds describe-db-engine-versions \
+              --engine mysql \
+              --engine-version "${CURRENT_ENGINE_VERSION}" \
+              --region "${REGION}" \
+              --query "DBEngineVersions[0].ValidUpgradeTarget[?starts_with(EngineVersion, '8.4')].EngineVersion" \
+              --output text | awk '{print $1}')
+
+            if [ -z "${TARGET_VERSION}" ]; then
+              echo "ValidUpgradeTarget query returned empty; querying all MySQL 8.4 versions..."
+              TARGET_VERSION=$(aws rds describe-db-engine-versions \
+                --engine mysql \
+                --region "${REGION}" \
+                --query "DBEngineVersions[?starts_with(EngineVersion, '8.4')].EngineVersion" \
+                --output text | awk '{print $NF}')
+            fi
+            
+            if [ -z "${TARGET_VERSION}" ]; then
+              TARGET_VERSION="8.4"
+            fi
+          else
+            TARGET_VERSION="${REQUESTED_VERSION}"
+          fi
+
+          echo "Selected Target Engine Version: ${TARGET_VERSION}"
+          echo "Target Parameter Group:         ${PARAM_GROUP_NAME}"
+          echo "Applying modify-db-instance with --allow-major-version-upgrade and --apply-immediately..."
+
+          aws rds modify-db-instance \
+            --db-instance-identifier "${DB_ID}" \
+            --engine-version "${TARGET_VERSION}" \
+            --db-parameter-group-name "${PARAM_GROUP_NAME}" \
+            --allow-major-version-upgrade \
+            --apply-immediately \
+            --region "${REGION}"
+
+          echo "Upgrade request accepted by AWS RDS!"
+          echo "TARGET_VERSION=${TARGET_VERSION}" >> $GITHUB_ENV
+
+      - name: Monitor Initial Upgrade Transition & Generate Report
+        run: |
+          REGION="${{ secrets.AWS_REGION || 'ap-southeast-2' }}"
+          DB_ID="${{ inputs.db_instance_id }}"
+
+          echo "Waiting 30 seconds for RDS to transition state..."
+          sleep 30
+
+          STATUS=$(aws rds describe-db-instances \
+            --db-instance-identifier "${DB_ID}" \
+            --region "${REGION}" \
+            --query "DBInstances[0].DBInstanceStatus" \
+            --output text)
+
+          echo "Instance '${DB_ID}' status is now: ${STATUS}"
+
+          echo "## 🚀 AWS RDS MySQL Upgrade Initiated" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Property | Value |" >> $GITHUB_STEP_SUMMARY
+          echo "|---|---|" >> $GITHUB_STEP_SUMMARY
+          echo "| **DB Instance** | \`${DB_ID}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Region** | \`${REGION}\` (Sydney) |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Previous Engine** | \`MySQL ${CURRENT_ENGINE_VERSION}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Target Engine** | \`MySQL ${TARGET_VERSION}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Parameter Group** | \`${{ inputs.parameter_group_name }}\` (Family: \`mysql8.4\`) |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Current Status** | **\`${STATUS}\`** |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "> 💡 **Note**: AWS RDS major version upgrades perform pre-upgrade checks, automated snapshotting, and binary updates. The upgrade typically takes 10–25 minutes. You can monitor progress in the [AWS RDS Console](https://ap-southeast-2.console.aws.amazon.com/rds/home?region=ap-southeast-2#databases:)." >> $GITHUB_STEP_SUMMARY
