@@ -381,4 +381,47 @@ However, in the mobile application (`jbac_app`), when users registered, logged i
      - `EngineVersion`: `'8.4'`
      - Updated description to MySQL 8.4.
 
+---
+
+## 14. Mobile App UI Restoration to Google Play Store Look & Simultaneous Sync Engine (October 2026)
+
+### Problem Context & Root Cause Analysis
+- **User Issue**: The user observed that during previous automation syncs, the mobile application (`jbac_app` / Google Play Store ID: `io.ionic.starterjbac`) began displaying the desktop/responsive website UI instead of the actual native mobile app UI from the Google Play Store.
+- **Root Cause**:
+  1. Previous sync scripts copied the compiled Angular 15 website bundle (`dist/churchwebsite`) into `jbac_app/www/`.
+  2. This overwrote `www/index.html` (the Ionic 3 entry point with `<ion-app></ion-app>` and `build/main.js`) with the web application's `index.html` (`<app-root></app-root>`), and dumped loose hashed JavaScript/CSS files (`main.*.js`, `styles.*.css`, `polyfills.*.js`, `runtime.*.js`).
+  3. When the Cordova WebView or Android Studio loaded the app, it rendered the website UI inside the app rather than the native Ionic 3 mobile UI.
+
+### Resolution & Mobile UI Restoration
+1. **Purged Foreign Web Artifacts**:
+   - Removed all desktop website bundles (`main.*.js`, `polyfills.*.js`, `runtime.*.js`, `styles.*.css`, `3rdpartylicenses.txt`, hashed PNGs) from `jbac_app/www/` and `platforms/android/app/src/main/assets/www/`.
+2. **Restored Native Play Store Mobile Entry Point**:
+   - Re-instated the canonical Ionic 3 `index.html` loading `<ion-app></ion-app>`, `data-ionic="inject"`, `build/main.css`, `build/polyfills.js`, `build/vendor.js`, `build/main.js`, and `cordova.js`.
+   - Synchronized this file to `platforms/android/app/src/main/assets/www/index.html`.
+3. **Verified Native Play Store Mobile Views & Telugu Encoding**:
+   - Verified that `www/build/0.js` (HomePage) has the complete Play Store mobile UI:
+     - Blue header (`#00548F`) with hamburger side-drawer toggle and `JBAC-AP` title.
+     - Swiper banner carousel and Telugu news marquee ticker.
+     - 18 native mobile grid action cards with crisp Telugu titles (నా గురించి, రిజిస్ట్రేషన్, మా సహాయం, జరగబోయే మీటింగ్స్, సబ్మిట్ మీటింగ్ పోస్టర్, టెక్నికల్ సోలుషన్స్, etc.).
+     - App visitors counter and privacy policy link.
+     - Footer with Home icon, logo with association name in Telugu, and Profile/Login button.
+4. **Built and Verified Android Release Artifacts**:
+   - Executed `scripts/build_mobile_release.ps1` via Gradle `assembleRelease bundleRelease`.
+   - Generated signed `jbacApp-0.0.23.apk` (120.17 MB) and `appreleasesigned.aab` (117.26 MB) bundling the native Play Store UI.
+   - Verified that `assets/www/index.html` inside the APK boots `<ion-app></ion-app>`.
+
+### Upgraded Simultaneous Synchronization Pipeline
+1. **Redesigned [`scripts/sync-to-mobile.js`](scripts/sync-to-mobile.js)**:
+   - **Strict UI Protection**: Guaranteed that `dist/churchwebsite` is never copied to `mobile/www/` and `www/index.html` is never overwritten.
+   - **Shared Assets Sync**: Automatically synchronizes icons, banners, SVGs, and images from `src/assets` to `mobile/src/assets` and `mobile/www/assets`.
+   - **API Endpoint Sync**: Detects production API URL (`https://1a8kqxawxd.execute-api.ap-southeast-2.amazonaws.com/dashboardapi/`) and synchronizes `src/providers/service/service.ts`, `www/build/main.js`, and Android assets.
+   - **Geographic Cascade Support**: Injected parameter support for `getconsistencys(districtId)`, `getmandals(constId)`, `gepanchayatis(mandalId)` into mobile service providers.
+   - **Web Source Mirror**: Continues mirroring Angular 15 web sources into `web-src/` for developer reference with dedicated documentation.
+2. **Updated GitHub Actions Workflow ([`.github/workflows/sync-mobile.yml`](.github/workflows/sync-mobile.yml))**:
+   - Ensured CI/CD auto-sync runs the upgraded engine so remote pushes never compromise the mobile UI.
+3. **Synchronized Repositories & Local Workspaces**:
+   - Committed and pushed changes to `https://github.com/dr-mjoseph/jbac_app.git` on `main`.
+   - Pulled and verified consistency in both local directories: `C:\Users\rajes\StudioProjects\jbac_app` and `C:\Users\rajes\StudioProjects\jbac_app1`.
+
+
 

@@ -40,7 +40,7 @@ jobs:
 
       - name: Build Web App Production Bundle
         working-directory: web_app
-        run: npm run build -- --configuration production --base-href ./
+        run: npm run build -- --configuration production
 
       - name: Run Web-to-Mobile Sync Engine
         working-directory: web_app
