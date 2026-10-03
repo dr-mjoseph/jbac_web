@@ -100,26 +100,42 @@ jobs:
           REGION="${{ secrets.AWS_REGION || 'ap-southeast-2' }}"
           PARAM_GROUP_NAME="${{ inputs.parameter_group_name }}"
           echo "=========================================================="
-          echo "STEP 2: ENSURING PARAMETER GROUP '${PARAM_GROUP_NAME}' EXISTS"
+          echo "STEP 2: ENSURING PARAMETER GROUP '${PARAM_GROUP_NAME}' EXISTS WITH FAMILY 'mysql8.4'"
           echo "=========================================================="
 
-          EXISTS=$(aws rds describe-db-parameter-groups \
+          CURRENT_FAMILY=$(aws rds describe-db-parameter-groups \
             --db-parameter-group-name "${PARAM_GROUP_NAME}" \
             --region "${REGION}" \
-            --query "DBParameterGroups[0].DBParameterGroupName" \
+            --query "DBParameterGroups[0].DBParameterGroupFamily" \
             --output text 2>/dev/null || true)
 
-          if [ "${EXISTS}" != "${PARAM_GROUP_NAME}" ]; then
-            echo "Creating DB Parameter Group '${PARAM_GROUP_NAME}' (Family: mysql8.4)..."
+          echo "Current Parameter Group Family: '${CURRENT_FAMILY}'"
+
+          EFFECTIVE_PARAM_GROUP="${PARAM_GROUP_NAME}"
+          if [ -n "${CURRENT_FAMILY}" ] && [ "${CURRENT_FAMILY}" != "mysql8.4" ]; then
+            echo "DETECTED MISMATCH: Parameter group '${PARAM_GROUP_NAME}' has family '${CURRENT_FAMILY}' instead of 'mysql8.4'."
+            echo "Deleting mismatched parameter group '${PARAM_GROUP_NAME}'..."
+            if aws rds delete-db-parameter-group --db-parameter-group-name "${PARAM_GROUP_NAME}" --region "${REGION}"; then
+              echo "Successfully deleted mismatched parameter group '${PARAM_GROUP_NAME}'."
+              CURRENT_FAMILY=""
+            else
+              echo "Could not delete '${PARAM_GROUP_NAME}'. Falling back to new name 'jbac-mysql-community-84'..."
+              EFFECTIVE_PARAM_GROUP="jbac-mysql-community-84"
+              CURRENT_FAMILY=""
+            fi
+          fi
+
+          if [ -z "${CURRENT_FAMILY}" ]; then
+            echo "Creating DB Parameter Group '${EFFECTIVE_PARAM_GROUP}' (Family: mysql8.4)..."
             aws rds create-db-parameter-group \
-              --db-parameter-group-name "${PARAM_GROUP_NAME}" \
+              --db-parameter-group-name "${EFFECTIVE_PARAM_GROUP}" \
               --db-parameter-group-family "mysql8.4" \
               --description "JBAC MySQL 8.4 UTF8MB4 Parameter Group" \
               --region "${REGION}"
 
             echo "Configuring character set utf8mb4 and max_allowed_packet..."
             aws rds modify-db-parameter-group \
-              --db-parameter-group-name "${PARAM_GROUP_NAME}" \
+              --db-parameter-group-name "${EFFECTIVE_PARAM_GROUP}" \
               --parameters \
                 "ParameterName=character_set_server,ParameterValue=utf8mb4,ApplyMethod=immediate" \
                 "ParameterName=collation_server,ParameterValue=utf8mb4_unicode_ci,ApplyMethod=immediate" \
@@ -129,17 +145,19 @@ jobs:
                 "ParameterName=character_set_results,ParameterValue=utf8mb4,ApplyMethod=immediate" \
                 "ParameterName=max_allowed_packet,ParameterValue=67108864,ApplyMethod=immediate" \
               --region "${REGION}" || echo "Note: Initial parameter modification completed with non-fatal warnings."
-            echo "[SUCCESS] Parameter group created and configured."
+            echo "[SUCCESS] Parameter group '${EFFECTIVE_PARAM_GROUP}' created and configured with family 'mysql8.4'."
           else
-            echo "Parameter group '${PARAM_GROUP_NAME}' already exists. Skipping creation."
+            echo "Parameter group '${EFFECTIVE_PARAM_GROUP}' already exists with correct family 'mysql8.4'."
           fi
+
+          echo "EFFECTIVE_PARAM_GROUP=${EFFECTIVE_PARAM_GROUP}" >> $GITHUB_ENV
 
       - name: Trigger Major Version Upgrade to MySQL 8.4
         id: trigger_upgrade
         run: |
           REGION="${{ secrets.AWS_REGION || 'ap-southeast-2' }}"
           DB_ID="${{ inputs.db_instance_id }}"
-          PARAM_GROUP_NAME="${{ inputs.parameter_group_name }}"
+          PARAM_GROUP_NAME="${EFFECTIVE_PARAM_GROUP:-${{ inputs.parameter_group_name }}}"
           REQUESTED_VERSION="${{ inputs.target_engine_version }}"
 
           echo "=========================================================="
@@ -210,7 +228,7 @@ jobs:
           echo "| **Region** | \`${REGION}\` (Sydney) |" >> $GITHUB_STEP_SUMMARY
           echo "| **Previous Engine** | \`MySQL ${CURRENT_ENGINE_VERSION}\` |" >> $GITHUB_STEP_SUMMARY
           echo "| **Target Engine** | \`MySQL ${TARGET_VERSION}\` |" >> $GITHUB_STEP_SUMMARY
-          echo "| **Parameter Group** | \`${{ inputs.parameter_group_name }}\` (Family: \`mysql8.4\`) |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Parameter Group** | \`${EFFECTIVE_PARAM_GROUP}\` (Family: \`mysql8.4\`) |" >> $GITHUB_STEP_SUMMARY
           echo "| **Current Status** | **\`${STATUS}\`** |" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "> 💡 **Note**: AWS RDS major version upgrades perform pre-upgrade checks, automated snapshotting, and binary updates. The upgrade typically takes 10–25 minutes. You can monitor progress in the [AWS RDS Console](https://ap-southeast-2.console.aws.amazon.com/rds/home?region=ap-southeast-2#databases:)." >> $GITHUB_STEP_SUMMARY
