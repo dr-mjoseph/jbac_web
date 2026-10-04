@@ -86,7 +86,7 @@ export class StudentregisterComponent {
       resconstituencyname: ['', [Validators.required]],
       resdistricts: ['', [Validators.required]],
       god: [''],
-     // term: [''],
+      term: [true, [Validators.required]],
       mother: [''],
       orphon: [''],
       subcaste: [''],

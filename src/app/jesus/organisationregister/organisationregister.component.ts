@@ -83,7 +83,7 @@ export class OrganisationregisterComponent {
       youtube: [''],
       lname: [''],
       god: [''],
-      // // term: ['', [Validators.required]],
+      term: [true, [Validators.required]],
       password: ['', [Validators.required, Validators.minLength(6)]],
       retypepassword: ['', [Validators.required, Validators.minLength(6)]],
     })
@@ -126,7 +126,7 @@ export class OrganisationregisterComponent {
       resconstituencyname: ['', [Validators.required]],
       resdistricts: ['', [Validators.required]],
       god: [''],
-      // // term: ['', [Validators.required]],
+      term: [true, [Validators.required]],
       mother: [''],
       orphon: [''],
       subcaste: [''],
@@ -153,7 +153,7 @@ export class OrganisationregisterComponent {
       // dob: ['', [Validators.required]],
       pastor: [''],
       description: [''],
-      // // term: ['', [Validators.required]],
+      term: [true, [Validators.required]],
 
     })
 
@@ -185,7 +185,7 @@ export class OrganisationregisterComponent {
       wingtype: ['',],
       facebook: [''],
       god: [''],
-      // // term: ['', [Validators.required]],
+      term: [true, [Validators.required]],
       lifegoal: [''],
       denomination_id: ['', [Validators.required]],
       villagename: ['', [Validators.required]],
@@ -217,7 +217,7 @@ export class OrganisationregisterComponent {
       youtube: [''],
       remarks: [''],
       village_name: ['', [Validators.required]],
-      // // term: ['', [Validators.required]],
+      term: [true, [Validators.required]],
 
     })
 
@@ -244,7 +244,7 @@ export class OrganisationregisterComponent {
       panchayati: ['', [Validators.required]],
       villagename: ['', [Validators.required]],
       ward: ['', [Validators.required]],
-      // term: ['', [Validators.required]]
+      term: [true, [Validators.required]]
     })
 
     this.independentchurchform = this.formBuilder.group({
@@ -282,7 +282,7 @@ export class OrganisationregisterComponent {
       description: [''],
       password: ['', [Validators.required, Validators.minLength(6)]],
       retypepassword: ['', [Validators.required, Validators.minLength(6)]],
-      // // term: ['', [Validators.required]],
+      term: [true, [Validators.required]],
 
     })
   }

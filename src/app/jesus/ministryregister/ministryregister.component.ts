@@ -53,7 +53,7 @@ export class MinistryregisterComponent {
       // dob: ['', [Validators.required]],
       pastor: [''],
       description: [''],
-      // // term: ['', [Validators.required]],
+      term: [true, [Validators.required]],
 
     })
   }

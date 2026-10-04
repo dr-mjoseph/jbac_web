@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-10-03T17:11:20.709Z",
+  "timestamp": "2026-10-04T06:48:16.738Z",
   "webApp": {
     "routesTested": 57,
     "routesWithErrors": 57,
@@ -51,7 +51,7 @@
         ],
         "networkErrors": [
           "GET https://kit.fontawesome.com/a076d05399.js - net::ERR_ABORTED",
-          "POST https://www.youtube.com/api/stats/qoe?cpn=9Po7FdOGm_X6icRx&el=embedded&ns=yt&fexp=v1%2C100673025%2C-76668381%2C27058999%2C34656%2C124674%2C117689%2C9252%2C16509%2C23206%2C100702%2C15105%2C25059%2C4174%2C30446%2C18706%2C26008%2C13015%2C14666%2C1422%2C6620%2C2784%2C23826%2C9500%2C1840%2C24119%2C32526%2C38192%2C20589%2C4199%2C30114%2C9181%2C32875%2C20108%2C6032%2C1168%2C372%2C7758%2C18832%2C11374%2C4115%2C11462%2C26847%2C1352%2C13723%2C4366%2C9716%2C3614%2C26539%2C3843%2C17160%2C1340%2C6470%2C4434%2C3241%2C4%2C17339%2C9038%2C1537%2C5824%2C20492%2C1%2C2058%2C10221%2C5675%2C15388%2C9179%2C6387%2C3306%2C4595%2C9279%2C3640%2C9%2C5316%2C1326%2C940%2C4783%2C5469%2C3423%2C12240%2C12476%2C816%2C589%2C7182%2C3374&cl=990399410&seq=1&event=streamingstats&docid=xKb9CQvHYUQ&cbr=HeadlessChrome&cbrver=154.0.0.0&c=WEB_EMBEDDED_PLAYER&cver=2.20261002.01.00&cplayer=UNIPLAYER&cos=Windows&cosver=10.0&cplatform=DESKTOP&vps=0.000:N,0.000:ER&cmt=0.000:0.000,0.000:0.000&error=0.000:auth::0.000:0;a6s.0;r.Video_unavailable&vis=0.000:0&bh=0.000:0.000&qclc=ChA5UG83RmRPR21fWDZpY1J4EAE - net::ERR_ABORTED"
+          "POST https://www.youtube.com/api/stats/qoe?cpn=CrAgr5CWXRRRB7C0&el=embedded&ns=yt&fexp=v1%2C100673025%2C-76668381%2C494888%2C26564111%2C34656%2C124674%2C117689%2C9252%2C16509%2C23206%2C35402%2C65300%2C15105%2C25059%2C4174%2C30447%2C18705%2C26008%2C13015%2C1190%2C13476%2C761%2C661%2C6621%2C2783%2C23826%2C9500%2C1840%2C18113%2C35518%2C3014%2C38193%2C20588%2C4200%2C30113%2C9181%2C32875%2C20108%2C6032%2C1168%2C372%2C7758%2C30205%2C4116%2C11462%2C26846%2C15075%2C4367%2C9716%2C3614%2C4364%2C19884%2C2291%2C3843%2C13241%2C3919%2C1340%2C6470%2C4434%2C1262%2C1982%2C17340%2C9038%2C1537%2C5824%2C20491%2C4%2C2057%2C15895%2C14843%2C545%2C9179%2C929%2C5458%2C1648%2C1659%2C4594%2C6341%2C385%2C581%2C1972%2C3638%2C11%2C5316%2C1326%2C940%2C4783%2C5469%2C3424%2C12239%2C12165%2C1128%2C588&cl=990399410&seq=1&event=streamingstats&docid=xKb9CQvHYUQ&cbr=HeadlessChrome&cbrver=154.0.0.0&c=WEB_EMBEDDED_PLAYER&cver=2.20261002.01.00&cplayer=UNIPLAYER&cos=Windows&cosver=10.0&cplatform=DESKTOP&vps=0.000:N,0.000:ER&cmt=0.000:0.000,0.000:0.000&error=0.000:auth::0.000:0;a6s.0;r.Video_unavailable&vis=0.000:0&bh=0.000:0.000&qclc=ChBDckFncjVDV1hSUlJCN0MwEAE - net::ERR_ABORTED"
         ],
         "dropdowns": [],
         "buttons": [
@@ -84,7 +84,8 @@
         "consoleErrors": [
           "Failed to load resource: the server responded with a status of 403 ()",
           "Failed to load resource: the server responded with a status of 503 ()",
-          "Failed to load resource: the server responded with a status of 503 ()"
+          "Failed to load resource: the server responded with a status of 503 ()",
+          "ERROR [object ay]"
         ],
         "networkErrors": [
           "GET https://kit.fontawesome.com/a076d05399.js - net::ERR_ABORTED"
@@ -126,7 +127,7 @@
         ],
         "fileUploads": [],
         "issues": [
-          "Console Errors: Failed to load resource: the server responded with a status of 403 () | Failed to load resource: the server responded with a status of 503 () | Failed to load resource: the server responded with a status of 503 ()"
+          "Console Errors: Failed to load resource: the server responded with a status of 403 () | Failed to load resource: the server responded with a status of 503 () | Failed to load resource: the server responded with a status of 503 () | ERROR [object ay]"
         ]
       },
       {
@@ -844,12 +845,10 @@
         "route": "/contactus",
         "url": "http://127.0.0.1:4200/contactus",
         "consoleErrors": [
-          "Failed to load resource: the server responded with a status of 403 ()",
-          "Refused to apply style from 'https://fonts.googleapis.com/css2?family=Inter:wght@400;500[_ngcontent-viv-c37];600[_ngcontent-viv-c37];700&display=swap' because its MIME type ('text/html') is not a supported stylesheet MIME type, and strict MIME checking is enabled."
+          "Failed to load resource: the server responded with a status of 403 ()"
         ],
         "networkErrors": [
-          "GET https://kit.fontawesome.com/a076d05399.js - net::ERR_ABORTED",
-          "GET https://fonts.googleapis.com/css2?family=Inter:wght@400;500[_ngcontent-viv-c37];600[_ngcontent-viv-c37];700&display=swap - net::ERR_ABORTED"
+          "GET https://kit.fontawesome.com/a076d05399.js - net::ERR_ABORTED"
         ],
         "dropdowns": [],
         "buttons": [
@@ -888,7 +887,7 @@
         ],
         "fileUploads": [],
         "issues": [
-          "Console Errors: Failed to load resource: the server responded with a status of 403 () | Refused to apply style from 'https://fonts.googleapis.com/css2?family=Inter:wght@400;500[_ngcontent-viv-c37];600[_ngcontent-viv-c37];700&display=swap' because its MIME type ('text/html') is not a supported stylesheet MIME type, and strict MIME checking is enabled."
+          "Console Errors: Failed to load resource: the server responded with a status of 403 ()"
         ]
       },
       {
@@ -896,12 +895,7 @@
         "url": "http://127.0.0.1:4200/signup",
         "consoleErrors": [
           "Failed to load resource: the server responded with a status of 403 ()",
-          "ERROR TypeError: Cannot read properties of null (reading 'scrollIntoView')",
-          "ERROR Error: Cannot find control with name: 'term'",
-          "ERROR Error: Cannot find control with name: 'term'",
-          "ERROR Error: Cannot find control with name: 'term'",
-          "ERROR Error: Cannot find control with name: 'term'",
-          "ERROR Error: Cannot find control with name: 'term'"
+          "ERROR TypeError: Cannot read properties of null (reading 'scrollIntoView')"
         ],
         "networkErrors": [
           "GET https://kit.fontawesome.com/a076d05399.js - net::ERR_ABORTED"
@@ -963,7 +957,7 @@
         ],
         "fileUploads": [],
         "issues": [
-          "Console Errors: Failed to load resource: the server responded with a status of 403 () | ERROR TypeError: Cannot read properties of null (reading 'scrollIntoView') | ERROR Error: Cannot find control with name: 'term' | ERROR Error: Cannot find control with name: 'term' | ERROR Error: Cannot find control with name: 'term' | ERROR Error: Cannot find control with name: 'term' | ERROR Error: Cannot find control with name: 'term'"
+          "Console Errors: Failed to load resource: the server responded with a status of 403 () | ERROR TypeError: Cannot read properties of null (reading 'scrollIntoView')"
         ]
       },
       {
@@ -1076,7 +1070,7 @@
           "Failed to load resource: the server responded with a status of 403 ()",
           "ERROR TypeError: Cannot read properties of undefined (reading 'length')",
           "Failed to load resource: the server responded with a status of 404 ()",
-          "ERROR [object HttpErrorResponse]"
+          "ERROR [object ay]"
         ],
         "networkErrors": [
           "GET https://kit.fontawesome.com/a076d05399.js - net::ERR_ABORTED"
@@ -1138,7 +1132,7 @@
         ],
         "issues": [
           "Empty Dropdown: 'swal2-select' has no available options!",
-          "Console Errors: Failed to load resource: the server responded with a status of 403 () | ERROR TypeError: Cannot read properties of undefined (reading 'length') | Failed to load resource: the server responded with a status of 404 () | ERROR [object HttpErrorResponse]"
+          "Console Errors: Failed to load resource: the server responded with a status of 403 () | ERROR TypeError: Cannot read properties of undefined (reading 'length') | Failed to load resource: the server responded with a status of 404 () | ERROR [object ay]"
         ]
       },
       {
@@ -1461,7 +1455,7 @@
         "consoleErrors": [
           "Failed to load resource: the server responded with a status of 403 ()",
           "Failed to load resource: the server responded with a status of 403 ()",
-          "ERROR Error: Uncaught (in promise): Error: NG04002: Cannot match any routes. URL Segment: 'undefined'"
+          "ERROR Error: Uncaught (in promise): Error: NG04002"
         ],
         "networkErrors": [
           "GET https://kit.fontawesome.com/a076d05399.js - net::ERR_ABORTED",
@@ -1489,7 +1483,7 @@
         ],
         "fileUploads": [],
         "issues": [
-          "Console Errors: Failed to load resource: the server responded with a status of 403 () | Failed to load resource: the server responded with a status of 403 () | ERROR Error: Uncaught (in promise): Error: NG04002: Cannot match any routes. URL Segment: 'undefined'"
+          "Console Errors: Failed to load resource: the server responded with a status of 403 () | Failed to load resource: the server responded with a status of 403 () | ERROR Error: Uncaught (in promise): Error: NG04002"
         ]
       },
       {
@@ -1740,7 +1734,7 @@
         ],
         "networkErrors": [
           "GET https://kit.fontawesome.com/a076d05399.js - net::ERR_ABORTED",
-          "POST https://www.youtube.com/api/stats/qoe?cpn=R-kw5D0GpIsDSY6A&el=embedded&ns=yt&fexp=v1%2C100673025%2C-76668381%2C27058999%2C34656%2C124674%2C117689%2C9252%2C16509%2C23206%2C100702%2C15105%2C25059%2C4174%2C30446%2C18706%2C26008%2C13015%2C14666%2C1422%2C6620%2C2784%2C23826%2C9500%2C1840%2C24119%2C32526%2C38192%2C20589%2C4199%2C30114%2C9181%2C32875%2C20108%2C6032%2C1168%2C372%2C7758%2C18832%2C11374%2C4115%2C11462%2C26847%2C1352%2C13723%2C4366%2C9716%2C3614%2C16650%2C9889%2C3843%2C17160%2C1340%2C6470%2C4434%2C3241%2C4%2C17339%2C9038%2C1537%2C5824%2C20492%2C1%2C2058%2C10221%2C5675%2C15388%2C9179%2C6387%2C3306%2C4595%2C9279%2C3640%2C9%2C5316%2C1326%2C940%2C4783%2C5469%2C3423%2C12240%2C12476%2C816%2C589%2C7182%2C3374&cl=990399410&seq=1&event=streamingstats&docid=TlLUHZIkSE0&cbr=HeadlessChrome&cbrver=154.0.0.0&c=WEB_EMBEDDED_PLAYER&cver=2.20261002.01.00&cplayer=UNIPLAYER&cos=Windows&cosver=10.0&cplatform=DESKTOP&vps=0.000:N,0.000:ER&cmt=0.000:0.000,0.000:0.000&error=0.000:auth::0.000:0;a6s.0;r.Video_unavailable&vis=0.000:0&bh=0.000:0.000&qclc=ChBSLWt3NUQwR3BJc0RTWTZBEAE - net::ERR_ABORTED"
+          "POST https://www.youtube.com/api/stats/qoe?cpn=8h65j2tXjQdXUOny&el=embedded&ns=yt&fexp=v1%2C100673025%2C-76668381%2C494888%2C26564111%2C34656%2C124674%2C117689%2C9252%2C16509%2C23206%2C35402%2C65300%2C15105%2C25059%2C4174%2C30447%2C18705%2C26008%2C13015%2C1190%2C13476%2C761%2C661%2C6621%2C2783%2C23826%2C9500%2C1840%2C18113%2C35518%2C3014%2C38193%2C20588%2C4200%2C30113%2C9181%2C32875%2C20108%2C6032%2C1168%2C372%2C7758%2C30205%2C4116%2C11462%2C26846%2C15075%2C4367%2C9716%2C3614%2C4364%2C19884%2C2291%2C3843%2C17160%2C1340%2C6470%2C4434%2C1262%2C1982%2C17340%2C9038%2C1537%2C5824%2C20491%2C4%2C2057%2C15895%2C14843%2C545%2C9179%2C929%2C5458%2C1648%2C1659%2C4594%2C6341%2C385%2C2553%2C3638%2C11%2C5316%2C1326%2C940%2C4783%2C5469%2C3424%2C12239%2C12165%2C1128%2C588&cl=990399410&seq=1&event=streamingstats&docid=TlLUHZIkSE0&cbr=HeadlessChrome&cbrver=154.0.0.0&c=WEB_EMBEDDED_PLAYER&cver=2.20261002.01.00&cplayer=UNIPLAYER&cos=Windows&cosver=10.0&cplatform=DESKTOP&vps=0.000:N,0.000:ER&cmt=0.000:0.000,0.000:0.000&error=0.000:auth::0.000:0;a6s.0;r.Video_unavailable&vis=0.000:0&bh=0.000:0.000&qclc=ChA4aDY1ajJ0WGpRZFhVT255EAE - net::ERR_ABORTED"
         ],
         "dropdowns": [],
         "buttons": [
@@ -1998,8 +1992,7 @@
         "route": "/believerregister",
         "url": "http://127.0.0.1:4200/believerregister",
         "consoleErrors": [
-          "Failed to load resource: the server responded with a status of 403 ()",
-          "ERROR Error: Cannot find control with name: 'term'"
+          "Failed to load resource: the server responded with a status of 403 ()"
         ],
         "networkErrors": [
           "GET https://kit.fontawesome.com/a076d05399.js - net::ERR_ABORTED"
@@ -2567,7 +2560,7 @@
           "Empty Dropdown: 'panchayati' has no available options!",
           "Empty Dropdown: 'pastor' has no available options!",
           "Empty Dropdown: 'church' has no available options!",
-          "Console Errors: Failed to load resource: the server responded with a status of 403 () | ERROR Error: Cannot find control with name: 'term'"
+          "Console Errors: Failed to load resource: the server responded with a status of 403 ()"
         ]
       },
       {
@@ -2948,8 +2941,7 @@
         "route": "/ministryregister",
         "url": "http://127.0.0.1:4200/ministryregister",
         "consoleErrors": [
-          "Failed to load resource: the server responded with a status of 403 ()",
-          "ERROR Error: Cannot find control with name: 'term'"
+          "Failed to load resource: the server responded with a status of 403 ()"
         ],
         "networkErrors": [
           "GET https://kit.fontawesome.com/a076d05399.js - net::ERR_ABORTED"
@@ -3152,7 +3144,7 @@
           "Empty Dropdown: 'mandal_id' has no available options!",
           "Empty Dropdown: 'panchayat_id' has no available options!",
           "Empty Dropdown: 'pastor' has no available options!",
-          "Console Errors: Failed to load resource: the server responded with a status of 403 () | ERROR Error: Cannot find control with name: 'term'"
+          "Console Errors: Failed to load resource: the server responded with a status of 403 ()"
         ]
       },
       {
@@ -3160,12 +3152,12 @@
         "url": "http://127.0.0.1:4200/pastorregister",
         "consoleErrors": [
           "Failed to load resource: the server responded with a status of 403 ()",
-          "ERROR TypeError: control.registerOnChange is not a function",
-          "ERROR TypeError: control.registerOnChange is not a function",
-          "ERROR TypeError: control.registerOnChange is not a function",
-          "ERROR TypeError: control.registerOnChange is not a function",
-          "ERROR TypeError: control.registerOnChange is not a function",
-          "ERROR TypeError: control.registerOnChange is not a function"
+          "ERROR TypeError: t.registerOnChange is not a function",
+          "ERROR TypeError: t.registerOnChange is not a function",
+          "ERROR TypeError: t.registerOnChange is not a function",
+          "ERROR TypeError: t.registerOnChange is not a function",
+          "ERROR TypeError: t.registerOnChange is not a function",
+          "ERROR TypeError: t.registerOnChange is not a function"
         ],
         "networkErrors": [
           "GET https://kit.fontawesome.com/a076d05399.js - net::ERR_ABORTED"
@@ -3487,15 +3479,14 @@
           "Empty Dropdown: 'constituency_id' has no available options!",
           "Empty Dropdown: 'mandal_id' has no available options!",
           "Empty Dropdown: 'panchayat_id' has no available options!",
-          "Console Errors: Failed to load resource: the server responded with a status of 403 () | ERROR TypeError: control.registerOnChange is not a function | ERROR TypeError: control.registerOnChange is not a function | ERROR TypeError: control.registerOnChange is not a function | ERROR TypeError: control.registerOnChange is not a function | ERROR TypeError: control.registerOnChange is not a function | ERROR TypeError: control.registerOnChange is not a function"
+          "Console Errors: Failed to load resource: the server responded with a status of 403 () | ERROR TypeError: t.registerOnChange is not a function | ERROR TypeError: t.registerOnChange is not a function | ERROR TypeError: t.registerOnChange is not a function | ERROR TypeError: t.registerOnChange is not a function | ERROR TypeError: t.registerOnChange is not a function | ERROR TypeError: t.registerOnChange is not a function"
         ]
       },
       {
         "route": "/churchregister",
         "url": "http://127.0.0.1:4200/churchregister",
         "consoleErrors": [
-          "Failed to load resource: the server responded with a status of 403 ()",
-          "ERROR Error: Cannot find control with name: 'term'"
+          "Failed to load resource: the server responded with a status of 403 ()"
         ],
         "networkErrors": [
           "GET https://kit.fontawesome.com/a076d05399.js - net::ERR_ABORTED"
@@ -3702,15 +3693,14 @@
           "Empty Dropdown: 'mandal_id' has no available options!",
           "Empty Dropdown: 'village_id' has no available options!",
           "Empty Dropdown: 'pastor_id' has no available options!",
-          "Console Errors: Failed to load resource: the server responded with a status of 403 () | ERROR Error: Cannot find control with name: 'term'"
+          "Console Errors: Failed to load resource: the server responded with a status of 403 ()"
         ]
       },
       {
         "route": "/organisationregister",
         "url": "http://127.0.0.1:4200/organisationregister",
         "consoleErrors": [
-          "Failed to load resource: the server responded with a status of 403 ()",
-          "ERROR Error: Cannot find control with name: 'term'"
+          "Failed to load resource: the server responded with a status of 403 ()"
         ],
         "networkErrors": [
           "GET https://kit.fontawesome.com/a076d05399.js - net::ERR_ABORTED"
@@ -3953,7 +3943,7 @@
           "Empty Dropdown: 'constituencyname' has no available options!",
           "Empty Dropdown: 'mandals' has no available options!",
           "Empty Dropdown: 'panchayati' has no available options!",
-          "Console Errors: Failed to load resource: the server responded with a status of 403 () | ERROR Error: Cannot find control with name: 'term'"
+          "Console Errors: Failed to load resource: the server responded with a status of 403 ()"
         ]
       },
       {
@@ -4277,9 +4267,9 @@
         "url": "http://127.0.0.1:4200/addattacks",
         "consoleErrors": [
           "Failed to load resource: the server responded with a status of 403 ()",
-          "ERROR Error: Cannot find control with name: 'category'",
+          "ERROR TypeError: Cannot read properties of null (reading '_rawValidators')",
           "Uncaught Exception: Cannot read properties of undefined (reading 'top')",
-          "ERROR Error: Cannot find control with name: 'prob_category'"
+          "ERROR TypeError: Cannot read properties of null (reading '_rawValidators')"
         ],
         "networkErrors": [
           "GET https://kit.fontawesome.com/a076d05399.js - net::ERR_ABORTED"
@@ -4525,7 +4515,7 @@
           "Empty Dropdown: 'constituency_id' has no available options!",
           "Empty Dropdown: 'mandal_id' has no available options!",
           "Empty Dropdown: 'village_id' has no available options!",
-          "Console Errors: Failed to load resource: the server responded with a status of 403 () | ERROR Error: Cannot find control with name: 'category' | Uncaught Exception: Cannot read properties of undefined (reading 'top') | ERROR Error: Cannot find control with name: 'prob_category'"
+          "Console Errors: Failed to load resource: the server responded with a status of 403 () | ERROR TypeError: Cannot read properties of null (reading '_rawValidators') | Uncaught Exception: Cannot read properties of undefined (reading 'top') | ERROR TypeError: Cannot read properties of null (reading '_rawValidators')"
         ]
       },
       {
@@ -5369,7 +5359,7 @@
         ],
         "networkErrors": [
           "GET https://kit.fontawesome.com/a076d05399.js - net::ERR_ABORTED",
-          "POST https://www.youtube.com/api/stats/qoe?cpn=b60iW1BDHRgdw9nx&el=embedded&ns=yt&fexp=v1%2C100673025%2C-76668381%2C27058999%2C34656%2C124674%2C117689%2C9252%2C16509%2C23206%2C100702%2C15105%2C25059%2C4174%2C30446%2C18706%2C26008%2C13015%2C14666%2C1422%2C6620%2C2784%2C23826%2C9500%2C1840%2C24119%2C32526%2C38192%2C20589%2C4199%2C30114%2C9181%2C32875%2C20108%2C6032%2C1168%2C372%2C7758%2C18832%2C11374%2C4115%2C11462%2C26847%2C1352%2C13723%2C4366%2C9716%2C3614%2C16649%2C9890%2C3843%2C17160%2C1340%2C6470%2C4434%2C3241%2C4%2C17339%2C9038%2C1537%2C5824%2C20492%2C1%2C2058%2C10221%2C5675%2C15388%2C9179%2C6387%2C3306%2C4595%2C9279%2C3640%2C9%2C5316%2C1326%2C940%2C4783%2C5469%2C3423%2C12240%2C12476%2C816%2C589%2C7182%2C3374&cl=990399410&seq=1&event=streamingstats&docid=MjDV1hHkPkY&cbr=HeadlessChrome&cbrver=154.0.0.0&c=WEB_EMBEDDED_PLAYER&cver=2.20261002.01.00&cplayer=UNIPLAYER&cos=Windows&cosver=10.0&cplatform=DESKTOP&vps=0.000:N,0.000:ER&cmt=0.000:0.000,0.000:0.000&error=0.000:auth::0.000:0;a6s.0;r.Video_unavailable&vis=0.000:0&bh=0.000:0.000&qclc=ChBiNjBpVzFCREhSZ2R3OW54EAE - net::ERR_ABORTED"
+          "POST https://www.youtube.com/api/stats/qoe?cpn=_9SxsMc_owxRtaaO&el=embedded&ns=yt&fexp=v1%2C100673025%2C-76668381%2C494888%2C26564111%2C34656%2C124674%2C117689%2C9252%2C16509%2C23206%2C35402%2C65300%2C15105%2C25059%2C4174%2C30447%2C18705%2C26008%2C13015%2C1190%2C13476%2C761%2C661%2C6621%2C2783%2C23826%2C9500%2C1840%2C18113%2C35518%2C3014%2C38193%2C20588%2C4200%2C30113%2C9181%2C32875%2C20108%2C6032%2C1168%2C372%2C7758%2C30205%2C4116%2C11462%2C26846%2C15075%2C4367%2C9716%2C3614%2C4364%2C19884%2C2291%2C3843%2C17160%2C1340%2C6470%2C4434%2C1262%2C1982%2C17340%2C9038%2C1537%2C5824%2C20491%2C4%2C2057%2C15895%2C14843%2C545%2C9179%2C929%2C5458%2C1648%2C1659%2C4594%2C6341%2C385%2C2553%2C3638%2C11%2C5316%2C1326%2C940%2C4783%2C5469%2C3424%2C12239%2C12165%2C1128%2C588&cl=990399410&seq=1&event=streamingstats&docid=MjDV1hHkPkY&cbr=HeadlessChrome&cbrver=154.0.0.0&c=WEB_EMBEDDED_PLAYER&cver=2.20261002.01.00&cplayer=UNIPLAYER&cos=Windows&cosver=10.0&cplatform=DESKTOP&vps=0.000:N,0.000:ER&cmt=0.000:0.000,0.000:0.000&error=0.000:auth::0.000:0;a6s.0;r.Video_unavailable&vis=0.000:0&bh=0.000:0.000&qclc=ChBfOVN4c01jX293eFJ0YWFPEAE - net::ERR_ABORTED"
         ],
         "dropdowns": [],
         "buttons": [

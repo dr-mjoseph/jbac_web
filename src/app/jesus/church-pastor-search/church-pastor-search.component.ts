@@ -134,6 +134,7 @@ export class ChurchPastorSearchComponent {
     const id = event && event.target ? event.target.value : event;
     this.search.patchValue({ constituency_id: id, mandal_id: '', pastor_id: '', church: '' });
     this.mandals = [];
+    this.panchayati = [];
     if (id) {
       this.service.getmandals().subscribe(res => {
         if (res && res.data) {
@@ -146,6 +147,14 @@ export class ChurchPastorSearchComponent {
   onMandalChange(event: any) {
     const id = event && event.target ? event.target.value : event;
     this.search.patchValue({ mandal_id: id, pastor_id: '', church: '' });
+    this.panchayati = [];
+    if (id) {
+      this.service.gepanchayatis(id).subscribe((res: any) => {
+        if (res && res.data) {
+          this.panchayati = res.data.filter((data: any) => !id || data.mndl_id == id);
+        }
+      });
+    }
     if (this.form == 1) {
       this.pastorfilter();
     } else if (this.form == 2) {

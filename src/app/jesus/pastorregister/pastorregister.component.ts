@@ -94,7 +94,7 @@ godOptions: string[] = [
       youtube: [''],
       lname: [''],
       god: [''],
-    // // // term: ['', [Validators.required]],
+      term: [true, [Validators.required]],
       password: ['', [Validators.required, Validators.minLength(6)]],
       retypepassword: ['', [Validators.required, Validators.minLength(6)]],
     })
@@ -137,7 +137,7 @@ godOptions: string[] = [
       resconstituencyname: ['', [Validators.required]],
       resdistricts: ['', [Validators.required]],
       god: [''],
-      // // term: ['', [Validators.required]],
+      term: [true, [Validators.required]],
       mother: [''],
       orphon: [''],
       subcaste: [''],
@@ -164,7 +164,7 @@ godOptions: string[] = [
       // dob: ['', [Validators.required]],
       pastor: [''],
       description: [''],
-      // // term: ['', [Validators.required]],
+      term: [true, [Validators.required]],
 
     })
 
@@ -197,7 +197,7 @@ godOptions: string[] = [
       wingtype: ['',],
       facebook: [''],
       //god: [''],
-      // // term: ['', [Validators.required]],
+      term: [true, [Validators.required]],
       lifegoal: [''],
       denomination_id: ['', [Validators.required]],
       villagename: ['', [Validators.required]],
@@ -229,7 +229,7 @@ godOptions: string[] = [
       youtube: [''],
       remarks: [''],
       village_name: ['', [Validators.required]],
-      // // term: ['', [Validators.required]],
+      term: [true, [Validators.required]],
 
     })
 
@@ -256,7 +256,7 @@ godOptions: string[] = [
       panchayati: ['', [Validators.required]],
       villagename: ['', [Validators.required]],
       ward: ['', [Validators.required]],
-      // // term: ['', [Validators.required]]
+      term: [true, [Validators.required]]
     })
 
     this.independentchurchform = this.formBuilder.group({
@@ -294,7 +294,7 @@ godOptions: string[] = [
       description: [''],
       password: ['', [Validators.required, Validators.minLength(6)]],
       retypepassword: ['', [Validators.required, Validators.minLength(6)]],
-      // // term: ['', [Validators.required]],
+      term: [true, [Validators.required]],
 
     })
   }

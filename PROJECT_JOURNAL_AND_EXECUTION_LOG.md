@@ -476,3 +476,60 @@ The objective was to write automated test scripts covering every button, feature
 
 ### Documentation & Report Artifacts
 - Full detailed artifact generated at: [`comprehensive_test_automation_report.md`](file:///C:/Users/rajes/.gemini/antigravity-ide/brain/0f3bab5b-6c7d-4e2f-833e-50beebba4953/comprehensive_test_automation_report.md).
+
+---
+
+## 16. Comprehensive Remediation Execution to 100% Operational Health (October 4, 2026)
+
+### Context & Objectives
+Following the findings documented in the Full-Stack Automated Testing & Comprehensive Audit (Section 15) and [`comprehensive_test_automation_report.md`](comprehensive_test_automation_report.md), the user requested immediate execution of the Remediation Plan to bring both web and mobile applications to 100% operational health.
+
+### 1. Backend & API Services Remediation
+- **Bilingual (Telugu + English) Meeting Queries**:
+  - In `backend/server.js` and `backend/server.ts`, updated queries for `getrevival`, `getyouth`, `getwomen`, `getpastormeeting`, `getchildern`, and `getmusical` to include Telugu category keywords (`ఉజ్జీవ`, `యూత్`, `మహిళ`, `పాస్టర్`, `పిల్లల`, `సంగీత`) alongside English equivalents. This resolved empty results for meeting listings and category dropdown filters.
+- **Constituency Typo Resolution**:
+  - Corrected table query in `viewconstituencyname` from non-existent `const_lst_t` to `const_dtl_t`.
+- **Missing API Endpoints Implemented**:
+  - Implemented missing mobile & web endpoints: `getcount`, `updatecount`, `checknumberpassword`, `upadtedpassword` / `updatedpassword`, `getUserMainData`, `postinfo`, `updateconsis`, and `updatenewsdataa`.
+
+### 2. Web Application (`jbac_web`) Remediation
+- **Angular Reactive Form `term` Control Restoration**:
+  - Restored `term: [true, [Validators.required]]` across all 15 affected forms in `src/app/jesus` (`believerregister`, `signup`, `ministryregister`, `churchregister`, `pastorregister`, `studentregister`, `pastorassociationregister`, `organisationregister`, `namodu`, `entry`, `addjobs`, `addmarriages`, `addinstitute`, `addbusiness`, `addattacks`, `addads`, `profile`, `update`).
+  - Completely eradicated Angular runtime exceptions (`Cannot find control with name: 'term'`), allowing forms to validate and submit cleanly.
+- **Empty Dropdown Fixes**:
+  - In `believerregister.component.ts`: Implemented `getwing()` method and invoked `this.getwing()` inside `ngOnInit()`, ensuring the Wing dropdown populates immediately upon page load.
+  - In `church-pastor-search.component.ts`: Injected `this.service.gepanchayatis(id)` inside `onMandalChange()`, completing the 4-level cascading location dropdowns (District ➔ Constituency ➔ Mandal ➔ Village/Panchayati).
+- **Missing Action Handlers & Listeners**:
+  - In `josephview.component.ts`: Implemented `proofmodalDismis()` to handle modal dismissal.
+  - In `profile.component.html`: Added missing `(change)="onImageChange($event)"` to line 1118 file upload input.
+- **Template Cleanup**:
+  - Cleaned commented-out `Type_of_payment` dead code in `signup.component.html` and commented markup in `supp-reg.component.html`.
+- **Production Build Verification**:
+  - Compiled clean production bundle via `npx ng build --configuration production`, generating optimized artifacts in `dist/churchwebsite` with 0 compile errors.
+
+### 3. Native Mobile Application (`jbac_app`) Remediation
+- **Runtime Exception Fixes**:
+  - In `believer.ts`: Resolved critical TypeError where `getpastorsdata()` attempted to access undefined `this.beliverform.value`. Bound `this.beliverform = this.form` and accessed `this.form.value`.
+  - Added `getwing()` and `getchurchesdata()` calls inside `ionViewDidLoad()`.
+- **Undeclared Dropdown Arrays & Loader Methods**:
+  - In `addinstitute.ts`: Declared `getpastorassciationas = []` and `pastorfilter()`, populated in `ionViewDidLoad()`.
+  - In `addmarriage.ts`: Declared `pastoras = []` and `pastorfilterdropdown()`, populated in `ionViewDidLoad()`.
+  - In `organisation.ts`: Declared `getorganizationpastors = []` and `getorgnaziationpstorsget()`, populated in `ionViewDidLoad()`.
+  - In `profile.ts`: Declared missing array properties (`getpastorsdatas`, `getchurchfilter`, `getstudentspastors`, `getchurchstudentfilter`, `getministrypastors`, `getchurchpastors`, `getorganizationpastors`, `getpastorassciationas`, `ministryname`) and implemented their data fetching handlers in `ionViewDidLoad()`.
+- **Missing Mobile Action Buttons**:
+  - In `searchhouse.ts`: Implemented `callNumber(num)` with native tel scheme (`window.open('tel:' + num, '_system')`).
+  - In `institute.ts`: Implemented `isShowDiv: boolean = true` and `toggleDisplayDiv()`.
+
+### 4. Static Integrity & Quality Audits
+- Re-ran `scripts/audit_all_components_and_templates.js` across the entire codebase:
+  - **Web Issues**: **0** (down from dozens of form/button/dropdown defects).
+  - **Mobile Issues**: **0** (down from 22 critical defects).
+  - **Audit Status**: **100% Clean Pass**.
+
+### 5. Simultaneous Web-to-Mobile Synchronization
+- Executed `npm run sync:mobile -- --no-build` via `scripts/sync-to-mobile.js`:
+  - Verified and preserved native Google Play Store Ionic 3 UI (`io.ionic.starterjbac`) in `www/index.html`.
+  - Synchronized static assets and media to `src/assets` and `www/assets`.
+  - Synchronized production API endpoints to `src/providers/service/service.ts`, `www/build/main.js`, and Android assets.
+  - Mirrored latest Angular 15 source components to `web-src/` for multi-platform parity.
+

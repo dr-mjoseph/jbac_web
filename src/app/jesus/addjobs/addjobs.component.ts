@@ -124,7 +124,7 @@ export class AddjobsComponent {
       location: [''],
       address: ['', [Validators.required]],
       facebook: [''],
-      // // term: ['', [Validators.required]],
+      term: [true, [Validators.required]],
       ministry: [''],
       ministry_id: [''],
     })
@@ -166,7 +166,7 @@ export class AddjobsComponent {
       whealth: [''],
       types: [''],
       self: [''],
-      // // term: ['', [Validators.required]],
+      term: [true, [Validators.required]],
       caste: ['', [Validators.required]],
       subcaste: [''],
       spirti:['']
@@ -188,11 +188,7 @@ export class AddjobsComponent {
       mandals: ['', [Validators.required]],
       village_name: ['', [Validators.required]],
       google_location: [''],
-      
-      // image: [''],
-      // facebook: [''],
-      // youtube: [''],
-      // term: [''],
+      term: [true, [Validators.required]],
     })
 
     this.addsadding = this.formBuilder.group({
@@ -201,7 +197,7 @@ export class AddjobsComponent {
       image: ['', [Validators.required]],
       description: ['', [Validators.required]],
       number: ['', [Validators.required, Validators.minLength(10)]],
-      // term: ['', [Validators.required]]
+      term: [true, [Validators.required]]
     })
 
     this.addingbusiness = this.formBuilder.group({
@@ -217,7 +213,7 @@ export class AddjobsComponent {
       village_name: ['', [Validators.required]],
       ministry_id: [''],
       ward: ['', [Validators.required]],
-      // // term: ['', [Validators.required]],
+      term: [true, [Validators.required]],
     })
 
     this.attacksform = this.formBuilder.group({
@@ -240,7 +236,7 @@ export class AddjobsComponent {
       constituency_id: ['', [Validators.required]],
       mandal_id: ['', [Validators.required]],
       village_id: ['', [Validators.required]],
-      // term: ['', [Validators.required]]
+      term: [true, [Validators.required]]
     })
   }
 

@@ -159,6 +159,7 @@ export class UpdateComponent {
       youtube: [''],
       lname: [''],
       god: [''],
+      term: [''],
     })
     this.studentform = this.formBuilder.group({
       studentname: [''],

@@ -74,7 +74,7 @@ export class BelieverregisterComponent {
       youtube: [''],
       lname: [''],
       god: [''],
-      // // term: ['', [Validators.required]],
+      term: [true, [Validators.required]],
       password: ['', [Validators.required, Validators.minLength(6)]],
       retypepassword: ['', [Validators.required, Validators.minLength(6)]],
     })
@@ -87,6 +87,7 @@ export class BelieverregisterComponent {
   ngOnInit(): void {
     this.getdistric();
     this.getdenomations();
+    this.getwing();
     const datePipe = new DatePipe('en-Us');
     this.now = datePipe.transform(new Date(), 'yyyy-MM-dd');
     this.usr_id = sessionStorage.getItem('usr_id');
@@ -216,6 +217,12 @@ export class BelieverregisterComponent {
     }, error => {
 
     })
+  }
+  getwing() {
+    this.service.getwing().subscribe((res: any) => {
+      this.wings = res && res.data ? res.data : [];
+    }, error => {
+    });
   }
   lead: boolean = false;
   mini: boolean = false;

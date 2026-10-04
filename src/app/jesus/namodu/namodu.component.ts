@@ -88,16 +88,7 @@ export class NamoduComponent {
       village_id: ['', [Validators.required]],
       address: [''],
       description:[''],
-      // mdistrict_id: ['', [Validators.required]],
-      // mconstituency_id: ['', [Validators.required]],
-      // mmandal_id: ['', [Validators.required]],
-      // mpanchayat_id: ['', [Validators.required]],
-      //password: ['', [Validators.required, Validators.minLength(6)]],
-      //retypepassword: ['', [Validators.required, Validators.minLength(6)]],
-      // dob: ['', [Validators.required]],
-      //pastor: [''],
-      // description: [''],
-      //// // term: ['', [Validators.required]],
+      term: [true, [Validators.required]],
 
     })
 

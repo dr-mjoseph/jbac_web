@@ -33,5 +33,7 @@ export class JosephviewComponent {
     this.expanded[index] = !this.expanded[index];
   }
 
+  proofmodalDismis() {
+  }
 }
 

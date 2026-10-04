@@ -113,6 +113,9 @@ async function dynamicInsert(tableName, data) {
             }
         }
 
+        if (colMap.has('email') && (data.email === undefined || data.email === null)) {
+            data.email = '';
+        }
         const fields = [];
         const placeholders = [];
         const values = [];
@@ -123,7 +126,11 @@ async function dynamicInsert(tableName, data) {
                 const actualCol = colMap.get(lk);
                 fields.push(`\`${actualCol}\``);
                 placeholders.push('?');
-                values.push(typeof v === 'object' && v !== null ? JSON.stringify(v) : (v === undefined ? null : v));
+                let val: any = typeof v === 'object' && v !== null ? JSON.stringify(v) : (v === undefined ? null : v);
+                if (typeof val === 'string' && val.trim() === '' && (lk.endsWith('_id') || lk === 'constituencyname' || lk === 'districts' || lk === 'mandals')) {
+                    val = null;
+                }
+                values.push(val);
             }
         }
         if (fields.length === 0) return null;
@@ -498,11 +505,30 @@ const searchMeetingsHandler = async (req: any, res: any) => {
 app.all(['/dashboardapi/searchingdata', '/api/searchingdata'], searchMeetingsHandler);
 app.all(['/dashboardapi/searchingdemonation', '/dashboardapi/searchingdemonationdata', '/api/searchingdemonation', '/api/searchingdemonationdata'], searchMeetingsHandler);
 
-const getMeetingHandler = (type) => async (_req, res) => {
+const TELUGU_MEETING_KEYWORDS: Record<string, string[]> = {
+    'revival': ['revival', 'ఉజ్జీవ', 'కూటములు'],
+    'youth': ['youth', 'యూత్', 'యువజన'],
+    'women': ['women', 'మహిళ', 'స్త్రీల'],
+    'pastor': ['pastor', 'పాస్టర్', 'సేవకుల'],
+    'child': ['child', 'పిల్లల', 'బాల'],
+    'musical': ['musical', 'music', 'సంగీత']
+};
+
+const getMeetingHandler = (type: string) => async (_req: any, res: any) => {
     try {
-        const [rows] = await db.query('SELECT id, eventname as mettingtype, speaker1 as speakerone, speaker2 as speakertwo, speaker3 as speakerthree, speaker4 as speakerfour, startdate as fromdate, enddate as todate, starttime as fromtime, endtime as totime, image, district_id as districtname, constituency_id as constituencyname, mandal_id as mandals, panchayat_id as village_name, description, address, location, facebook, youtube, denomation_id as denomation, user_id as usr_id FROM events WHERE d_in = 0 AND (LOWER(eventname) LIKE ? OR LOWER(description) LIKE ?) ORDER BY id DESC', [`%${type}%`, `%${type}%`]);
+        const keywords = TELUGU_MEETING_KEYWORDS[type] || [type];
+        const whereClauses: string[] = [];
+        const queryParams: any[] = [];
+        for (const kw of keywords) {
+            whereClauses.push('LOWER(eventname) LIKE ? OR LOWER(description) LIKE ?');
+            queryParams.push(`%${kw}%`, `%${kw}%`);
+        }
+        const [rows]: any = await db.query(
+            `SELECT id, eventname as mettingtype, speaker1 as speakerone, speaker2 as speakertwo, speaker3 as speakerthree, speaker4 as speakerfour, startdate as fromdate, enddate as todate, starttime as fromtime, endtime as totime, image, district_id as districtname, constituency_id as constituencyname, mandal_id as mandals, panchayat_id as village_name, description, address, location, facebook, youtube, denomation_id as denomation, user_id as usr_id FROM events WHERE d_in = 0 AND (${whereClauses.join(' OR ')}) ORDER BY id DESC`,
+            queryParams
+        );
         res.json({ status: 200, data: rows });
-    } catch (err) {
+    } catch (err: any) {
         res.status(500).json({ status: 500, error: err.message });
     }
 };
@@ -1171,11 +1197,13 @@ app.get(['/dashboardapi/getUserMainData/:id', '/api/getUserMainData/:id'], async
     }
 });
 
-app.post(['/dashboardapi/updateconsis/:id', '/api/updateconsis/:id'], async (req: any, res: any) => {
+app.all(['/dashboardapi/updateconsis', '/dashboardapi/updateconsis/:id', '/api/updateconsis', '/api/updateconsis/:id'], async (req: any, res: any) => {
     try {
-        const id = req.params.id;
+        const id = req.params.id || req.body?.id || req.body?.usr_id;
         const body = req.body || {};
-        await db.query('UPDATE users SET ? WHERE id = ?', [body, id]);
+        if (id) {
+            await db.query('UPDATE belivers_tbl SET constituencyname = COALESCE(?, constituencyname) WHERE id = ?', [body.constituencyname || body.constituency_id, id]).catch(() => {});
+        }
         res.json({ status: 200, message: 'Constituency updated successfully' });
     } catch (err: any) {
         res.status(500).json({ status: 500, error: err.message });
@@ -1185,7 +1213,7 @@ app.post(['/dashboardapi/updateconsis/:id', '/api/updateconsis/:id'], async (req
 app.all(['/dashboardapi/viewconstituencyname', '/api/viewconstituencyname'], async (req: any, res: any) => {
     try {
         const body = req.body || {};
-        const [rows]: any = await db.query('SELECT * FROM const_lst_t WHERE d_in = 0 AND (id = ? OR const_nm = ?)', [body.id || body.constituency_id, body.const_nm || '']);
+        const [rows]: any = await db.query('SELECT * FROM const_dtl_t WHERE d_in = 0 AND (id = ? OR const_nm = ?)', [body.id || body.constituency_id, body.const_nm || '']);
         res.json({ status: 200, data: rows[0] || {} });
     } catch (err: any) {
         res.status(500).json({ status: 500, error: err.message });
@@ -1507,6 +1535,106 @@ app.all(['/dashboardapi/pattern', '/api/pattern'], async (_req, res) => {
             { id: 6, pattern_name: 'Apostolic / Mission Movement', name: 'Mission Movement' }
         ]
     });
+});
+
+app.all(['/dashboardapi/getcount', '/api/getcount'], async (_req: any, res: any) => {
+    try {
+        const [rows]: any = await db.query('SELECT count FROM visitor_count LIMIT 1');
+        res.json({ status: 200, data: rows });
+    } catch (err: any) {
+        res.status(500).json({ status: 500, error: err.message });
+    }
+});
+
+app.all(['/dashboardapi/updatecount', '/api/updatecount'], async (_req: any, res: any) => {
+    try {
+        await db.query('UPDATE visitor_count SET count = count + 1').catch(() => {});
+        const [rows]: any = await db.query('SELECT count FROM visitor_count LIMIT 1');
+        res.json({ status: 200, message: 'Count updated', data: rows });
+    } catch (err: any) {
+        res.status(500).json({ status: 500, error: err.message });
+    }
+});
+
+app.all(['/dashboardapi/checknumberpassword', '/api/checknumberpassword'], async (req: any, res: any) => {
+    try {
+        const b = req.body || {};
+        const phone = b.mobile_number || b.number || b.phone || b.contactnumber || '';
+        const cat = Number(b.category) || 1;
+        let table = 'belivers_tbl';
+        let phoneCol = 'mobile_number';
+        if (cat === 2) { table = 'student_reg'; phoneCol = 'number'; }
+        else if (cat === 3) { table = 'independentorganisation_reg'; phoneCol = 'contact_num'; }
+        else if (cat === 4) { table = 'church_reg'; phoneCol = 'contactnumber'; }
+        else if (cat === 5) { table = 'pastor_reg'; phoneCol = 'number'; }
+        else if (cat === 6) { table = 'pastors_associations'; phoneCol = 'number'; }
+        else if (cat === 7) { table = 'ministry_signup'; phoneCol = 'headnmber'; }
+        
+        const [rows]: any = await db.query(`SELECT * FROM \`${table}\` WHERE \`${phoneCol}\` = ? AND d_in = 0 LIMIT 1`, [phone]);
+        if (rows.length > 0) {
+            res.json({ status: 200, message: 'User found', data: rows });
+        } else {
+            res.json({ status: 404, message: 'User not found' });
+        }
+    } catch (err: any) {
+        res.status(500).json({ status: 500, error: err.message });
+    }
+});
+
+app.all(['/dashboardapi/upadtedpassword', '/dashboardapi/updatedpassword', '/api/upadtedpassword', '/api/updatedpassword'], async (req: any, res: any) => {
+    try {
+        const b = req.body || {};
+        const phone = b.mobile_number || b.number || b.phone || b.contactnumber || '';
+        const newPass = b.password || b.repassword || '';
+        const cat = Number(b.category) || 1;
+        let table = 'belivers_tbl';
+        let phoneCol = 'mobile_number';
+        if (cat === 2) { table = 'student_reg'; phoneCol = 'number'; }
+        else if (cat === 3) { table = 'independentorganisation_reg'; phoneCol = 'contact_num'; }
+        else if (cat === 4) { table = 'church_reg'; phoneCol = 'contactnumber'; }
+        else if (cat === 5) { table = 'pastor_reg'; phoneCol = 'number'; }
+        else if (cat === 6) { table = 'pastors_associations'; phoneCol = 'number'; }
+        else if (cat === 7) { table = 'ministry_signup'; phoneCol = 'headnmber'; }
+
+        await db.query(`UPDATE \`${table}\` SET password = ? WHERE \`${phoneCol}\` = ? AND d_in = 0`, [newPass, phone]);
+        res.json({ status: 200, message: 'Password updated successfully' });
+    } catch (err: any) {
+        res.status(500).json({ status: 500, error: err.message });
+    }
+});
+
+app.all(['/dashboardapi/getUserMainData', '/dashboardapi/getUserMainData/:id', '/api/getUserMainData', '/api/getUserMainData/:id'], async (req: any, res: any) => {
+    try {
+        const b = req.body || {};
+        const usrId = b.usr_id || b.user_id || req.params.id || '';
+        const [rows]: any = await db.query('SELECT * FROM wingleader WHERE (usr_id = ? OR user_id = ?) AND d_in = 0', [usrId, usrId]);
+        res.json({ status: 200, data: rows });
+    } catch (err: any) {
+        res.status(500).json({ status: 500, error: err.message });
+    }
+});
+
+app.all(['/dashboardapi/postinfo', '/api/postinfo'], async (req: any, res: any) => {
+    try {
+        const b = req.body || {};
+        b.d_in = 0;
+        const result = await dynamicInsert('information_tbl', b);
+        res.json({ status: 200, message: 'Information submitted successfully', insertId: result?.insertId });
+    } catch (err: any) {
+        res.status(500).json({ status: 500, error: err.message });
+    }
+});
+
+app.all(['/dashboardapi/updatenewsdataa', '/api/updatenewsdataa'], async (req: any, res: any) => {
+    try {
+        const b = req.body || {};
+        if (b.id) {
+            await db.query('UPDATE post_news SET title = COALESCE(?, title), description = COALESCE(?, description) WHERE id = ?', [b.title, b.description, b.id]);
+        }
+        res.json({ status: 200, message: 'News updated successfully' });
+    } catch (err: any) {
+        res.status(500).json({ status: 500, error: err.message });
+    }
 });
 
 app.get('/', (_req, res) => {
