@@ -47,62 +47,61 @@
         <div class="container mt-3" style="padding-bottom: 28px;">
 
             <div class="row">
-                <div class="card" class="max-w-sm rounded overflow-hidden shadow-lg" style="padding:10px">
+                <div class="card max-w-sm rounded overflow-hidden shadow-lg" style="padding:15px; background: #fff; border-radius: 12px; border: 1px solid #e2e8f0;">
                     <form [formGroup]="serachMeetingform">
                         <div class="row">
-                            <div class="col-md-2 mb-4">
+                            <div class="col-md-2 mb-3">
                                 <div class="form-outline">
-                                    <label class="form-label" for="pattern_name">Denomation
-                                        <span style="color:red; -webkit-text-stroke-width:thick;">*</span></label>
+                                    <label class="form-label" for="pattern_name" style="font-weight: 600; font-size: 13px;">Denomination</label>
                                     <select class="form-control" formControlName="denomation_id"
-                                        (change)="serachgender($event,1);">
-                                        <option value="" selected disabled>Select the Denomation </option>
-                                        <option *ngFor="let i of denomation" value="{{i.id}}">
+                                        (change)="serachgender($event,1);" style="height:38px; width: 100%;">
+                                        <option value="">All Denominations</option>
+                                        <option *ngFor="let i of denomation" [value]="i.id">
                                             {{i.denomation_name}}</option>
                                     </select>
                                 </div>
                             </div>
-                            <div class="col-md-2 mb-4">
+                            <div class="col-md-2 mb-3">
                                 <div class="form-outline">
-                                    <label class="form-label">Ministry </label>
+                                    <label class="form-label" style="font-weight: 600; font-size: 13px;">Ministry</label>
                                     <select class="form-control" formControlName="ministry_id"
-                                        (change)="serachgender($event,2);">
-                                        <option value="" selected disabled>Select the Ministry </option>
-                                        <option *ngFor="let i of ministryname" value="{{i.id}}">
+                                        (change)="serachgender($event,2);" style="height:38px; width: 100%;">
+                                        <option value="">All Ministries</option>
+                                        <option *ngFor="let i of ministryname" [value]="i.id">
                                             {{i.ministryname}}</option>
                                     </select>
                                 </div>
                             </div>
 
-                            <div class="col-md-2 mb-4">
+                            <div class="col-md-2 mb-3">
                                 <div class="form-outline">
-                                    <label class="form-label">Gender</label>
+                                    <label class="form-label" style="font-weight: 600; font-size: 13px;">Gender</label>
                                     <select class="form-control" formControlName="gender"
-                                        (change)="serachgender($event,3);" style="height:37px;width: 273px;">
-                                        <option value="" selected disabled>Select Gender</option>
+                                        (change)="serachgender($event,3);" style="height:38px; width: 100%;">
+                                        <option value="">All Genders</option>
                                         <option value="Male">Male</option>
                                         <option value="Female">Female</option>
                                     </select>
                                 </div>
                             </div>
-                            <div class="col-md-2 mb-4">
+                            <div class="col-md-2 mb-3">
                                 <div class="form-outline">
-                                    <label class="form-label">Married Status</label>
+                                    <label class="form-label" style="font-weight: 600; font-size: 13px;">Marital Status</label>
                                     <select class="form-control" formControlName="status"
-                                        (change)="serachcaste($event,4);" style="height:37px;width: 273px;">
-                                        <option value="" selected disabled>Select Status</option>
+                                        (change)="serachcaste($event,4);" style="height:38px; width: 100%;">
+                                        <option value="">All Statuses</option>
                                         <option value="Single">Single</option>
                                         <option value="Married">Married</option>
                                         <option value="Divorce">Divorce</option>
                                     </select>
                                 </div>
                             </div>
-                            <div class="col-md-2 mb-4">
+                            <div class="col-md-2 mb-3">
                                 <div class="form-outline">
-                                    <label class="form-label">మీ కులం</label>
+                                    <label class="form-label" style="font-weight: 600; font-size: 13px;">Caste / కులం</label>
                                     <select class="form-control" formControlName="caste" (change)="serach($event,5);"
-                                        style="height:37px;width: 150px;">
-                                        <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
+                                        style="height:38px; width: 100%;">
+                                        <option value="">All Castes</option>
                                         <option value="SC">No Caste</option>
                                         <option value="SC">SC</option>
                                         <option value="ST">ST</option>
@@ -115,88 +114,89 @@
                                     </select>
                                 </div>
                             </div>
-                            <div class="col-md-2 mb-4">
+                            <div class="col-md-2 mb-3">
                                 <div class="form-outline">
-                                    <label class="form-label">Spiritual Status</label>
+                                    <label class="form-label" style="font-weight: 600; font-size: 13px;">Spiritual Status</label>
                                     <select class="form-control" formControlName="spirti"
-                                        style="height:37px;width: 150px;" (change)="spirit($event,6)">
-                                        <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
+                                        style="height:38px; width: 100%;" (change)="spirit($event,6)">
+                                        <option value="">All Spiritual</option>
                                         <option value="practicingchristian">Practicing Christian</option>
                                         <option value="nominalchristian">Nominal Christian</option>
                                         <option value="festivalchristian">Festival Christian</option>
                                         <option value="justbelievingjesus">Just Believing Jesus</option>
                                     </select>
-
                                 </div>
                             </div>
                         </div>
-                        <br>
-                        <div class="row">
-                            <div class="col-md-2 pb-2">
+
+                        <div class="row mt-2">
+                            <div class="col-md-2 mb-3">
                                 <div class="form-outline">
-                                    <label class="form-label">Select Districts </label>
+                                    <label class="form-label" style="font-weight: 600; font-size: 13px;">Districts / జిల్లా</label>
                                     <select class="form-control" formControlName="district_id"
                                         (change)="onDistrictChange($event);"
-                                        style="height:37px;width: 273px;">
-                                        <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
-                                        <option value="{{item.id}}" *ngFor="let item of districts">
+                                        style="height:38px; width: 100%;">
+                                        <option value="">All Districts</option>
+                                        <option [value]="item.id" *ngFor="let item of districts">
                                             {{item.distrct_nm}}
                                         </option>
                                     </select>
                                 </div>
                             </div>
 
-                            <div class="col-md-2 mb-4 pb-2">
+                            <div class="col-md-2 mb-3">
                                 <div class="form-outline">
-                                    <label class="form-label">నియోజకవర్గం ఎంచుకోండి </label>
+                                    <label class="form-label" style="font-weight: 600; font-size: 13px;">నియోజకవర్గం</label>
                                     <select class="form-control" formControlName="constenncy_id"
                                         (change)="onConstituencyChange($event);"
-                                        style="height:37px;width: 273px;">
-                                        <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
-                                        <option value="{{item.id}}" *ngFor="let item of constituency">
+                                        style="height:38px; width: 100%;">
+                                        <option value="">All Constituencies</option>
+                                        <option [value]="item.id" *ngFor="let item of constituency">
                                             {{item.const_nm}}
                                         </option>
                                     </select>
                                 </div>
                             </div>
-                            <div class="col-md-2 mb-4 pb-2">
+                            <div class="col-md-2 mb-3">
                                 <div class="form-outline">
-                                    <label class="form-label">మండలం ఎంచుకోండి </label>
+                                    <label class="form-label" style="font-weight: 600; font-size: 13px;">మండలం</label>
                                     <select class="form-control" formControlName="mandal_id"
                                         (change)="onMandalChange($event);"
-                                        style="height:37px;width: 273px;">
-                                        <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
-                                        <option value="{{item.id}}" *ngFor="let item of mandals">
+                                        style="height:38px; width: 100%;">
+                                        <option value="">All Mandals</option>
+                                        <option [value]="item.id" *ngFor="let item of mandals">
                                             {{item.mndl_nm}}
                                         </option>
                                     </select>
                                 </div>
                             </div>
-                            <div class="col-md-2 mb-4 pb-2">
+                            <div class="col-md-2 mb-3">
                                 <div class="form-outline">
-                                    <label class="form-label">పంచాయతీ ఎంచుకోండి </label>
+                                    <label class="form-label" style="font-weight: 600; font-size: 13px;">పంచాయతీ</label>
                                     <select class="form-control" formControlName="panchayati_id"
-                                        (change)="onPanchayatiChange($event);" style="height:37px;width: 273px;">
-                                        <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
-                                        <option value="{{item.id}}" *ngFor="let item of panchayati">
+                                        (change)="onPanchayatiChange($event);" style="height:38px; width: 100%;">
+                                        <option value="">All Panchayats</option>
+                                        <option [value]="item.id" *ngFor="let item of panchayati">
                                             {{item.pnchyt_nm}}
                                         </option>
                                     </select>
                                 </div>
                             </div>
 
-                            <div class="col-md-2 mb-4 pb-2">
-                                <br>
-                                <button type="submit" class="default-btn  user-all-btn"
-                                    style="padding-top:5px; text-align: center; background-color: aquamarine;"
-                                    (click)="search()">Search
+                            <div class="col-md-2 mb-3">
+                                <label class="form-label d-none d-md-block">&nbsp;</label>
+                                <button type="button" class="btn btn-primary w-100"
+                                    style="height: 38px; font-weight: 600; background-color: #2b7a78; border-color: #2b7a78; color: #fff;"
+                                    (click)="search()">
+                                    <i class="fa fa-search"></i> Search
                                 </button>
                             </div>
-                            <div class="col-md-2 mb-4 pb-2">
-                                &nbsp;&nbsp;&nbsp;&nbsp;
-                                <button type="submit" class="default-btn  user-all-btn"
-                                    style="padding-top:5px; text-align: center; background-color: aquamarine;"
-                                    (click)="reset()">Reset
+                            <div class="col-md-2 mb-3">
+                                <label class="form-label d-none d-md-block">&nbsp;</label>
+                                <button type="button" class="btn btn-outline-secondary w-100"
+                                    style="height: 38px; font-weight: 600;"
+                                    (click)="reset()">
+                                    <i class="fa fa-refresh"></i> Reset
                                 </button>
                             </div>
                         </div>
@@ -207,62 +207,67 @@
         <br>
 
         <div class="row">
-            <div class="col-lg-7">
-                <div class="row">
-                    <div class="col-lg-4" *ngFor="let item of marriagedata" style="margin-bottom: 16px;">
-                        <div class="flex justify-center items-center h-screen">
-                            <div class="main">
-                                <ul class="cards">
-                                    <li class="cards_item">
-                                        <div class="card" tabindex="0">
-                                            <div class="card_image"><img [src]="item.image || 'assets/images/user.jpg'"
-                                                    (error)="$any($event.target).src = 'assets/images/user.jpg'"
-                                                    (click)="openimg(item.image || 'assets/images/user.jpg',openmodel)" alt="image"
-                                                    style="height:250px; width:250px; object-fit: cover;"></div>
-                                            <div class="card_content">
-                                                <div class="card_text">
+            <div class="col-lg-8">
+                <!-- Empty State Message when no records found -->
+                <div *ngIf="noRecordsFound || (hasSearched && (!marriagedata || marriagedata.length === 0))" class="col-12 py-5 text-center">
+                    <div class="alert alert-warning shadow-sm p-4 mx-auto" style="max-width: 650px; border-radius: 12px; font-size: 18px; font-weight: 500; background-color: #fff3cd; color: #856404; border: 1px solid #ffeeba;">
+                        <i class="fa fa-info-circle fa-2x mb-2 d-block text-warning"></i>
+                        <h4 style="color: #856404; font-weight: 600; margin-bottom: 8px;">you have no records / no records found</h4>
+                        <p class="mb-0 text-muted" style="font-size: 14px;">మీరు వెతికిన వివరాలకు సరిపడే వివాహ సంబంధాలు ఏవీ లభించలేదు. / No marriage records found matching your filters.</p>
+                    </div>
+                </div>
 
-                                                    <p>Denomination:<strong> {{item.denomination_id}}</strong></p>
-                                                    <p>Name:<strong> {{item.name}}</strong></p>
-                                                    <p>Work: <b>{{item.work}} </b></p>
-                                                    <p>Address:<strong> {{item.address}}</strong></p>
-                                                    <a (click)="toggleDisplayDiv()" style="color:rgb(175, 15, 15)">
-                                                        READMORE
-                                                    </a>
-                                                    <!-- <p [hidden]="isShowDiv"> Phone Number:<strong>{{item.phonenumber}}</strong></p> -->
-                                                    <p [hidden]="isShowDiv"> Color:<strong>{{item.color}}</strong></p>
-                                                    <p [hidden]="isShowDiv"> Height:<strong>{{item.height}}</strong></p>
-                                                    <p [hidden]="isShowDiv">Gender:<strong>{{item.gender}}</strong></p>
-                                                    <p [hidden]="isShowDiv">Date Of Birth:<strong>{{item.dob
-                                                            |date:'dd/MM/yyyy'}}</strong></p>
-                                                    <p [hidden]="isShowDiv">Status:<strong>{{item.status}}</strong></p>
-                                                    <p [hidden]="isShowDiv">Location:<strong>{{item.location}}</strong>
-                                                    </p>
-                                                    <p [hidden]="isShowDiv">
-                                                        Description:<strong>{{item.description}}</strong></p>
-                                                    <p [hidden]="isShowDiv">
-                                                        Sub Caste:<strong>{{item.subcaste}}</strong></p>
-                                                    <!-- <i class='fas fa-map-marker-alt' style='font-size:36px' [hidden]="isShowDiv"> <a
-                                                href="{{item.location}}">location</a></i> -->
-                                                    <a href="{{item.location}}" [hidden]="isShowDiv">
-                                                        <img src="assets/images/marker.png" style="width:45px;"></a>
-                                                    <a href="tel:+91{{item.phonenumber}}" [hidden]="isShowDiv">&nbsp;
-                                                        <img src="assets/images/phone.png" style="width:45px;
-                                                                        "></a>
+                <!-- Marriage Cards Grid when records exist -->
+                <div class="row" *ngIf="marriagedata && marriagedata.length > 0 && !noRecordsFound">
+                    <div class="col-md-6 mb-4" *ngFor="let item of marriagedata">
+                        <div class="card h-100 shadow-sm" style="border-radius: 12px; overflow: hidden; background: #ffffff; border: 1px solid #e2e8f0; color: #2d3748;">
+                            <div style="background-color: #edf2f7; text-align: center; padding: 12px; border-bottom: 1px solid #e2e8f0;">
+                                <img [src]="item.image || 'assets/images/user.jpg'"
+                                    (error)="$any($event.target).src = 'assets/images/user.jpg'"
+                                    (click)="openimg(item.image || 'assets/images/user.jpg', openmodel)"
+                                    alt="{{item.name}}"
+                                    style="height: 230px; width: 100%; max-width: 250px; object-fit: cover; border-radius: 8px; cursor: pointer; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);">
+                            </div>
+                            <div class="card-body p-3" style="font-size: 14px;">
+                                <h5 class="card-title font-weight-bold mb-2" style="font-size: 18px; color: #1a365d;">{{ item.name || 'Anonymous' }}</h5>
+                                <div class="mb-1" *ngIf="item.denomination_id"><strong>Denomination:</strong> {{ getDenominationName(item.denomination_id) || item.denomination_name || item.denomation_name || item.denomination_id }}</div>
+                                <div class="mb-1" *ngIf="item.ministry_id"><strong>Ministry:</strong> {{ getMinistryName(item.ministry_id) || item.ministryname || item.ministry_id }}</div>
+                                <div class="mb-1" *ngIf="item.work"><strong>Work:</strong> {{ item.work }}</div>
+                                <div class="mb-1"><strong>Gender:</strong> {{ item.gender || 'N/A' }} &nbsp;|&nbsp; <strong>Status:</strong> {{ item.status || 'N/A' }}</div>
+                                <div class="mb-1" *ngIf="item.caste"><strong>Caste:</strong> {{ item.caste }} <span *ngIf="item.subcaste">({{ item.subcaste }})</span></div>
+                                <div class="mb-2" *ngIf="item.address"><strong>Address:</strong> {{ item.address }}</div>
 
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </li>
-                                </ul>
+                                <!-- Read More Toggle -->
+                                <div class="my-2">
+                                    <a (click)="toggleShowMore(item)" style="color: #c0392b; font-weight: 600; cursor: pointer; text-decoration: underline;">
+                                        {{ item.showMore ? '▲ SHOW LESS' : '▼ READ MORE / DETAILS' }}
+                                    </a>
+                                </div>
+
+                                <!-- Extended Details on Toggle -->
+                                <div *ngIf="item.showMore" class="mt-2 pt-2 border-top text-muted" style="background-color: #f7fafc; padding: 10px; border-radius: 6px;">
+                                    <div class="mb-1" *ngIf="item.dob"><strong>Date of Birth:</strong> {{ item.dob | date:'dd/MM/yyyy' }}</div>
+                                    <div class="mb-1" *ngIf="item.height"><strong>Height:</strong> {{ item.height }}</div>
+                                    <div class="mb-1" *ngIf="item.color"><strong>Complexion:</strong> {{ item.color }}</div>
+                                    <div class="mb-1" *ngIf="item.spirti"><strong>Spiritual Status:</strong> {{ item.spirti }}</div>
+                                    <div class="mb-1" *ngIf="item.education"><strong>Education:</strong> {{ item.education }}</div>
+                                    <div class="mb-1" *ngIf="item.description"><strong>Description:</strong> {{ item.description }}</div>
+                                    <div class="mt-2 d-flex align-items-center">
+                                        <a *ngIf="item.location" [href]="item.location" target="_blank" class="mr-3 text-info" style="margin-right: 15px;">
+                                            <img src="assets/images/marker.png" style="width: 28px; vertical-align: middle;"> Location
+                                        </a>
+                                        <a *ngIf="item.phonenumber" [href]="'tel:+91' + item.phonenumber" class="btn btn-sm btn-success text-white">
+                                            <img src="assets/images/phone.png" style="width: 20px; vertical-align: middle;"> Call: {{ item.phonenumber }}
+                                        </a>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-
-            <div class="col-lg-5">
+            <div class="col-lg-4">
                 <marquee onmouseover="this.stop();" onmouseout="this.start();" direction="up"
                     style="scroll-behavior: smooth;">
                     <div class="container">

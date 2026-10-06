@@ -286,9 +286,17 @@ postwishform(data: any) {
       return error;
     }));
   }
+  getministry() {
+    var data = {}
+    return this.http.post<any>(this.testApi + `getministry`, data).pipe(map(res => {
+      return res;
+    }, (error: any) => {
+      return error;
+    }));
+  }
   getbeliversdata() {
     var data = {}
-    return this.http.post<any>(this.testApi + `getbeliversdata`, data).pipe(map(res => {
+    return this.http.post<any>(this.testApi + `getministry`, data).pipe(map(res => {
       return res;
     }, (error: any) => {
       return error;

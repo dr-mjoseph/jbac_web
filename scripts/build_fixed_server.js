@@ -735,8 +735,13 @@ app.all(['/dashboardapi/getjobs', '/dashboardapi/getjob', '/dashboardapi/searchj
 // Marriages (marriages)
 app.post(['/dashboardapi/postmarriages', '/dashboardapi/postingmarriages', '/api/postmarriages'], async (req, res) => {
     try {
-        const m = req.body;
+        const m = req.body || {};
         m.d_in = 0;
+        if (m.districtname && !m.district_id) m.district_id = m.districtname;
+        if (m.constituencyname && !m.constituency_id) m.constituency_id = m.constituencyname;
+        if (m.mandals && !m.mandal_id) m.mandal_id = m.mandals;
+        if (m.village_name && !m.panchayat_id) m.panchayat_id = m.village_name;
+        if (m.denomation_id && !m.denomination_id) m.denomination_id = m.denomation_id;
         const result = await dynamicInsert('marriages', m);
         res.json({ status: 200, message: 'Marriage profile created successfully', insertId: result?.insertId });
     } catch (err) {
@@ -744,9 +749,34 @@ app.post(['/dashboardapi/postmarriages', '/dashboardapi/postingmarriages', '/api
     }
 });
 
-app.all(['/dashboardapi/searchmarriages', '/dashboardapi/Searchmarriages', '/api/marriages'], async (_req, res) => {
+app.all(['/dashboardapi/searchmarriages', '/dashboardapi/Searchmarriages', '/dashboardapi/searchingmarriages', '/api/marriages'], async (req, res) => {
     try {
-        const [rows] = await db.query('SELECT * FROM marriages WHERE d_in = 0 ORDER BY id DESC');
+        const body = req.body || {};
+        let sql = 'SELECT * FROM marriages WHERE d_in = 0';
+        const params = [];
+        if (body.columnid && body.name) {
+            if (body.columnid == 1) { sql += ' AND denomination_id = ?'; params.push(body.name); }
+            else if (body.columnid == 2) { sql += ' AND ministry_id = ?'; params.push(body.name); }
+            else if (body.columnid == 3) { sql += ' AND gender = ?'; params.push(body.name); }
+            else if (body.columnid == 4) { sql += ' AND status = ?'; params.push(body.name); }
+            else if (body.columnid == 5) { sql += ' AND caste = ?'; params.push(body.name); }
+            else if (body.columnid == 6) { sql += ' AND (spirti LIKE ? OR description LIKE ?)'; params.push(`%${body.name}%`, `%${body.name}%`); }
+        }
+        if (body.gender) { sql += ' AND gender = ?'; params.push(body.gender); }
+        if (body.status) { sql += ' AND status = ?'; params.push(body.status); }
+        if (body.caste) { sql += ' AND caste = ?'; params.push(body.caste); }
+        if (body.subcaste) { sql += ' AND subcaste = ?'; params.push(body.subcaste); }
+        if (body.denomination_id || body.denomation_id) { sql += ' AND denomination_id = ?'; params.push(body.denomination_id || body.denomation_id); }
+        if (body.ministry_id) { sql += ' AND ministry_id = ?'; params.push(body.ministry_id); }
+        if (body.spirti || body.spirituality) { sql += ' AND (spirti LIKE ? OR description LIKE ?)'; params.push(`%${body.spirti || body.spirituality}%`, `%${body.spirti || body.spirituality}%`); }
+        if (body.district_id) { sql += ' AND district_id = ?'; params.push(body.district_id); }
+        if (body.constenncy_id || body.constituency_id) { sql += ' AND constituency_id = ?'; params.push(body.constenncy_id || body.constituency_id); }
+        if (body.mandal_id || body.mandals) { sql += ' AND mandal_id = ?'; params.push(body.mandal_id || body.mandals); }
+        if (body.village_id || body.panchayat_id || body.panchayati_id) { sql += ' AND (village_id = ? OR panchayat_id = ?)'; params.push(body.village_id || body.panchayat_id || body.panchayati_id, body.village_id || body.panchayat_id || body.panchayati_id); }
+        if (body.id) { sql += ' AND id = ?'; params.push(body.id); }
+
+        sql += ' ORDER BY id DESC';
+        const [rows] = await db.query(sql, params);
         res.json({ status: 200, data: rows });
     } catch (err) {
         res.status(500).json({ status: 500, error: err.message });

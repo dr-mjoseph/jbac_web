@@ -166,6 +166,14 @@ async function runAutomation() {
   const page = await browser.newPage();
   await page.setViewport({ width: 1280, height: 800 });
 
+  await page.evaluateOnNewDocument(() => {
+    sessionStorage.setItem('auth_ind', '1');
+    sessionStorage.setItem('usr_id', '1');
+    sessionStorage.setItem('name', 'Admin');
+    sessionStorage.setItem('role', '1');
+    sessionStorage.setItem('tableid', '1');
+  });
+
   for (let i = 0; i < WEB_ROUTES.length; i++) {
     const route = WEB_ROUTES[i];
     const url = `http://127.0.0.1:4200/${route}`;
@@ -323,6 +331,146 @@ async function runAutomation() {
     fullReport.webApp.routesTested++;
     fullReport.webApp.details.push(routeDetail);
   }
+
+  // -------------------------------------------------------------
+  // DEDICATED MARRIAGE MODULE VERIFICATION
+  // -------------------------------------------------------------
+  console.log('\n--- VERIFYING MARRIAGES MODULE & REQUIREMENTS ---');
+  const marriageVerification = {
+    addMarriagesMinistryVisible: false,
+    addMarriagesMinistryCount: 0,
+    marriagesMinistryVisible: false,
+    marriagesMinistryCount: 0,
+    searchSuccessfulWithData: false,
+    dataCardCount: 0,
+    searchEmptyStateShowsMessage: false,
+    emptyStateMessageText: ''
+  };
+
+  try {
+    // 1. Verify /addmarriages ministry dropdown
+    console.log('[MARRIAGE CHECK] Testing /addmarriages ministry dropdown visibility...');
+    await page.goto('http://127.0.0.1:4200/addmarriages', { waitUntil: 'networkidle2', timeout: 15000 });
+    await new Promise(r => setTimeout(r, 2000));
+    
+    const addMinistryInfo = await page.evaluate(() => {
+      const select = document.querySelector('select[formcontrolname="ministry_id"]');
+      if (!select) return { found: false };
+      const options = Array.from(select.querySelectorAll('option')).filter(o => o.value !== '');
+      const visibleTexts = options.map(o => o.innerText.trim()).filter(t => t.length > 0);
+      return {
+        found: true,
+        count: options.length,
+        visibleCount: visibleTexts.length,
+        samples: visibleTexts.slice(0, 5)
+      };
+    });
+    marriageVerification.addMarriagesMinistryCount = addMinistryInfo.count || 0;
+    marriageVerification.addMarriagesMinistryVisible = (addMinistryInfo.visibleCount || 0) > 0;
+    console.log('[MARRIAGE CHECK] /addmarriages Ministry Dropdown:', addMinistryInfo);
+
+    // 2. Verify /marriages ministry dropdown & searching
+    console.log('[MARRIAGE CHECK] Testing /marriages ministry dropdown & searching...');
+    await page.goto('http://127.0.0.1:4200/marriages', { waitUntil: 'networkidle2', timeout: 15000 });
+    await new Promise(r => setTimeout(r, 2500));
+
+    const searchMinistryInfo = await page.evaluate(() => {
+      const select = document.querySelector('select[formcontrolname="ministry_id"]');
+      if (!select) return { found: false };
+      const options = Array.from(select.querySelectorAll('option')).filter(o => o.value !== '');
+      const visibleTexts = options.map(o => o.innerText.trim()).filter(t => t.length > 0);
+      return {
+        found: true,
+        count: options.length,
+        visibleCount: visibleTexts.length,
+        samples: visibleTexts.slice(0, 5)
+      };
+    });
+    marriageVerification.marriagesMinistryCount = searchMinistryInfo.count || 0;
+    marriageVerification.marriagesMinistryVisible = (searchMinistryInfo.visibleCount || 0) > 0;
+    console.log('[MARRIAGE CHECK] /marriages Ministry Dropdown:', searchMinistryInfo);
+
+    // 3. Test Search with existing data (Default / initial cards)
+    const initialCards = await page.evaluate(() => {
+      const cards = document.querySelectorAll('.card-title, .card.h-100');
+      return cards.length;
+    });
+    console.log(`[MARRIAGE CHECK] Initial marriage cards loaded: ${initialCards}`);
+    if (initialCards > 0) {
+      marriageVerification.searchSuccessfulWithData = true;
+      marriageVerification.dataCardCount = initialCards;
+    }
+
+    // 4. Test Search with filter that returns NO records (e.g. Gender: Female)
+    console.log('[MARRIAGE CHECK] Testing search filter with NO records (Gender: Female)...');
+    await page.evaluate(() => {
+      const genderSelect = document.querySelector('select[formcontrolname="gender"]');
+      if (genderSelect) {
+        genderSelect.value = 'Female';
+        genderSelect.dispatchEvent(new Event('change', { bubbles: true }));
+      }
+    });
+    await new Promise(r => setTimeout(r, 500));
+    
+    // Click Search button
+    await page.evaluate(() => {
+      const btns = Array.from(document.querySelectorAll('button'));
+      const searchBtn = btns.find(b => b.innerText.includes('Search'));
+      if (searchBtn) searchBtn.click();
+    });
+    await new Promise(r => setTimeout(r, 2000));
+
+    // Verify empty state message in DOM
+    const emptyStateCheck = await page.evaluate(() => {
+      const bodyText = document.body.innerText;
+      const targetMatch = bodyText.toLowerCase().includes('you have no records / no records found') ||
+                         bodyText.toLowerCase().includes('no records found');
+      const alertEl = document.querySelector('.alert-warning');
+      const alertText = alertEl ? alertEl.innerText.trim() : '';
+      return {
+        matched: targetMatch,
+        alertText: alertText
+      };
+    });
+    marriageVerification.searchEmptyStateShowsMessage = emptyStateCheck.matched;
+    marriageVerification.emptyStateMessageText = emptyStateCheck.alertText;
+    console.log('[MARRIAGE CHECK] Empty state verification result:', emptyStateCheck);
+
+    // 5. Test Search with filter that HAS records (Gender: Male)
+    console.log('[MARRIAGE CHECK] Testing search filter WITH records (Gender: Male)...');
+    await page.evaluate(() => {
+      const genderSelect = document.querySelector('select[formcontrolname="gender"]');
+      if (genderSelect) {
+        genderSelect.value = 'Male';
+        genderSelect.dispatchEvent(new Event('change', { bubbles: true }));
+      }
+    });
+    await new Promise(r => setTimeout(r, 500));
+    await page.evaluate(() => {
+      const btns = Array.from(document.querySelectorAll('button'));
+      const searchBtn = btns.find(b => b.innerText.includes('Search'));
+      if (searchBtn) searchBtn.click();
+    });
+    await new Promise(r => setTimeout(r, 2000));
+
+    const maleCards = await page.evaluate(() => {
+      const titles = Array.from(document.querySelectorAll('.card-title')).map(t => t.innerText.trim());
+      return {
+        count: titles.length,
+        names: titles
+      };
+    });
+    if (maleCards.count > 0) {
+      marriageVerification.searchSuccessfulWithData = true;
+      marriageVerification.dataCardCount = maleCards.count;
+    }
+    console.log('[MARRIAGE CHECK] Male search results:', maleCards);
+
+  } catch (mErr) {
+    console.error('[MARRIAGE CHECK ERROR]', mErr.message);
+    marriageVerification.error = mErr.message;
+  }
+  fullReport.marriageVerification = marriageVerification;
 
   // -------------------------------------------------------------
   // TEST MOBILE APPLICATION

@@ -694,7 +694,7 @@ export class AddmarriagesComponent {
   }
   getmandals(event: any) {
     var id = event.target.value;
-    this.service.getmandals().subscribe(res => {
+    this.service.getmandals(id).subscribe(res => {
       if (res.status == 202) {
         Swal.fire(res.message);
       } else if (res.status == 200) {
@@ -707,14 +707,14 @@ export class AddmarriagesComponent {
 
   getconstency(event: any) {
     var id = event.target.value;
-    this.service.getconsistencys().subscribe(res => {
+    this.service.getconsistencys(id).subscribe(res => {
       this.constituency = res.data.filter((data: any) => data.dstrct_id == id);
     });
   }
 
   gepanchayati(event: any) {
     var id = event.target.value;
-    this.service.gepanchayatis().subscribe(res => {
+    this.service.gepanchayatis(id).subscribe(res => {
       if (res.status == 202) {
         Swal.fire(res.message);
       } else if (res.status == 200) {
@@ -935,15 +935,20 @@ export class AddmarriagesComponent {
         location: this.addingmarriages.value.location,
         address: this.addingmarriages.value.address,
         phonenumber: this.addingmarriages.value.phonenumber,
+        district_id: this.addingmarriages.value.districtname,
         districtname: this.addingmarriages.value.districtname,
+        constituency_id: this.addingmarriages.value.constituencyname,
         constituencyname: this.addingmarriages.value.constituencyname,
+        mandal_id: this.addingmarriages.value.mandals,
         mandals: this.addingmarriages.value.mandals,
+        panchayat_id: this.addingmarriages.value.village_name,
         village_name: this.addingmarriages.value.village_name,
         gender: this.addingmarriages.value.gender,
         whealth: this.addingmarriages.value.whealth,
         types: this.addingmarriages.value.types,
         self: this.addingmarriages.value.self,
         reviewImg: this.imagesData,
+        denomination_id: this.addingmarriages.value.denomation_id,
         denomation_id: this.addingmarriages.value.denomation_id,
         ministry_id: this.addingmarriages.value.ministry_id,
         caste: this.addingmarriages.value.caste,
@@ -974,15 +979,25 @@ export class AddmarriagesComponent {
 
 
   getbeliver() {
-    this.service.getbeliversdata().subscribe(res => {
-      if (res.status == 202) {
+    this.service.getministry().subscribe(res => {
+      if (res && res.status == 200 && Array.isArray(res.data)) {
+        this.ministryname = res.data
+          .filter((item: any) => item && (item.ministryname || item.name) && (item.ministryname || item.name).trim() !== '')
+          .map((item: any) => ({ ...item, ministryname: (item.ministryname || item.name).trim() }))
+          .sort((a: any, b: any) => a.ministryname.localeCompare(b.ministryname));
+      } else if (res && res.status == 202) {
         Swal.fire(res.message);
-      } else if (res.status == 200) {
-        this.ministryname = res.data;
       }
     }, error => {
-
-    })
+      this.service.getbeliversdata().subscribe((bRes: any) => {
+        if (bRes && bRes.status == 200 && Array.isArray(bRes.data)) {
+          this.ministryname = bRes.data
+            .filter((item: any) => item && (item.ministryname || item.name) && (item.ministryname || item.name).trim() !== '')
+            .map((item: any) => ({ ...item, ministryname: (item.ministryname || item.name).trim() }))
+            .sort((a: any, b: any) => a.ministryname.localeCompare(b.ministryname));
+        }
+      });
+    });
   }
 
   form: any;

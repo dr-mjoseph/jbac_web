@@ -99,10 +99,10 @@
                                         </div>
                                         <div class="col-md-6 mb-4">
                                             <div class="form-outline">
-                                                <label class="form-label">Ministry </label>
-                                                <select class="form-control" formControlName="ministry_id">
+                                                <label class="form-label">Ministry <span style="color:red; -webkit-text-stroke-width:thick;">*</span></label>
+                                                <select class="form-control" formControlName="ministry_id" style="height:38px; width: 100%;">
                                                     <option value="" selected disabled>Select the Ministry </option>
-                                                    <option *ngFor="let i of ministryname" value="{{i.id}}">
+                                                    <option *ngFor="let i of ministryname" [value]="i.id">
                                                         {{i.ministryname}}</option>
                                                 </select>
                                             </div>
