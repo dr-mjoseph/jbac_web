@@ -981,14 +981,43 @@ app.all(['/dashboardapi/getorganizations', '/dashboardapi/searchorganization', '
         let sql = 'SELECT * FROM independentorganisation_reg WHERE d_in = 0';
         const params: any[] = [];
         
-        if (body.denomation_id) { sql += ' AND denomation_id = ?'; params.push(body.denomation_id); }
-        if (body.ministry_id) { sql += ' AND ministry_id = ?'; params.push(body.ministry_id); }
-        if (body.district_id) { sql += ' AND district_id = ?'; params.push(body.district_id); }
-        if (body.constenncy_id || body.constituency_id) { sql += ' AND constituency_id = ?'; params.push(body.constenncy_id || body.constituency_id); }
-        if (body.mandal_id || body.mandals) { sql += ' AND mandal_id = ?'; params.push(body.mandal_id || body.mandals); }
-        if (body.panchayati_id || body.village_id) { sql += ' AND (panchayat_id = ? OR village_id = ?)'; params.push(body.panchayati_id || body.village_id, body.panchayati_id || body.village_id); }
-        if (body.gender) { sql += ' AND gender = ?'; params.push(body.gender); }
-        if (body.status) { sql += ' AND status = ?'; params.push(body.status); }
+        sql += ' AND organisation_name IS NOT NULL AND TRIM(organisation_name) != ""';
+
+        const denom = body.denomation_id || body.denomation || body.denomination_id;
+        if (denom) { sql += ' AND denomation = ?'; params.push(String(denom)); }
+
+        const minId = body.ministry_id;
+        if (minId) { sql += ' AND ministry_id = ?'; params.push(String(minId)); }
+
+        const srvName = body.service_name || body.service_id;
+        if (srvName) { sql += ' AND service_name = ?'; params.push(String(srvName)); }
+
+        const dist = body.district_id || body.districts || body.district;
+        if (dist) { sql += ' AND districts = ?'; params.push(String(dist)); }
+
+        const constId = body.constenncy_id || body.constituency_id || body.constituencyname || body.constituency;
+        if (constId) { sql += ' AND constituencyname = ?'; params.push(String(constId)); }
+
+        const mand = body.mandal_id || body.mandals || body.mandal;
+        if (mand) { sql += ' AND mandals = ?'; params.push(String(mand)); }
+
+        const panch = body.panchayati_id || body.panchayati || body.village_id || body.panchayat_id;
+        if (panch) { sql += ' AND panchayati = ?'; params.push(String(panch)); }
+
+        const orgType = body.organizationtype || body.organization_type;
+        if (orgType) { sql += ' AND organizationtype = ?'; params.push(String(orgType)); }
+
+        if (body.columnid && body.name) {
+            if (body.columnid == 1) { sql += ' AND denomation = ?'; params.push(String(body.name)); }
+            else if (body.columnid == 2) { sql += ' AND ministry_id = ?'; params.push(String(body.name)); }
+            else if (body.columnid == 3) { sql += ' AND service_name = ?'; params.push(String(body.name)); }
+        }
+
+        const searchKeyword = body.name || body.search || body.organisation_name || body.keyword;
+        if (searchKeyword && !body.columnid) {
+            sql += ' AND (organisation_name LIKE ? OR description LIKE ? OR org_address LIKE ? OR villagename LIKE ?)';
+            params.push(`%${searchKeyword}%`, `%${searchKeyword}%`, `%${searchKeyword}%`, `%${searchKeyword}%`);
+        }
 
         sql += ' ORDER BY id DESC';
         const [rows] = await db.query(sql, params);
@@ -1026,7 +1055,7 @@ app.all(['/dashboardapi/getpastorassociation', '/dashboardapi/getpastorassociati
     try {
         const [rows] = await db.query('SELECT * FROM pastors_associations WHERE d_in = 0 ORDER BY id DESC');
         res.json({ status: 200, data: rows });
-    } catch (err) {
+    } catch (err: any) {
         res.status(500).json({ status: 500, error: err.message });
     }
 });
@@ -1034,11 +1063,46 @@ app.all(['/dashboardapi/getpastorassociation', '/dashboardapi/getpastorassociati
 // Jobs (jobs)
 app.post(['/dashboardapi/postjobs', '/api/postjobs'], async (req, res) => {
     try {
-        const j = req.body;
-        j.d_in = 0;
+        const j = req.body || {};
+        j.d_in = '0';
+        j.accept_ind = 0;
+        if (!j.i_ts) {
+            j.i_ts = new Date().toISOString().slice(0, 19).replace('T', ' ');
+        }
+        
+        // Map frontend field aliases to MySQL table columns
+        if (j.jobname && !j.jobtitle) j.jobtitle = j.jobname;
+        if (!j.jobtitle && j.title) j.jobtitle = j.title;
+        if (!j.jobtitle && j.name) j.jobtitle = j.name;
+        if (!j.jobtitle) j.jobtitle = 'Job Requirement';
+
+        if (j.number1 && !j.contactnumber) j.contactnumber = j.number1;
+        if (!j.contactnumber && j.mobile_number) j.contactnumber = j.mobile_number;
+        if (!j.contactnumber && j.phonenumber) j.contactnumber = j.phonenumber;
+        if (!j.phonenumber && j.contactnumber) j.phonenumber = j.contactnumber;
+
+        if (j.number2 && !j.contactnumber2) j.contactnumber2 = j.number2;
+
+        if (j.experience_t && !j.experience_type) j.experience_type = j.experience_t;
+
+        if (j.location) {
+            const ageNum = parseInt(j.location, 10);
+            if (!isNaN(ageNum)) {
+                j.age = ageNum;
+            }
+            if (!j.workinglocation) j.workinglocation = j.location;
+        }
+
+        if (j.districtname && !j.district_id) j.district_id = Number(j.districtname) || null;
+        if (j.constituencyname && !j.constituency_id) j.constituency_id = Number(j.constituencyname) || null;
+        if (j.mandals && !j.mandal_id) j.mandal_id = Number(j.mandals) || null;
+        if (j.village_name && !j.panchayat_id) j.panchayat_id = Number(j.village_name) || null;
+
+        if (j.usr_id && !j.believerorpaster_id) j.believerorpaster_id = Number(j.usr_id) || null;
+
         const result = await dynamicInsert('jobs', j);
         res.json({ status: 200, message: 'Job created successfully', insertId: result?.insertId });
-    } catch (err) {
+    } catch (err: any) {
         res.status(500).json({ status: 500, error: err.message });
     }
 });
@@ -1056,7 +1120,7 @@ app.all(['/dashboardapi/getjobs', '/dashboardapi/getjob', '/dashboardapi/searchj
         if (body.district_id) { sql += ' AND district_id = ?'; params.push(body.district_id); }
         if (body.constenncy_id || body.constituency_id) { sql += ' AND constituency_id = ?'; params.push(body.constenncy_id || body.constituency_id); }
         if (body.mandal_id) { sql += ' AND mandal_id = ?'; params.push(body.mandal_id); }
-        if (body.panchayati_id) { sql += ' AND panchayati_id = ?'; params.push(body.panchayati_id); }
+        if (body.panchayati_id || body.panchayat_id) { sql += ' AND panchayat_id = ?'; params.push(body.panchayati_id || body.panchayat_id); }
         if (body.jobtitle || body.jobtile || body.title) { sql += ' AND (jobtitle LIKE ? OR title LIKE ?)'; params.push(`%${body.jobtitle || body.jobtile || body.title}%`, `%${body.jobtitle || body.jobtile || body.title}%`); }
         if (body.qualification || body.qual) { sql += ' AND qualification LIKE ?'; params.push(`%${body.qualification || body.qual}%`); }
         if (body.experience) { sql += ' AND experience = ?'; params.push(body.experience); }

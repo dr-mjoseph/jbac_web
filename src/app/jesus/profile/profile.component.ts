@@ -191,7 +191,7 @@ export class ProfileComponent {
       image: [''],
       facebook: [''],
       youtube: [''],
-      term: [true, [Validators.required]],
+      term: [true],
     })
 
     this.addsadding = this.formBuilder.group({
@@ -494,42 +494,77 @@ export class ProfileComponent {
     this.submitted = true;
     this.showSpinner = true;
     if (this.jobsadding.invalid) {
-      Swal.fire('* ఉన్న తప్పనిసరి  ఫీల్డ్స్ ఎంటర్ చేయండి');
-    } else {
-      var data = {
-        jobname: this.jobsadding.value.jobname,
-        qualification: this.jobsadding.value.qualification,
-        experience: this.jobsadding.value.experience,
-        salary: this.jobsadding.value.salary,
-        location: this.jobsadding.value.location,
-        description: this.jobsadding.value.description,
-        number1: this.jobsadding.value.number1,
-        number2: this.jobsadding.value.number2,
-        districtname: this.jobsadding.value.districtname,
-        constituencyname: this.jobsadding.value.constituencyname,
-        mandals: this.jobsadding.value.mandals,
-        village_name: this.jobsadding.value.village_name,
-        google_location: this.jobsadding.value.google_location,
-        usr_id: sessionStorage.getItem('usr_id'),
-        mobile_number: sessionStorage.getItem('mobile_number'),
-        name: sessionStorage.getItem('name'),
-        reviewImg: this.imagesData
-      }
-      this.service.postjobs(data).subscribe((res: any) => {
+      Swal.fire({
+        icon: 'warning',
+        title: '* ఉన్న తప్పనిసరి ఫీల్డ్స్ ఎంటర్ చేయండి',
+        text: 'దయచేసి అన్ని తప్పనిసరి వివరాలను సరిగ్గా పూర్తి చేయండి.'
+      });
+      this.showSpinner = false;
+      return;
+    }
+
+    const val = this.jobsadding.value;
+    const data = {
+      jobname: val.jobname,
+      jobtitle: val.jobname,
+      qualification: val.qualification || '',
+      experience: val.experience || '',
+      experience_t: val.experience_t || '',
+      experience_type: val.experience_t || '',
+      salary: val.salary,
+      location: val.location,
+      workinglocation: val.location,
+      age: parseInt(val.location, 10) || null,
+      description: val.description || '',
+      number1: val.number1,
+      contactnumber: val.number1,
+      number2: val.number2 || '',
+      contactnumber2: val.number2 || '',
+      districtname: val.districtname,
+      district_id: Number(val.districtname) || null,
+      constituencyname: val.constituencyname,
+      constituency_id: Number(val.constituencyname) || null,
+      mandals: val.mandals,
+      mandal_id: Number(val.mandals) || null,
+      village_name: val.village_name,
+      panchayat_id: Number(val.village_name) || null,
+      google_location: val.google_location || '',
+      usr_id: sessionStorage.getItem('usr_id'),
+      believerorpaster_id: sessionStorage.getItem('usr_id'),
+      mobile_number: sessionStorage.getItem('mobile_number') || val.number1,
+      name: sessionStorage.getItem('name') || val.jobname,
+      reviewImg: this.imagesData || []
+    };
+
+    this.service.postjobs(data).subscribe({
+      next: (res: any) => {
+        this.showSpinner = false;
         if (res.status == 200) {
-          Swal.fire('విజయవంతముగా నమోదు చేయబడింది, మీ ఫోన్ నెంబర్ మరియు పాస్వర్డ్ తో లాగిన్ అవగలరు')
-          this.jobsadding.reset();
+          Swal.fire({
+            icon: 'success',
+            title: 'విజయవంతముగా నమోదు చేయబడింది',
+            text: 'ఉద్యోగ సమాచారం విజయవంతంగా నమోదు చేయబడింది.'
+          });
+          this.jobsadding.reset({ term: true });
           this.submitted = false;
           this.imagesData = [];
-          this.showSpinner = false;
         } else {
-          alert('సర్వర్ డౌన్ వుంది, దయచేసి తరువాత ప్రయత్నిచండి')
+          Swal.fire({
+            icon: 'error',
+            title: 'సబ్మిట్ చేయడంలో విఫలమైంది',
+            text: res?.message || 'సర్వర్ డౌన్ వుంది, దయచేసి తరువాత ప్రయత్నించండి.'
+          });
         }
       },
-        error => {
-        })
-    }
-    this.showSpinner = false;
+      error: (error: any) => {
+        this.showSpinner = false;
+        Swal.fire({
+          icon: 'error',
+          title: 'సబ్మిట్ చేయడంలో విఫలమైంది',
+          text: error?.error?.error || 'సర్వర్ డౌన్ వుంది, దయచేసి తరువాత ప్రయత్నించండి.'
+        });
+      }
+    });
   }
   imagesDatains: any
 

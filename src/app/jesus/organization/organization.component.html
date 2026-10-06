@@ -135,14 +135,14 @@
 
                             <div class="col-md-2 mb-4 pb-2">
                                 <br>
-                                <button type="submit" class="default-btn  user-all-btn"
+                                <button type="button" class="default-btn  user-all-btn"
                                     style="padding-top:5px; text-align: center; background-color: aquamarine;"
                                     (click)="search()">Search
                                 </button>
                             </div>
                             <div class="col-md-2 mb-4 pb-2">
                                 &nbsp;&nbsp;&nbsp;&nbsp;
-                                <button type="submit" class="default-btn  user-all-btn"
+                                <button type="button" class="default-btn  user-all-btn"
                                     style="padding-top:5px; text-align: center; background-color: aquamarine;"
                                     (click)="reset()">Reset
                                 </button>
@@ -156,7 +156,16 @@
 
         <div class="row">
             <div class="col-lg-7">
-                <div class="row">
+                <!-- Empty State Message when no records found -->
+                <div *ngIf="noRecordsFound || (hasSearched && (!marriagedata || marriagedata.length === 0))" class="col-12 py-5 text-center">
+                    <div class="alert alert-warning shadow-sm p-4 mx-auto" style="max-width: 650px; border-radius: 12px; font-size: 18px; font-weight: 500; background-color: #fff3cd; color: #856404; border: 1px solid #ffeeba;">
+                        <i class="fa fa-info-circle fa-2x mb-2 d-block text-warning"></i>
+                        <h4 style="color: #856404; font-weight: 600; margin-bottom: 8px;">సమాచారం కనుగొనబడలేదు / No records found</h4>
+                        <p class="mb-0 text-muted" style="font-size: 14px;">మీరు వెతికిన వివరాలకు సరిపడే సంస్థల సమాచారం లభించలేదు. / No organization records found matching your filters.</p>
+                    </div>
+                </div>
+
+                <div class="row" *ngIf="marriagedata && marriagedata.length > 0 && !noRecordsFound">
                     <div class="col-lg-4" *ngFor="let item of marriagedata" style="margin-bottom: 16px;">
                         <div class="flex justify-center items-center h-screen">
                             <div class="main">
@@ -164,28 +173,32 @@
                                     <li class="cards_item">
                                         <div class="card" tabindex="0">
                                             <div class="card_image">
-                                                <img *ngIf="item.image == undefined || item.image == null || item.image == '' "
-                                                    src="../../../assets/images/no.jpg"
-                                                    style="height: 251px;width:250px;">
-                                                <img src="{{item.image}}" style="width:212px;height:251px;"
-                                                    (click)="openimg(item.image,openmodel)">
+                                                <img [src]="item.image || 'assets/images/no.jpg'"
+                                                    (error)="$any($event.target).src = 'assets/images/no.jpg'"
+                                                    style="height: 251px; width: 100%; object-fit: cover; cursor: pointer;"
+                                                    (click)="openimg(item.image || 'assets/images/no.jpg', openmodel)">
                                             </div>
                                             <div class="card_content">
                                                 <div class="card_text">
-                                                    <p>Organisation Name:<strong> {{item.organisation_name}}</strong>
-                                                    </p>
-                                                    <p>Street name: <b>{{item.ward}} </b></p>
-                                                    <p>Local address:<strong> {{item.org_address}}</strong></p>
-                                                    <a (click)="toggleDisplayDiv()" style="color:rgb(175, 15, 15)">
-                                                        READMORE
+                                                    <p>Organisation Name:<strong> {{item.organisation_name}}</strong></p>
+                                                    <p *ngIf="item.ward">Street name: <b>{{item.ward}} </b></p>
+                                                    <p *ngIf="item.org_address">Local address:<strong> {{item.org_address}}</strong></p>
+                                                    <a (click)="toggleShowMore(item)" style="color:rgb(175, 15, 15); cursor: pointer; font-weight: 600;">
+                                                        {{ item.showMore ? '▲ తగ్గించు (SHOW LESS)' : '▼ వివరాలు చూడండి (READ MORE)' }}
                                                     </a>
 
-
-                                                    <a href="{{item.location}}" [hidden]="isShowDiv">
-                                                        <img src="assets/images/marker.png" style="width:45px;"></a>
-                                                    <a href="tel:+91{{item.contact_num}}" [hidden]="isShowDiv">&nbsp;
-                                                        <img src="assets/images/phone.png" style="width:45px;
-                                                                        "></a>
+                                                    <div class="mt-2" *ngIf="item.showMore">
+                                                        <p *ngIf="item.service_name">Service: <b>{{item.service_name}}</b></p>
+                                                        <p *ngIf="item.denomation">Denomination: <b>{{item.denomation}}</b></p>
+                                                        <div class="d-flex align-items-center mt-2">
+                                                            <a *ngIf="item.location" [href]="item.location" target="_blank" style="margin-right: 15px;">
+                                                                <img src="assets/images/marker.png" style="width:36px;">
+                                                            </a>
+                                                            <a *ngIf="item.contact_num" [href]="'tel:+91' + item.contact_num">
+                                                                <img src="assets/images/phone.png" style="width:36px;">
+                                                            </a>
+                                                        </div>
+                                                    </div>
 
                                                 </div>
                                             </div>
@@ -242,8 +255,12 @@
             </div>
 
             <img src={{image}}>
-
         </ng-template>
+    </div>
+
+    <div class="my-overlay" *ngIf="showSpinner">
+        <div class="cusloader"></div>
+        <h5 style="color: white; margin-top: 15px;">వెతుకుతున్నాము, కొంచెం ఆగండి... / Searching, please wait...</h5>
     </div>
 
 </div>

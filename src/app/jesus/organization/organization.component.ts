@@ -25,6 +25,9 @@ export class OrganizationComponent {
   adds: any;
   ministryname: any;
   denomation: any;
+  showSpinner: boolean = false;
+  hasSearched: boolean = false;
+  noRecordsFound: boolean = false;
 
   constructor(public service: ServiceService, private modalService: NgbModal, private fromb: FormBuilder, private router: Router) {
     if (sessionStorage.getItem("auth_ind") == '' || sessionStorage.getItem("auth_ind") == null || sessionStorage.getItem("auth_ind") == undefined) {
@@ -69,19 +72,26 @@ export class OrganizationComponent {
     })
   }
   defaultdata() {
-    this.service.getorganizations().subscribe((res: any) => {
-      console.log(res.data);
-      this.marriagedata = [];
-      if (res.status == 200) {
-        this.marriagedata = res.data.map((item: any) => ({
-          ...item, showMore: false
-        }));
-      } else {
-        Swal.fire('server down')
+    this.showSpinner = true;
+    this.service.getorganizations().subscribe({
+      next: (res: any) => {
+        this.showSpinner = false;
+        this.marriagedata = [];
+        if (res && res.status == 200 && Array.isArray(res.data)) {
+          this.marriagedata = res.data.map((item: any) => ({
+            ...item, showMore: false
+          }));
+          this.noRecordsFound = this.marriagedata.length === 0;
+        } else {
+          this.noRecordsFound = true;
+        }
+      },
+      error: (err) => {
+        this.showSpinner = false;
+        this.noRecordsFound = true;
+        console.error(err);
       }
-    },
-      error => {
-      })
+    });
   }
 
   getdistric() {
@@ -203,72 +213,17 @@ export class OrganizationComponent {
 
 
   serachcaste(event: any) {
-    this.denomation_id = event.target.value
-    var data = {
-      denomation_id: event.target.value,
-      df: 1,
-    }
-    this.service.searchorganization(data).subscribe((res: any) => {
-      this.marriagedata = [];
-      if (res.status == 200) {
-        this.marriagedata = res.data.map((item: any) => ({
-          ...item, showMore: false
-        }));
-      } else {
-        Swal.fire('server down')
-      }
-    },
-      error => {
-      })
+    this.onDenominationChange(event);
   }
   searchdeno: any;
   ministry_id: any;
   serachgender(event: any) {
-    this.ministry_id = event.target.value
-    var data = {
-      denomation_id: this.denomation_id,
-      ministry_id: this.ministry_id,
-      df: 2
-    }
-    this.service.searchorganization(data).subscribe((res: any) => {
-      console.log(data);
-
-      this.marriagedata = [];
-      if (res.status == 200) {
-        this.marriagedata = res.data.map((item: any) => ({
-          ...item, showMore: false
-        }));
-      } else {
-        Swal.fire('server down')
-      }
-    },
-      error => {
-      })
+    this.onMinistryChange(event);
   }
 
-
-  service_name: any
+  service_name: any;
   servicessearch(event: any) {
-    this.service_name = event.target.value
-    var data = {
-      denomation_id: this.denomation_id,
-      ministry_id: this.ministry_id,
-      service_name: this.service_name,
-      df: 3,
-    }
-    console.log(data);
-    this.service.searchorganization(data).subscribe((res: any) => {
-      this.marriagedata = [];
-      if (res.status == 200) {
-        this.marriagedata = res.data.map((item: any) => ({
-          ...item, showMore: false
-        }));
-      } else {
-        Swal.fire('No Data')
-      }
-    },
-      error => {
-      })
+    this.onServiceChange(event);
   }
 
   onDenominationChange(event: any) {
@@ -299,12 +254,32 @@ export class OrganizationComponent {
       name: event.target.value,
       columnid: tableid
     }
-    console.log(data);
-
-    this.service.searchinorganizations(data).subscribe((res: any) => {
-      this.marriagedata = res.data;
-    })
+    this.hasSearched = true;
+    this.showSpinner = true;
+    this.service.searchinorganizations(data).subscribe({
+      next: (res: any) => {
+        this.showSpinner = false;
+        this.marriagedata = [];
+        if (res && res.status == 200 && Array.isArray(res.data) && res.data.length > 0) {
+          this.noRecordsFound = false;
+          this.marriagedata = res.data.map((item: any) => ({ ...item, showMore: false }));
+        } else {
+          this.noRecordsFound = true;
+          Swal.fire({
+            icon: 'info',
+            title: 'సమాచారం కనుగొనబడలేదు',
+            text: 'మీరు వెతికిన వివరాలకు సరిపడే సంస్థల సమాచారం లభించలేదు. / No records found matching the search criteria.'
+          });
+        }
+      },
+      error: (err: any) => {
+        this.showSpinner = false;
+        this.noRecordsFound = true;
+        console.error(err);
+      }
+    });
   }
+
   district_id: any;
   constenncy_id: any;
   mandal_id: any;
@@ -374,25 +349,65 @@ export class OrganizationComponent {
   searchmandals(event: any) { this.onMandalChange(event); }
   searchvillages(event: any) { this.onPanchayatiChange(event); }
 
+  toggleShowMore(item: any) {
+    if (item) {
+      item.showMore = !item.showMore;
+    }
+  }
+
   applyFilter() {
     const vals = this.serachMeetingform.value || {};
-    const data = {
-      denomation_id: vals.denomation_id || this.denomation_id || '',
-      ministry_id: vals.ministry_id || this.ministry_id || '',
-      service_name: vals.service_name || this.service_name || '',
-      district_id: vals.district_id || this.district_id || this.searchdist || '',
-      constituency_id: vals.constenncy_id || this.constenncy_id || this.searchconts || '',
-      mandal_id: vals.mandal_id || this.mandal_id || this.searchmand || '',
-      panchayati_id: vals.panchayati_id || this.panchayati_id || '',
-    };
+    const data: any = {};
+    const denom = vals.denomation_id || this.denomation_id;
+    if (denom) data.denomation_id = denom;
+
+    const min = vals.ministry_id || this.ministry_id;
+    if (min) data.ministry_id = min;
+
+    const srv = vals.service_name || this.service_name;
+    if (srv) data.service_name = srv;
+
+    const dist = vals.district_id || this.district_id || this.searchdist;
+    if (dist) data.district_id = dist;
+
+    const cont = vals.constenncy_id || this.constenncy_id || this.searchconts;
+    if (cont) data.constituency_id = cont;
+
+    const mand = vals.mandal_id || this.mandal_id || this.searchmand;
+    if (mand) data.mandal_id = mand;
+
+    const panch = vals.panchayati_id || this.panchayati_id;
+    if (panch) data.panchayati_id = panch;
+
+    this.hasSearched = true;
+    this.showSpinner = true;
     this.service.searchorganization(data).subscribe({
       next: (res: any) => {
+        this.showSpinner = false;
         this.marriagedata = [];
-        if (res && res.status == 200 && Array.isArray(res.data)) {
+        if (res && res.status == 200 && Array.isArray(res.data) && res.data.length > 0) {
+          this.noRecordsFound = false;
           this.marriagedata = res.data.map((item: any) => ({ ...item, showMore: false }));
+        } else {
+          this.noRecordsFound = true;
+          Swal.fire({
+            icon: 'info',
+            title: 'సమాచారం కనుగొనబడలేదు',
+            text: 'మీరు వెతికిన వివరాలకు సరిపడే సంస్థల సమాచారం లభించలేదు. / No records found matching the search criteria.',
+            confirmButtonColor: '#3085d6'
+          });
         }
       },
-      error: err => console.error(err)
+      error: (err: any) => {
+        this.showSpinner = false;
+        this.noRecordsFound = true;
+        console.error(err);
+        Swal.fire({
+          icon: 'error',
+          title: 'శోధనలో లోపం ఏర్పడింది',
+          text: 'సర్వర్ డౌన్ వుంది, దయచేసి తరువాత ప్రయత్నించండి.'
+        });
+      }
     });
   }
 
@@ -418,10 +433,13 @@ export class OrganizationComponent {
     this.searchconts = '';
     this.searchmand = '';
     this.denomation_id = '';
+    this.ministry_id = '';
     this.service_name = '';
     this.constituency = [];
     this.mandals = [];
     this.panchayati = [];
+    this.hasSearched = false;
+    this.noRecordsFound = false;
     this.defaultdata();
   }
   ///////////////////mobile view///////////////
