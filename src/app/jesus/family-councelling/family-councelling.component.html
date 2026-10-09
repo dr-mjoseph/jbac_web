@@ -315,8 +315,25 @@
                 </td>
                 <td>
                   <span class="badge bg-light text-dark border">{{ appt.counselling_type || 'General Counselling' }}</span>
-                  <div class="small text-muted text-truncate" style="max-width: 200px;" [title]="appt.notes">
+                  <div class="small text-muted" style="max-width: 250px;">
                     {{ appt.notes }}
+                  </div>
+
+                  <!-- Patient's Own Recorded Voice -->
+                  <div *ngIf="appt.user_voice_audio" class="mt-2 p-1 bg-light rounded border border-info">
+                    <div class="small fw-bold text-info mb-1"><i class="fa fa-microphone text-danger me-1"></i> మీ వాయిస్ సందేశం:</div>
+                    <audio [src]="appt.user_voice_audio" controls class="w-100" style="height: 28px;"></audio>
+                  </div>
+
+                  <!-- Doctor's Voice Advice & Counsel -->
+                  <div *ngIf="appt.doctor_voice_audio || appt.doctor_voice_text" class="mt-2 p-2 bg-success bg-opacity-10 border border-success rounded">
+                    <div class="small fw-bold text-success mb-1">
+                      <i class="fa fa-user-md me-1"></i> డాక్టర్ గారి వాయిస్ సలహా (Doctor Advice):
+                    </div>
+                    <audio *ngIf="appt.doctor_voice_audio" [src]="appt.doctor_voice_audio" controls class="w-100" style="height: 30px;"></audio>
+                    <div *ngIf="appt.doctor_voice_text" class="small text-dark mt-1">
+                      {{ appt.doctor_voice_text }}
+                    </div>
                   </div>
                 </td>
                 <td>
@@ -639,6 +656,27 @@
                 <td>
                   <div class="badge bg-light text-primary border mb-1">{{ appt.counselling_type }}</div>
                   <div class="small text-muted" style="max-width: 250px;">{{ appt.notes }}</div>
+
+                  <!-- Patient's Voice Message to Doctor -->
+                  <div *ngIf="appt.user_voice_audio" class="mt-2 p-2 bg-light rounded border border-info">
+                    <div class="small fw-bold text-info mb-1">
+                      <i class="fa fa-microphone text-danger me-1"></i> పేషెంట్ వాయిస్ మెసేజ్ (Patient Voice):
+                      <span class="badge bg-secondary ms-1">{{ appt.user_language === 'en' ? 'English' : (appt.user_language === 'hi' ? 'हिन्दी' : 'తెలుగు') }}</span>
+                    </div>
+                    <audio [src]="appt.user_voice_audio" controls class="w-100" style="height: 32px;"></audio>
+                    <div *ngIf="appt.user_voice_text" class="small text-dark mt-1 font-monospace">
+                      <i>"{{ appt.user_voice_text }}"</i>
+                    </div>
+                  </div>
+
+                  <!-- Doctor's Own Sent Voice Advice -->
+                  <div *ngIf="appt.doctor_voice_audio" class="mt-2 p-2 bg-white rounded border border-success">
+                    <div class="small fw-bold text-success mb-1">
+                      <i class="fa fa-user-md me-1"></i> పంపిన డాక్టర్ వాయిస్ సలహా (Sent Advice):
+                    </div>
+                    <audio [src]="appt.doctor_voice_audio" controls class="w-100" style="height: 32px;"></audio>
+                  </div>
+
                   <div *ngIf="appt.doctor_notes" class="small text-success mt-1">
                     <b>డాక్టర్ నోట్:</b> {{ appt.doctor_notes }}
                   </div>
@@ -650,6 +688,7 @@
                       'bg-warning text-dark': appt.status === 'Pending',
                       'bg-success text-white': appt.status === 'Confirmed',
                       'bg-primary text-white': appt.status === 'Completed',
+                      'bg-info text-white': appt.status === 'Doctor Replied',
                       'bg-danger text-white': appt.status === 'Cancelled'
                     }"
                   >
@@ -657,35 +696,44 @@
                   </span>
                 </td>
                 <td>
-                  <div class="btn-group btn-group-sm">
+                  <div class="d-flex flex-column gap-1">
                     <button
-                      class="btn btn-outline-success"
-                      title="Confirm"
-                      (click)="quickStatusChange(appt, 'Confirmed')"
+                      class="btn btn-sm btn-info text-white shadow-sm"
+                      title="డాక్టర్ వాయిస్ సలహా పంపండి (Send Voice Advice)"
+                      (click)="openDoctorVoiceReplyModal(appt, doctorVoiceModal)"
                     >
-                      <i class="fa fa-check"></i>
+                      <i class="fa fa-microphone me-1"></i> వాయిస్ సలహా
                     </button>
-                    <button
-                      class="btn btn-outline-primary"
-                      title="Complete"
-                      (click)="quickStatusChange(appt, 'Completed')"
-                    >
-                      <i class="fa fa-check-circle"></i>
-                    </button>
-                    <button
-                      class="btn btn-outline-secondary"
-                      title="Add Notes"
-                      (click)="openStatusModal(appt, statusModal)"
-                    >
-                      <i class="fa fa-edit"></i>
-                    </button>
-                    <button
-                      class="btn btn-outline-danger"
-                      title="Cancel"
-                      (click)="quickStatusChange(appt, 'Cancelled')"
-                    >
-                      <i class="fa fa-ban"></i>
-                    </button>
+                    <div class="btn-group btn-group-sm">
+                      <button
+                        class="btn btn-outline-success"
+                        title="Confirm"
+                        (click)="quickStatusChange(appt, 'Confirmed')"
+                      >
+                        <i class="fa fa-check"></i>
+                      </button>
+                      <button
+                        class="btn btn-outline-primary"
+                        title="Complete"
+                        (click)="quickStatusChange(appt, 'Completed')"
+                      >
+                        <i class="fa fa-check-circle"></i>
+                      </button>
+                      <button
+                        class="btn btn-outline-secondary"
+                        title="Add Notes"
+                        (click)="openStatusModal(appt, statusModal)"
+                      >
+                        <i class="fa fa-edit"></i>
+                      </button>
+                      <button
+                        class="btn btn-outline-danger"
+                        title="Cancel"
+                        (click)="quickStatusChange(appt, 'Cancelled')"
+                      >
+                        <i class="fa fa-ban"></i>
+                      </button>
+                    </div>
                   </div>
                 </td>
               </tr>
@@ -822,6 +870,100 @@
           ></textarea>
         </div>
 
+        <!-- VOICE CONSULTATION FEATURE (USER SPEAK TO CONFIRM PROBLEM) -->
+        <div class="col-12">
+          <div class="card p-3 bg-light border-primary rounded shadow-sm">
+            <div class="d-flex justify-content-between align-items-center flex-wrap mb-2">
+              <div>
+                <label class="form-label fw-bold text-primary mb-0">
+                  <i class="fa fa-microphone fa-lg text-danger me-2"></i>
+                  వాయిస్ మెసేజ్ ద్వారా మీ సమస్యను వివరించండి (Speak to Explain your Problem)
+                </label>
+                <div class="small text-muted">
+                  మీరు మాట్లాడితే అది వాయిస్ రికార్డ్ అయి డాక్టర్‌కు వెళ్తుంది మరియు ఆటోమేటిక్‌గా టెక్స్ట్‌గా కూడా మారుతుంది.
+                </div>
+              </div>
+              <!-- Language Selector (Telugu, English, Hindi) -->
+              <div class="d-flex align-items-center mt-2 mt-sm-0">
+                <span class="small fw-bold text-secondary me-2">మాట్లాడే భాష:</span>
+                <div class="btn-group btn-group-sm" role="group">
+                  <button
+                    type="button"
+                    class="btn btn-sm"
+                    [ngClass]="userLanguage === 'te-IN' ? 'btn-primary' : 'btn-outline-primary'"
+                    (click)="setUserLanguage('te-IN')"
+                  >
+                    తెలుగు
+                  </button>
+                  <button
+                    type="button"
+                    class="btn btn-sm"
+                    [ngClass]="userLanguage === 'en-IN' ? 'btn-primary' : 'btn-outline-primary'"
+                    (click)="setUserLanguage('en-IN')"
+                  >
+                    English
+                  </button>
+                  <button
+                    type="button"
+                    class="btn btn-sm"
+                    [ngClass]="userLanguage === 'hi-IN' ? 'btn-primary' : 'btn-outline-primary'"
+                    (click)="setUserLanguage('hi-IN')"
+                  >
+                    हिन्दी
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Voice Recording Controls -->
+            <div class="d-flex align-items-center flex-wrap gap-2 mt-2">
+              <button
+                type="button"
+                *ngIf="!isRecordingUserVoice"
+                class="btn btn-danger btn-sm px-3 shadow-sm"
+                (click)="startUserVoiceRecording()"
+              >
+                <i class="fa fa-microphone me-1"></i> మాట్లాడటం ప్రారంభించండి (Start Recording)
+              </button>
+
+              <button
+                type="button"
+                *ngIf="isRecordingUserVoice"
+                class="btn btn-warning btn-sm px-3 shadow-sm text-dark fw-bold animate-pulse"
+                (click)="stopUserVoiceRecording()"
+              >
+                <i class="fa fa-stop-circle me-1 text-danger"></i> రికార్డింగ్ ఆపండి (Stop - {{ formatVoiceSeconds(userVoiceSeconds) }})
+              </button>
+
+              <button
+                type="button"
+                *ngIf="userVoiceAudio && !isRecordingUserVoice"
+                class="btn btn-outline-secondary btn-sm"
+                (click)="clearUserVoiceRecording()"
+              >
+                <i class="fa fa-trash me-1"></i> మళ్లీ రికార్డ్ చేయండి (Re-record)
+              </button>
+
+              <span *ngIf="isRecordingUserVoice" class="badge bg-danger text-white py-2 px-3 animate-pulse">
+                🔴 వింటున్నాము... మాట్లాడండి (Listening in {{ userLanguage === 'en-IN' ? 'English' : (userLanguage === 'hi-IN' ? 'Hindi' : 'Telugu') }}...)
+              </span>
+            </div>
+
+            <!-- Audio Playback Preview & Converted Text -->
+            <div *ngIf="userVoiceAudio" class="mt-3 p-2 bg-white rounded border border-success">
+              <div class="small fw-bold text-success mb-1">
+                <i class="fa fa-check-circle me-1"></i> మీ వాయిస్ రికార్డింగ్ సిద్ధంగా ఉంది (Audio Preview):
+              </div>
+              <audio [src]="userVoiceAudio" controls class="w-100" style="height: 38px;"></audio>
+            </div>
+
+            <div *ngIf="userVoiceText" class="mt-2 p-2 bg-white rounded border border-info">
+              <span class="badge bg-info text-dark me-1">టెక్స్ట్‌గా మార్చబడిన మాటలు (Converted Text):</span>
+              <span class="small text-dark font-monospace">{{ userVoiceText }}</span>
+            </div>
+          </div>
+        </div>
+
         <div class="col-12">
           <div class="form-check">
             <input
@@ -891,3 +1033,148 @@
     </form>
   </div>
 </ng-template>
+
+<!-- ============================================================= -->
+<!-- DOCTOR VOICE REPLY MODAL                                       -->
+<!-- ============================================================= -->
+<ng-template #doctorVoiceModal let-modal>
+  <div class="modal-header bg-primary text-white py-3">
+    <h5 class="modal-title mb-0 text-white">
+      <i class="fa fa-stethoscope me-2"></i> డాక్టర్ వాయిస్ సలహా & సందేశం పంపండి (Doctor Voice Advice)
+    </h5>
+    <button type="button" class="btn-close btn-close-white" aria-label="Close" (click)="modal.dismiss()"></button>
+  </div>
+  <div class="modal-body p-4" *ngIf="selectedAppointmentForVoiceReply">
+    <div class="patient-card p-3 bg-light rounded mb-3 border">
+      <div class="fw-bold text-primary" style="font-size: 15px;">
+        <i class="fa fa-user me-1"></i> {{ selectedAppointmentForVoiceReply.family_name }} ({{ selectedAppointmentForVoiceReply.contact_person }})
+      </div>
+      <div class="small text-muted">
+        ఫోన్: {{ selectedAppointmentForVoiceReply.phone_number }} | తేదీ: {{ selectedAppointmentForVoiceReply.appointment_date }} ({{ selectedAppointmentForVoiceReply.appointment_time }})
+      </div>
+      <div class="small mt-1 text-dark">
+        <b>కౌన్సిలింగ్ సమస్య:</b> {{ selectedAppointmentForVoiceReply.notes }}
+      </div>
+
+      <!-- Patient Voice Message if available -->
+      <div *ngIf="selectedAppointmentForVoiceReply.user_voice_audio" class="mt-2 p-2 bg-white rounded border border-info">
+        <div class="small fw-bold text-info mb-1">
+          <i class="fa fa-microphone me-1 text-danger"></i> పేషెంట్ చెప్పిన వాయిస్ సందేశం (Patient Spoken Voice):
+          <span class="badge bg-secondary ms-1">{{ selectedAppointmentForVoiceReply.user_language === 'en' ? 'English' : (selectedAppointmentForVoiceReply.user_language === 'hi' ? 'हिन्दी' : 'తెలుగు') }}</span>
+        </div>
+        <audio [src]="selectedAppointmentForVoiceReply.user_voice_audio" controls class="w-100" style="height: 34px;"></audio>
+        <div *ngIf="selectedAppointmentForVoiceReply.user_voice_text" class="small text-muted mt-1 font-monospace">
+          "{{ selectedAppointmentForVoiceReply.user_voice_text }}"
+        </div>
+      </div>
+    </div>
+
+    <!-- Doctor Voice Recording & Transcription Box -->
+    <div class="card p-3 bg-light border-success rounded">
+      <div class="d-flex justify-content-between align-items-center flex-wrap mb-2">
+        <label class="form-label fw-bold text-success mb-0">
+          <i class="fa fa-microphone me-1"></i> మీ వాయిస్ సలహాను రికార్డ్ చేయండి (Record Voice Advice):
+        </label>
+        <div class="btn-group btn-group-sm">
+          <button
+            type="button"
+            class="btn btn-sm"
+            [ngClass]="doctorReplyLanguage === 'te-IN' ? 'btn-success' : 'btn-outline-success'"
+            (click)="setDoctorReplyLanguage('te-IN')"
+          >
+            తెలుగు
+          </button>
+          <button
+            type="button"
+            class="btn btn-sm"
+            [ngClass]="doctorReplyLanguage === 'en-IN' ? 'btn-success' : 'btn-outline-success'"
+            (click)="setDoctorReplyLanguage('en-IN')"
+          >
+            English
+          </button>
+          <button
+            type="button"
+            class="btn btn-sm"
+            [ngClass]="doctorReplyLanguage === 'hi-IN' ? 'btn-success' : 'btn-outline-success'"
+            (click)="setDoctorReplyLanguage('hi-IN')"
+          >
+            हिन्दी
+          </button>
+        </div>
+      </div>
+
+      <div class="d-flex align-items-center flex-wrap gap-2 mt-2">
+        <button
+          type="button"
+          *ngIf="!isRecordingDoctorVoice"
+          class="btn btn-success btn-sm px-3 shadow-sm"
+          (click)="startDoctorVoiceRecording()"
+        >
+          <i class="fa fa-microphone me-1"></i> మాట్లాడటం ప్రారంభించండి (Start Recording)
+        </button>
+
+        <button
+          type="button"
+          *ngIf="isRecordingDoctorVoice"
+          class="btn btn-danger btn-sm px-3 shadow-sm text-white fw-bold animate-pulse"
+          (click)="stopDoctorVoiceRecording()"
+        >
+          <i class="fa fa-stop me-1"></i> రికార్డింగ్ ఆపండి (Stop - {{ formatVoiceSeconds(doctorVoiceSeconds) }})
+        </button>
+
+        <button
+          type="button"
+          *ngIf="doctorVoiceAudio && !isRecordingDoctorVoice"
+          class="btn btn-outline-secondary btn-sm"
+          (click)="clearDoctorVoiceRecording()"
+        >
+          <i class="fa fa-trash me-1"></i> మళ్లీ రికార్డ్ చేయండి
+        </button>
+
+        <span *ngIf="isRecordingDoctorVoice" class="badge bg-danger text-white py-2 px-3 animate-pulse">
+          🔴 డాక్టర్ వాయిస్ రికార్డ్ అవుతోంది... (Recording in {{ doctorReplyLanguage === 'en-IN' ? 'English' : (doctorReplyLanguage === 'hi-IN' ? 'Hindi' : 'Telugu') }}...)
+        </span>
+      </div>
+
+      <!-- Doctor Voice Playback -->
+      <div *ngIf="doctorVoiceAudio" class="mt-3 p-2 bg-white rounded border border-success">
+        <div class="small fw-bold text-success mb-1">
+          <i class="fa fa-check-circle me-1"></i> రికార్డ్ అయిన వాయిస్ సలహా (Audio Preview):
+        </div>
+        <audio [src]="doctorVoiceAudio" controls class="w-100" style="height: 38px;"></audio>
+      </div>
+
+      <!-- Transcribed / Editable Text Area -->
+      <div class="mt-3">
+        <label class="form-label fw-bold small text-dark">
+          సలహా టెక్స్ట్ (Transcribed / Written Counsel):
+        </label>
+        <textarea
+          class="form-control"
+          rows="3"
+          [(ngModel)]="doctorVoiceText"
+          placeholder="మీరు మాట్లాడిన మాటలు ఇక్కడ ఆటోమేటిక్‌గా వస్తాయి, లేదా మీరు స్వయంగా సలహాను టైప్ చేయవచ్చు..."
+        ></textarea>
+        <div class="small text-muted mt-1">
+          ఈ వాయిస్ మరియు టెక్స్ట్ రెండూ పేషెంట్ వారి 'నా అపాయింట్‌మెంట్లు' పేజీలో చూడగలరు.
+        </div>
+      </div>
+    </div>
+
+    <div class="text-end mt-4">
+      <button type="button" class="btn btn-secondary me-2" (click)="modal.dismiss()">
+        రద్దు (Cancel)
+      </button>
+      <button
+        type="button"
+        class="btn btn-primary px-4 shadow-sm"
+        [disabled]="isSendingDoctorVoice"
+        (click)="sendDoctorVoiceReply()"
+      >
+        <i class="fa fa-paper-plane me-1"></i>
+        {{ isSendingDoctorVoice ? 'పంపుతోంది...' : 'రోగికి వాయిస్ సలహా పంపండి (Send Voice Advice)' }}
+      </button>
+    </div>
+  </div>
+</ng-template>
+

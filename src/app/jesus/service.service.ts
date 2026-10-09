@@ -750,6 +750,22 @@ postwishform(data: any) {
       return error;
     }));
   }
+
+  doctorvoicereply(data: any) {
+    return this.http.post<any>(this.testApi + 'doctorvoicereply', data).pipe(map(res => {
+      return res;
+    }, (error: any) => {
+      return error;
+    }));
+  }
+
+  getcouncellingvoicemessages(appointmentId: any) {
+    return this.http.post<any>(this.testApi + 'getcouncellingvoicemessages', { appointment_id: appointmentId }).pipe(map(res => {
+      return res;
+    }, (error: any) => {
+      return error;
+    }));
+  }
 }
 
 

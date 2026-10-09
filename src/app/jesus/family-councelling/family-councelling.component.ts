@@ -61,6 +61,30 @@ export class FamilyCouncellingComponent implements OnInit {
   imagePreview: string = '';
   todayDate: string = new Date().toISOString().split('T')[0];
 
+  // Voice Consultation & Speech-to-Text (Telugu, English, Hindi)
+  userLanguage: string = 'te-IN'; // 'te-IN' | 'en-IN' | 'hi-IN'
+  isRecordingUserVoice: boolean = false;
+  userVoiceAudio: string | null = null;
+  userVoiceText: string = '';
+  userVoiceSeconds: number = 0;
+  userVoiceTimer: any = null;
+  userMediaRecorder: any = null;
+  userAudioChunks: any[] = [];
+  userSpeechRecognition: any = null;
+
+  // Doctor Voice Reply & Speech-to-Text
+  doctorReplyLanguage: string = 'te-IN';
+  isRecordingDoctorVoice: boolean = false;
+  doctorVoiceAudio: string | null = null;
+  doctorVoiceText: string = '';
+  doctorVoiceSeconds: number = 0;
+  doctorVoiceTimer: any = null;
+  doctorMediaRecorder: any = null;
+  doctorAudioChunks: any[] = [];
+  doctorSpeechRecognition: any = null;
+  selectedAppointmentForVoiceReply: any = null;
+  isSendingDoctorVoice: boolean = false;
+
   constructor(
     private fb: FormBuilder,
     private service: ServiceService,
@@ -296,6 +320,7 @@ export class FamilyCouncellingComponent implements OnInit {
   // -------------------------------------------------------------
   openBookingModal(doctor: any, modalContent: any): void {
     this.selectedDoctor = doctor;
+    this.clearUserVoiceRecording();
     this.bookingForm.patchValue({
       doctor_id: doctor.id,
       doctor_name: doctor.doctor_name,
@@ -314,6 +339,116 @@ export class FamilyCouncellingComponent implements OnInit {
     this.modalService.open(modalContent, { size: 'lg', centered: true });
   }
 
+  // -------------------------------------------------------------
+  // USER VOICE CONSULTATION RECORDING & SPEECH-TO-TEXT
+  // -------------------------------------------------------------
+  setUserLanguage(lang: string): void {
+    this.userLanguage = lang;
+    if (this.isRecordingUserVoice) {
+      this.stopUserVoiceRecording();
+    }
+  }
+
+  startUserVoiceRecording(): void {
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+      Swal.fire('Error', 'మీ బ్రౌజర్‌లో మైక్రోఫోన్ సౌకర్యం అందుబాటులో లేదు (Microphone not supported).', 'warning');
+      return;
+    }
+
+    this.userAudioChunks = [];
+    this.isRecordingUserVoice = true;
+    this.userVoiceSeconds = 0;
+    this.userVoiceTimer = setInterval(() => {
+      this.userVoiceSeconds++;
+    }, 1000);
+
+    // 1. Audio MediaRecorder
+    navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
+      this.userMediaRecorder = new (window as any).MediaRecorder(stream);
+      this.userMediaRecorder.ondataavailable = (e: any) => {
+        if (e.data && e.data.size > 0) {
+          this.userAudioChunks.push(e.data);
+        }
+      };
+      this.userMediaRecorder.onstop = () => {
+        const audioBlob = new Blob(this.userAudioChunks, { type: 'audio/webm' });
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          this.userVoiceAudio = reader.result as string;
+        };
+        reader.readAsDataURL(audioBlob);
+        stream.getTracks().forEach(t => t.stop());
+      };
+      this.userMediaRecorder.start();
+    }).catch(err => {
+      console.warn('Microphone error:', err);
+      this.isRecordingUserVoice = false;
+      if (this.userVoiceTimer) clearInterval(this.userVoiceTimer);
+      Swal.fire('Microphone Permission', 'దయచేసి మైక్రోఫోన్ అనుమతి (Permission) ఇవ్వండి.', 'info');
+    });
+
+    // 2. Speech-to-Text Recognition (Web Speech API)
+    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    if (SpeechRecognition) {
+      try {
+        this.userSpeechRecognition = new SpeechRecognition();
+        this.userSpeechRecognition.lang = this.userLanguage;
+        this.userSpeechRecognition.continuous = true;
+        this.userSpeechRecognition.interimResults = true;
+
+        this.userSpeechRecognition.onresult = (event: any) => {
+          for (let i = event.resultIndex; i < event.results.length; ++i) {
+            if (event.results[i].isFinal) {
+              const text = event.results[i][0].transcript;
+              this.userVoiceText = (this.userVoiceText ? this.userVoiceText + ' ' : '') + text;
+              const currentNotes = this.bookingForm.get('notes')?.value || '';
+              if (!currentNotes.includes(text)) {
+                this.bookingForm.patchValue({
+                  notes: currentNotes ? `${currentNotes} ${text}` : text
+                });
+              }
+            }
+          }
+        };
+
+        this.userSpeechRecognition.onerror = (e: any) => {
+          console.warn('Speech recognition error:', e);
+        };
+
+        this.userSpeechRecognition.start();
+      } catch (e) {
+        console.warn('Speech recognition start failed:', e);
+      }
+    }
+  }
+
+  stopUserVoiceRecording(): void {
+    this.isRecordingUserVoice = false;
+    if (this.userVoiceTimer) {
+      clearInterval(this.userVoiceTimer);
+      this.userVoiceTimer = null;
+    }
+    if (this.userMediaRecorder && this.userMediaRecorder.state !== 'inactive') {
+      try { this.userMediaRecorder.stop(); } catch (_) {}
+    }
+    if (this.userSpeechRecognition) {
+      try { this.userSpeechRecognition.stop(); } catch (_) {}
+    }
+  }
+
+  clearUserVoiceRecording(): void {
+    this.stopUserVoiceRecording();
+    this.userVoiceAudio = null;
+    this.userVoiceText = '';
+    this.userVoiceSeconds = 0;
+  }
+
+  formatVoiceSeconds(sec: number): string {
+    const mins = Math.floor(sec / 60);
+    const remaining = sec % 60;
+    return `${mins < 10 ? '0' : ''}${mins}:${remaining < 10 ? '0' : ''}${remaining}`;
+  }
+
   submitBooking(): void {
     if (this.bookingForm.invalid) {
       Swal.fire({
@@ -324,10 +459,18 @@ export class FamilyCouncellingComponent implements OnInit {
       return;
     }
 
+    if (this.isRecordingUserVoice) {
+      this.stopUserVoiceRecording();
+    }
+
     this.isSubmittingBooking = true;
+    const langCode = this.userLanguage.split('-')[0];
     const payload = {
       ...this.bookingForm.value,
-      user_id: this.usr_id
+      user_id: this.usr_id,
+      user_voice_audio: this.userVoiceAudio,
+      user_voice_text: this.userVoiceText || this.bookingForm.value.notes,
+      user_language: langCode
     };
 
     this.service.bookcouncellingappointment(payload).subscribe(
@@ -349,10 +492,11 @@ export class FamilyCouncellingComponent implements OnInit {
           icon: 'success',
           title: 'అపాయింట్‌మెంట్ విజయవంతంగా బుక్ అయింది!',
           html: `
-            <p>మీ అపాయింట్‌మెంట్ నమోదు చేయబడింది.</p>
+            <p>మీ అపాయింట్‌మెంట్ మరియు వాయిస్ కన్సల్టేషన్ నమోదు చేయబడింది.</p>
             <p><b>డాక్టర్:</b> ${payload.doctor_name}</p>
             <p><b>తేదీ:</b> ${payload.appointment_date}</p>
             <p><b>సమయం:</b> ${payload.appointment_time}</p>
+            ${payload.user_voice_audio ? '<p class="text-success"><i class="fa fa-microphone"></i> మీ వాయిస్ మెసేజ్ డాక్టర్‌కు చేరింది.</p>' : ''}
             <p class="text-success"><small>డాక్టర్ లేదా కౌన్సిలింగ్ కేంద్రం నుండి మిమ్మల్ని ఫోన్ ద్వారా సంప్రదిస్తారు.</small></p>
           `,
           confirmButtonColor: '#00548F',
@@ -373,15 +517,171 @@ export class FamilyCouncellingComponent implements OnInit {
         this.myAppointments.unshift(newAppt);
         this.saveMyAppointmentsToStorage();
         this.modalService.dismissAll();
-
         Swal.fire({
           icon: 'success',
-          title: 'అపాయింట్‌మెంట్ బుక్ అయింది!',
-          text: `డాక్టర్ ${payload.doctor_name} గారికి మీ అపాయింట్‌మెంట్ షెడ్యూల్ నమోదు చేయబడింది.`,
+          title: 'అపాయింట్‌మెంట్ నమోదు చేయబడింది',
+          text: 'మీ అపాయింట్‌మెంట్ వివరాలు భద్రపరచబడ్డాయి.',
           confirmButtonColor: '#00548F'
         }).then(() => {
           this.switchTab('my_bookings');
         });
+      }
+    );
+  }
+
+  // -------------------------------------------------------------
+  // DOCTOR VOICE REPLY RECORDING & SENDING
+  // -------------------------------------------------------------
+  openDoctorVoiceReplyModal(appointment: any, modalContent: any): void {
+    this.selectedAppointmentForVoiceReply = appointment;
+    this.clearDoctorVoiceRecording();
+    const patientLang = (appointment.user_language || 'te').toLowerCase();
+    this.doctorReplyLanguage = patientLang === 'en' ? 'en-IN' : (patientLang === 'hi' ? 'hi-IN' : 'te-IN');
+    this.modalService.open(modalContent, { size: 'lg', centered: true });
+  }
+
+  setDoctorReplyLanguage(lang: string): void {
+    this.doctorReplyLanguage = lang;
+    if (this.isRecordingDoctorVoice) {
+      this.stopDoctorVoiceRecording();
+    }
+  }
+
+  startDoctorVoiceRecording(): void {
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+      Swal.fire('Error', 'Microphone not supported in browser.', 'warning');
+      return;
+    }
+
+    this.doctorAudioChunks = [];
+    this.isRecordingDoctorVoice = true;
+    this.doctorVoiceSeconds = 0;
+    this.doctorVoiceTimer = setInterval(() => {
+      this.doctorVoiceSeconds++;
+    }, 1000);
+
+    navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
+      this.doctorMediaRecorder = new (window as any).MediaRecorder(stream);
+      this.doctorMediaRecorder.ondataavailable = (e: any) => {
+        if (e.data && e.data.size > 0) {
+          this.doctorAudioChunks.push(e.data);
+        }
+      };
+      this.doctorMediaRecorder.onstop = () => {
+        const audioBlob = new Blob(this.doctorAudioChunks, { type: 'audio/webm' });
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          this.doctorVoiceAudio = reader.result as string;
+        };
+        reader.readAsDataURL(audioBlob);
+        stream.getTracks().forEach(t => t.stop());
+      };
+      this.doctorMediaRecorder.start();
+    }).catch(err => {
+      this.isRecordingDoctorVoice = false;
+      if (this.doctorVoiceTimer) clearInterval(this.doctorVoiceTimer);
+      Swal.fire('Permission Required', 'దయచేసి మైక్రోఫోన్ అనుమతి ఇవ్వండి.', 'info');
+    });
+
+    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    if (SpeechRecognition) {
+      try {
+        this.doctorSpeechRecognition = new SpeechRecognition();
+        this.doctorSpeechRecognition.lang = this.doctorReplyLanguage;
+        this.doctorSpeechRecognition.continuous = true;
+        this.doctorSpeechRecognition.interimResults = true;
+
+        this.doctorSpeechRecognition.onresult = (event: any) => {
+          for (let i = event.resultIndex; i < event.results.length; ++i) {
+            if (event.results[i].isFinal) {
+              const text = event.results[i][0].transcript;
+              this.doctorVoiceText = (this.doctorVoiceText ? this.doctorVoiceText + ' ' : '') + text;
+            }
+          }
+        };
+
+        this.doctorSpeechRecognition.start();
+      } catch (_) {}
+    }
+  }
+
+  stopDoctorVoiceRecording(): void {
+    this.isRecordingDoctorVoice = false;
+    if (this.doctorVoiceTimer) {
+      clearInterval(this.doctorVoiceTimer);
+      this.doctorVoiceTimer = null;
+    }
+    if (this.doctorMediaRecorder && this.doctorMediaRecorder.state !== 'inactive') {
+      try { this.doctorMediaRecorder.stop(); } catch (_) {}
+    }
+    if (this.doctorSpeechRecognition) {
+      try { this.doctorSpeechRecognition.stop(); } catch (_) {}
+    }
+  }
+
+  clearDoctorVoiceRecording(): void {
+    this.stopDoctorVoiceRecording();
+    this.doctorVoiceAudio = null;
+    this.doctorVoiceText = '';
+    this.doctorVoiceSeconds = 0;
+  }
+
+  sendDoctorVoiceReply(): void {
+    if (!this.selectedAppointmentForVoiceReply) return;
+    if (!this.doctorVoiceAudio && !this.doctorVoiceText) {
+      Swal.fire('సమాచారం అవసరం', 'దయచేసి మీ వాయిస్ సందేశం రికార్డ్ చేయండి లేదా సలహాను టైప్ చేయండి.', 'warning');
+      return;
+    }
+
+    if (this.isRecordingDoctorVoice) {
+      this.stopDoctorVoiceRecording();
+    }
+
+    this.isSendingDoctorVoice = true;
+    const langCode = this.doctorReplyLanguage.split('-')[0];
+    const payload = {
+      appointment_id: this.selectedAppointmentForVoiceReply.id,
+      doctor_voice_audio: this.doctorVoiceAudio,
+      doctor_voice_text: this.doctorVoiceText,
+      doctor_language: langCode,
+      doctor_notes: this.doctorVoiceText
+    };
+
+    this.service.doctorvoicereply(payload).subscribe(
+      (res: any) => {
+        this.isSendingDoctorVoice = false;
+        this.selectedAppointmentForVoiceReply.doctor_voice_audio = this.doctorVoiceAudio;
+        this.selectedAppointmentForVoiceReply.doctor_voice_text = this.doctorVoiceText;
+        this.selectedAppointmentForVoiceReply.doctor_language = langCode;
+        this.selectedAppointmentForVoiceReply.doctor_notes = this.doctorVoiceText;
+        this.selectedAppointmentForVoiceReply.status = 'Doctor Replied';
+
+        const myAppt = this.myAppointments.find(a => a.id == this.selectedAppointmentForVoiceReply.id);
+        if (myAppt) {
+          myAppt.doctor_voice_audio = this.doctorVoiceAudio;
+          myAppt.doctor_voice_text = this.doctorVoiceText;
+          myAppt.doctor_language = langCode;
+          myAppt.status = 'Doctor Replied';
+        }
+
+        this.saveDoctorAppointmentsToStorage();
+        this.modalService.dismissAll();
+        Swal.fire({
+          icon: 'success',
+          title: 'వాయిస్ సలహా విజయవంతంగా పంపబడింది!',
+          text: 'రోగి / కుటుంబ సభ్యులు వారి అపాయింట్‌మెంట్ పేజీలో ఈ వాయిస్ సందేశం వినగలరు.',
+          confirmButtonColor: '#00548F'
+        });
+      },
+      (err: any) => {
+        this.isSendingDoctorVoice = false;
+        this.selectedAppointmentForVoiceReply.doctor_voice_audio = this.doctorVoiceAudio;
+        this.selectedAppointmentForVoiceReply.doctor_voice_text = this.doctorVoiceText;
+        this.selectedAppointmentForVoiceReply.doctor_language = langCode;
+        this.selectedAppointmentForVoiceReply.status = 'Doctor Replied';
+        this.saveDoctorAppointmentsToStorage();
+        this.modalService.dismissAll();
+        Swal.fire('సందేశం పంపబడింది', 'డాక్టర్ వాయిస్ సలహా సేవ్ అయింది.', 'success');
       }
     );
   }

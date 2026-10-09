@@ -1953,17 +1953,19 @@ app.all(['/dashboardapi/savecouncellingdoctor', '/api/savecouncellingdoctor', '/
     try {
         await ensureCouncellingTables();
         const b = req.body || {};
-        if (!b.doctor_name || !b.phone_number) {
+        const doctorName = (b.doctor_name || b.name || '').trim();
+        const phoneNumber = String(b.phone_number || b.phone || b.mobile_number || '').trim();
+        if (!doctorName || !phoneNumber) {
             return res.json({ status: 400, message: 'Doctor name and phone number are required' });
         }
         const img = extractUploadedImage(b) || b.image || 'assets/images/pastor.png';
         const docData = {
-            user_id: b.user_id || null,
-            doctor_name: b.doctor_name,
+            user_id: b.user_id || b.usr_id || null,
+            doctor_name: doctorName,
             specialization: b.specialization || 'Family Counsellor',
             qualification: b.qualification || '',
             experience_years: b.experience_years || '',
-            phone_number: b.phone_number,
+            phone_number: phoneNumber,
             email: b.email || '',
             consultation_fee: b.consultation_fee || 'Free / Volunteer Service',
             available_days: b.available_days || 'Monday to Saturday',
@@ -2107,40 +2109,59 @@ app.all(['/dashboardapi/registerdoctor', '/api/registerdoctor', '/dashboardapi/r
     }
 });
 
-// 3. Book Appointment (Families / Users after login)
+// 3. Book Appointment (Families / Users after login - with Voice Consultation Support)
 app.all(['/dashboardapi/bookcouncellingappointment', '/api/bookcouncellingappointment', '/dashboardapi/bookcounsellingappointment'], async (req: any, res: any) => {
     try {
         await ensureCouncellingTables();
         const b = req.body || {};
-        if (!b.family_name || !b.phone_number || !b.appointment_date || !b.appointment_time) {
+        const familyName = (b.family_name || b.patient_name || b.name || '').trim();
+        const phoneNumber = String(b.phone_number || b.patient_phone || b.phone || '').trim();
+        if (!familyName || !phoneNumber || !b.appointment_date || !b.appointment_time) {
             return res.json({ status: 400, message: 'Family name, phone number, appointment date and time are required' });
         }
         const apptData = {
-            doctor_id: Number(b.doctor_id) || 1,
+            doctor_id: Number(b.doctor_id || b.doc_id) || 1,
             doctor_name: b.doctor_name || 'Assigned Family Counsellor',
-            family_name: b.family_name,
-            contact_person: b.contact_person || b.family_name,
-            phone_number: b.phone_number,
-            email: b.email || '',
-            user_id: b.user_id ? Number(b.user_id) : null,
+            family_name: familyName,
+            contact_person: b.contact_person || familyName,
+            phone_number: phoneNumber,
+            email: b.email || b.patient_email || '',
+            user_id: b.user_id ? Number(b.user_id) : (b.usr_id ? Number(b.usr_id) : null),
             appointment_date: b.appointment_date,
             appointment_time: b.appointment_time,
             members_count: Number(b.members_count) || 1,
-            counselling_type: b.counselling_type || 'General Family Counselling',
+            counselling_type: b.counselling_type || b.reason || 'General Family & Marriage Counselling',
             notes: b.notes || '',
             status: 'Confirmed',
             doctor_notes: '',
+            user_voice_audio: b.user_voice_audio || null,
+            user_voice_text: b.user_voice_text || null,
+            user_language: b.user_language || 'te',
+            doctor_voice_audio: null,
+            doctor_voice_text: null,
+            doctor_language: null,
             created_at: new Date().toISOString(),
             d_in: 0
         };
 
         const [ins]: any = await db.query(
-            'INSERT INTO `family_councelling_appointments` (`doctor_id`, `doctor_name`, `family_name`, `contact_person`, `phone_number`, `email`, `user_id`, `appointment_date`, `appointment_time`, `members_count`, `counselling_type`, `notes`, `status`, `doctor_notes`, `d_in`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0)',
-            [apptData.doctor_id, apptData.doctor_name, apptData.family_name, apptData.contact_person, apptData.phone_number, apptData.email, apptData.user_id, apptData.appointment_date, apptData.appointment_time, apptData.members_count, apptData.counselling_type, apptData.notes, apptData.status, apptData.doctor_notes]
+            'INSERT INTO `family_councelling_appointments` (`doctor_id`, `doctor_name`, `family_name`, `contact_person`, `phone_number`, `email`, `user_id`, `appointment_date`, `appointment_time`, `members_count`, `counselling_type`, `notes`, `status`, `doctor_notes`, `user_voice_audio`, `user_voice_text`, `user_language`, `d_in`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0)',
+            [apptData.doctor_id, apptData.doctor_name, apptData.family_name, apptData.contact_person, apptData.phone_number, apptData.email, apptData.user_id, apptData.appointment_date, apptData.appointment_time, apptData.members_count, apptData.counselling_type, apptData.notes, apptData.status, apptData.doctor_notes, apptData.user_voice_audio, apptData.user_voice_text, apptData.user_language]
         );
         const newId = ins?.insertId || Date.now();
         inMemoryCounsellingAppointments.push({ ...apptData, id: newId });
-        res.json({ status: 200, message: 'Appointment booked successfully! Our doctor/counsellor has received your schedule.', id: newId });
+
+        // If voice audio or text provided, also record in councelling_voice_messages
+        if (apptData.user_voice_audio || apptData.user_voice_text) {
+            try {
+                await db.query(
+                    'INSERT INTO `councelling_voice_messages` (`appointment_id`, `doctor_id`, `user_id`, `sender_type`, `sender_name`, `sender_phone`, `audio_data`, `transcribed_text`, `language`, `d_in`) VALUES (?, ?, ?, "user", ?, ?, ?, ?, ?, 0)',
+                    [newId, apptData.doctor_id, apptData.user_id, apptData.family_name, apptData.phone_number, apptData.user_voice_audio, apptData.user_voice_text, apptData.user_language]
+                );
+            } catch (_) {}
+        }
+
+        res.json({ status: 200, message: 'Appointment booked successfully! Our doctor/counsellor has received your schedule and voice consultation.', id: newId });
     } catch (err: any) {
         const b = req.body || {};
         const newId = Date.now();
@@ -2155,14 +2176,24 @@ app.all(['/dashboardapi/getcouncellingappointments', '/api/getcouncellingappoint
         await ensureCouncellingTables();
         const b = req.body || {};
         const q = req.query || {};
-        const doctorId = b.doctor_id || q.doctor_id;
+        let doctorId = b.doctor_id || q.doctor_id || b.doc_id || q.doc_id;
         const doctorPhone = b.doctor_phone || q.doctor_phone;
-        const userId = b.user_id || q.user_id;
-        const userPhone = b.phone_number || q.phone_number;
-        const isAdmin = b.is_admin || q.is_admin || (b.role === 'admin') || (q.role === 'admin');
+        const userId = b.user_id || q.user_id || b.usr_id || q.usr_id;
+        const userPhone = b.phone_number || q.phone_number || b.patient_phone || q.patient_phone || b.phone || q.phone;
+        const role = b.role || q.role;
+        const isAdmin = b.is_admin || q.is_admin || (role === 'admin');
 
         let sql = 'SELECT * FROM `family_councelling_appointments` WHERE `d_in` = 0';
         const params: any[] = [];
+
+        if (role === 'doctor' && userId && !doctorId) {
+            try {
+                const [doc]: any = await db.query('SELECT id FROM `family_councelling_doctors` WHERE `user_id` = ? OR `id` = ? OR `phone_number` = ? LIMIT 1', [userId, userId, userPhone || '']);
+                if (doc && doc.length > 0) {
+                    doctorId = doc[0].id;
+                }
+            } catch (_) {}
+        }
 
         if (doctorId) {
             sql += ' AND `doctor_id` = ?';
@@ -2246,6 +2277,77 @@ app.all(['/dashboardapi/updateappointmentstatus', '/api/updateappointmentstatus'
             if (b.doctor_notes) inMemoryCounsellingAppointments[idx].doctor_notes = b.doctor_notes;
         }
         res.json({ status: 200, message: 'Appointment updated successfully' });
+    }
+});
+
+// 5b. Doctor Voice Reply (Doctor records voice advice + text for a patient)
+app.all(['/dashboardapi/doctorvoicereply', '/api/doctorvoicereply', '/dashboardapi/replycouncellingappointment'], async (req: any, res: any) => {
+    try {
+        await ensureCouncellingTables();
+        const b = req.body || {};
+        const apptId = b.appointment_id || b.id;
+        if (!apptId) {
+            return res.json({ status: 400, message: 'Appointment ID is required' });
+        }
+
+        const voiceAudio = b.doctor_voice_audio || b.audio_data || null;
+        const voiceText = b.doctor_voice_text || b.transcribed_text || b.doctor_notes || null;
+        const lang = b.doctor_language || b.language || 'te';
+        const docNotes = b.doctor_notes || voiceText || '';
+
+        await db.query(
+            'UPDATE `family_councelling_appointments` SET `doctor_voice_audio` = ?, `doctor_voice_text` = ?, `doctor_language` = ?, `doctor_notes` = ?, `status` = "Doctor Replied" WHERE `id` = ?',
+            [voiceAudio, voiceText, lang, docNotes, apptId]
+        );
+
+        // Record in councelling_voice_messages thread
+        try {
+            const [apptRows]: any = await db.query('SELECT doctor_id, user_id, doctor_name, phone_number FROM `family_councelling_appointments` WHERE `id` = ?', [apptId]);
+            if (apptRows && apptRows.length > 0) {
+                const appt = apptRows[0];
+                await db.query(
+                    'INSERT INTO `councelling_voice_messages` (`appointment_id`, `doctor_id`, `user_id`, `sender_type`, `sender_name`, `audio_data`, `transcribed_text`, `language`, `d_in`) VALUES (?, ?, ?, "doctor", ?, ?, ?, ?, 0)',
+                    [apptId, appt.doctor_id, appt.user_id, appt.doctor_name || 'Doctor', voiceAudio, voiceText, lang]
+                );
+            }
+        } catch (_) {}
+
+        // Update in-memory fallback
+        const idx = inMemoryCounsellingAppointments.findIndex(a => a.id == apptId);
+        if (idx !== -1) {
+            inMemoryCounsellingAppointments[idx].doctor_voice_audio = voiceAudio;
+            inMemoryCounsellingAppointments[idx].doctor_voice_text = voiceText;
+            inMemoryCounsellingAppointments[idx].doctor_language = lang;
+            inMemoryCounsellingAppointments[idx].doctor_notes = docNotes;
+            inMemoryCounsellingAppointments[idx].status = 'Doctor Replied';
+        }
+
+        res.json({
+            status: 200,
+            message: 'డాక్టర్ వాయిస్ సలహా విజయవంతంగా సేవ్ అయింది మరియు పేషెంట్‌కు పంపబడింది! (Doctor voice advice sent successfully!)',
+            appointment_id: apptId
+        });
+    } catch (err: any) {
+        res.json({ status: 500, message: err.message || 'Error saving doctor voice advice' });
+    }
+});
+
+// 5c. Get Voice Messages for an Appointment
+app.all(['/dashboardapi/getcouncellingvoicemessages', '/api/getcouncellingvoicemessages'], async (req: any, res: any) => {
+    try {
+        const b = req.body || {};
+        const q = req.query || {};
+        const apptId = b.appointment_id || q.appointment_id;
+        if (!apptId) {
+            return res.json({ status: 400, message: 'Appointment ID required' });
+        }
+        const [rows]: any = await db.query(
+            'SELECT * FROM `councelling_voice_messages` WHERE `appointment_id` = ? AND `d_in` = 0 ORDER BY `id` ASC',
+            [apptId]
+        );
+        res.json({ status: 200, data: rows || [] });
+    } catch (err: any) {
+        res.json({ status: 200, data: [] });
     }
 });
 
