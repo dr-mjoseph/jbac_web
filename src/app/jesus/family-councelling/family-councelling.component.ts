@@ -349,50 +349,33 @@ export class FamilyCouncellingComponent implements OnInit {
     }
   }
 
-  startUserVoiceRecording(): void {
-    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-      Swal.fire('Error', 'మీ బ్రౌజర్‌లో మైక్రోఫోన్ సౌకర్యం అందుబాటులో లేదు (Microphone not supported).', 'warning');
-      return;
+  // Helper to safely obtain microphone stream across modern and legacy browsers
+  private getMicrophoneStream(): Promise<MediaStream> {
+    const nav: any = navigator;
+    if (nav.mediaDevices && nav.mediaDevices.getUserMedia) {
+      return nav.mediaDevices.getUserMedia({ audio: true });
     }
+    const legacyGUM = nav.getUserMedia || nav.webkitGetUserMedia || nav.mozGetUserMedia || nav.msGetUserMedia;
+    if (legacyGUM) {
+      return new Promise<MediaStream>((resolve, reject) => {
+        legacyGUM.call(nav, { audio: true }, resolve, reject);
+      });
+    }
+    return Promise.reject(new Error('GETUSERMEDIA_NOT_SUPPORTED'));
+  }
 
-    this.userAudioChunks = [];
-    this.isRecordingUserVoice = true;
-    this.userVoiceSeconds = 0;
-    this.userVoiceTimer = setInterval(() => {
-      this.userVoiceSeconds++;
-    }, 1000);
+  startUserVoiceRecording(): void {
+    const SpeechRec = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    let speechActive = false;
 
-    // 1. Audio MediaRecorder
-    navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
-      this.userMediaRecorder = new (window as any).MediaRecorder(stream);
-      this.userMediaRecorder.ondataavailable = (e: any) => {
-        if (e.data && e.data.size > 0) {
-          this.userAudioChunks.push(e.data);
-        }
-      };
-      this.userMediaRecorder.onstop = () => {
-        const audioBlob = new Blob(this.userAudioChunks, { type: 'audio/webm' });
-        const reader = new FileReader();
-        reader.onloadend = () => {
-          this.userVoiceAudio = reader.result as string;
-        };
-        reader.readAsDataURL(audioBlob);
-        stream.getTracks().forEach(t => t.stop());
-      };
-      this.userMediaRecorder.start();
-    }).catch(err => {
-      console.warn('Microphone error:', err);
-      this.isRecordingUserVoice = false;
-      if (this.userVoiceTimer) clearInterval(this.userVoiceTimer);
-      Swal.fire('Microphone Permission', 'దయచేసి మైక్రోఫోన్ అనుమతి (Permission) ఇవ్వండి.', 'info');
-    });
-
-    // 2. Speech-to-Text Recognition (Web Speech API)
-    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
-    if (SpeechRecognition) {
+    // 1. Start Speech-to-Text Recognition first so speech is captured immediately
+    if (SpeechRec) {
       try {
-        this.userSpeechRecognition = new SpeechRecognition();
-        this.userSpeechRecognition.lang = this.userLanguage;
+        if (this.userSpeechRecognition) {
+          try { this.userSpeechRecognition.abort(); } catch (_) {}
+        }
+        this.userSpeechRecognition = new SpeechRec();
+        this.userSpeechRecognition.lang = this.userLanguage || 'te-IN';
         this.userSpeechRecognition.continuous = true;
         this.userSpeechRecognition.interimResults = true;
 
@@ -412,14 +395,114 @@ export class FamilyCouncellingComponent implements OnInit {
         };
 
         this.userSpeechRecognition.onerror = (e: any) => {
-          console.warn('Speech recognition error:', e);
+          console.warn('Speech recognition warning:', e);
         };
 
         this.userSpeechRecognition.start();
+        speechActive = true;
       } catch (e) {
         console.warn('Speech recognition start failed:', e);
       }
     }
+
+    // 2. Initialize Recording State & Timer
+    this.userAudioChunks = [];
+    this.isRecordingUserVoice = true;
+    this.userVoiceSeconds = 0;
+    if (this.userVoiceTimer) clearInterval(this.userVoiceTimer);
+    this.userVoiceTimer = setInterval(() => {
+      this.userVoiceSeconds++;
+    }, 1000);
+
+    // 3. Audio MediaRecorder Stream Capture
+    this.getMicrophoneStream().then(stream => {
+      try {
+        const MediaRec = (window as any).MediaRecorder;
+        if (MediaRec) {
+          let options: any;
+          if (typeof MediaRec.isTypeSupported === 'function') {
+            if (MediaRec.isTypeSupported('audio/webm')) options = { mimeType: 'audio/webm' };
+            else if (MediaRec.isTypeSupported('audio/mp4')) options = { mimeType: 'audio/mp4' };
+          }
+          this.userMediaRecorder = options ? new MediaRec(stream, options) : new MediaRec(stream);
+          this.userMediaRecorder.ondataavailable = (e: any) => {
+            if (e.data && e.data.size > 0) {
+              this.userAudioChunks.push(e.data);
+            }
+          };
+          this.userMediaRecorder.onstop = () => {
+            const mime = this.userMediaRecorder?.mimeType || 'audio/webm';
+            const audioBlob = new Blob(this.userAudioChunks, { type: mime });
+            const reader = new FileReader();
+            reader.onloadend = () => {
+              this.userVoiceAudio = reader.result as string;
+            };
+            reader.readAsDataURL(audioBlob);
+            stream.getTracks().forEach(t => t.stop());
+          };
+          this.userMediaRecorder.start();
+        }
+      } catch (err) {
+        console.warn('MediaRecorder recording error:', err);
+      }
+    }).catch(err => {
+      console.warn('Microphone stream capture error:', err);
+      if (speechActive) {
+        Swal.fire({
+          icon: 'info',
+          title: 'స్పీచ్-టు-టెక్స్ట్ ప్రారంభమైంది!',
+          text: 'మీరు మాట్లాడవచ్చు. మీ మాటలు నేరుగా టెక్స్ట్‌గా నమోదవుతాయి (Speech recognition is active, you can speak now).',
+          timer: 3000,
+          showConfirmButton: false
+        });
+      } else {
+        this.isRecordingUserVoice = false;
+        if (this.userVoiceTimer) clearInterval(this.userVoiceTimer);
+        const isHttp = !window.isSecureContext && location.protocol !== 'https:' && location.hostname !== 'localhost' && location.hostname !== '127.0.0.1';
+        Swal.fire({
+          icon: 'info',
+          title: 'మైక్రోఫోన్ సౌకర్యం (Microphone)',
+          html: isHttp
+            ? 'బ్రౌజర్‌లో నేరుగా మైక్రోఫోన్ ఉపయోగించడానికి <b>HTTPS</b> లేదా <b>localhost</b> అవసరం.<br><br><b>మీరు సమస్య వివరాలను క్రింద బాక్స్‌లో నేరుగా టైప్ చేయవచ్చు</b> లేదా మీ మొబైల్ కీబోర్డ్‌లోని మైక్రోఫోన్ (🎙) నొక్కి మాట్లాడవచ్చు లేదా రికార్డ్ చేసిన ఆడియో ఫైల్ అప్‌లోడ్ చేయవచ్చు.'
+            : 'దయచేసి బ్రౌజర్ అడ్రస్ బార్‌లో 🔒 ఐకాన్ క్లిక్ చేసి <b>మైక్రోఫోన్ అనుమతి (Allow Microphone)</b> ఇవ్వండి, లేదా సమస్యను క్రింద నేరుగా టైప్ చేయండి.',
+          showCancelButton: true,
+          confirmButtonColor: '#00548F',
+          confirmButtonText: '<i class="fa fa-pencil"></i> నేరుగా టైప్ చేస్తాను',
+          cancelButtonText: '<i class="fa fa-upload"></i> ఆడియో ఫైల్ ఎంచుకోండి',
+          cancelButtonColor: '#6c757d'
+        }).then(res => {
+          if (res.dismiss === Swal.DismissReason.cancel) {
+            this.triggerUserAudioUpload();
+          } else if (res.isConfirmed) {
+            const textarea = document.querySelector('textarea[formcontrolname="notes"]') as HTMLElement;
+            if (textarea) textarea.focus();
+          }
+        });
+      }
+    });
+  }
+
+  triggerUserAudioUpload(): void {
+    const input = document.getElementById('userAudioFileInput') as HTMLInputElement;
+    if (input) input.click();
+  }
+
+  onUserAudioFileSelected(event: any): void {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      this.userVoiceAudio = reader.result as string;
+      this.userVoiceSeconds = 30;
+      Swal.fire({
+        icon: 'success',
+        title: 'ఆడియో ఫైల్ జతచేయబడింది!',
+        text: file.name,
+        timer: 2000,
+        showConfirmButton: false
+      });
+    };
+    reader.readAsDataURL(file);
   }
 
   stopUserVoiceRecording(): void {
@@ -548,45 +631,16 @@ export class FamilyCouncellingComponent implements OnInit {
   }
 
   startDoctorVoiceRecording(): void {
-    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-      Swal.fire('Error', 'Microphone not supported in browser.', 'warning');
-      return;
-    }
+    const SpeechRec = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    let speechActive = false;
 
-    this.doctorAudioChunks = [];
-    this.isRecordingDoctorVoice = true;
-    this.doctorVoiceSeconds = 0;
-    this.doctorVoiceTimer = setInterval(() => {
-      this.doctorVoiceSeconds++;
-    }, 1000);
-
-    navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
-      this.doctorMediaRecorder = new (window as any).MediaRecorder(stream);
-      this.doctorMediaRecorder.ondataavailable = (e: any) => {
-        if (e.data && e.data.size > 0) {
-          this.doctorAudioChunks.push(e.data);
-        }
-      };
-      this.doctorMediaRecorder.onstop = () => {
-        const audioBlob = new Blob(this.doctorAudioChunks, { type: 'audio/webm' });
-        const reader = new FileReader();
-        reader.onloadend = () => {
-          this.doctorVoiceAudio = reader.result as string;
-        };
-        reader.readAsDataURL(audioBlob);
-        stream.getTracks().forEach(t => t.stop());
-      };
-      this.doctorMediaRecorder.start();
-    }).catch(err => {
-      this.isRecordingDoctorVoice = false;
-      if (this.doctorVoiceTimer) clearInterval(this.doctorVoiceTimer);
-      Swal.fire('Permission Required', 'దయచేసి మైక్రోఫోన్ అనుమతి ఇవ్వండి.', 'info');
-    });
-
-    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
-    if (SpeechRecognition) {
+    // 1. Start Speech-to-Text Recognition for Doctor
+    if (SpeechRec) {
       try {
-        this.doctorSpeechRecognition = new SpeechRecognition();
+        if (this.doctorSpeechRecognition) {
+          try { this.doctorSpeechRecognition.abort(); } catch (_) {}
+        }
+        this.doctorSpeechRecognition = new SpeechRec();
         this.doctorSpeechRecognition.lang = this.doctorReplyLanguage;
         this.doctorSpeechRecognition.continuous = true;
         this.doctorSpeechRecognition.interimResults = true;
@@ -601,8 +655,107 @@ export class FamilyCouncellingComponent implements OnInit {
         };
 
         this.doctorSpeechRecognition.start();
-      } catch (_) {}
+        speechActive = true;
+      } catch (e) {
+        console.warn('Doctor speech recognition start failed:', e);
+      }
     }
+
+    // 2. Initialize Doctor Recording State & Timer
+    this.doctorAudioChunks = [];
+    this.isRecordingDoctorVoice = true;
+    this.doctorVoiceSeconds = 0;
+    if (this.doctorVoiceTimer) clearInterval(this.doctorVoiceTimer);
+    this.doctorVoiceTimer = setInterval(() => {
+      this.doctorVoiceSeconds++;
+    }, 1000);
+
+    // 3. Audio MediaRecorder Stream Capture
+    this.getMicrophoneStream().then(stream => {
+      try {
+        const MediaRec = (window as any).MediaRecorder;
+        if (MediaRec) {
+          let options: any;
+          if (typeof MediaRec.isTypeSupported === 'function') {
+            if (MediaRec.isTypeSupported('audio/webm')) options = { mimeType: 'audio/webm' };
+            else if (MediaRec.isTypeSupported('audio/mp4')) options = { mimeType: 'audio/mp4' };
+          }
+          this.doctorMediaRecorder = options ? new MediaRec(stream, options) : new MediaRec(stream);
+          this.doctorMediaRecorder.ondataavailable = (e: any) => {
+            if (e.data && e.data.size > 0) {
+              this.doctorAudioChunks.push(e.data);
+            }
+          };
+          this.doctorMediaRecorder.onstop = () => {
+            const mime = this.doctorMediaRecorder?.mimeType || 'audio/webm';
+            const audioBlob = new Blob(this.doctorAudioChunks, { type: mime });
+            const reader = new FileReader();
+            reader.onloadend = () => {
+              this.doctorVoiceAudio = reader.result as string;
+            };
+            reader.readAsDataURL(audioBlob);
+            stream.getTracks().forEach(t => t.stop());
+          };
+          this.doctorMediaRecorder.start();
+        }
+      } catch (err) {
+        console.warn('Doctor MediaRecorder error:', err);
+      }
+    }).catch(err => {
+      console.warn('Doctor microphone stream error:', err);
+      if (speechActive) {
+        Swal.fire({
+          icon: 'info',
+          title: 'స్పీచ్-టు-టెక్స్ట్ ప్రారంభమైంది!',
+          text: 'డాక్టర్ గారూ, మీరు మాట్లాడవచ్చు. మీ మాటలు నేరుగా టెక్స్ట్‌గా నమోదవుతాయి.',
+          timer: 3000,
+          showConfirmButton: false
+        });
+      } else {
+        this.isRecordingDoctorVoice = false;
+        if (this.doctorVoiceTimer) clearInterval(this.doctorVoiceTimer);
+        const isHttp = !window.isSecureContext && location.protocol !== 'https:' && location.hostname !== 'localhost' && location.hostname !== '127.0.0.1';
+        Swal.fire({
+          icon: 'info',
+          title: 'మైక్రోఫోన్ సౌకర్యం (Microphone)',
+          html: isHttp
+            ? 'బ్రౌజర్‌లో మైక్రోఫోన్ నేరుగా ఉపయోగించడానికి <b>HTTPS</b> అవసరం.<br><br>మీరు సలహాను క్రింద నేరుగా టైప్ చేయవచ్చు లేదా ఆడియో ఫైల్ అప్‌లోడ్ చేయవచ్చు.'
+            : 'దయచేసి మైక్రోఫోన్ అనుమతి ఇవ్వండి లేదా మీ సలహాను క్రింద నేరుగా టైప్ చేయండి.',
+          showCancelButton: true,
+          confirmButtonColor: '#00548F',
+          confirmButtonText: '<i class="fa fa-pencil"></i> సలహాను టైప్ చేస్తాను',
+          cancelButtonText: '<i class="fa fa-upload"></i> ఆడియో ఫైల్ ఎంచుకోండి',
+          cancelButtonColor: '#6c757d'
+        }).then(res => {
+          if (res.dismiss === Swal.DismissReason.cancel) {
+            this.triggerDoctorAudioUpload();
+          }
+        });
+      }
+    });
+  }
+
+  triggerDoctorAudioUpload(): void {
+    const input = document.getElementById('doctorAudioFileInput') as HTMLInputElement;
+    if (input) input.click();
+  }
+
+  onDoctorAudioFileSelected(event: any): void {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      this.doctorVoiceAudio = reader.result as string;
+      this.doctorVoiceSeconds = 30;
+      Swal.fire({
+        icon: 'success',
+        title: 'ఆడియో ఫైల్ జతచేయబడింది!',
+        text: file.name,
+        timer: 2000,
+        showConfirmButton: false
+      });
+    };
+    reader.readAsDataURL(file);
   }
 
   stopDoctorVoiceRecording(): void {

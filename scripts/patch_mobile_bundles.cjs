@@ -360,47 +360,32 @@ var FamilyCouncellingPage = /** @class */ (function () {
 
     FamilyCouncellingPage.prototype.startUserVoiceRecording = function () {
         var _this = this;
-        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-            this.showToast('మైక్రోఫోన్ సపోర్ట్ లేదు (Microphone not supported).');
-            return;
-        }
-        navigator.mediaDevices.getUserMedia({ audio: true }).then(function (stream) {
-            _this.audioChunks = [];
-            var MediaRec = window.MediaRecorder;
-            if (!MediaRec) {
-                _this.showToast('MediaRecorder not available.');
-                return;
+        var nav = navigator;
+        var getGum = function(opts) {
+            if (nav.mediaDevices && nav.mediaDevices.getUserMedia) {
+                return nav.mediaDevices.getUserMedia(opts);
             }
-            _this.mediaRecorder = new MediaRec(stream);
-            _this.mediaRecorder.ondataavailable = function (e) {
-                if (e.data && e.data.size > 0) {
-                    _this.audioChunks.push(e.data);
-                }
-            };
-            _this.mediaRecorder.onstop = function () {
-                var audioBlob = new Blob(_this.audioChunks, { type: 'audio/webm' });
-                _this.recordedAudioUrl = URL.createObjectURL(audioBlob);
-                var reader = new FileReader();
-                reader.onloadend = function () {
-                    _this.recordedAudioBase64 = reader.result;
-                    _this.bookingData.user_voice_audio = _this.recordedAudioBase64;
-                };
-                reader.readAsDataURL(audioBlob);
-            };
-            _this.mediaRecorder.start();
-            _this.isRecording = true;
-            _this.recordingTimer = 0;
-            _this.recordingInterval = setInterval(function () {
-                _this.recordingTimer++;
-            }, 1000);
+            var legacy = nav.getUserMedia || nav.webkitGetUserMedia || nav.mozGetUserMedia || nav.msGetUserMedia;
+            if (legacy) {
+                return new Promise(function(resolve, reject) {
+                    legacy.call(nav, opts, resolve, reject);
+                });
+            }
+            return Promise.reject(new Error('NO_GUM'));
+        };
 
-            var SpeechRec = window.webkitSpeechRecognition || window.SpeechRecognition;
-            if (SpeechRec) {
-                _this.speechRecognition = new SpeechRec();
-                _this.speechRecognition.lang = _this.selectedLang;
-                _this.speechRecognition.continuous = true;
-                _this.speechRecognition.interimResults = true;
-                _this.speechRecognition.onresult = function (event) {
+        var SpeechRec = window.webkitSpeechRecognition || window.SpeechRecognition;
+        var speechActive = false;
+        if (SpeechRec) {
+            try {
+                if (this.speechRecognition) {
+                    try { this.speechRecognition.abort(); } catch(e){}
+                }
+                this.speechRecognition = new SpeechRec();
+                this.speechRecognition.lang = this.selectedLang || 'te-IN';
+                this.speechRecognition.continuous = true;
+                this.speechRecognition.interimResults = true;
+                this.speechRecognition.onresult = function (event) {
                     var text = '';
                     for (var i = event.resultIndex; i < event.results.length; ++i) {
                         text += event.results[i][0].transcript;
@@ -408,15 +393,56 @@ var FamilyCouncellingPage = /** @class */ (function () {
                     if (text) {
                         _this.transcribedText = text;
                         _this.bookingData.user_voice_text = text;
-                        if (!_this.bookingData.notes) {
-                            _this.bookingData.notes = text;
+                        var currentNotes = _this.bookingData.notes || '';
+                        if (currentNotes.indexOf(text) === -1) {
+                            _this.bookingData.notes = currentNotes ? (currentNotes + ' ' + text) : text;
                         }
                     }
                 };
-                try { _this.speechRecognition.start(); } catch (e) {}
+                this.speechRecognition.start();
+                speechActive = true;
+            } catch (e) {}
+        }
+
+        this.isRecording = true;
+        this.recordingTimer = 0;
+        if (this.recordingInterval) clearInterval(this.recordingInterval);
+        this.recordingInterval = setInterval(function () {
+            _this.recordingTimer++;
+        }, 1000);
+
+        getGum({ audio: true }).then(function (stream) {
+            _this.audioChunks = [];
+            var MediaRec = window.MediaRecorder;
+            if (MediaRec) {
+                _this.mediaRecorder = new MediaRec(stream);
+                _this.mediaRecorder.ondataavailable = function (e) {
+                    if (e.data && e.data.size > 0) {
+                        _this.audioChunks.push(e.data);
+                    }
+                };
+                _this.mediaRecorder.onstop = function () {
+                    var audioBlob = new Blob(_this.audioChunks, { type: 'audio/webm' });
+                    _this.recordedAudioUrl = URL.createObjectURL(audioBlob);
+                    var reader = new FileReader();
+                    reader.onloadend = function () {
+                        _this.recordedAudioBase64 = reader.result;
+                        _this.bookingData.user_voice_audio = _this.recordedAudioBase64;
+                    };
+                    reader.readAsDataURL(audioBlob);
+                    stream.getTracks().forEach(function(t) { t.stop(); });
+                };
+                _this.mediaRecorder.start();
             }
         }).catch(function (err) {
-            _this.showToast('దయచేసి మైక్రోఫోన్ అనుమతి ఇవ్వండి.');
+            console.warn('Microphone error:', err);
+            if (speechActive) {
+                _this.showToast('స్పీచ్ రికగ్నిషన్ ప్రారంభమైంది! మాట్లాడండి.');
+            } else {
+                _this.isRecording = false;
+                if (_this.recordingInterval) clearInterval(_this.recordingInterval);
+                _this.showToast('దయచేసి మైక్రోఫోన్ అనుమతి ఇవ్వండి లేదా సమస్యను నేరుగా టైప్ చేయండి.');
+            }
         });
     };
 
@@ -526,11 +552,53 @@ var FamilyCouncellingPage = /** @class */ (function () {
 
     FamilyCouncellingPage.prototype.startDoctorVoiceRecording = function () {
         var _this = this;
-        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-            this.showToast('మైక్రోఫోన్ సపోర్ట్ లేదు.');
-            return;
+        var nav = navigator;
+        var getGum = function(opts) {
+            if (nav.mediaDevices && nav.mediaDevices.getUserMedia) {
+                return nav.mediaDevices.getUserMedia(opts);
+            }
+            var legacy = nav.getUserMedia || nav.webkitGetUserMedia || nav.mozGetUserMedia || nav.msGetUserMedia;
+            if (legacy) {
+                return new Promise(function(resolve, reject) {
+                    legacy.call(nav, opts, resolve, reject);
+                });
+            }
+            return Promise.reject(new Error('NO_GUM'));
+        };
+
+        var SpeechRec = window.webkitSpeechRecognition || window.SpeechRecognition;
+        var speechActive = false;
+        if (SpeechRec) {
+            try {
+                if (this.doctorSpeechRecognition) {
+                    try { this.doctorSpeechRecognition.abort(); } catch(e){}
+                }
+                this.doctorSpeechRecognition = new SpeechRec();
+                this.doctorSpeechRecognition.lang = this.selectedDoctorLang || 'te-IN';
+                this.doctorSpeechRecognition.continuous = true;
+                this.doctorSpeechRecognition.interimResults = true;
+                this.doctorSpeechRecognition.onresult = function (event) {
+                    var text = '';
+                    for (var i = event.resultIndex; i < event.results.length; ++i) {
+                        text += event.results[i][0].transcript;
+                    }
+                    if (text) {
+                        _this.doctorTranscribedText = text;
+                    }
+                };
+                this.doctorSpeechRecognition.start();
+                speechActive = true;
+            } catch (e) {}
         }
-        navigator.mediaDevices.getUserMedia({ audio: true }).then(function (stream) {
+
+        this.isDoctorRecording = true;
+        this.doctorRecordingTimer = 0;
+        if (this.doctorRecordingInterval) clearInterval(this.doctorRecordingInterval);
+        this.doctorRecordingInterval = setInterval(function () {
+            _this.doctorRecordingTimer++;
+        }, 1000);
+
+        getGum({ audio: true }).then(function (stream) {
             _this.doctorAudioChunks = [];
             var MediaRec = window.MediaRecorder;
             if (!MediaRec) return;
@@ -548,33 +616,18 @@ var FamilyCouncellingPage = /** @class */ (function () {
                     _this.doctorRecordedAudioBase64 = reader.result;
                 };
                 reader.readAsDataURL(audioBlob);
+                stream.getTracks().forEach(function(t) { t.stop(); });
             };
             _this.doctorMediaRecorder.start();
-            _this.isDoctorRecording = true;
-            _this.doctorRecordingTimer = 0;
-            _this.doctorRecordingInterval = setInterval(function () {
-                _this.doctorRecordingTimer++;
-            }, 1000);
-
-            var SpeechRec = window.webkitSpeechRecognition || window.SpeechRecognition;
-            if (SpeechRec) {
-                _this.doctorSpeechRecognition = new SpeechRec();
-                _this.doctorSpeechRecognition.lang = _this.selectedDoctorLang;
-                _this.doctorSpeechRecognition.continuous = true;
-                _this.doctorSpeechRecognition.interimResults = true;
-                _this.doctorSpeechRecognition.onresult = function (event) {
-                    var text = '';
-                    for (var i = event.resultIndex; i < event.results.length; ++i) {
-                        text += event.results[i][0].transcript;
-                    }
-                    if (text) {
-                        _this.doctorTranscribedText = text;
-                    }
-                };
-                try { _this.doctorSpeechRecognition.start(); } catch (e) {}
-            }
         }).catch(function (err) {
-            _this.showToast('దయచేసి మైక్రోఫోన్ అనుమతి ఇవ్వండి.');
+            console.warn('Doctor microphone error:', err);
+            if (speechActive) {
+                _this.showToast('స్పీచ్ రికగ్నిషన్ ప్రారంభమైంది! మాట్లాడండి.');
+            } else {
+                _this.isDoctorRecording = false;
+                if (_this.doctorRecordingInterval) clearInterval(_this.doctorRecordingInterval);
+                _this.showToast('దయచేసి మైక్రోఫోన్ అనుమతి ఇవ్వండి లేదా సలహాను టైప్ చేయండి.');
+            }
         });
     };
 

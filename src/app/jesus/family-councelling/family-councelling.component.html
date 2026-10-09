@@ -935,18 +935,39 @@
                 <i class="fa fa-stop-circle me-1 text-danger"></i> రికార్డింగ్ ఆపండి (Stop - {{ formatVoiceSeconds(userVoiceSeconds) }})
               </button>
 
+              <input
+                type="file"
+                id="userAudioFileInput"
+                accept="audio/*"
+                (change)="onUserAudioFileSelected($event)"
+                style="display: none;"
+              />
+              <button
+                type="button"
+                class="btn btn-outline-secondary btn-sm px-2 shadow-sm"
+                (click)="triggerUserAudioUpload()"
+                title="రికార్డ్ చేసిన ఆడియో ఫైల్ అప్‌లోడ్ చేయండి"
+              >
+                <i class="fa fa-paperclip me-1"></i> ఆడియో ఫైల్ (Attach Audio)
+              </button>
+
               <button
                 type="button"
                 *ngIf="userVoiceAudio && !isRecordingUserVoice"
-                class="btn btn-outline-secondary btn-sm"
+                class="btn btn-outline-danger btn-sm"
                 (click)="clearUserVoiceRecording()"
               >
-                <i class="fa fa-trash me-1"></i> మళ్లీ రికార్డ్ చేయండి (Re-record)
+                <i class="fa fa-trash me-1"></i> తొలగించండి (Clear)
               </button>
 
               <span *ngIf="isRecordingUserVoice" class="badge bg-danger text-white py-2 px-3 animate-pulse">
                 🔴 వింటున్నాము... మాట్లాడండి (Listening in {{ userLanguage === 'en-IN' ? 'English' : (userLanguage === 'hi-IN' ? 'Hindi' : 'Telugu') }}...)
               </span>
+
+              <div class="w-100 mt-2 small text-muted">
+                <i class="fa fa-info-circle text-primary me-1"></i>
+                <b>సూచన:</b> మీరు నేరుగా మాట్లాడవచ్చు, లేదా మీ మొబైల్ కీబోర్డ్ మైక్రోఫోన్ (🎙) ద్వారా మాట్లాడవచ్చు, లేదా పై బాక్స్‌లో నేరుగా మీ సమస్యను టైప్ చేయవచ్చు.
+              </div>
             </div>
 
             <!-- Audio Playback Preview & Converted Text -->
@@ -1120,6 +1141,22 @@
           (click)="stopDoctorVoiceRecording()"
         >
           <i class="fa fa-stop me-1"></i> రికార్డింగ్ ఆపండి (Stop - {{ formatVoiceSeconds(doctorVoiceSeconds) }})
+        </button>
+
+        <input
+          type="file"
+          id="doctorAudioFileInput"
+          accept="audio/*"
+          (change)="onDoctorAudioFileSelected($event)"
+          style="display: none;"
+        />
+        <button
+          type="button"
+          class="btn btn-outline-secondary btn-sm px-2 shadow-sm"
+          (click)="triggerDoctorAudioUpload()"
+          title="రికార్డ్ చేసిన ఆడియో ఫైల్ అప్‌లోడ్ చేయండి"
+        >
+          <i class="fa fa-paperclip me-1"></i> ఆడియో ఫైల్ (Attach Audio)
         </button>
 
         <button
