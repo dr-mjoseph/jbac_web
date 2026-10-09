@@ -105,6 +105,86 @@
     </div>
 </div>
 
+<!-- ==============================================
+     QUICK SERVICES & FEATURES ICON GRID
+     ============================================== -->
+<div class="container my-5">
+    <div class="text-center mb-4">
+        <h3 style="font-weight: 700; color: #1f376e; position: relative; display: inline-block;">
+            ప్రధాన సేవలు & విభాగాలు (Services & Quick Access)
+            <div style="height: 3px; width: 60px; background: #237e8d; margin: 8px auto 0; border-radius: 2px;"></div>
+        </h3>
+    </div>
+
+    <div class="row g-3 justify-content-center text-center">
+        <!-- 1. Family Counselling (NEW PAGE ICON) -->
+        <div class="col-6 col-md-4 col-lg-2 mb-3">
+            <div class="service-quick-icon-card new-service-highlight" (click)="goToCounselling('browse')" style="cursor: pointer;">
+                <div class="service-icon-wrapper" style="background: linear-gradient(135deg, #e0f2fe, #bae6fd); color: #0284c7;">
+                    <i class="fa fa-heartbeat" style="font-size: 28px;"></i>
+                    <span class="new-pill">NEW</span>
+                </div>
+                <h5 class="service-icon-title">ఫ్యామిలీ కౌన్సిలింగ్</h5>
+                <small class="text-muted d-block" style="font-size: 11px;">Family Counselling</small>
+            </div>
+        </div>
+
+        <!-- 2. Services List -->
+        <div class="col-6 col-md-4 col-lg-2 mb-3">
+            <div class="service-quick-icon-card" routerLink="/services" style="cursor: pointer;">
+                <div class="service-icon-wrapper" style="background: linear-gradient(135deg, #fef3c7, #fde68a); color: #d97706;">
+                    <i class="fa fa-th-large" style="font-size: 28px;"></i>
+                </div>
+                <h5 class="service-icon-title">ఇతర సర్వీసెస్</h5>
+                <small class="text-muted d-block" style="font-size: 11px;">All Services</small>
+            </div>
+        </div>
+
+        <!-- 3. Meetings -->
+        <div class="col-6 col-md-4 col-lg-2 mb-3">
+            <div class="service-quick-icon-card" routerLink="/meetings" style="cursor: pointer;">
+                <div class="service-icon-wrapper" style="background: linear-gradient(135deg, #dcfce7, #bbf7d0); color: #16a34a;">
+                    <i class="fa fa-calendar" style="font-size: 28px;"></i>
+                </div>
+                <h5 class="service-icon-title">మీటింగ్స్</h5>
+                <small class="text-muted d-block" style="font-size: 11px;">Upcoming Meetings</small>
+            </div>
+        </div>
+
+        <!-- 4. News -->
+        <div class="col-6 col-md-4 col-lg-2 mb-3">
+            <div class="service-quick-icon-card" routerLink="/news" style="cursor: pointer;">
+                <div class="service-icon-wrapper" style="background: linear-gradient(135deg, #fce7f3, #fbcfe8); color: #db2777;">
+                    <i class="fa fa-newspaper-o" style="font-size: 28px;"></i>
+                </div>
+                <h5 class="service-icon-title">వార్తలు</h5>
+                <small class="text-muted d-block" style="font-size: 11px;">Latest News</small>
+            </div>
+        </div>
+
+        <!-- 5. Photo Gallery -->
+        <div class="col-6 col-md-4 col-lg-2 mb-3">
+            <div class="service-quick-icon-card" routerLink="/gallery" style="cursor: pointer;">
+                <div class="service-icon-wrapper" style="background: linear-gradient(135deg, #f3e8ff, #e9d5ff); color: #9333ea;">
+                    <i class="fa fa-picture-o" style="font-size: 28px;"></i>
+                </div>
+                <h5 class="service-icon-title">ఫోటో గ్యాలరీ</h5>
+                <small class="text-muted d-block" style="font-size: 11px;">Photo Gallery</small>
+            </div>
+        </div>
+
+        <!-- 6. Contact Us -->
+        <div class="col-6 col-md-4 col-lg-2 mb-3">
+            <div class="service-quick-icon-card" routerLink="/contact" style="cursor: pointer;">
+                <div class="service-icon-wrapper" style="background: linear-gradient(135deg, #e2e8f0, #cbd5e1); color: #475569;">
+                    <i class="fa fa-phone" style="font-size: 28px;"></i>
+                </div>
+                <h5 class="service-icon-title">సంప్రదించండి</h5>
+                <small class="text-muted d-block" style="font-size: 11px;">Contact Us</small>
+            </div>
+        </div>
+    </div>
+</div>
 
  <!-- <div
     class="page body_style_wide body_filled article_style_stretch scheme_original top_panel_show top_panel_above sidebar_hide">

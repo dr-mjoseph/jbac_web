@@ -483,3 +483,68 @@
     color: #64748b;
 }
 
+/* ===================================================
+   Quick Services & Feature Icon Cards
+   =================================================== */
+.service-quick-icon-card {
+    background: #ffffff;
+    border-radius: 14px;
+    padding: 18px 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    border: 1px solid #eef2f6;
+    transition: all 0.3s ease;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.service-quick-icon-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(35, 126, 141, 0.15);
+    border-color: #237e8d;
+}
+
+.new-service-highlight {
+    border: 1.5px solid #0284c7;
+    background: linear-gradient(to bottom, #f0f9ff, #ffffff);
+}
+
+.service-icon-wrapper {
+    width: 62px;
+    height: 62px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 12px;
+    position: relative;
+    transition: transform 0.3s ease;
+}
+
+.service-quick-icon-card:hover .service-icon-wrapper {
+    transform: scale(1.08);
+}
+
+.new-pill {
+    position: absolute;
+    top: -4px;
+    right: -6px;
+    background: #ef4444;
+    color: white;
+    font-size: 9px;
+    font-weight: 700;
+    padding: 2px 6px;
+    border-radius: 10px;
+    letter-spacing: 0.5px;
+}
+
+.service-icon-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 2px;
+}
+
+
