@@ -78,6 +78,24 @@ export class HomeComponent {
   }
 
 
+  goToCounselling(tab: string = 'browse') {
+    if (this.notlogin) {
+      this.router.navigate(['/family-councelling'], { queryParams: { tab: tab } });
+    } else {
+      Swal.fire({
+        title: 'లాగిన్ అవ్వండి / Please Login',
+        text: 'ఫ్యామిలీ కౌన్సిలింగ్ సేవలను పొందడానికి దయచేసి లాగిన్ అవ్వండి. (Please login to access Family Counselling services).',
+        icon: 'info',
+        confirmButtonText: 'Login Now',
+        showCancelButton: true
+      }).then((result) => {
+        if (result.isConfirmed) {
+          this.router.navigate(['/login']);
+        }
+      });
+    }
+  }
+
   alert() {
     Swal.fire('Hey user!',
       'please Login',

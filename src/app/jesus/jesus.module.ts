@@ -70,6 +70,7 @@ import { Ap1croreBelieversComponent } from './ap1crore-believers/ap1crore-believ
 import { WorkComponent } from './work/work.component';
 import { NamoduComponent } from './namodu/namodu.component';
 import { WishComponent } from './wish/wish.component';
+import { FamilyCouncellingComponent } from './family-councelling/family-councelling.component';
 
 
 
@@ -138,7 +139,7 @@ import { WishComponent } from './wish/wish.component';
   WorkComponent,
   NamoduComponent,
   WishComponent,
-    
+  FamilyCouncellingComponent
     
   ],
   imports: [

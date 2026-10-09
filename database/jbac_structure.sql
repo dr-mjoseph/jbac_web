@@ -2152,6 +2152,67 @@ INSERT INTO `wish_form` (`reg-id`, `category`, `cts`, `church_orgname`, `denomin
 UNLOCK TABLES;
 
 --
+-- Table structure for table `family_councelling_doctors`
+--
+
+DROP TABLE IF EXISTS `family_councelling_doctors`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `family_councelling_doctors` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `user_id` int DEFAULT NULL,
+  `doctor_name` varchar(255) NOT NULL,
+  `specialization` varchar(255) NOT NULL,
+  `qualification` varchar(255) DEFAULT NULL,
+  `experience_years` varchar(50) DEFAULT NULL,
+  `phone_number` varchar(50) NOT NULL,
+  `email` varchar(255) DEFAULT NULL,
+  `consultation_fee` varchar(100) DEFAULT 'Free / Volunteer Service',
+  `available_days` varchar(255) DEFAULT 'Monday to Saturday',
+  `available_time_start` varchar(50) DEFAULT '10:00 AM',
+  `available_time_end` varchar(50) DEFAULT '05:00 PM',
+  `location` varchar(255) DEFAULT NULL,
+  `address` text,
+  `bio` text,
+  `image` longtext,
+  `is_active` tinyint(1) DEFAULT '1',
+  `created_by` varchar(100) DEFAULT 'doctor',
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `d_in` tinyint(1) DEFAULT '0',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `family_councelling_appointments`
+--
+
+DROP TABLE IF EXISTS `family_councelling_appointments`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `family_councelling_appointments` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `doctor_id` int NOT NULL,
+  `doctor_name` varchar(255) DEFAULT NULL,
+  `family_name` varchar(255) NOT NULL,
+  `contact_person` varchar(255) NOT NULL,
+  `phone_number` varchar(50) NOT NULL,
+  `email` varchar(255) DEFAULT NULL,
+  `user_id` int DEFAULT NULL,
+  `appointment_date` date NOT NULL,
+  `appointment_time` varchar(50) NOT NULL,
+  `members_count` int DEFAULT '1',
+  `counselling_type` varchar(100) DEFAULT 'General Family Counselling',
+  `notes` text,
+  `status` varchar(50) DEFAULT 'Confirmed',
+  `doctor_notes` text,
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `d_in` tinyint(1) DEFAULT '0',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
 -- Dumping events for database 'jbac_jbac'
 --
 

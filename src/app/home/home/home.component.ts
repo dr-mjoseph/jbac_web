@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { ServiceService } from 'src/app/jesus/service.service';
 import Swal from 'sweetalert2';
 
@@ -9,7 +9,7 @@ import Swal from 'sweetalert2';
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.css'],
   standalone: true,
-  imports: [CommonModule]
+  imports: [CommonModule, RouterModule]
 })
 export class HomeComponent {
   name: any;
@@ -79,6 +79,24 @@ export class HomeComponent {
     }, 15000); // Change image every 5 seconds
   }
 
+
+  goToCounselling(tab: string = 'browse') {
+    if (this.notlogin) {
+      this.router.navigate(['/family-councelling'], { queryParams: { tab: tab } });
+    } else {
+      Swal.fire({
+        title: 'లాగిన్ అవ్వండి / Please Login',
+        text: 'ఫ్యామిలీ కౌన్సిలింగ్ సేవలను పొందడానికి దయచేసి లాగిన్ అవ్వండి. (Please login to access Family Counselling services).',
+        icon: 'info',
+        confirmButtonText: 'Login Now',
+        showCancelButton: true
+      }).then((result) => {
+        if (result.isConfirmed) {
+          this.router.navigate(['/login']);
+        }
+      });
+    }
+  }
 
   alert() {
     Swal.fire('Hey user!',

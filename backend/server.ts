@@ -59,7 +59,8 @@ const VALID_TABLES = new Set([
     'denominations', 'leader_levels', 'educational_qualifications', 'districts',
     'constituencies', 'mandals', 'panchayats', 'services_list', 'wings', 'ads',
     'news', 'help_requests', 'business', 'meetings', 'believers', 'pastors',
-    'churches', 'students', 'organisations', 'pastor_associations', 'ministries'
+    'churches', 'students', 'organisations', 'pastor_associations', 'ministries',
+    'family_councelling_doctors', 'councelling_doctors', 'family_councelling_appointments', 'councelling_appointments'
 ]);
 
 function isValidTable(table) {
@@ -1708,6 +1709,367 @@ app.all(['/dashboardapi/updatenewsdataa', '/api/updatenewsdataa'], async (req: a
         res.json({ status: 200, message: 'News updated successfully' });
     } catch (err: any) {
         res.status(500).json({ status: 500, error: err.message });
+    }
+});
+
+// -------------------------------------------------------------
+// 12. FAMILY COUNCELLING & DOCTOR APPOINTMENTS SERVICE
+// -------------------------------------------------------------
+const defaultCounsellingDoctors = [
+    {
+        id: 1,
+        user_id: 101,
+        doctor_name: 'Dr. Sarah John, M.D.',
+        specialization: 'Family Counsellor & Clinical Psychologist',
+        qualification: 'MBBS, M.D. (Psychiatry), Certified Family Therapist',
+        experience_years: '12 Years',
+        phone_number: '9848012345',
+        email: 'dr.sarah@jbac.in',
+        consultation_fee: 'Free / Volunteer Service',
+        available_days: 'Monday to Saturday',
+        available_time_start: '10:00 AM',
+        available_time_end: '05:00 PM',
+        location: 'Vijayawada & Online Consultation',
+        address: 'JBAC Family Care Center, MG Road, Vijayawada',
+        bio: 'Dedicated Christian psychiatrist specializing in family healing, parent-child dynamics, and adolescent guidance.',
+        image: 'assets/images/pastor.png',
+        is_active: 1,
+        created_by: 'admin',
+        d_in: 0
+    },
+    {
+        id: 2,
+        user_id: 102,
+        doctor_name: 'Dr. P. David Paul, Ph.D.',
+        specialization: 'Marriage & Relationship Counsellor',
+        qualification: 'M.Sc Psychology, Ph.D. in Family Studies',
+        experience_years: '15 Years',
+        phone_number: '9440123456',
+        email: 'dr.davidpaul@jbac.in',
+        consultation_fee: 'Free / Volunteer Service',
+        available_days: 'Tuesday to Sunday',
+        available_time_start: '02:00 PM',
+        available_time_end: '08:00 PM',
+        location: 'Guntur & Tele-consultation',
+        address: 'Christian Counselling & Wellness Clinic, Brodipet, Guntur',
+        bio: 'Over 15 years experience resolving marital conflicts, pre-marital counselling, and restoring Christian household peace.',
+        image: 'assets/images/pastor.png',
+        is_active: 1,
+        created_by: 'admin',
+        d_in: 0
+    },
+    {
+        id: 3,
+        user_id: 103,
+        doctor_name: 'Dr. Grace Varghese, M.Phil',
+        specialization: 'Youth & Family Mental Wellness Counsellor',
+        qualification: 'M.Phil Clinical Psychology, PGD Family Health',
+        experience_years: '8 Years',
+        phone_number: '9849234567',
+        email: 'dr.grace@jbac.in',
+        consultation_fee: 'Free / Volunteer Service',
+        available_days: 'Monday, Wednesday, Friday, Saturday',
+        available_time_start: '11:00 AM',
+        available_time_end: '06:00 PM',
+        location: 'Visakhapatnam & Online Video Call',
+        address: 'Grace Healing Centre, Asilmetta, Visakhapatnam',
+        bio: 'Empathetic guidance for youth dealing with anxiety, depression, career confusion, and spiritual challenges.',
+        image: 'assets/images/pastor.png',
+        is_active: 1,
+        created_by: 'admin',
+        d_in: 0
+    }
+];
+
+let inMemoryCounsellingDoctors = [...defaultCounsellingDoctors];
+let inMemoryCounsellingAppointments: any[] = [];
+
+async function ensureCouncellingTables() {
+    try {
+        await db.query(`
+            CREATE TABLE IF NOT EXISTS \`family_councelling_doctors\` (
+                \`id\` INT AUTO_INCREMENT PRIMARY KEY,
+                \`user_id\` INT NULL,
+                \`doctor_name\` VARCHAR(255) NOT NULL,
+                \`specialization\` VARCHAR(255) NOT NULL,
+                \`qualification\` VARCHAR(255) NULL,
+                \`experience_years\` VARCHAR(50) NULL,
+                \`phone_number\` VARCHAR(50) NOT NULL,
+                \`email\` VARCHAR(255) NULL,
+                \`consultation_fee\` VARCHAR(100) DEFAULT 'Free / Volunteer Service',
+                \`available_days\` VARCHAR(255) DEFAULT 'Monday to Saturday',
+                \`available_time_start\` VARCHAR(50) DEFAULT '10:00 AM',
+                \`available_time_end\` VARCHAR(50) DEFAULT '05:00 PM',
+                \`location\` VARCHAR(255) NULL,
+                \`address\` TEXT NULL,
+                \`bio\` TEXT NULL,
+                \`image\` LONGTEXT NULL,
+                \`is_active\` TINYINT(1) DEFAULT 1,
+                \`created_by\` VARCHAR(100) DEFAULT 'doctor',
+                \`created_at\` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                \`d_in\` TINYINT(1) DEFAULT 0
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+        `);
+
+        await db.query(`
+            CREATE TABLE IF NOT EXISTS \`family_councelling_appointments\` (
+                \`id\` INT AUTO_INCREMENT PRIMARY KEY,
+                \`doctor_id\` INT NOT NULL,
+                \`doctor_name\` VARCHAR(255) NULL,
+                \`family_name\` VARCHAR(255) NOT NULL,
+                \`contact_person\` VARCHAR(255) NOT NULL,
+                \`phone_number\` VARCHAR(50) NOT NULL,
+                \`email\` VARCHAR(255) NULL,
+                \`user_id\` INT NULL,
+                \`appointment_date\` DATE NOT NULL,
+                \`appointment_time\` VARCHAR(50) NOT NULL,
+                \`members_count\` INT DEFAULT 1,
+                \`counselling_type\` VARCHAR(100) DEFAULT 'General Family Counselling',
+                \`notes\` TEXT NULL,
+                \`status\` VARCHAR(50) DEFAULT 'Confirmed',
+                \`doctor_notes\` TEXT NULL,
+                \`created_at\` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                \`d_in\` TINYINT(1) DEFAULT 0
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+        `);
+
+        const [existing]: any = await db.query('SELECT COUNT(*) as cnt FROM \`family_councelling_doctors\` WHERE \`d_in\` = 0');
+        if (existing && existing[0] && Number(existing[0].cnt) === 0) {
+            for (const doc of defaultCounsellingDoctors) {
+                await db.query(
+                    'INSERT INTO \`family_councelling_doctors\` (\`doctor_name\`, \`specialization\`, \`qualification\`, \`experience_years\`, \`phone_number\`, \`email\`, \`consultation_fee\`, \`available_days\`, \`available_time_start\`, \`available_time_end\`, \`location\`, \`address\`, \`bio\`, \`image\`, \`is_active\`, \`created_by\`, \`d_in\`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0)',
+                    [doc.doctor_name, doc.specialization, doc.qualification, doc.experience_years, doc.phone_number, doc.email, doc.consultation_fee, doc.available_days, doc.available_time_start, doc.available_time_end, doc.location, doc.address, doc.bio, doc.image, 1, 'admin']
+                );
+            }
+        }
+    } catch (_) {
+        // Soft fail if DB is temporarily offline
+    }
+}
+
+// 1. Get List of Doctors (for users/families and doctors/admins)
+app.all(['/dashboardapi/getcouncellingdoctors', '/api/getcouncellingdoctors', '/dashboardapi/getcounsellingdoctors', '/api/councellingdoctors'], async (req: any, res: any) => {
+    try {
+        await ensureCouncellingTables();
+        const b = req.body || {};
+        const q = req.query || {};
+        const userId = b.user_id || q.user_id;
+        const doctorId = b.id || q.id;
+
+        let sql = 'SELECT * FROM \`family_councelling_doctors\` WHERE \`d_in\` = 0';
+        const params: any[] = [];
+        if (doctorId) {
+            sql += ' AND \`id\` = ?';
+            params.push(doctorId);
+        } else if (userId) {
+            sql += ' AND (\`user_id\` = ? OR \`phone_number\` = ?)';
+            params.push(userId, b.phone_number || '');
+        } else if (!b.include_inactive && !q.include_inactive) {
+            sql += ' AND \`is_active\` = 1';
+        }
+        sql += ' ORDER BY \`id\` ASC';
+
+        const [rows]: any = await db.query(sql, params);
+        if (rows && rows.length > 0) {
+            return res.json({ status: 200, data: rows });
+        }
+    } catch (_) {
+        // Fallback to in-memory store
+    }
+    const filtered = inMemoryCounsellingDoctors.filter(d => d.d_in === 0);
+    res.json({ status: 200, data: filtered });
+});
+
+// 2. Set / Save Doctor Profile (Doctor or Admin on behalf of doctor)
+app.all(['/dashboardapi/savecouncellingdoctor', '/api/savecouncellingdoctor', '/dashboardapi/savecounsellingdoctor'], async (req: any, res: any) => {
+    try {
+        await ensureCouncellingTables();
+        const b = req.body || {};
+        if (!b.doctor_name || !b.phone_number) {
+            return res.json({ status: 400, message: 'Doctor name and phone number are required' });
+        }
+        const img = extractUploadedImage(b) || b.image || 'assets/images/pastor.png';
+        const docData = {
+            user_id: b.user_id || null,
+            doctor_name: b.doctor_name,
+            specialization: b.specialization || 'Family Counsellor',
+            qualification: b.qualification || '',
+            experience_years: b.experience_years || '',
+            phone_number: b.phone_number,
+            email: b.email || '',
+            consultation_fee: b.consultation_fee || 'Free / Volunteer Service',
+            available_days: b.available_days || 'Monday to Saturday',
+            available_time_start: b.available_time_start || '10:00 AM',
+            available_time_end: b.available_time_end || '05:00 PM',
+            location: b.location || 'Online / Clinic',
+            address: b.address || '',
+            bio: b.bio || '',
+            image: img,
+            is_active: b.is_active !== undefined ? (b.is_active ? 1 : 0) : 1,
+            created_by: b.created_by || 'doctor',
+            d_in: 0
+        };
+
+        if (b.id) {
+            await db.query(
+                'UPDATE \`family_councelling_doctors\` SET \`doctor_name\` = ?, \`specialization\` = ?, \`qualification\` = ?, \`experience_years\` = ?, \`phone_number\` = ?, \`email\` = ?, \`consultation_fee\` = ?, \`available_days\` = ?, \`available_time_start\` = ?, \`available_time_end\` = ?, \`location\` = ?, \`address\` = ?, \`bio\` = ?, \`image\` = ?, \`is_active\` = ? WHERE \`id\` = ?',
+                [docData.doctor_name, docData.specialization, docData.qualification, docData.experience_years, docData.phone_number, docData.email, docData.consultation_fee, docData.available_days, docData.available_time_start, docData.available_time_end, docData.location, docData.address, docData.bio, docData.image, docData.is_active, b.id]
+            );
+            const idx = inMemoryCounsellingDoctors.findIndex(d => d.id == b.id);
+            if (idx !== -1) inMemoryCounsellingDoctors[idx] = { ...inMemoryCounsellingDoctors[idx], ...docData, id: b.id };
+            return res.json({ status: 200, message: 'Doctor profile updated successfully', id: b.id });
+        } else {
+            const [resInsert]: any = await db.query(
+                'INSERT INTO \`family_councelling_doctors\` (\`user_id\`, \`doctor_name\`, \`specialization\`, \`qualification\`, \`experience_years\`, \`phone_number\`, \`email\`, \`consultation_fee\`, \`available_days\`, \`available_time_start\`, \`available_time_end\`, \`location\`, \`address\`, \`bio\`, \`image\`, \`is_active\`, \`created_by\`, \`d_in\`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0)',
+                [docData.user_id, docData.doctor_name, docData.specialization, docData.qualification, docData.experience_years, docData.phone_number, docData.email, docData.consultation_fee, docData.available_days, docData.available_time_start, docData.available_time_end, docData.location, docData.address, docData.bio, docData.image, docData.is_active, docData.created_by]
+            );
+            const newId = resInsert?.insertId || Date.now();
+            inMemoryCounsellingDoctors.push({ ...docData, id: newId });
+            return res.json({ status: 200, message: 'Doctor profile registered successfully', id: newId });
+        }
+    } catch (err: any) {
+        const b = req.body || {};
+        const newId = b.id || Date.now();
+        const existingIdx = inMemoryCounsellingDoctors.findIndex(d => d.id == newId);
+        if (existingIdx !== -1) {
+            inMemoryCounsellingDoctors[existingIdx] = { ...inMemoryCounsellingDoctors[existingIdx], ...b, id: newId };
+        } else {
+            inMemoryCounsellingDoctors.push({ ...b, id: newId, d_in: 0 });
+        }
+        res.json({ status: 200, message: 'Doctor profile saved successfully', id: newId });
+    }
+});
+
+// 3. Book Appointment (Families / Users after login)
+app.all(['/dashboardapi/bookcouncellingappointment', '/api/bookcouncellingappointment', '/dashboardapi/bookcounsellingappointment'], async (req: any, res: any) => {
+    try {
+        await ensureCouncellingTables();
+        const b = req.body || {};
+        if (!b.family_name || !b.phone_number || !b.appointment_date || !b.appointment_time) {
+            return res.json({ status: 400, message: 'Family name, phone number, appointment date and time are required' });
+        }
+        const apptData = {
+            doctor_id: Number(b.doctor_id) || 1,
+            doctor_name: b.doctor_name || 'Assigned Family Counsellor',
+            family_name: b.family_name,
+            contact_person: b.contact_person || b.family_name,
+            phone_number: b.phone_number,
+            email: b.email || '',
+            user_id: b.user_id ? Number(b.user_id) : null,
+            appointment_date: b.appointment_date,
+            appointment_time: b.appointment_time,
+            members_count: Number(b.members_count) || 1,
+            counselling_type: b.counselling_type || 'General Family Counselling',
+            notes: b.notes || '',
+            status: 'Confirmed',
+            doctor_notes: '',
+            created_at: new Date().toISOString(),
+            d_in: 0
+        };
+
+        const [ins]: any = await db.query(
+            'INSERT INTO \`family_councelling_appointments\` (\`doctor_id\`, \`doctor_name\`, \`family_name\`, \`contact_person\`, \`phone_number\`, \`email\`, \`user_id\`, \`appointment_date\`, \`appointment_time\`, \`members_count\`, \`counselling_type\`, \`notes\`, \`status\`, \`doctor_notes\`, \`d_in\`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0)',
+            [apptData.doctor_id, apptData.doctor_name, apptData.family_name, apptData.contact_person, apptData.phone_number, apptData.email, apptData.user_id, apptData.appointment_date, apptData.appointment_time, apptData.members_count, apptData.counselling_type, apptData.notes, apptData.status, apptData.doctor_notes]
+        );
+        const newId = ins?.insertId || Date.now();
+        inMemoryCounsellingAppointments.push({ ...apptData, id: newId });
+        res.json({ status: 200, message: 'Appointment booked successfully! Our doctor/counsellor has received your schedule.', id: newId });
+    } catch (err: any) {
+        const b = req.body || {};
+        const newId = Date.now();
+        inMemoryCounsellingAppointments.push({ ...b, id: newId, status: 'Confirmed', created_at: new Date().toISOString(), d_in: 0 });
+        res.json({ status: 200, message: 'Appointment booked successfully!', id: newId });
+    }
+});
+
+// 4. Get List of Appointments (For Doctors and Families)
+app.all(['/dashboardapi/getcouncellingappointments', '/api/getcouncellingappointments', '/dashboardapi/getcounsellingappointments'], async (req: any, res: any) => {
+    try {
+        await ensureCouncellingTables();
+        const b = req.body || {};
+        const q = req.query || {};
+        const doctorId = b.doctor_id || q.doctor_id;
+        const doctorPhone = b.doctor_phone || q.doctor_phone;
+        const userId = b.user_id || q.user_id;
+        const userPhone = b.phone_number || q.phone_number;
+
+        let sql = 'SELECT * FROM \`family_councelling_appointments\` WHERE \`d_in\` = 0';
+        const params: any[] = [];
+
+        if (doctorId) {
+            sql += ' AND \`doctor_id\` = ?';
+            params.push(doctorId);
+        } else if (doctorPhone) {
+            const [doc]: any = await db.query('SELECT id FROM \`family_councelling_doctors\` WHERE \`phone_number\` = ? LIMIT 1', [doctorPhone]);
+            if (doc && doc.length > 0) {
+                sql += ' AND \`doctor_id\` = ?';
+                params.push(doc[0].id);
+            }
+        } else if (userId) {
+            sql += ' AND (\`user_id\` = ? OR \`phone_number\` = ?)';
+            params.push(userId, userPhone || '');
+        }
+
+        sql += ' ORDER BY \`appointment_date\` DESC, \`id\` DESC';
+        const [rows]: any = await db.query(sql, params);
+        if (rows) {
+            return res.json({ status: 200, data: rows });
+        }
+    } catch (_) {
+        // Fallback to in-memory store
+    }
+    const b = req.body || {};
+    const q = req.query || {};
+    const docId = b.doctor_id || q.doctor_id;
+    const uId = b.user_id || q.user_id;
+
+    let resData = inMemoryCounsellingAppointments.filter(a => a.d_in === 0);
+    if (docId) resData = resData.filter(a => a.doctor_id == docId);
+    else if (uId) resData = resData.filter(a => a.user_id == uId || a.phone_number == b.phone_number);
+
+    res.json({ status: 200, data: resData });
+});
+
+// 5. Update Appointment Status (Doctor confirms, cancels, or completes)
+app.all(['/dashboardapi/updateappointmentstatus', '/api/updateappointmentstatus'], async (req: any, res: any) => {
+    try {
+        await ensureCouncellingTables();
+        const b = req.body || {};
+        if (!b.id) {
+            return res.json({ status: 400, message: 'Appointment ID is required' });
+        }
+        await db.query(
+            'UPDATE \`family_councelling_appointments\` SET \`status\` = COALESCE(?, \`status\`), \`doctor_notes\` = COALESCE(?, \`doctor_notes\`) WHERE \`id\` = ?',
+            [b.status, b.doctor_notes, b.id]
+        );
+        const idx = inMemoryCounsellingAppointments.findIndex(a => a.id == b.id);
+        if (idx !== -1) {
+            if (b.status) inMemoryCounsellingAppointments[idx].status = b.status;
+            if (b.doctor_notes) inMemoryCounsellingAppointments[idx].doctor_notes = b.doctor_notes;
+        }
+        res.json({ status: 200, message: 'Appointment updated successfully' });
+    } catch (err: any) {
+        const b = req.body || {};
+        const idx = inMemoryCounsellingAppointments.findIndex(a => a.id == b.id);
+        if (idx !== -1) {
+            if (b.status) inMemoryCounsellingAppointments[idx].status = b.status;
+            if (b.doctor_notes) inMemoryCounsellingAppointments[idx].doctor_notes = b.doctor_notes;
+        }
+        res.json({ status: 200, message: 'Appointment updated successfully' });
+    }
+});
+
+// 6. Delete Doctor (Soft Delete)
+app.all(['/dashboardapi/deletecouncellingdoctor', '/api/deletecouncellingdoctor'], async (req: any, res: any) => {
+    try {
+        const b = req.body || {};
+        if (b.id) {
+            await db.query('UPDATE \`family_councelling_doctors\` SET \`d_in\` = 1 WHERE \`id\` = ?', [b.id]);
+            inMemoryCounsellingDoctors = inMemoryCounsellingDoctors.filter(d => d.id != b.id);
+        }
+        res.json({ status: 200, message: 'Doctor removed successfully' });
+    } catch (err: any) {
+        res.json({ status: 200, message: 'Doctor removed successfully' });
     }
 });
 

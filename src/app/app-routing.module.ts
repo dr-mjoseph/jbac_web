@@ -59,6 +59,7 @@ import { ApchristianpoliticsComponent } from './jesus/apchristianpolitics/apchri
 import { ChristianattackvideoComponent } from './jesus/christianattackvideo/christianattackvideo.component';
 import { EntryComponent } from './jesus/entry/entry.component';
 import { NamoduComponent } from './jesus/namodu/namodu.component';
+import { FamilyCouncellingComponent } from './jesus/family-councelling/family-councelling.component';
 
 
 
@@ -122,7 +123,9 @@ const routes: Routes = [
   { path: 'entry', component: EntryComponent },
  { path: 'namodu', component: NamoduComponent  },
  { path: 'wish', component:WishComponent  },
-  
+ { path: 'family-councelling', component: FamilyCouncellingComponent },
+ { path: 'familycouncelling', component: FamilyCouncellingComponent },
+ { path: 'family-counseling', component: FamilyCouncellingComponent },
 ];
 
 @NgModule({

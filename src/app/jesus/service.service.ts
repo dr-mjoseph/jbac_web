@@ -693,6 +693,55 @@ postwishform(data: any) {
   viewpastorupdates(data: any) {
     return this.http.post(this.testApi + 'pastorviewupdates', data)
   }
+
+  // Family Counselling & Doctor Appointment Services
+  getcouncellingdoctors(filter: any = {}) {
+    return this.http.post<any>(this.testApi + 'getcouncellingdoctors', filter).pipe(map(res => {
+      return res;
+    }, (error: any) => {
+      return error;
+    }));
+  }
+
+  savecouncellingdoctor(data: any) {
+    return this.http.post<any>(this.testApi + 'savecouncellingdoctor', data).pipe(map(res => {
+      return res;
+    }, (error: any) => {
+      return error;
+    }));
+  }
+
+  deletecouncellingdoctor(id: any) {
+    return this.http.post<any>(this.testApi + 'deletecouncellingdoctor', { id }).pipe(map(res => {
+      return res;
+    }, (error: any) => {
+      return error;
+    }));
+  }
+
+  getcouncellingappointments(filter: any = {}) {
+    return this.http.post<any>(this.testApi + 'getcouncellingappointments', filter).pipe(map(res => {
+      return res;
+    }, (error: any) => {
+      return error;
+    }));
+  }
+
+  bookcouncellingappointment(data: any) {
+    return this.http.post<any>(this.testApi + 'bookcouncellingappointment', data).pipe(map(res => {
+      return res;
+    }, (error: any) => {
+      return error;
+    }));
+  }
+
+  updateappointmentstatus(data: any) {
+    return this.http.post<any>(this.testApi + 'updateappointmentstatus', data).pipe(map(res => {
+      return res;
+    }, (error: any) => {
+      return error;
+    }));
+  }
 }
 
 
