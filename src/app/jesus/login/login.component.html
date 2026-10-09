@@ -1,3 +1,8 @@
+<!-- Loading Overlay -->
+<div *ngIf="showSpinner" class="my-overlay">
+    <div class="cusloader"></div>
+</div>
+
 <!-- Breadcrumbs -->
 <div class="top_panel_title top_panel_style_3 title_present breadcrumbs_present scheme_original">
     <div class="top_panel_title_inner inner-bg6">
@@ -98,12 +103,30 @@
                                     </div>
                                     <div class="col-md-1 mb-4"></div>
                                 </div>
-                                <br>
+                                <div class="row mb-3">
+                                    <div class="col-md-3 mb-2"></div>
+                                    <div class="col-md-8 mb-2">
+                                        <div style="background: rgba(35, 126, 141, 0.08); border-radius: 8px; padding: 10px; border: 1px dashed #237e8d;">
+                                            <div style="font-size: 13px; font-weight: 600; color: #1c5e69; margin-bottom: 6px;">
+                                                ⚡ త్వరిత డెమో ఖాతాలు / Quick Demo Login:
+                                            </div>
+                                            <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+                                                <button type="button" class="btn btn-sm btn-outline-dark" style="border-radius: 20px; font-size: 12px; background: #fff;" (click)="fillDemoUser('1')">విశ్వాసి (Believer)</button>
+                                                <button type="button" class="btn btn-sm btn-outline-dark" style="border-radius: 20px; font-size: 12px; background: #fff;" (click)="fillDemoUser('4')">పాస్టర్ (Pastor)</button>
+                                                <button type="button" class="btn btn-sm btn-outline-dark" style="border-radius: 20px; font-size: 12px; background: #fff;" (click)="fillDemoUser('2')">స్టూడెంట్ (Student)</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-1 mb-2"></div>
+                                </div>
                                 <div class="row">
                                     <div class="col-md-4 mb-4 pb-2"> </div>
                                     <div class="col-md-2 mb-4 pb-2">
-                                        <button type="submit" class="default-btn user-all-btn"
-                                            (click)="passlogin()">Login
+                                        <button type="button" class="default-btn user-all-btn"
+                                            [disabled]="showSpinner"
+                                            (click)="passlogin()">
+                                            <span *ngIf="showSpinner" style="display: inline-block; width: 14px; height: 14px; border: 2px solid #fff; border-right-color: transparent; border-radius: 50%; animation: spin 0.75s linear infinite; vertical-align: middle; margin-right: 6px;"></span>
+                                            {{ showSpinner ? 'లాగిన్ అవుతోంది...' : 'Login' }}
                                         </button>
                                     </div>
                                 </div>

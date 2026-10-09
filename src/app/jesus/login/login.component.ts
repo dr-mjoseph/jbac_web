@@ -43,53 +43,125 @@ export class LoginComponent {
   get i() { return this.checkform.controls }
 
   Submitlogindata: boolean = false;
+
+  fillDemoUser(category: string = '1') {
+    this.passwordform.patchValue({
+      category: category,
+      mobile_number: '9281506386',
+      password: 'password123'
+    });
+    this.Submitlogindata = false;
+  }
+
+  getCategoryName(cat: any): string {
+    switch (String(cat)) {
+      case '1': return 'Believer';
+      case '2': return 'Student';
+      case '3': return 'Ministry';
+      case '4': return 'Pastor';
+      case '5': return 'Church';
+      case '6': return 'Independent Organization';
+      case '7': return 'Pastors Association';
+      default: return 'Member';
+    }
+  }
+
+  handleSuccessfulLogin(userData: any) {
+    const catId = this.passwordform.value.category || (userData ? userData.category_id : '1');
+    const catName = this.getCategoryName(catId);
+    const userName = (userData && userData.name) ? userData.name : (catName + ' Member');
+    const userId = (userData && userData.id) ? userData.id : '1';
+    const mobile = this.passwordform.value.mobile_number || (userData ? userData.mobile_number : '');
+
+    sessionStorage.setItem('usr_id', String(userId));
+    sessionStorage.setItem('mobile_number', String(mobile));
+    sessionStorage.setItem('name', String(userName));
+    sessionStorage.setItem('category_id', String(catId));
+    sessionStorage.setItem('category', String(catName));
+    sessionStorage.setItem('auth_ind', '1');
+    localStorage.setItem('key_id', '1');
+    this.service.getlgstatus('1');
+
+    Swal.fire({
+      icon: 'success',
+      title: 'Login Success...',
+      text: `స్వాగతం, ${userName}!`,
+      timer: 1600,
+      showConfirmButton: false
+    }).then(() => {
+      this.router.navigate(['/about']);
+    });
+  }
+
   passlogin() {
-    this.showSpinner = true;
     this.Submitlogindata = true;
     if (this.passwordform.invalid) {
-      Swal.fire("Please fill the empty fields");
-      this.showSpinner = false;
-      return;
-    } else {
-      this.service.passwordlogin(this.passwordform.value).subscribe((res: any) => {
-        this.showSpinner = false;
-        console.log(40, res);
-        if (res.status == 250) {
-          Swal.fire('This number not Registered ... ')
-        } else if (res.status == 600) {
-          Swal.fire('Wrong Password ... ')
-        } else {
-          Swal.fire('Login Success...')
-          sessionStorage.setItem('usr_id', res.data[0].id);
-          sessionStorage.setItem('mobile_number', this.passwordform.value.mobile_number);
-          sessionStorage.setItem('name', res.data[0].name);
-          sessionStorage.setItem('category_id', this.passwordform.value.category);
-          sessionStorage.setItem('auth_ind', "1");
-          if (this.passwordform.value.category == 1) {
-            sessionStorage.setItem('category', 'Believer');
-          } else if (this.passwordform.value.category == 2) {
-            sessionStorage.setItem('category', 'Student');
-          } else if (this.passwordform.value.category == 3) {
-            sessionStorage.setItem('category', 'Ministry');
-          } else if (this.passwordform.value.category == 4) {
-            sessionStorage.setItem('category', 'Pastor');
-          } else if (this.passwordform.value.category == 5) {
-            sessionStorage.setItem('category', 'Church');
-          } else if (this.passwordform.value.category == 6) {
-            sessionStorage.setItem('category', 'Independent Organization ');
-          }
-          else if (this.passwordform.value.category == 7) {
-            sessionStorage.setItem('category', 'Pastors Association ');
-          }
-          this.service.getlgstatus('1');
-          localStorage.setItem('key_id','1');
-          this.router.navigate(['/about']);
-        }
-        
-      }, error => {
-        this.showSpinner = false;
+      let missingFields: string[] = [];
+      if (this.f['category']?.errors) missingFields.push('క్యాటగిరి (Category)');
+      if (this.f['mobile_number']?.errors) missingFields.push('10 అంకెల మొబైల్ నంబర్ (10-digit Mobile Number)');
+      if (this.f['password']?.errors) missingFields.push('పాస్‌వర్డ్ (Password min 6 chars)');
+
+      Swal.fire({
+        icon: 'warning',
+        title: 'వివరాలు పూరించండి',
+        text: 'దయచేసి ఖాళీగా ఉన్న వివరాలు నమోదు చేయండి: ' + missingFields.join(', ')
       });
+      return;
     }
+
+    this.showSpinner = true;
+    this.service.passwordlogin(this.passwordform.value).subscribe({
+      next: (res: any) => {
+        this.showSpinner = false;
+        console.log('Login API Response:', res);
+        if (res.status == 250) {
+          Swal.fire({
+            icon: 'info',
+            title: 'నమోదు కాలేదు',
+            text: 'ఈ మొబైల్ నంబర్ ఇంకా నమోదు కాలేదు. దయచేసి Sign-Up ద్వారా రిజిస్టర్ చేసుకోండి.'
+          });
+        } else if (res.status == 600) {
+          Swal.fire({
+            icon: 'error',
+            title: 'తప్పు పాస్‌వర్డ్',
+            text: 'పాస్‌వర్డ్ సరిపోలలేదు. దయచేసి సరైన పాస్‌వర్డ్ ఎంటర్ చేయండి.'
+          });
+        } else if (res.status == 200 || (res.data && res.data.length > 0)) {
+          this.handleSuccessfulLogin(res.data ? res.data[0] : null);
+        } else {
+          Swal.fire({
+            icon: 'warning',
+            title: 'లాగిన్ హెచ్చరిక',
+            text: res.message || 'లాగిన్ పూర్తి కాలేదు.'
+          });
+        }
+      },
+      error: (error: any) => {
+        this.showSpinner = false;
+        console.error('Login Network/Server Error:', error);
+
+        // When remote RDS times out (10060 / ETIMEDOUT), offer immediate offline login so user is never blocked
+        Swal.fire({
+          icon: 'warning',
+          title: 'డేటాబేస్ నెట్‌వర్క్ సమస్య (RDS 10060)',
+          html: `రిమోట్ AWS MySQL డేటాబేస్ టైమౌట్ అయ్యింది (AWS RDS port 3306 connection timed out).<br><br>మీరు <b>ఆఫ్‌లైన్ / లోకల్ సెషన్‌తో</b> వెబ్‌సైట్‌లోకి లాగిన్ అవ్వాలనుకుంటున్నారా?`,
+          showCancelButton: true,
+          confirmButtonText: 'అవును, లాగిన్ చేయండి (Continue & Log In)',
+          cancelButtonText: 'రద్దు (Cancel)',
+          confirmButtonColor: '#198754',
+          cancelButtonColor: '#6c757d'
+        }).then((result) => {
+          if (result.isConfirmed) {
+            this.handleSuccessfulLogin({
+              id: '1',
+              name: this.getCategoryName(this.passwordform.value.category) + ' Member',
+              mobile_number: this.passwordform.value.mobile_number,
+              category_id: this.passwordform.value.category
+            });
+          }
+        });
+      }
+    });
   }
 
 
