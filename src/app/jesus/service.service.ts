@@ -742,6 +742,14 @@ postwishform(data: any) {
       return error;
     }));
   }
+
+  registercouncellingdoctor(data: any) {
+    return this.http.post<any>(this.testApi + 'registerdoctor', data).pipe(map(res => {
+      return res;
+    }, (error: any) => {
+      return error;
+    }));
+  }
 }
 
 

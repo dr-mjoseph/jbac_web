@@ -1,0 +1,391 @@
+<!-- Breadcrumbs Header -->
+<div class="top_panel_title top_panel_style_3 title_present breadcrumbs_present scheme_original">
+  <div class="top_panel_title_inner inner-bg6">
+    <div class="content_wrap">
+      <h1 class="page_title">డాక్టర్ / కౌన్సిలర్ రిజిస్ట్రేషన్ (Doctor Registration)</h1>
+      <div class="breadcrumbs">
+        <a class="breadcrumbs_item home" routerLink="/">Home</a>
+        <span class="breadcrumbs_delimiter"></span>
+        <a class="breadcrumbs_item" routerLink="/family-councelling">Family Counselling</a>
+        <span class="breadcrumbs_delimiter"></span>
+        <span class="breadcrumbs_item current">Doctor Registration</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="doctor-reg-container container py-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-10 col-xl-9">
+      
+      <!-- Intro Card Banner -->
+      <div class="hero-card shadow-sm rounded-4 p-4 mb-4 text-white">
+        <div class="d-flex align-items-center mb-2">
+          <span class="badge bg-white text-primary fw-bold px-3 py-2 me-2">
+            <i class="fa fa-user-md me-1"></i> వైద్యుల ప్రత్యేక విభాగం
+          </span>
+          <span class="badge bg-warning text-dark fw-bold px-3 py-2">
+            <i class="fa fa-certificate me-1"></i> Authorized Medical & Counselling Network
+          </span>
+        </div>
+        <h2 class="hero-title fw-bold mb-2">
+          క్రైస్తవ కుటుంబ కౌన్సిలర్ & డాక్టర్ నమోదు ఫారమ్
+        </h2>
+        <p class="hero-subtitle mb-0 opacity-90">
+          JBAC ఆధ్వర్యంలో క్రైస్తవ కుటుంబాలకు సహాయపడటానికి అర్హత గల డాక్టర్లు మరియు కౌన్సిలర్లు ఇక్కడ నమోదు చేసుకోవచ్చు. నమోదు చేసుకున్న తర్వాత మీ ప్రొఫైల్ వివరాలు మరియు మీకు కేటాయించిన పేషెంట్ల షెడ్యూల్ మీరు మాత్రమే లాగిన్ అయి నిర్వహించుకోవచ్చు.
+        </p>
+      </div>
+
+      <!-- Main Form Card -->
+      <div class="card form-card shadow border-0 rounded-4 overflow-hidden">
+        <div class="card-header bg-white border-bottom p-4">
+          <div class="d-flex justify-content-between align-items-center flex-wrap">
+            <div>
+              <h4 class="mb-1 text-primary fw-bold">
+                <i class="fa fa-stethoscope me-2"></i> డాక్టర్ వివరాల నమోదు (Doctor Profile Details)
+              </h4>
+              <p class="text-muted small mb-0">
+                * గుర్తు ఉన్న అన్ని ఫీల్డులు తప్పనిసరిగా పూరించాలి.
+              </p>
+            </div>
+            <div class="mt-2 mt-sm-0">
+              <span class="text-muted small">ఖాతా ఇప్పటికే ఉందా? </span>
+              <a routerLink="/login" [queryParams]="{cat: '8'}" class="btn btn-outline-primary btn-sm fw-bold">
+                <i class="fa fa-sign-in me-1"></i> డాక్టర్ లాగిన్ (Login)
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-body p-4 p-md-5">
+          <form [formGroup]="doctorForm" (ngSubmit)="onSubmit()">
+
+            <!-- Section 1: Professional Information -->
+            <div class="section-badge mb-3">
+              <i class="fa fa-id-badge me-2"></i> 1. వ్యక్తిగత & వృత్తిపరమైన వివరాలు (Professional Credentials)
+            </div>
+
+            <div class="row g-3 mb-4">
+              <!-- Doctor Name -->
+              <div class="col-md-6">
+                <label class="form-label fw-bold small text-dark">డాక్టర్ పూర్తి పేరు (Full Name with Dr.) <span class="text-danger">*</span></label>
+                <div class="input-group">
+                  <span class="input-group-text bg-light"><i class="fa fa-user-md text-primary"></i></span>
+                  <input
+                    type="text"
+                    class="form-control"
+                    placeholder="ఉదా: Dr. Mary Grace / Dr. P. David Paul"
+                    formControlName="doctor_name"
+                    [ngClass]="{'is-invalid': submitted && f['doctor_name'].errors}"
+                  />
+                </div>
+                <div *ngIf="submitted && f['doctor_name'].errors" class="text-danger small mt-1">
+                  డాక్టర్ పేరు తప్పనిసరి (కనీసం 3 అక్షరాలు).
+                </div>
+              </div>
+
+              <!-- Medical / Council Reg No -->
+              <div class="col-md-6">
+                <label class="form-label fw-bold small text-dark">మెడికల్ కౌన్సిల్ / థెరపిస్ట్ రిజిస్ట్రేషన్ నంబర్ <span class="text-danger">*</span></label>
+                <div class="input-group">
+                  <span class="input-group-text bg-light"><i class="fa fa-shield text-primary"></i></span>
+                  <input
+                    type="text"
+                    class="form-control"
+                    placeholder="ఉదా: APMC-2018-8421 / RCI-1094"
+                    formControlName="license_number"
+                    [ngClass]="{'is-invalid': submitted && f['license_number'].errors}"
+                  />
+                </div>
+                <div *ngIf="submitted && f['license_number'].errors" class="text-danger small mt-1">
+                  లైసెన్స్ లేదా కౌన్సిల్ నంబర్ తప్పనిసరి.
+                </div>
+              </div>
+
+              <!-- Specialization -->
+              <div class="col-md-6">
+                <label class="form-label fw-bold small text-dark">స్పెషలైజేషన్ (Specialization / Domain) <span class="text-danger">*</span></label>
+                <div class="input-group">
+                  <span class="input-group-text bg-light"><i class="fa fa-heartbeat text-primary"></i></span>
+                  <select
+                    class="form-select form-control"
+                    formControlName="specialization"
+                    [ngClass]="{'is-invalid': submitted && f['specialization'].errors}"
+                  >
+                    <option *ngFor="let spec of specializations" [value]="spec">{{ spec }}</option>
+                  </select>
+                </div>
+              </div>
+
+              <!-- Qualifications -->
+              <div class="col-md-6">
+                <label class="form-label fw-bold small text-dark">విద్యార్హతలు (Qualifications) <span class="text-danger">*</span></label>
+                <div class="input-group">
+                  <span class="input-group-text bg-light"><i class="fa fa-graduation-cap text-primary"></i></span>
+                  <input
+                    type="text"
+                    class="form-control"
+                    placeholder="ఉదా: MBBS, M.D. (Psychiatry), Certified Family Therapist"
+                    formControlName="qualification"
+                    [ngClass]="{'is-invalid': submitted && f['qualification'].errors}"
+                  />
+                </div>
+                <div *ngIf="submitted && f['qualification'].errors" class="text-danger small mt-1">
+                  విద్యార్హత వివరాలు నమోదు చేయండి.
+                </div>
+              </div>
+
+              <!-- Experience Years -->
+              <div class="col-md-6">
+                <label class="form-label fw-bold small text-dark">అనుభవం (Years of Experience) <span class="text-danger">*</span></label>
+                <div class="input-group">
+                  <span class="input-group-text bg-light"><i class="fa fa-calendar-check-o text-primary"></i></span>
+                  <input
+                    type="text"
+                    class="form-control"
+                    placeholder="ఉదా: 8 Years / 15 Years"
+                    formControlName="experience_years"
+                    [ngClass]="{'is-invalid': submitted && f['experience_years'].errors}"
+                  />
+                </div>
+                <div *ngIf="submitted && f['experience_years'].errors" class="text-danger small mt-1">
+                  అనుభవం వివరాలు నమోదు చేయండి.
+                </div>
+              </div>
+
+              <!-- Profile Picture Upload -->
+              <div class="col-md-6">
+                <label class="form-label fw-bold small text-dark">ప్రొఫైల్ ఫోటో (Doctor Photo / Badge)</label>
+                <input
+                  type="file"
+                  class="form-control"
+                  accept="image/*"
+                  (change)="onImageChange($event)"
+                />
+                <small class="text-muted">JPG, PNG (గరిష్ట పరిమాణం 2MB)</small>
+                <div *ngIf="imagePreview" class="mt-2">
+                  <img [src]="imagePreview" alt="Doctor Preview" class="rounded-circle border" style="width: 50px; height: 50px; object-fit: cover;">
+                  <span class="ms-2 small text-success"><i class="fa fa-check"></i> ఫోటో ఎంపికైంది</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Section 2: Contact & Secure Login Credentials -->
+            <div class="section-badge mb-3">
+              <i class="fa fa-lock me-2"></i> 2. లాగిన్ క్రెడెన్షియల్స్ & కాంటాక్ట్ (Login Credentials & Contact)
+            </div>
+
+            <div class="row g-3 mb-4">
+              <!-- Mobile Number -->
+              <div class="col-md-6">
+                <label class="form-label fw-bold small text-dark">సంప్రదింపు మొబైల్ నంబర్ (10-Digit Mobile - లాగిన్ యూజర్ ID) <span class="text-danger">*</span></label>
+                <div class="input-group">
+                  <span class="input-group-text bg-light fw-bold text-muted">+91</span>
+                  <input
+                    type="text"
+                    class="form-control"
+                    maxlength="10"
+                    placeholder="10-digit mobile number"
+                    formControlName="phone_number"
+                    (keypress)="numericOnly($event)"
+                    [ngClass]="{'is-invalid': submitted && f['phone_number'].errors}"
+                  />
+                </div>
+                <div *ngIf="submitted && f['phone_number'].errors" class="text-danger small mt-1">
+                  10 అంకెల సరైన మొబైల్ నంబర్ నమోదు చేయండి.
+                </div>
+                <small class="text-muted">ఈ నంబర్‌తోనే మీరు భవిష్యత్తులో డాక్టర్ పోర్టల్‌కు లాగిన్ అవుతారు.</small>
+              </div>
+
+              <!-- Email -->
+              <div class="col-md-6">
+                <label class="form-label fw-bold small text-dark">ఈమెయిల్ అడ్రస్ (Official Email)</label>
+                <div class="input-group">
+                  <span class="input-group-text bg-light"><i class="fa fa-envelope text-primary"></i></span>
+                  <input
+                    type="email"
+                    class="form-control"
+                    placeholder="doctor@jbac.org"
+                    formControlName="email"
+                    [ngClass]="{'is-invalid': submitted && f['email'].errors}"
+                  />
+                </div>
+                <div *ngIf="submitted && f['email'].errors" class="text-danger small mt-1">
+                  సరైన ఈమెయిల్ అడ్రస్ ఇవ్వండి.
+                </div>
+              </div>
+
+              <!-- Password -->
+              <div class="col-md-6">
+                <label class="form-label fw-bold small text-dark">లాగిన్ పాస్‌వర్డ్ (Password - 6 నుండి 16 అక్షరాలు) <span class="text-danger">*</span></label>
+                <div class="input-group">
+                  <span class="input-group-text bg-light"><i class="fa fa-key text-primary"></i></span>
+                  <input
+                    [type]="passwordVisible ? 'text' : 'password'"
+                    class="form-control"
+                    placeholder="Enter password..."
+                    maxlength="16"
+                    formControlName="password"
+                    [ngClass]="{'is-invalid': submitted && f['password'].errors}"
+                  />
+                  <button type="button" class="btn btn-outline-secondary" (click)="togglePasswordVisibility()">
+                    <i class="fa" [ngClass]="passwordVisible ? 'fa-eye-slash' : 'fa-eye'"></i>
+                  </button>
+                </div>
+                <div *ngIf="submitted && f['password'].errors" class="text-danger small mt-1">
+                  పాస్‌వర్డ్ కనీసం 6 అక్షరాలు ఉండాలి.
+                </div>
+              </div>
+
+              <!-- Confirm Password -->
+              <div class="col-md-6">
+                <label class="form-label fw-bold small text-dark">పాస్‌వర్డ్ ధృవీకరణ (Confirm Password) <span class="text-danger">*</span></label>
+                <div class="input-group">
+                  <span class="input-group-text bg-light"><i class="fa fa-check-circle text-primary"></i></span>
+                  <input
+                    [type]="passwordVisible ? 'text' : 'password'"
+                    class="form-control"
+                    placeholder="Re-enter password..."
+                    maxlength="16"
+                    formControlName="confirm_password"
+                    [ngClass]="{'is-invalid': submitted && f['confirm_password'].errors}"
+                  />
+                </div>
+                <div *ngIf="submitted && f['confirm_password'].errors" class="text-danger small mt-1">
+                  పాస్‌వర్డ్ సరిపోల్చండి.
+                </div>
+              </div>
+            </div>
+
+            <!-- Section 3: Availability & Clinic Information -->
+            <div class="section-badge mb-3">
+              <i class="fa fa-clock-o me-2"></i> 3. అందుబాటు సమయాలు & క్లినిక్ వివరాలు (Timings & Location)
+            </div>
+
+            <div class="row g-3 mb-4">
+              <!-- Available Days -->
+              <div class="col-md-6">
+                <label class="form-label fw-bold small text-dark">అందుబాటులో ఉండే రోజులు (Available Days) <span class="text-danger">*</span></label>
+                <select class="form-select form-control" formControlName="available_days">
+                  <option *ngFor="let day of availableDaysList" [value]="day">{{ day }}</option>
+                </select>
+              </div>
+
+              <!-- Consultation Fee -->
+              <div class="col-md-6">
+                <label class="form-label fw-bold small text-dark">కన్సల్టేషన్ ఫీజు (Consultation Fee)</label>
+                <div class="input-group">
+                  <span class="input-group-text bg-light"><i class="fa fa-money text-success"></i></span>
+                  <input
+                    type="text"
+                    class="form-control"
+                    placeholder="ఉదా: Free / Volunteer Service లేదా ₹500"
+                    formControlName="consultation_fee"
+                  />
+                </div>
+              </div>
+
+              <!-- Timing Start -->
+              <div class="col-md-3">
+                <label class="form-label fw-bold small text-dark">ప్రారంభ సమయం (Start Time) <span class="text-danger">*</span></label>
+                <input
+                  type="text"
+                  class="form-control"
+                  placeholder="10:00 AM"
+                  formControlName="available_time_start"
+                />
+              </div>
+
+              <!-- Timing End -->
+              <div class="col-md-3">
+                <label class="form-label fw-bold small text-dark">ముగింపు సమయం (End Time) <span class="text-danger">*</span></label>
+                <input
+                  type="text"
+                  class="form-control"
+                  placeholder="05:00 PM"
+                  formControlName="available_time_end"
+                />
+              </div>
+
+              <!-- Location / City -->
+              <div class="col-md-6">
+                <label class="form-label fw-bold small text-dark">ప్రాంతం / నగరం (Location & Consultation Mode) <span class="text-danger">*</span></label>
+                <div class="input-group">
+                  <span class="input-group-text bg-light"><i class="fa fa-map-marker text-danger"></i></span>
+                  <input
+                    type="text"
+                    class="form-control"
+                    placeholder="ఉదా: Vijayawada & Online Video Consultation"
+                    formControlName="location"
+                  />
+                </div>
+              </div>
+
+              <!-- Full Address -->
+              <div class="col-12">
+                <label class="form-label fw-bold small text-dark">క్లినిక్ / ఆస్పత్రి / సెంటర్ చిరునామా (Full Address) <span class="text-danger">*</span></label>
+                <textarea
+                  class="form-control"
+                  rows="2"
+                  placeholder="పూర్తి చిరునామా నమోదు చేయండి..."
+                  formControlName="address"
+                  [ngClass]="{'is-invalid': submitted && f['address'].errors}"
+                ></textarea>
+                <div *ngIf="submitted && f['address'].errors" class="text-danger small mt-1">
+                  చిరునామా తప్పనిసరి.
+                </div>
+              </div>
+
+              <!-- Bio -->
+              <div class="col-12">
+                <label class="form-label fw-bold small text-dark">డాక్టర్ సంక్షిప్త ప్రొఫైల్ వివరణ (Doctor Bio / Professional Summary) <span class="text-danger">*</span></label>
+                <textarea
+                  class="form-control"
+                  rows="3"
+                  placeholder="మీ నైపుణ్యం, అందించే కౌన్సిలింగ్ సేవలు మరియు కుటుంబ సంరక్షణ గురించి క్లుప్తంగా వివరించండి..."
+                  formControlName="bio"
+                  [ngClass]="{'is-invalid': submitted && f['bio'].errors}"
+                ></textarea>
+                <div *ngIf="submitted && f['bio'].errors" class="text-danger small mt-1">
+                  సంక్షిప్త వివరణ తప్పనిసరి (కనీసం 20 అక్షరాలు).
+                </div>
+              </div>
+            </div>
+
+            <!-- Terms & Consent -->
+            <div class="form-check p-3 bg-light rounded-3 border mb-4">
+              <input
+                type="checkbox"
+                class="form-check-input ms-0 me-2"
+                id="doctorTerms"
+                formControlName="terms"
+                [ngClass]="{'is-invalid': submitted && f['terms'].errors}"
+              />
+              <label class="form-check-label small text-secondary" for="doctorTerms">
+                నేను అందించిన అన్ని వివరాలు, విద్యార్హతలు మరియు లైసెన్స్ సమాచారం నిజమని ధృవీకరిస్తున్నాను. క్రైస్తవ కుటుంబాల సమాచారం మరియు పేషెంట్ల అపాయింట్‌మెంట్స్ యొక్క గోప్యతను గౌరవిస్తానని అంగీకరిస్తున్నాను.
+              </label>
+              <div *ngIf="submitted && f['terms'].errors" class="text-danger small mt-1">
+                దయచేసి నిబంధనలను అంగీకరించండి.
+              </div>
+            </div>
+
+            <!-- Submit Button -->
+            <div class="text-center">
+              <button
+                type="submit"
+                class="btn btn-primary btn-lg px-5 py-3 fw-bold shadow rounded-pill"
+                [disabled]="showSpinner"
+              >
+                <span *ngIf="showSpinner" class="spinner-border spinner-border-sm me-2" role="status"></span>
+                <i *ngIf="!showSpinner" class="fa fa-user-plus me-2"></i>
+                డాక్టర్ రిజిస్ట్రేషన్ పూర్తి చేయండి (Submit Registration)
+              </button>
+            </div>
+
+          </form>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>

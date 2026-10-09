@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import Swal from 'sweetalert2';
 import { ServiceService } from '../service.service';
@@ -65,6 +65,7 @@ export class FamilyCouncellingComponent implements OnInit {
     private fb: FormBuilder,
     private service: ServiceService,
     private router: Router,
+    private route: ActivatedRoute,
     private modalService: NgbModal
   ) {}
 
@@ -90,7 +91,7 @@ export class FamilyCouncellingComponent implements OnInit {
     this.userMobile = sessionStorage.getItem('mobile_number') || '';
     this.userCategory = sessionStorage.getItem('category') || '';
 
-    // Determine Admin or Doctor permissions
+    // Determine Admin permissions
     const categoryId = sessionStorage.getItem('category_id');
     if (
       this.userCategory.toLowerCase().includes('admin') ||
@@ -100,6 +101,34 @@ export class FamilyCouncellingComponent implements OnInit {
     ) {
       this.isAdmin = true;
     }
+
+    // Determine Doctor permissions
+    const isDoctorSession = sessionStorage.getItem('is_doctor');
+    const userCat = (this.userCategory || '').toLowerCase();
+    if (
+      categoryId === '8' ||
+      isDoctorSession === '1' ||
+      userCat.includes('doctor') ||
+      userCat.includes('councellor')
+    ) {
+      this.isDoctor = true;
+    }
+
+    // Initialize Active Tab based on role & query parameters
+    this.route.queryParams.subscribe(params => {
+      const requestedTab = params['tab'];
+      if (requestedTab) {
+        if ((requestedTab === 'doctor_profile' || requestedTab === 'doctor_schedule') && !this.isDoctor && !this.isAdmin) {
+          this.activeTab = 'browse';
+        } else {
+          this.activeTab = requestedTab;
+        }
+      } else if (this.isDoctor) {
+        this.activeTab = 'doctor_schedule';
+      } else {
+        this.activeTab = 'browse';
+      }
+    });
 
     // Initialize Forms
     this.initForms();
@@ -158,6 +187,19 @@ export class FamilyCouncellingComponent implements OnInit {
   }
 
   switchTab(tab: string): void {
+    // Security check: Only doctors and admins can access doctor profile setup and appointment schedule
+    if ((tab === 'doctor_profile' || tab === 'doctor_schedule') && !this.isDoctor && !this.isAdmin) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'అనుమతి లేదు (Access Restricted)',
+        text: 'ఈ విభాగం కేవలం నమోదిత డాక్టర్లకు మరియు కౌన్సిలర్లకు మాత్రమే అందుబాటులో ఉంటుంది. (This section is accessible only to registered doctors and counsellors).',
+        confirmButtonColor: '#00548F'
+      });
+      this.activeTab = 'browse';
+      this.loadDoctors();
+      return;
+    }
+
     this.activeTab = tab;
     if (tab === 'browse') {
       this.loadDoctors();
@@ -222,12 +264,30 @@ export class FamilyCouncellingComponent implements OnInit {
   }
 
   checkIfUserIsDoctor(): void {
+    const categoryId = sessionStorage.getItem('category_id');
+    const isDoctorSession = sessionStorage.getItem('is_doctor');
+    const userCat = (sessionStorage.getItem('category') || '').toLowerCase();
+
+    if (
+      categoryId === '8' ||
+      isDoctorSession === '1' ||
+      userCat.includes('doctor') ||
+      userCat.includes('councellor')
+    ) {
+      this.isDoctor = true;
+    }
+
     const found = this.doctors.find(
       d => (d.user_id && d.user_id == this.usr_id) || (d.phone_number && d.phone_number === this.userMobile)
     );
     if (found) {
       this.isDoctor = true;
       this.selectedDoctorToEdit = found;
+    }
+
+    // Safety guard: If user is neither doctor nor admin and current tab is restricted, revert to browse
+    if (!this.isDoctor && !this.isAdmin && (this.activeTab === 'doctor_profile' || this.activeTab === 'doctor_schedule')) {
+      this.activeTab = 'browse';
     }
   }
 

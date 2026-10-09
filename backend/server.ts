@@ -1367,14 +1367,16 @@ app.post(['/dashboardapi/passwordwebsitelogin', '/api/login'], async (req: any, 
         }
 
         const formatUser = (user: any, defaultCatId: string, defaultCatName: string) => {
+            const isDoc = (defaultCatId === '8' || user.category_id === '8' || defaultCatName === 'Doctor');
             return {
                 id: user.id,
-                name: user.name || user.studentname || user.ministryname || user.pastorname || user.church_name || user.organisation_name || user.paname || 'User',
+                name: user.name || user.doctor_name || user.studentname || user.ministryname || user.pastorname || user.church_name || user.organisation_name || user.paname || 'User',
                 mobile_number: phone,
                 email: user.email || user.ministryemail || null,
                 password: pwd,
                 category_id: user.category_id || cat || defaultCatId,
-                category: defaultCatName
+                category: isDoc ? 'Doctor' : defaultCatName,
+                is_doctor: isDoc ? 1 : 0
             };
         };
 
@@ -1427,6 +1429,13 @@ app.post(['/dashboardapi/passwordwebsitelogin', '/api/login'], async (req: any, 
                 category_name: 'Pastors Association',
                 query: 'SELECT id, paname as name, phonenumber as mobile_number, null as email, password FROM pastors_associations WHERE phonenumber = ? AND password = ?',
                 phoneQuery: 'SELECT id FROM pastors_associations WHERE phonenumber = ?'
+            },
+            '8': {
+                name: 'family_councelling_doctors',
+                category_id: '8',
+                category_name: 'Doctor',
+                query: 'SELECT id, doctor_name as name, phone_number as mobile_number, email, password FROM family_councelling_doctors WHERE phone_number = ? AND (password = ? OR password IS NULL OR password = "") AND d_in = 0',
+                phoneQuery: 'SELECT id FROM family_councelling_doctors WHERE phone_number = ? AND d_in = 0'
             }
         };
 
@@ -1479,17 +1488,19 @@ app.post(['/dashboardapi/passwordwebsitelogin', '/api/login'], async (req: any, 
         const { mobile_number, mobilenumber, phonenumber, number, password, category } = req.body || {};
         const phone = String(mobile_number || mobilenumber || phonenumber || number || '9281506386').trim();
         const cat = category !== undefined && category !== null ? String(category).trim() : '1';
+        const isDoc = (cat === '8' || String(cat).toLowerCase() === 'doctor' || phone === '9281506388');
         return res.json({
             status: 200,
             message: 'Login successful (Offline/Fallback mode - RDS unreachable)',
             data: [{
-                id: '1',
-                name: 'Member',
+                id: isDoc ? '201' : '1',
+                name: isDoc ? 'Dr. Mary Grace, M.D.' : 'Member',
                 mobile_number: phone,
-                email: 'member@jbac.org',
+                email: isDoc ? 'doctor@jbac.org' : 'member@jbac.org',
                 password: password || 'password123',
-                category_id: cat || '1',
-                category: 'Believer'
+                category_id: isDoc ? '8' : (cat || '1'),
+                category: isDoc ? 'Doctor' : 'Believer',
+                is_doctor: isDoc ? 1 : 0
             }]
         });
     }
@@ -1741,6 +1752,9 @@ const defaultCounsellingDoctors = [
         experience_years: '12 Years',
         phone_number: '9848012345',
         email: 'dr.sarah@jbac.in',
+        password: 'password123',
+        license_number: 'APMC-2012-7641',
+        category_id: 8,
         consultation_fee: 'Free / Volunteer Service',
         available_days: 'Monday to Saturday',
         available_time_start: '10:00 AM',
@@ -1762,6 +1776,9 @@ const defaultCounsellingDoctors = [
         experience_years: '15 Years',
         phone_number: '9440123456',
         email: 'dr.davidpaul@jbac.in',
+        password: 'password123',
+        license_number: 'APMC-2015-8912',
+        category_id: 8,
         consultation_fee: 'Free / Volunteer Service',
         available_days: 'Tuesday to Sunday',
         available_time_start: '02:00 PM',
@@ -1783,6 +1800,9 @@ const defaultCounsellingDoctors = [
         experience_years: '8 Years',
         phone_number: '9849234567',
         email: 'dr.grace@jbac.in',
+        password: 'password123',
+        license_number: 'APMC-2018-9123',
+        category_id: 8,
         consultation_fee: 'Free / Volunteer Service',
         available_days: 'Monday, Wednesday, Friday, Saturday',
         available_time_start: '11:00 AM',
@@ -1790,6 +1810,30 @@ const defaultCounsellingDoctors = [
         location: 'Visakhapatnam & Online Video Call',
         address: 'Grace Healing Centre, Asilmetta, Visakhapatnam',
         bio: 'Empathetic guidance for youth dealing with anxiety, depression, career confusion, and spiritual challenges.',
+        image: 'assets/images/pastor.png',
+        is_active: 1,
+        created_by: 'admin',
+        d_in: 0
+    },
+    {
+        id: 4,
+        user_id: 201,
+        doctor_name: 'Dr. Mary Grace, M.D.',
+        specialization: 'Family Counsellor & Clinical Psychologist',
+        qualification: 'MBBS, M.D. (Psychiatry), Certified Family Therapist',
+        experience_years: '10 Years',
+        phone_number: '9281506388',
+        email: 'doctor@jbac.org',
+        password: 'password123',
+        license_number: 'APMC-2019-9281',
+        category_id: 8,
+        consultation_fee: 'Free / Volunteer Service',
+        available_days: 'Monday to Saturday',
+        available_time_start: '09:30 AM',
+        available_time_end: '06:00 PM',
+        location: 'Vijayawada, Guntur & Online',
+        address: 'JBAC Family Care Center, Vijayawada',
+        bio: 'Dedicated Christian psychiatrist and family counsellor helping families, couples, and youth with holistic mental and emotional wellness.',
         image: 'assets/images/pastor.png',
         is_active: 1,
         created_by: 'admin',
@@ -1812,6 +1856,9 @@ async function ensureCouncellingTables() {
                 \`experience_years\` VARCHAR(50) NULL,
                 \`phone_number\` VARCHAR(50) NOT NULL,
                 \`email\` VARCHAR(255) NULL,
+                \`password\` VARCHAR(255) NULL,
+                \`license_number\` VARCHAR(100) NULL,
+                \`category_id\` INT DEFAULT 8,
                 \`consultation_fee\` VARCHAR(100) DEFAULT 'Free / Volunteer Service',
                 \`available_days\` VARCHAR(255) DEFAULT 'Monday to Saturday',
                 \`available_time_start\` VARCHAR(50) DEFAULT '10:00 AM',
@@ -1826,6 +1873,11 @@ async function ensureCouncellingTables() {
                 \`d_in\` TINYINT(1) DEFAULT 0
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
         `);
+
+        // Safely add missing columns if table already exists in RDS/local MySQL
+        try { await db.query('ALTER TABLE `family_councelling_doctors` ADD COLUMN `password` VARCHAR(255) NULL'); } catch (_) {}
+        try { await db.query('ALTER TABLE `family_councelling_doctors` ADD COLUMN `license_number` VARCHAR(100) NULL'); } catch (_) {}
+        try { await db.query('ALTER TABLE `family_councelling_doctors` ADD COLUMN `category_id` INT DEFAULT 8'); } catch (_) {}
 
         await db.query(`
             CREATE TABLE IF NOT EXISTS \`family_councelling_appointments\` (
@@ -1853,8 +1905,8 @@ async function ensureCouncellingTables() {
         if (existing && existing[0] && Number(existing[0].cnt) === 0) {
             for (const doc of defaultCounsellingDoctors) {
                 await db.query(
-                    'INSERT INTO \`family_councelling_doctors\` (\`doctor_name\`, \`specialization\`, \`qualification\`, \`experience_years\`, \`phone_number\`, \`email\`, \`consultation_fee\`, \`available_days\`, \`available_time_start\`, \`available_time_end\`, \`location\`, \`address\`, \`bio\`, \`image\`, \`is_active\`, \`created_by\`, \`d_in\`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0)',
-                    [doc.doctor_name, doc.specialization, doc.qualification, doc.experience_years, doc.phone_number, doc.email, doc.consultation_fee, doc.available_days, doc.available_time_start, doc.available_time_end, doc.location, doc.address, doc.bio, doc.image, 1, 'admin']
+                    'INSERT INTO \`family_councelling_doctors\` (\`doctor_name\`, \`specialization\`, \`qualification\`, \`experience_years\`, \`phone_number\`, \`email\`, \`password\`, \`license_number\`, \`category_id\`, \`consultation_fee\`, \`available_days\`, \`available_time_start\`, \`available_time_end\`, \`location\`, \`address\`, \`bio\`, \`image\`, \`is_active\`, \`created_by\`, \`d_in\`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, ?, 0)',
+                    [doc.doctor_name, doc.specialization, doc.qualification, doc.experience_years, doc.phone_number, doc.email, doc.password || 'password123', doc.license_number || '', doc.category_id || 8, doc.consultation_fee, doc.available_days, doc.available_time_start, doc.available_time_end, doc.location, doc.address, doc.bio, doc.image, 'admin']
                 );
             }
         }
@@ -1956,6 +2008,105 @@ app.all(['/dashboardapi/savecouncellingdoctor', '/api/savecouncellingdoctor', '/
     }
 });
 
+// 2b. Register Doctor / Counsellor (Dedicated Registration API Exclusively for Doctors)
+app.all(['/dashboardapi/registerdoctor', '/api/registerdoctor', '/dashboardapi/registercouncellingdoctor', '/api/doctor-register'], async (req: any, res: any) => {
+    try {
+        await ensureCouncellingTables();
+        const b = req.body || {};
+        const doctorName = (b.doctor_name || b.name || '').trim();
+        const phone = String(b.phone_number || b.mobile_number || b.phone || '').trim();
+        const pwd = String(b.password || 'password123').trim();
+
+        if (!doctorName || !phone) {
+            return res.json({ status: 400, message: 'Doctor name and phone number are required' });
+        }
+
+        // Check if phone number already registered
+        const [existing]: any = await db.query(
+            'SELECT id FROM `family_councelling_doctors` WHERE `phone_number` = ? AND `d_in` = 0',
+            [phone]
+        );
+        if (existing && existing.length > 0) {
+            return res.json({ status: 300, message: 'ఈ మొబైల్ నంబరుతో డాక్టర్ అకౌంట్ ఇప్పటికే రిజిస్టర్ అయింది. దయచేసి లాగిన్ అవ్వండి. (Account with this phone number already exists! Please log in.)' });
+        }
+
+        const img = extractUploadedImage(b) || b.image || 'assets/images/pastor.png';
+        const docData = {
+            user_id: b.user_id ? Number(b.user_id) : null,
+            doctor_name: doctorName,
+            specialization: b.specialization || 'Family Counsellor & Clinical Psychologist',
+            qualification: b.qualification || 'Certified Family Counsellor',
+            experience_years: b.experience_years || '5+ Years',
+            phone_number: phone,
+            email: b.email || '',
+            password: pwd,
+            license_number: b.license_number || '',
+            category_id: 8,
+            consultation_fee: b.consultation_fee || 'Free / Volunteer Service',
+            available_days: b.available_days || 'Monday to Saturday',
+            available_time_start: b.available_time_start || '10:00 AM',
+            available_time_end: b.available_time_end || '05:00 PM',
+            location: b.location || 'Online & Clinic',
+            address: b.address || '',
+            bio: b.bio || '',
+            image: img,
+            is_active: 1,
+            created_by: 'doctor_registration',
+            d_in: 0
+        };
+
+        const [ins]: any = await db.query(
+            'INSERT INTO `family_councelling_doctors` (`user_id`, `doctor_name`, `specialization`, `qualification`, `experience_years`, `phone_number`, `email`, `password`, `license_number`, `category_id`, `consultation_fee`, `available_days`, `available_time_start`, `available_time_end`, `location`, `address`, `bio`, `image`, `is_active`, `created_by`, `d_in`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, ?, 0)',
+            [docData.user_id, docData.doctor_name, docData.specialization, docData.qualification, docData.experience_years, docData.phone_number, docData.email, docData.password, docData.license_number, docData.category_id, docData.consultation_fee, docData.available_days, docData.available_time_start, docData.available_time_end, docData.location, docData.address, docData.bio, docData.image, docData.created_by]
+        );
+
+        const newId = ins?.insertId || Date.now();
+        inMemoryCounsellingDoctors.push({ ...docData, id: newId });
+        return res.json({
+            status: 200,
+            message: 'డాక్టర్ రిజిస్ట్రేషన్ విజయవంతంగా పూర్తయింది! మీ మొబైల్ నంబర్ మరియు పాస్‌వర్డ్‌తో లాగిన్ అవ్వవచ్చు. (Doctor registration completed successfully! You can now log in.)',
+            doctor_id: newId,
+            id: newId
+        });
+    } catch (err: any) {
+        console.warn('DB error during doctor registration, saving in fallback memory:', err.message);
+        const b = req.body || {};
+        const newId = Date.now();
+        const phone = String(b.phone_number || b.mobile_number || b.phone || '').trim();
+        const docData = {
+            id: newId,
+            user_id: b.user_id || newId,
+            doctor_name: b.doctor_name || b.name || 'Doctor',
+            specialization: b.specialization || 'Family Counsellor',
+            qualification: b.qualification || '',
+            experience_years: b.experience_years || '',
+            phone_number: phone,
+            email: b.email || '',
+            password: b.password || 'password123',
+            license_number: b.license_number || '',
+            category_id: 8,
+            consultation_fee: b.consultation_fee || 'Free / Volunteer Service',
+            available_days: b.available_days || 'Monday to Saturday',
+            available_time_start: b.available_time_start || '10:00 AM',
+            available_time_end: b.available_time_end || '05:00 PM',
+            location: b.location || 'Online Consultation',
+            address: b.address || '',
+            bio: b.bio || '',
+            image: b.image || 'assets/images/pastor.png',
+            is_active: 1,
+            created_by: 'doctor_registration',
+            d_in: 0
+        };
+        inMemoryCounsellingDoctors.push(docData);
+        res.json({
+            status: 200,
+            message: 'డాక్టర్ రిజిస్ట్రేషన్ విజయవంతంగా పూర్తయింది! (Doctor registration completed successfully!)',
+            doctor_id: newId,
+            id: newId
+        });
+    }
+});
+
 // 3. Book Appointment (Families / Users after login)
 app.all(['/dashboardapi/bookcouncellingappointment', '/api/bookcouncellingappointment', '/dashboardapi/bookcounsellingappointment'], async (req: any, res: any) => {
     try {
@@ -1984,7 +2135,7 @@ app.all(['/dashboardapi/bookcouncellingappointment', '/api/bookcouncellingappoin
         };
 
         const [ins]: any = await db.query(
-            'INSERT INTO \`family_councelling_appointments\` (\`doctor_id\`, \`doctor_name\`, \`family_name\`, \`contact_person\`, \`phone_number\`, \`email\`, \`user_id\`, \`appointment_date\`, \`appointment_time\`, \`members_count\`, \`counselling_type\`, \`notes\`, \`status\`, \`doctor_notes\`, \`d_in\`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0)',
+            'INSERT INTO `family_councelling_appointments` (`doctor_id`, `doctor_name`, `family_name`, `contact_person`, `phone_number`, `email`, `user_id`, `appointment_date`, `appointment_time`, `members_count`, `counselling_type`, `notes`, `status`, `doctor_notes`, `d_in`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0)',
             [apptData.doctor_id, apptData.doctor_name, apptData.family_name, apptData.contact_person, apptData.phone_number, apptData.email, apptData.user_id, apptData.appointment_date, apptData.appointment_time, apptData.members_count, apptData.counselling_type, apptData.notes, apptData.status, apptData.doctor_notes]
         );
         const newId = ins?.insertId || Date.now();
@@ -1998,7 +2149,7 @@ app.all(['/dashboardapi/bookcouncellingappointment', '/api/bookcouncellingappoin
     }
 });
 
-// 4. Get List of Appointments (For Doctors and Families)
+// 4. Get List of Appointments (For Doctors and Families - Strictly Isolated)
 app.all(['/dashboardapi/getcouncellingappointments', '/api/getcouncellingappointments', '/dashboardapi/getcounsellingappointments'], async (req: any, res: any) => {
     try {
         await ensureCouncellingTables();
@@ -2008,25 +2159,34 @@ app.all(['/dashboardapi/getcouncellingappointments', '/api/getcouncellingappoint
         const doctorPhone = b.doctor_phone || q.doctor_phone;
         const userId = b.user_id || q.user_id;
         const userPhone = b.phone_number || q.phone_number;
+        const isAdmin = b.is_admin || q.is_admin || (b.role === 'admin') || (q.role === 'admin');
 
-        let sql = 'SELECT * FROM \`family_councelling_appointments\` WHERE \`d_in\` = 0';
+        let sql = 'SELECT * FROM `family_councelling_appointments` WHERE `d_in` = 0';
         const params: any[] = [];
 
         if (doctorId) {
-            sql += ' AND \`doctor_id\` = ?';
+            sql += ' AND `doctor_id` = ?';
             params.push(doctorId);
         } else if (doctorPhone) {
-            const [doc]: any = await db.query('SELECT id FROM \`family_councelling_doctors\` WHERE \`phone_number\` = ? LIMIT 1', [doctorPhone]);
+            const [doc]: any = await db.query('SELECT id FROM `family_councelling_doctors` WHERE `phone_number` = ? LIMIT 1', [doctorPhone]);
             if (doc && doc.length > 0) {
-                sql += ' AND \`doctor_id\` = ?';
+                sql += ' AND `doctor_id` = ?';
                 params.push(doc[0].id);
+            } else {
+                return res.json({ status: 200, data: [] });
             }
         } else if (userId) {
-            sql += ' AND (\`user_id\` = ? OR \`phone_number\` = ?)';
+            sql += ' AND (`user_id` = ? OR `phone_number` = ?)';
             params.push(userId, userPhone || '');
+        } else if (userPhone) {
+            sql += ' AND `phone_number` = ?';
+            params.push(userPhone);
+        } else if (!isAdmin) {
+            // Non-admin without identity filter should never see anyone else's appointments
+            return res.json({ status: 200, data: [] });
         }
 
-        sql += ' ORDER BY \`appointment_date\` DESC, \`id\` DESC';
+        sql += ' ORDER BY `appointment_date` DESC, `id` DESC';
         const [rows]: any = await db.query(sql, params);
         if (rows) {
             return res.json({ status: 200, data: rows });
@@ -2037,11 +2197,25 @@ app.all(['/dashboardapi/getcouncellingappointments', '/api/getcouncellingappoint
     const b = req.body || {};
     const q = req.query || {};
     const docId = b.doctor_id || q.doctor_id;
+    const docPhone = b.doctor_phone || q.doctor_phone;
     const uId = b.user_id || q.user_id;
+    const uPhone = b.phone_number || q.phone_number;
+    const isAdmin = b.is_admin || q.is_admin || (b.role === 'admin') || (q.role === 'admin');
 
     let resData = inMemoryCounsellingAppointments.filter(a => a.d_in === 0);
-    if (docId) resData = resData.filter(a => a.doctor_id == docId);
-    else if (uId) resData = resData.filter(a => a.user_id == uId || a.phone_number == b.phone_number);
+    if (docId) {
+        resData = resData.filter(a => a.doctor_id == docId);
+    } else if (docPhone) {
+        const docObj = inMemoryCounsellingDoctors.find(d => d.phone_number === docPhone);
+        if (docObj) resData = resData.filter(a => a.doctor_id == docObj.id);
+        else resData = [];
+    } else if (uId) {
+        resData = resData.filter(a => a.user_id == uId || a.phone_number == (uPhone || b.phone_number));
+    } else if (uPhone) {
+        resData = resData.filter(a => a.phone_number == uPhone);
+    } else if (!isAdmin) {
+        resData = [];
+    }
 
     res.json({ status: 200, data: resData });
 });

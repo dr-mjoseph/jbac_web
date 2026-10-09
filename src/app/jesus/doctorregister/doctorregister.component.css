@@ -1,0 +1,56 @@
+.doctor-reg-container {
+  max-width: 1140px;
+}
+
+.hero-card {
+  background: linear-gradient(135deg, #00548F 0%, #00365c 100%);
+  border-left: 6px solid #ffc107;
+}
+
+.hero-title {
+  font-size: 1.6rem;
+  letter-spacing: -0.3px;
+}
+
+.hero-subtitle {
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.form-card {
+  box-shadow: 0 10px 30px rgba(0, 84, 143, 0.08);
+}
+
+.section-badge {
+  display: inline-block;
+  background-color: #e7f2fa;
+  color: #00548F;
+  font-weight: 700;
+  font-size: 0.9rem;
+  padding: 6px 14px;
+  border-radius: 6px;
+  border-left: 3px solid #00548F;
+}
+
+.input-group-text {
+  border-color: #ced4da;
+}
+
+.form-control:focus, .form-select:focus {
+  border-color: #00548F;
+  box-shadow: 0 0 0 0.2rem rgba(0, 84, 143, 0.15);
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #00548F, #0077c2);
+  border: none;
+  font-size: 1.05rem;
+  letter-spacing: 0.3px;
+  transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+  background: linear-gradient(135deg, #003e6b, #00548F);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 84, 143, 0.3);
+}

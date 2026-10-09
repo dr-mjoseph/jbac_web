@@ -50,33 +50,92 @@
     </div>
   </div>
 
+  <!-- Doctor Workspace Action Banner (Exclusively for Registered Doctors & Admins) -->
+  <div *ngIf="isDoctor || isAdmin" class="doctor-quick-actions-bar card bg-light border-primary mb-4 p-3 shadow-sm rounded">
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+      <div>
+        <span class="badge bg-primary text-white px-2 py-1 me-2"><i class="fa fa-stethoscope"></i> DOCTOR PORTAL</span>
+        <strong class="text-dark" style="font-size: 15px;">డాక్టర్ కార్యస్థలం (Doctor Workspace)</strong>
+        <div class="text-muted small mt-1">
+          మీ ప్రొఫైల్ వివరాలను సెటప్ చేసుకోవచ్చు మరియు మీకు కేటాయించబడిన రోగుల/కుటుంబాల అపాయింట్‌మెంట్లను ఇక్కడ సులభంగా పరిశీలించవచ్చు.
+        </div>
+      </div>
+      <div class="d-flex gap-2 flex-wrap">
+        <button
+          type="button"
+          class="btn btn-sm"
+          [ngClass]="activeTab === 'doctor_schedule' ? 'btn-primary' : 'btn-outline-primary'"
+          (click)="switchTab('doctor_schedule')"
+        >
+          <i class="fa fa-calendar-check-o me-1"></i> అపాయింట్ అయిన రోగుల వివరాలు (Appointed Patients)
+          <span *ngIf="doctorAppointments.length" class="badge bg-light text-dark ms-1">{{ doctorAppointments.length }}</span>
+        </button>
+        <button
+          type="button"
+          class="btn btn-sm"
+          [ngClass]="activeTab === 'doctor_profile' ? 'btn-success' : 'btn-outline-success'"
+          (click)="switchTab('doctor_profile')"
+        >
+          <i class="fa fa-user-md me-1"></i> నా ప్రొఫైల్ సెటప్ (Doctor Profile Setup)
+        </button>
+        <button
+          type="button"
+          class="btn btn-sm btn-outline-secondary"
+          (click)="switchTab('browse')"
+        >
+          <i class="fa fa-eye me-1"></i> కౌన్సిలర్ల జాబితా (Directory)
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- Navigation Tabs / Segments -->
   <div class="tab-navigation-bar mb-4">
     <ul class="nav nav-pills custom-pills shadow-sm p-1 bg-white rounded">
+      <!-- Option 1: Available Doctors (Accessible to Everyone) -->
       <li class="nav-item flex-fill text-center">
         <a class="nav-link" [class.active]="activeTab === 'browse'" (click)="switchTab('browse')" href="javascript:void(0)">
           <i class="fa fa-user-md me-1"></i> కౌన్సిలర్ డాక్టర్లు (Available Doctors)
         </a>
       </li>
+      <!-- Option 2: My Appointments (Accessible to Everyone / Families) -->
       <li class="nav-item flex-fill text-center">
         <a class="nav-link" [class.active]="activeTab === 'my_bookings'" (click)="switchTab('my_bookings')" href="javascript:void(0)">
           <i class="fa fa-calendar-check-o me-1"></i> నా అపాయింట్‌మెంట్లు (My Bookings)
           <span *ngIf="myAppointments.length" class="badge bg-secondary ms-1">{{ myAppointments.length }}</span>
         </a>
       </li>
-      <li class="nav-item flex-fill text-center">
+      <!-- Option 3: Doctor Profile Setup (EXCLUSIVELY for Doctors & Admins) -->
+      <li class="nav-item flex-fill text-center" *ngIf="isDoctor || isAdmin">
         <a class="nav-link" [class.active]="activeTab === 'doctor_profile'" (click)="switchTab('doctor_profile')" href="javascript:void(0)">
           <i class="fa fa-id-card-o me-1"></i> డాక్టర్ ప్రొఫైల్ సెట్టింగ్ (Doctor Profile Setup)
           <span *ngIf="isAdmin" class="badge bg-danger ms-1 text-white">Admin / On-Behalf</span>
         </a>
       </li>
-      <li class="nav-item flex-fill text-center">
+      <!-- Option 4: Doctor Schedule (EXCLUSIVELY for Doctors & Admins) -->
+      <li class="nav-item flex-fill text-center" *ngIf="isDoctor || isAdmin">
         <a class="nav-link" [class.active]="activeTab === 'doctor_schedule'" (click)="switchTab('doctor_schedule')" href="javascript:void(0)">
           <i class="fa fa-list-alt me-1"></i> అపాయింట్‌మెంట్స్ షెడ్యూల్ (Doctor Schedule)
           <span *ngIf="doctorAppointments.length" class="badge bg-info ms-1 text-white">{{ doctorAppointments.length }}</span>
         </a>
       </li>
     </ul>
+  </div>
+
+  <!-- Doctor Registration CTA for Non-Doctors -->
+  <div *ngIf="!isDoctor && !isAdmin" class="alert alert-info d-flex justify-content-between align-items-center flex-wrap p-3 mb-4 rounded border-info">
+    <div class="d-flex align-items-center">
+      <i class="fa fa-user-md fa-2x text-info me-3"></i>
+      <div>
+        <strong class="d-block text-dark">మీరు క్రైస్తవ వైద్యులా లేదా కౌన్సిలరా? (Are you a Doctor / Counsellor?)</strong>
+        <span class="small text-muted">మా కౌన్సిలింగ్ నెట్‌వర్క్‌లో చేరడానికి మరియు మీ ప్రొఫైల్ నమోదు చేసుకోవడానికి ప్రత్యేక ఫారమ్ ద్వారా రిజిస్టర్ అవ్వండి.</span>
+      </div>
+    </div>
+    <div class="mt-2 mt-md-0">
+      <a routerLink="/doctorregister" class="btn btn-outline-primary btn-sm px-3 fw-bold">
+        <i class="fa fa-plus-circle me-1"></i> డాక్టర్ రిజిస్ట్రేషన్ (Doctor Register)
+      </a>
+    </div>
   </div>
 
   <!-- ============================================================= -->
@@ -292,9 +351,9 @@
   </div>
 
   <!-- ============================================================= -->
-  <!-- TAB 3: DOCTOR / ADMIN PROFILE SETUP                          -->
+  <!-- TAB 3: DOCTOR / ADMIN PROFILE SETUP (EXCLUSIVELY DOCTORS/ADMIN) -->
   <!-- ============================================================= -->
-  <div *ngIf="activeTab === 'doctor_profile'">
+  <div *ngIf="activeTab === 'doctor_profile' && (isDoctor || isAdmin)">
     <div class="card shadow-sm border-0 rounded">
       <div class="card-header bg-white py-3 border-bottom">
         <div class="d-flex justify-content-between align-items-center flex-wrap">
@@ -515,9 +574,9 @@
   </div>
 
   <!-- ============================================================= -->
-  <!-- TAB 4: DOCTOR APPOINTMENTS SCHEDULE (Doctor & Admin View)     -->
+  <!-- TAB 4: DOCTOR APPOINTMENTS SCHEDULE (EXCLUSIVELY DOCTORS/ADMIN) -->
   <!-- ============================================================= -->
-  <div *ngIf="activeTab === 'doctor_schedule'">
+  <div *ngIf="activeTab === 'doctor_schedule' && (isDoctor || isAdmin)">
     <div class="card shadow-sm border-0 rounded">
       <div class="card-header bg-white py-3 border-bottom d-flex justify-content-between align-items-center flex-wrap">
         <div>

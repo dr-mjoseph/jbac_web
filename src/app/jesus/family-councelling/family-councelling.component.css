@@ -134,3 +134,9 @@
   border-top-left-radius: 8px;
   border-top-right-radius: 8px;
 }
+
+/* Doctor Quick Actions Bar */
+.doctor-quick-actions-bar {
+  background: linear-gradient(135deg, #eef6ff 0%, #e0effe 100%) !important;
+  border: 1.5px solid #93c5fd !important;
+}

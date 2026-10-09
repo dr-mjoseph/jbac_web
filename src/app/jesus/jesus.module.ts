@@ -71,6 +71,7 @@ import { WorkComponent } from './work/work.component';
 import { NamoduComponent } from './namodu/namodu.component';
 import { WishComponent } from './wish/wish.component';
 import { FamilyCouncellingComponent } from './family-councelling/family-councelling.component';
+import { DoctorregisterComponent } from './doctorregister/doctorregister.component';
 
 
 
@@ -139,7 +140,8 @@ import { FamilyCouncellingComponent } from './family-councelling/family-councell
   WorkComponent,
   NamoduComponent,
   WishComponent,
-  FamilyCouncellingComponent
+  FamilyCouncellingComponent,
+  DoctorregisterComponent
     
   ],
   imports: [

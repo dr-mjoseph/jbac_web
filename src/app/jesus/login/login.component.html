@@ -54,6 +54,7 @@
                                                 <option value="3">మినిస్ట్రీస్</option>
                                                 <option value="5">చర్చి</option>
                                                 <option value="6">క్రిస్టియన్ ఆర్గనైజెషన్ / కంపెనీ</option>
+                                                <option value="8">డాక్టర్ / కౌన్సిలర్ (Doctor / Counsellor)</option>
                                             </select>
                                             <div *ngIf="Submitlogindata && f['category'].errors"
                                                 class="invalid-feedback">
@@ -114,6 +115,7 @@
                                                 <button type="button" class="btn btn-sm btn-outline-dark" style="border-radius: 20px; font-size: 12px; background: #fff;" (click)="fillDemoUser('1')">విశ్వాసి (Believer)</button>
                                                 <button type="button" class="btn btn-sm btn-outline-dark" style="border-radius: 20px; font-size: 12px; background: #fff;" (click)="fillDemoUser('4')">పాస్టర్ (Pastor)</button>
                                                 <button type="button" class="btn btn-sm btn-outline-dark" style="border-radius: 20px; font-size: 12px; background: #fff;" (click)="fillDemoUser('2')">స్టూడెంట్ (Student)</button>
+                                                <button type="button" class="btn btn-sm btn-outline-primary" style="border-radius: 20px; font-size: 12px; background: #fff; font-weight: bold; color: #00548F; border-color: #00548F;" (click)="fillDemoUser('8')">డాక్టర్ (Dr. Mary Grace)</button>
                                             </div>
                                         </div>
                                     </div>
@@ -135,8 +137,8 @@
                             <div style="text-align:right;cursor: pointer;">
                                 <div class="row">
                                     <div style="text-align: left;" class="col-md-6 mb-4 pb-2">
-                                        <p>New Account? <a href="/signup" class="a2"><b
-                                                    style="color:#4a0a0a">Sign-Up</b></a></p>
+                                        <p class="mb-1">New Account? <a href="/signup" class="a2"><b style="color:#4a0a0a">Sign-Up</b></a></p>
+                                        <p class="mb-0"><i class="fa fa-user-md text-primary me-1"></i> డాక్టర్ / కౌన్సిలర్ రిజిస్ట్రేషన్? <a routerLink="/doctorregister" class="a2"><b style="color:#00548F">Doctor Registration</b></a></p>
                                     </div>
                                     <div style="text-align: right;" class="col-md-6 mb-4 pb-2">
                                         <p (click)="forgetpassword(forget)"><b><u>Forgot Password</u>?</b>

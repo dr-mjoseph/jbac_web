@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ServiceService } from '../service.service';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import Swal from 'sweetalert2';
 
@@ -16,7 +16,13 @@ export class LoginComponent {
   checkform: FormGroup;
   submitted: boolean = false;
 
-  constructor(private formBuilder: FormBuilder, private service: ServiceService, private router: Router, private modalService: NgbModal,) {
+  constructor(
+    private formBuilder: FormBuilder,
+    private service: ServiceService,
+    private router: Router,
+    private route: ActivatedRoute,
+    private modalService: NgbModal
+  ) {
     this.passwordform = this.formBuilder.group({
       category: ['', [Validators.required]],
       mobile_number: ['', [Validators.required, Validators.minLength(10)]],
@@ -29,14 +35,17 @@ export class LoginComponent {
       otp: ['', [Validators.minLength(4)]],
       password: ['', [Validators.minLength(8)]]
     });
-
-
   }
 
   ngOnInit(): void {
-
-
-
+    this.route.queryParams.subscribe((params: any) => {
+      if (params['cat']) {
+        this.passwordform.patchValue({
+          category: String(params['cat']),
+          mobile_number: params['phone'] || ''
+        });
+      }
+    });
   }
 
   get f() { return this.passwordform.controls }
@@ -45,9 +54,10 @@ export class LoginComponent {
   Submitlogindata: boolean = false;
 
   fillDemoUser(category: string = '1') {
+    const isDoc = (category === '8');
     this.passwordform.patchValue({
       category: category,
-      mobile_number: '9281506386',
+      mobile_number: isDoc ? '9281506388' : '9281506386',
       password: 'password123'
     });
     this.Submitlogindata = false;
@@ -62,6 +72,7 @@ export class LoginComponent {
       case '5': return 'Church';
       case '6': return 'Independent Organization';
       case '7': return 'Pastors Association';
+      case '8': return 'Doctor';
       default: return 'Member';
     }
   }
@@ -72,6 +83,7 @@ export class LoginComponent {
     const userName = (userData && userData.name) ? userData.name : (catName + ' Member');
     const userId = (userData && userData.id) ? userData.id : '1';
     const mobile = this.passwordform.value.mobile_number || (userData ? userData.mobile_number : '');
+    const isDoc = (String(catId) === '8' || (userData && userData.is_doctor == 1) || catName === 'Doctor');
 
     sessionStorage.setItem('usr_id', String(userId));
     sessionStorage.setItem('mobile_number', String(mobile));
@@ -79,6 +91,11 @@ export class LoginComponent {
     sessionStorage.setItem('category_id', String(catId));
     sessionStorage.setItem('category', String(catName));
     sessionStorage.setItem('auth_ind', '1');
+    if (isDoc) {
+      sessionStorage.setItem('is_doctor', '1');
+    } else {
+      sessionStorage.removeItem('is_doctor');
+    }
     localStorage.setItem('key_id', '1');
     this.service.getlgstatus('1');
 
@@ -89,7 +106,12 @@ export class LoginComponent {
       timer: 1600,
       showConfirmButton: false
     }).then(() => {
-      this.router.navigate(['/about']);
+      if (isDoc) {
+        // Direct doctor to doctor schedule and profile setup in family counselling
+        this.router.navigate(['/family-councelling'], { queryParams: { tab: 'doctor_schedule' } });
+      } else {
+        this.router.navigate(['/about']);
+      }
     });
   }
 

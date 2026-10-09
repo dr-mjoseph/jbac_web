@@ -60,6 +60,7 @@ import { ChristianattackvideoComponent } from './jesus/christianattackvideo/chri
 import { EntryComponent } from './jesus/entry/entry.component';
 import { NamoduComponent } from './jesus/namodu/namodu.component';
 import { FamilyCouncellingComponent } from './jesus/family-councelling/family-councelling.component';
+import { DoctorregisterComponent } from './jesus/doctorregister/doctorregister.component';
 
 
 
@@ -126,6 +127,8 @@ const routes: Routes = [
  { path: 'family-councelling', component: FamilyCouncellingComponent },
  { path: 'familycouncelling', component: FamilyCouncellingComponent },
  { path: 'family-counseling', component: FamilyCouncellingComponent },
+ { path: 'doctorregister', component: DoctorregisterComponent },
+ { path: 'doctor-register', component: DoctorregisterComponent },
 ];
 
 @NgModule({
