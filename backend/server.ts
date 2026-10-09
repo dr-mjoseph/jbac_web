@@ -24,7 +24,7 @@ app.use((req, _res, next) => {
 
 // Configure AWS Aurora RDS MySQL Connection
 const rawHost = process.env.DB_HOST;
-const dbHost = (rawHost && !rawHost.startsWith('://')) ? rawHost : 'jbac-mysql-db.cdeeuw0s2trf.ap-southeast-2.rds.amazonaws.com';
+const dbHost = (rawHost && !rawHost.startsWith('://')) ? rawHost : 'jbac-mysql-db-v2.cdeeuw0s2trf.ap-southeast-2.rds.amazonaws.com';
 const dbUser = process.env.DB_USER || 'admin';
 const dbPassword = process.env.DB_PASSWORD || 'biUt2TrZ9EZAqn6GXhiA';
 const dbName = (process.env.DB_NAME && process.env.DB_NAME !== 'sys') ? process.env.DB_NAME : 'jbac_jbac';

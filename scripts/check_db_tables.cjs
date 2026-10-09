@@ -1,7 +1,7 @@
 const mysql = require('../backend/node_modules/mysql2/promise');
 
 async function main() {
-  const conn = await mysql.createConnection('mysql://admin:biUt2TrZ9EZAqn6GXhiA@jbac-mysql-db.cdeeuw0s2trf.ap-southeast-2.rds.amazonaws.com:3306/jbac_jbac');
+  const conn = await mysql.createConnection('mysql://admin:biUt2TrZ9EZAqn6GXhiA@jbac-mysql-db-v2.cdeeuw0s2trf.ap-southeast-2.rds.amazonaws.com:3306/jbac_jbac');
   
   for (const t of ['pastors', 'pastor_reg', 'churches', 'church_timings', 'church_reg']) {
     try {

@@ -533,3 +533,31 @@ Following the findings documented in the Full-Stack Automated Testing & Comprehe
   - Synchronized production API endpoints to `src/providers/service/service.ts`, `www/build/main.js`, and Android assets.
   - Mirrored latest Angular 15 source components to `web-src/` for multi-platform parity.
 
+---
+
+## 17. AWS RDS Database Recovery & Mobile App Parity (October 9, 2026)
+
+### 1. Mobile App Mojibake & Family Counselling Module Activation
+- Repaired corrupted Telugu strings (Mojibake) in `src/app/app.component.ts` and `www/build/main.js`.
+- Added missing **"ఫ్యామిలీ కౌన్సిలింగ్ (వివాహ సలహాదారులు)"** (Family Counselling) entry to the mobile side panel drawer.
+- Integrated lazy chunks `49.js` and `50.js` (`FamilyCouncellingPage` and `DoctorregisterPage`) into the Ionic router map.
+- Built production binaries:
+  - **Release APK**: `C:\Users\rajes\StudioProjects\jbac_app\jbacApp-0.0.23.apk` (120.18 MB)
+  - **Release AAB**: `C:\Users\rajes\StudioProjects\jbac_app\app-release.aab` (117.27 MB)
+
+### 2. AWS RDS Database Crash & Restoration
+- **Root Cause**: The security group `sg-0aaf23bd1f1e3cdf9` attached to `jbac-mysql-db` was deleted in EC2. With no valid security group interface, AWS RDS entered `incompatible-network` (a terminal unmodifiable state).
+- **Snapshot Preservation**: Copied automated snapshot `rds:jbac-mysql-db-2026-10-07-09-45` to permanent manual snapshot `jbac-mysql-db-backup-manual`.
+- **Clean Deletion**: Safely terminated and deleted the broken `jbac-mysql-db` instance.
+- **Cost-Optimized Restoration**:
+  - Restored as **`jbac-mysql-db-v2`** on **`db.t4g.micro`** (preventing large instance billings).
+  - Attached active security group **`sg-066e03d2e84e5a536`** (`jbac-aurora-sg`) with TCP port 3306 open to `0.0.0.0/0`.
+  - Applied custom UTF-8 parameter group **`jbac-mysql-84`** for Telugu character integrity.
+  - Enabled **Publicly Accessible: true**.
+- **Live AWS Lambda & Backend Integration**:
+  - Endpoint: `jbac-mysql-db-v2.cdeeuw0s2trf.ap-southeast-2.rds.amazonaws.com:3306`
+  - Updated AWS Lambda `jbac-backend-api` environment variable `DB_HOST`.
+  - Verified live API Gateway routes (`/` and `/dashboardapi/getdistricts`) returning 200 OK and valid Telugu records.
+  - Verified all database tables (847 pastors, 509 churches, 17,244 panchayats) intact and accessible.
+
+

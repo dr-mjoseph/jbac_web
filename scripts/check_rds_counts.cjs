@@ -3,7 +3,7 @@ const path = require('path');
 const mysql = require(path.resolve(__dirname, '../backend/node_modules/mysql2/promise'));
 
 async function main() {
-  const host = process.env.DB_HOST || 'jbac-mysql-db.cdeeuw0s2trf.ap-southeast-2.rds.amazonaws.com';
+  const host = process.env.DB_HOST || 'jbac-mysql-db-v2.cdeeuw0s2trf.ap-southeast-2.rds.amazonaws.com';
   const user = process.env.DB_USER || 'admin';
   const password = process.env.DB_PASSWORD || 'biUt2TrZ9EZAqn6GXhiA';
   const dbName = process.env.DB_NAME || 'jbac_jbac';
