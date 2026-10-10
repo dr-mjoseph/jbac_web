@@ -561,3 +561,45 @@ Following the findings documented in the Full-Stack Automated Testing & Comprehe
   - Verified all database tables (847 pastors, 509 churches, 17,244 panchayats) intact and accessible.
 
 
+---
+
+## 18. Mobile Release v0.0.24 Official Production Signing & Public Download Pipeline (October 9, 2026)
+
+### Context & Root Cause Analysis
+The user reported that the previous `.apk` file was not working/updating on devices and requested an updated, downloadable file.
+1. **Debug Certificate Signature Conflict**:
+   - The previous build had fallen back to `assembleDebug` due to a D8 `StackOverflowError` in the Gradle daemon during dexing.
+   - The generated binary was signed with `CN=Android Debug` rather than the official production `Jbac.keystore`.
+   - When users tried installing or updating over an existing release app, Android OS blocked it with *"Package conflicts with an existing package / Signature mismatch"*.
+2. **Identical Version Code (23)**:
+   - Android requires a strictly incremented `versionCode` for in-place updates.
+3. **Absence of Direct Download Link**:
+   - Artifacts were only present on the local PC disk and inside GitHub Actions zip bundles.
+
+### Remediation & Execution
+1. **Version Increment to v0.0.24 (versionCode 24)**:
+   - Synchronized `config.xml` (`android-versionCode="24"`, `version="0.0.24"`).
+   - Synchronized `platforms/android/app/src/main/AndroidManifest.xml` (`versionCode="24"`, `versionName="0.0.24"`).
+2. **Gradle Dexing Memory Optimization**:
+   - Updated `platforms/android/gradle.properties` with `org.gradle.jvmargs=-Xmx3072m -Xss8m` to prevent stack overflows during dex transforms.
+3. **Clean Android Compilation & Asset Integrity**:
+   - Compiled full build with all latest mobile additions:
+     - New Marriage & Family Counseling side drawer and home banner / grid card.
+     - Doctor / Counselor Registration page.
+     - Mojibake-free Telugu UTF-8 strings.
+     - Chunks `0.js`, `main.js`, `49.js`, and `50.js`.
+4. **Official Production Keystore Signing (`Jbac.keystore`)**:
+   - Stripped debug signature headers from the APK archive.
+   - 4-byte aligned using `zipalign`.
+   - Signed using `apksigner` with `Jbac.keystore` (Alias: `jbac`, SHA-256 Digest: `E2:60:50:EC:00:02:24:DC:89:E4:4B:25:6F:66:2D:40:75:AF:04:22:21:CA:F2:83:E3:26:85:52:4F:FD:72:9D`).
+   - Verified v1 (JAR), v2 (APK Signature Scheme v2), and v3 schemes all active.
+5. **Direct Download S3 Deployment & Local Staging**:
+   - Uploaded to public AWS S3 bucket `jbac-web-production-298363284024`:
+     - **Versioned URL**: `https://jbac-web-production-298363284024.s3.ap-southeast-2.amazonaws.com/jbacApp-0.0.24.apk`
+     - **Permanent Latest URL**: `https://jbac-web-production-298363284024.s3.ap-southeast-2.amazonaws.com/jbacApp.apk`
+   - Verified HTTP 200 responses on both public HTTPS endpoints.
+   - Staged locally at:
+     - `C:\Users\rajes\Downloads\jbacApp-0.0.24.apk`
+     - `C:\Users\rajes\StudioProjects\jbac_app\jbacApp-0.0.24.apk`
+     - `c:\Users\rajes\Documents\jbac_web\dist\churchwebsite\jbacApp-0.0.24.apk`
+     - `c:\Users\rajes\Documents\jbac_web\dist\churchwebsite\jbacApp.apk`
