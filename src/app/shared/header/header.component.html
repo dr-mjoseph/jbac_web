@@ -591,7 +591,7 @@
          </nav>
         -->
         <nav class="menu_main_nav_area">
-            <ul id="menu_main_mobile" class="menu_main_nav" style="text-align: left; font-weight: lighter ;font-size:large;font-family: Ramabhadra,sans-serif!important; background-color: #1DC6DF; color: white;">
+            <ul id="menu_main_mobile" class="menu_main_nav" style="text-align: left; font-size: 15px; font-family: 'Ramabhadra', sans-serif !important; background-color: #00548F; color: white; padding: 10px 0;">
                 <!-- <ul id="menu_main" class="menu_main_nav" style="color: #1bbad2;"> -->
                 
                 <!--home menu shifted -->
@@ -760,56 +760,38 @@
 
                     </ul>
                 </li>
-                <li class="menu-item menu-item-has-children" *ngIf="login">
-                    <a (click)="alert()">సేవలు</a>
-                </li>
-                <li class="menu-item menu-item-has-children" *ngIf="notlogin">
-                    <a routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">సేవలు</a>
+                <li class="menu-item menu-item-has-children">
+                    <a routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">సేవలు (Services)</a>
                     <ul class="sub-menu">
-                        <li class="menu-item" *ngIf="notlogin">
+                        <li class="menu-item">
+                            <a routerLink="/marriages" routerLinkActive="active"
+                                [routerLinkActiveOptions]="{exact: true}">💍 వివాహాలు (Marriage Alliances)</a>
+                        </li>
+                        <li class="menu-item">
+                            <a routerLink="/family-councelling" routerLinkActive="active"
+                                [routerLinkActiveOptions]="{exact: true}">❤️ ఫ్యామిలీ కౌన్సిలింగ్ (Marriage & Family Counselling)</a>
+                        </li>
+                        <li class="menu-item">
                             <a routerLink="/institute" routerLinkActive="active"
                                 [routerLinkActiveOptions]="{exact: true}">క్రైస్తవ సంస్థలు</a>
                         </li>
-                          <!-- <li class="menu-item" *ngIf="notlogin">
-                            <a routerLink="/gallery" routerLinkActive="active"
-                                [routerLinkActiveOptions]="{exact: true}">Photo Gallery</a>
-                        </li>   -->
-                        <li class="menu-item" *ngIf="notlogin">
-                            <a routerLink="/marriages" routerLinkActive="active"
-                                [routerLinkActiveOptions]="{exact: true}">వివాహాలు </a>
-                        </li>
-                        <li class="menu-item" *ngIf="notlogin">
-                            <a routerLink="/family-councelling" routerLinkActive="active"
-                                [routerLinkActiveOptions]="{exact: true}">ఫ్యామిలీ కౌన్సిలింగ్ (Family Counselling)</a>
-                        </li>
-                        <li class="menu-item" *ngIf="notlogin">
+                        <li class="menu-item">
                             <a routerLink="/jobs" routerLinkActive="active"
                                 [routerLinkActiveOptions]="{exact: true}">ఉద్యోగాలు</a>
                         </li>
-                        <li class="menu-item" *ngIf="notlogin">
+                        <li class="menu-item">
                             <a routerLink="/help" routerLinkActive="active"
                                 [routerLinkActiveOptions]="{exact: true}">సహాయం కొరకు</a>
                         </li>
-                       
-                        <li class="menu-item" *ngIf="notlogin">
+                        <li class="menu-item">
                             <a routerLink="/business" routerLinkActive="active"
-                                [routerLinkActiveOptions]="{exact: true}"> Search Bussiness / House Rent
-                                Information</a>
+                                [routerLinkActiveOptions]="{exact: true}"> Search Bussiness / House Rent</a>
                         </li>
-                        
-                        <!-- <li class="menu-item" *ngIf="notlogin">
-                            <a routerLink="/videospage" routerLinkActive="active"
-                                [routerLinkActiveOptions]="{exact: true}">Video Gallery </a>
-                        </li> -->
-                        <!-- <li class="menu-item" *ngIf="notlogin">
-                            <a routerLink="/attack" routerLinkActive="active"
-                                [routerLinkActiveOptions]="{exact: true}">Attacks on AP Christians</a>
-                        </li>  -->
-                        <li class="menu-item" *ngIf="notlogin">
+                        <li class="menu-item">
                             <a routerLink="/wings" routerLinkActive="active"
                                 [routerLinkActiveOptions]="{exact: true}">JBAC Wings Information </a>
                         </li>
-                        <li class="menu-item" *ngIf="notlogin">
+                        <li class="menu-item">
                             <a routerLink="/organization" routerLinkActive="active"
                                 [routerLinkActiveOptions]="{exact: true}">Search Organisations </a>
                         </li>

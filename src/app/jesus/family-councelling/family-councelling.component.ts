@@ -85,6 +85,8 @@ export class FamilyCouncellingComponent implements OnInit {
   selectedAppointmentForVoiceReply: any = null;
   isSendingDoctorVoice: boolean = false;
 
+  isLoggedIn: boolean = false;
+
   constructor(
     private fb: FormBuilder,
     private service: ServiceService,
@@ -94,26 +96,22 @@ export class FamilyCouncellingComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    // 1. Enforce Login Requirement
+    // 1. Check Login Status (allows guest browsing, prompts on action)
     const authInd = sessionStorage.getItem('auth_ind');
     const storedUsrId = sessionStorage.getItem('usr_id');
-    if (!authInd && !storedUsrId) {
-      Swal.fire({
-        icon: 'warning',
-        title: 'లాగిన్ అవసరం (Login Required)',
-        text: 'ఫ్యామిలీ కౌన్సిలింగ్ సేవలు ఉపయోగించుటకు దయచేసి ముందుగా లాగిన్ అవ్వండి.',
-        confirmButtonColor: '#00548F',
-        confirmButtonText: 'లాగిన్ పేజీకి వెళ్లండి (Go to Login)'
-      }).then(() => {
-        this.router.navigate(['/login']);
-      });
-      return;
+    if (authInd || storedUsrId) {
+      this.isLoggedIn = true;
+      this.usr_id = storedUsrId;
+      this.userName = sessionStorage.getItem('name') || 'Family User';
+      this.userMobile = sessionStorage.getItem('mobile_number') || '';
+      this.userCategory = sessionStorage.getItem('category') || '';
+    } else {
+      this.isLoggedIn = false;
+      this.usr_id = 'guest_' + Math.floor(100000 + Math.random() * 900000);
+      this.userName = 'Guest Visitor';
+      this.userMobile = '';
+      this.userCategory = '';
     }
-
-    this.usr_id = storedUsrId;
-    this.userName = sessionStorage.getItem('name') || 'Family User';
-    this.userMobile = sessionStorage.getItem('mobile_number') || '';
-    this.userCategory = sessionStorage.getItem('category') || '';
 
     // Determine Admin permissions
     const categoryId = sessionStorage.getItem('category_id');
