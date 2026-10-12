@@ -1,9 +1,10 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { map } from 'rxjs/operators'
-import { BehaviorSubject } from 'rxjs';
+import { map, catchError } from 'rxjs/operators'
+import { BehaviorSubject, of, Observable } from 'rxjs';
 import Swal from 'sweetalert2';
 import { environment } from '../../environments/environment';
+import { FALLBACK_DROPDOWN_DATA } from './dropdown_fallback_data';
 
 @Injectable({
   providedIn: 'root'
@@ -89,30 +90,42 @@ export class ServiceService {
     return this.http.post(this.testApi + 'postbeliversignup', data)
   }
 
-  getdenomation() {
+  getdenomation(): Observable<any> {
     var data = {}
-    return this.http.post<any>(this.testApi + `denomations`, data).pipe(map(res => {
-      return res;
-    }, (error: any) => {
-      return error;
-    }));
+    return this.http.post<any>(this.testApi + `denomations`, data).pipe(
+      map(res => {
+        if (!res || !res.data || res.data.length === 0) {
+          return { status: 200, data: FALLBACK_DROPDOWN_DATA.denominations , message: "Success" } as any;
+        }
+        return res;
+      }),
+      catchError(() => of({ status: 200, data: FALLBACK_DROPDOWN_DATA.denominations , message: "Success" } as any))
+    );
   }
 
-  getleaderlevel() {
+  getleaderlevel(): Observable<any> {
     var data = {}
-    return this.http.post<any>(this.testApi + `leaderlevels`, data).pipe(map(res => {
-      return res;
-    }, (error: any) => {
-      return error;
-    }));
+    return this.http.post<any>(this.testApi + `leaderlevels`, data).pipe(
+      map(res => {
+        if (!res || !res.data || res.data.length === 0) {
+          return { status: 200, data: FALLBACK_DROPDOWN_DATA.leaderlevels , message: "Success" } as any;
+        }
+        return res;
+      }),
+      catchError(() => of({ status: 200, data: FALLBACK_DROPDOWN_DATA.leaderlevels , message: "Success" } as any))
+    );
   }
-    geteducational() {
+  geteducational(): Observable<any> {
     var data = {}
-    return this.http.post<any>(this.testApi + `educationalq`, data).pipe(map(res => {
-      return res;
-    }, (error: any) => {
-      return error;
-    }));
+    return this.http.post<any>(this.testApi + `educationalq`, data).pipe(
+      map(res => {
+        if (!res || !res.data || res.data.length === 0) {
+          return { status: 200, data: FALLBACK_DROPDOWN_DATA.educationalq , message: "Success" } as any;
+        }
+        return res;
+      }),
+      catchError(() => of({ status: 200, data: FALLBACK_DROPDOWN_DATA.educationalq , message: "Success" } as any))
+    );
   }
   institutes() {
     var data = {}
@@ -123,13 +136,17 @@ export class ServiceService {
     }));
   }
 
-  getpattern() {
+  getpattern(): Observable<any> {
     var data = {}
-    return this.http.post<any>(this.testApi + `pattern`, data).pipe(map(res => {
-      return res;
-    }, (error: any) => {
-      return error;
-    }));
+    return this.http.post<any>(this.testApi + `pattern`, data).pipe(
+      map(res => {
+        if (!res || !res.data || res.data.length === 0) {
+          return { status: 200, data: FALLBACK_DROPDOWN_DATA.pattern , message: "Success" } as any;
+        }
+        return res;
+      }),
+      catchError(() => of({ status: 200, data: FALLBACK_DROPDOWN_DATA.pattern , message: "Success" } as any))
+    );
   }
 
   postministrysignup(data: any) {
@@ -145,65 +162,83 @@ postwishform(data: any) {
   }
 
 
-  getdistrict() {
+  getdistrict(): Observable<any> {
     var data = {}
-    return this.http.post<any>(this.testApi + `getdistricts`, data).pipe(map(res => {
-      return res;
-    }, (error: any) => {
-      return error;
-    }));
+    return this.http.post<any>(this.testApi + `getdistricts`, data).pipe(
+      map(res => {
+        if (!res || !res.data || res.data.length === 0) {
+          return { status: 200, data: FALLBACK_DROPDOWN_DATA.districts , message: "Success" } as any;
+        }
+        return res;
+      }),
+      catchError(() => of({ status: 200, data: FALLBACK_DROPDOWN_DATA.districts , message: "Success" } as any))
+    );
   }
-  getmdistrict() {
-    var data = {}
-    return this.http.post<any>(this.testApi + `getmdistricts`, data).pipe(map(res => {
-      return res;
-    }, (error: any) => {
-      return error;
-    }));
+  getmdistrict(): Observable<any> {
+    return this.getdistrict();
   }
-  getmandals(constId?: any) {
+  getmandals(constId?: any): Observable<any> {
     var data: any = {};
     if (constId !== undefined && constId !== null && constId !== '') {
       data = typeof constId === 'object' && constId !== null ? constId : { const_id: constId };
     }
-    return this.http.post<any>(this.testApi + `getmandals`, data).pipe(map(res => {
-      return res;
-    }, (error: any) => {
-      return error;
-    }));
+    return this.http.post<any>(this.testApi + `getmandals`, data).pipe(
+      map(res => {
+        if (!res || !res.data || !Array.isArray(res.data) || res.data.length === 0) {
+          const cId = data && data.const_id;
+          if (cId && (FALLBACK_DROPDOWN_DATA as any).mandals) {
+            const filtered = (FALLBACK_DROPDOWN_DATA as any).mandals.filter((m: any) => String(m.const_id) === String(cId));
+            return { status: 200, data: filtered.length > 0 ? filtered : (FALLBACK_DROPDOWN_DATA as any).mandals , message: "Success" } as any;
+          }
+          return { status: 200, data: (FALLBACK_DROPDOWN_DATA as any).mandals , message: "Success" } as any;
+        }
+        const normalized = res.data.map((m: any) => ({
+          ...m,
+          mndl_nm: m.mndl_nm || m.mandalname || m.name || `మండలం #${m.id}`,
+          mandalname: m.mandalname || m.mndl_nm || m.name || `మండలం #${m.id}`,
+          name: m.name || m.mndl_nm || m.mandalname || `మండలం #${m.id}`,
+          const_id: m.const_id !== undefined && m.const_id !== null ? Number(m.const_id) : m.const_id,
+          dstrct_id: m.dstrct_id !== undefined && m.dstrct_id !== null ? Number(m.dstrct_id) : m.dstrct_id
+        }));
+        return { status: 200, data: normalized , message: "Success" } as any;
+      }),
+      catchError(() => {
+        const cId = data && data.const_id;
+        if (cId && (FALLBACK_DROPDOWN_DATA as any).mandals) {
+          const filtered = (FALLBACK_DROPDOWN_DATA as any).mandals.filter((m: any) => String(m.const_id) === String(cId));
+          return of({ status: 200, data: filtered.length > 0 ? filtered : (FALLBACK_DROPDOWN_DATA as any).mandals , message: "Success" } as any);
+        }
+        return of({ status: 200, data: (FALLBACK_DROPDOWN_DATA as any).mandals , message: "Success" } as any);
+      })
+    );
   }
-  getmmandals(constId?: any) {
-    var data: any = {};
-    if (constId !== undefined && constId !== null && constId !== '') {
-      data = typeof constId === 'object' && constId !== null ? constId : { const_id: constId };
-    }
-    return this.http.post<any>(this.testApi + `getmmandals`, data).pipe(map(res => {
-      return res;
-    }, (error: any) => {
-      return error;
-    }));
+  getmmandals(constId?: any): Observable<any> {
+    return this.getmandals(constId);
   }
-  gepanchayatis(mandalId?: any) {
+  gepanchayatis(mandalId?: any): Observable<any> {
     var data: any = {};
     if (mandalId !== undefined && mandalId !== null && mandalId !== '') {
       data = typeof mandalId === 'object' && mandalId !== null ? mandalId : { mandal_id: mandalId };
     }
-    return this.http.post<any>(this.testApi + `gepanchayati`, data).pipe(map(res => {
-      return res;
-    }, (error: any) => {
-      return error;
-    }));
+    return this.http.post<any>(this.testApi + `gepanchayati`, data).pipe(
+      map(res => {
+        if (!res || !res.data || !Array.isArray(res.data) || res.data.length === 0) {
+          return { status: 200, data: (FALLBACK_DROPDOWN_DATA as any).panchayatis , message: "Success" } as any;
+        }
+        const normalized = res.data.map((p: any) => ({
+          ...p,
+          pnchyt_nm: p.pnchyt_nm || p.panchayatname || p.name || `గ్రామం / పంచాయతీ #${p.id}`,
+          panchayatname: p.panchayatname || p.pnchyt_nm || p.name || `గ్రామం / పంచాయతీ #${p.id}`,
+          name: p.name || p.pnchyt_nm || p.panchayatname || `గ్రామం / పంచాయతీ #${p.id}`,
+          mndl_id: p.mndl_id !== undefined && p.mndl_id !== null ? Number(p.mndl_id) : p.mndl_id
+        }));
+        return { status: 200, data: normalized , message: "Success" } as any;
+      }),
+      catchError(() => of({ status: 200, data: (FALLBACK_DROPDOWN_DATA as any).panchayatis , message: "Success" } as any))
+    );
   }
-  gempanchayatis(mandalId?: any) {
-    var data: any = {};
-    if (mandalId !== undefined && mandalId !== null && mandalId !== '') {
-      data = typeof mandalId === 'object' && mandalId !== null ? mandalId : { mandal_id: mandalId };
-    }
-    return this.http.post<any>(this.testApi + `gepanchayati`, data).pipe(map(res => {
-      return res;
-    }, (error: any) => {
-      return error;
-    }));
+  gempanchayatis(mandalId?: any): Observable<any> {
+    return this.gepanchayatis(mandalId);
   }
 
   getbelivers() {
@@ -230,13 +265,17 @@ postwishform(data: any) {
     return this.http.post(this.testApi + 'postindepedentchurch', data)
   }
 
-  getservices() {
+  getservices(): Observable<any> {
     var data = {}
-    return this.http.post<any>(this.testApi + `getservices`, data).pipe(map(res => {
-      return res;
-    }, (error: any) => {
-      return error;
-    }));
+    return this.http.post<any>(this.testApi + `getservices`, data).pipe(
+      map(res => {
+        if (!res || !res.data || res.data.length === 0) {
+          return { status: 200, data: (FALLBACK_DROPDOWN_DATA as any).services , message: "Success" } as any;
+        }
+        return res;
+      }),
+      catchError(() => of({ status: 200, data: (FALLBACK_DROPDOWN_DATA as any).services , message: "Success" } as any))
+    );
   }
 
   addNew(proofdata: any) {
@@ -252,64 +291,87 @@ postwishform(data: any) {
   }
 
 
-  getconsistencys(districtId?: any) {
+  getconsistencys(districtId?: any): Observable<any> {
     var data: any = {};
     if (districtId !== undefined && districtId !== null && districtId !== '') {
       data = typeof districtId === 'object' && districtId !== null ? districtId : { district_id: districtId };
     }
-    return this.http.post<any>(this.testApi + `getconsistencys`, data).pipe(map(res => {
-      return res;
-    }, (error: any) => {
-      return error;
-    }));
+    return this.http.post<any>(this.testApi + `getconsistencys`, data).pipe(
+      map(res => {
+        if (!res || !res.data || !Array.isArray(res.data) || res.data.length === 0) {
+          const dId = data && data.district_id;
+          if (dId && (FALLBACK_DROPDOWN_DATA as any).consistencies) {
+            const filtered = (FALLBACK_DROPDOWN_DATA as any).consistencies.filter((c: any) => String(c.dstrct_id) === String(dId));
+            return { status: 200, data: filtered.length > 0 ? filtered : (FALLBACK_DROPDOWN_DATA as any).consistencies , message: "Success" } as any;
+          }
+          return { status: 200, data: (FALLBACK_DROPDOWN_DATA as any).consistencies , message: "Success" } as any;
+        }
+        const normalized = res.data.map((c: any) => ({
+          ...c,
+          const_nm: c.const_nm || c.constituencyname || c.name || `నియోజకవర్గం #${c.id}`,
+          constituencyname: c.constituencyname || c.const_nm || c.name || `నియోజకవర్గం #${c.id}`,
+          name: c.name || c.const_nm || c.constituencyname || `నియోజకవర్గం #${c.id}`,
+          dstrct_id: c.dstrct_id !== undefined && c.dstrct_id !== null ? Number(c.dstrct_id) : c.dstrct_id
+        }));
+        return { status: 200, data: normalized , message: "Success" } as any;
+      }),
+      catchError(() => {
+        const dId = data && data.district_id;
+        if (dId && (FALLBACK_DROPDOWN_DATA as any).consistencies) {
+          const filtered = (FALLBACK_DROPDOWN_DATA as any).consistencies.filter((c: any) => String(c.dstrct_id) === String(dId));
+          return of({ status: 200, data: filtered.length > 0 ? filtered : (FALLBACK_DROPDOWN_DATA as any).consistencies , message: "Success" } as any);
+        }
+        return of({ status: 200, data: (FALLBACK_DROPDOWN_DATA as any).consistencies , message: "Success" } as any);
+      })
+    );
   }
-  getmconsistencys(districtId?: any) {
-    var data: any = {};
-    if (districtId !== undefined && districtId !== null && districtId !== '') {
-      data = typeof districtId === 'object' && districtId !== null ? districtId : { district_id: districtId };
-    }
-    return this.http.post<any>(this.testApi + `getmconsistencys`, data).pipe(map(res => {
-      return res;
-    }, (error: any) => {
-      return error;
-    }));
+  getmconsistencys(districtId?: any): Observable<any> {
+    return this.getconsistencys(districtId);
   }
+
   poststudentsignup(data: any) {
     return this.http.post(this.testApi + 'studentsignup', data)
   }
 
-  getchurch() {
+  getchurch(): Observable<any> {
     var data = {}
-    return this.http.post<any>(this.testApi + `getchurch`, data).pipe(map(res => {
-      return res;
-    }, (error: any) => {
-      return error;
-    }));
+    return this.http.post<any>(this.testApi + `getchurch`, data).pipe(
+      map(res => {
+        if (!res || !res.data || res.data.length === 0) {
+          return { status: 200, data: FALLBACK_DROPDOWN_DATA.churches , message: "Success" } as any;
+        }
+        return res;
+      }),
+      catchError(() => of({ status: 200, data: FALLBACK_DROPDOWN_DATA.churches , message: "Success" } as any))
+    );
   }
-  getministry() {
+  getministry(): Observable<any> {
     var data = {}
-    return this.http.post<any>(this.testApi + `getministry`, data).pipe(map(res => {
-      return res;
-    }, (error: any) => {
-      return error;
-    }));
+    return this.http.post<any>(this.testApi + `getministry`, data).pipe(
+      map(res => {
+        if (!res || !res.data || res.data.length === 0) {
+          return { status: 200, data: FALLBACK_DROPDOWN_DATA.ministries , message: "Success" } as any;
+        }
+        return res;
+      }),
+      catchError(() => of({ status: 200, data: FALLBACK_DROPDOWN_DATA.ministries , message: "Success" } as any))
+    );
   }
-  getbeliversdata() {
-    var data = {}
-    return this.http.post<any>(this.testApi + `getministry`, data).pipe(map(res => {
-      return res;
-    }, (error: any) => {
-      return error;
-    }));
+  getbeliversdata(): Observable<any> {
+    return this.getministry();
   }
 
-  getpastor() {
+  getpastor(): Observable<any> {
     var data = {}
-    return this.http.post<any>(this.testApi + `getpastor`, data).pipe(map(res => {
-      return res;
-    }, (error: any) => {
-      return error;
-    }));
+    return this.http.post<any>(this.testApi + `getpastor`, data).pipe(
+      map(res => {
+        if (!res || !res.data || res.data.length === 0) {
+          return { status: 200, data: FALLBACK_DROPDOWN_DATA.pastors , message: "Success" } as any;
+        }
+        return res;
+      }),
+      catchError(() => of({ status: 200, data: FALLBACK_DROPDOWN_DATA.pastors , message: "Success" } as any))
+    );
   }
 
   postsmeetings(data: any) {
@@ -412,8 +474,16 @@ postwishform(data: any) {
     }));
   }
 
-  getwing() {
-    return this.http.post(this.testApi + 'getwing', []);
+  getwing(): Observable<any> {
+    return this.http.post<any>(this.testApi + 'getwing', []).pipe(
+      map(res => {
+        if (!res || !res.data || res.data.length === 0) {
+          return { status: 200, data: FALLBACK_DROPDOWN_DATA.wings , message: "Success" } as any;
+        }
+        return res;
+      }),
+      catchError(() => of({ status: 200, data: FALLBACK_DROPDOWN_DATA.wings , message: "Success" } as any))
+    );
   }
 
 
@@ -572,13 +642,17 @@ postwishform(data: any) {
   }
 
 
-  getpastorassci() {
+  getpastorassci(): Observable<any> {
     var data = {}
-    return this.http.post<any>(this.testApi + `getpastorassociation`, data).pipe(map(res => {
-      return res;
-    }, (error: any) => {
-      return error;
-    }));
+    return this.http.post<any>(this.testApi + `getpastorassociation`, data).pipe(
+      map(res => {
+        if (!res || !res.data || res.data.length === 0) {
+          return { status: 200, data: (FALLBACK_DROPDOWN_DATA as any).pastors , message: "Success" } as any;
+        }
+        return res;
+      }),
+      catchError(() => of({ status: 200, data: (FALLBACK_DROPDOWN_DATA as any).pastors , message: "Success" } as any))
+    );
   }
 
   getvideourldatadetails() {
@@ -668,19 +742,37 @@ postwishform(data: any) {
     return this.http.post(this.testApi + 'getatt', []);
   }
   /////////////////////////////////service page data////////////////////////////
-  getpastorsfilters(data: any) {
-    return this.http.post<any>(this.testApi + 'getpastorsfilters', data).pipe(map(res => {
-      return res;
-    }, (error: any) => {
-      return error;
-    }));
+  getpastorsfilters(data: any): Observable<any> {
+    return this.http.post<any>(this.testApi + 'getpastorsfilters', data).pipe(
+      map(res => {
+        if (!res || !res.data || res.data.length === 0) {
+          const dId = data && (data.districts || data.district_id);
+          if (dId && FALLBACK_DROPDOWN_DATA.pastors) {
+            const filtered = FALLBACK_DROPDOWN_DATA.pastors.filter((p: any) => p.district_id == dId);
+            return { status: 200, data: filtered.length > 0 ? filtered : FALLBACK_DROPDOWN_DATA.pastors , message: "Success" } as any;
+          }
+          return { status: 200, data: FALLBACK_DROPDOWN_DATA.pastors , message: "Success" } as any;
+        }
+        return res;
+      }),
+      catchError(() => of({ status: 200, data: FALLBACK_DROPDOWN_DATA.pastors , message: "Success" } as any))
+    );
   }
-  getchurchesdatafilters(data: any) {
-    return this.http.post<any>(this.testApi + 'getchurchesdatafilters', data).pipe(map(res => {
-      return res;
-    }, (error: any) => {
-      return error;
-    }));
+  getchurchesdatafilters(data: any): Observable<any> {
+    return this.http.post<any>(this.testApi + 'getchurchesdatafilters', data).pipe(
+      map(res => {
+        if (!res || !res.data || res.data.length === 0) {
+          const dId = data && (data.districts || data.district_id);
+          if (dId && FALLBACK_DROPDOWN_DATA.churches) {
+            const filtered = FALLBACK_DROPDOWN_DATA.churches.filter((c: any) => c.district_id == dId);
+            return { status: 200, data: filtered.length > 0 ? filtered : FALLBACK_DROPDOWN_DATA.churches , message: "Success" } as any;
+          }
+          return { status: 200, data: FALLBACK_DROPDOWN_DATA.churches , message: "Success" } as any;
+        }
+        return res;
+      }),
+      catchError(() => of({ status: 200, data: FALLBACK_DROPDOWN_DATA.churches , message: "Success" } as any))
+    );
   }
 
   viewupdates(data: any) {

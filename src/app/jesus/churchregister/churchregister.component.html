@@ -296,7 +296,7 @@
                                                         <option value="" selected disabled>Select the pastor
                                                         </option>
                                                         <option *ngFor="let i of getchurchpastors" value="{{i.id}}">
-                                                            {{i.pastorname }}</option>
+                                                            {{i.pastorname || i.name}}</option>
                                                     </select>
                                                     <div *ngIf="submitted && k['pastor_id'].errors"
                                                         class="invalid-feedback">

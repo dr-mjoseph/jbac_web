@@ -103,7 +103,9 @@ export class StudentregisterComponent {
   ngOnInit(): void {
     this.getdenomations();
     this.getdistric();
-    this.getwing()
+    this.getwing();
+    this.getpastor();
+    this.getchurch();
     const datePipe = new DatePipe('en-US');
     this.now = datePipe.transform(new Date(), 'yyyy-MM-dd');
 
@@ -522,40 +524,66 @@ export class StudentregisterComponent {
       }
     );
   }
-  getchurchstudentfilter: any;
-  getchurchesstudentdata() {
-    if (this.studentform.value.resdistricts == null || this.studentform.value.resconstituencyname == null || this.studentform.value.resmandals == null) {
-      alert("Please Fill the Districts, Constituency & Mandal")
-    } else {
-      var data = {
-        districts: this.studentform.value.resdistricts,
-        constituencyname: this.studentform.value.resconstituencyname,
-        mandal_id: this.studentform.value.resmandals,
+  getpastor() {
+    this.service.getpastor().subscribe((res: any) => {
+      if (res && res.data) {
+        this.pastor = res.data;
+        if (!this.getstudentspastors || this.getstudentspastors.length === 0) {
+          this.getstudentspastors = res.data;
+        }
       }
-      console.log(data);
+    });
+  }
+
+  getchurchstudentfilter: any = [];
+  getchurchesstudentdata() {
+    const dist = this.studentform.value.resdistricts;
+    const constId = this.studentform.value.resconstituencyname;
+    const mandalId = this.studentform.value.resmandals;
+    if (dist && constId) {
+      var data = {
+        districts: dist,
+        constituencyname: constId,
+        mandal_id: mandalId || '',
+      };
       this.service.getchurchesdatafilters(data).subscribe((res: any) => {
-        this.getchurchstudentfilter = res.data;
-      })
+        if (res && res.data && res.data.length > 0) {
+          this.getchurchstudentfilter = res.data;
+        } else if (this.church && this.church.length > 0) {
+          this.getchurchstudentfilter = this.church;
+        }
+      });
+    } else if (this.church && this.church.length > 0) {
+      this.getchurchstudentfilter = this.church;
+    } else {
+      this.getchurch();
     }
   }
-  getstudentspastors: any;
-  // getpastorssdata() {
-  //   if (this.studentform.value.resdistricts == null || this.studentform.value.resconstituencyname == null || this.studentform.value.resmandals == null) {
-  //     alert("Please Fill the Districts, Constituency & Mandal")
-  //   } else {
-  //     var data = {
-  //       districts: this.studentform.value.resdistricts,
-  //       constituencyname: this.studentform.value.resconstituencyname,
-  //       mandal_id: this.studentform.value.resmandals,
 
-  //     }
-  //     console.log(data);
-
-  //     this.service.getpastorsfilters(data).subscribe((res: any) => {
-  //       this.getstudentspastors = res.data;
-  //     })
-  //   }
-  // }
+  getstudentspastors: any = [];
+  getpastorssdata() {
+    const dist = this.studentform.value.resdistricts;
+    const constId = this.studentform.value.resconstituencyname;
+    const mandalId = this.studentform.value.resmandals;
+    if (dist && constId) {
+      var data = {
+        districts: dist,
+        constituencyname: constId,
+        mandal_id: mandalId || '',
+      };
+      this.service.getpastorsfilters(data).subscribe((res: any) => {
+        if (res && res.data && res.data.length > 0) {
+          this.getstudentspastors = res.data;
+        } else if (this.pastor && this.pastor.length > 0) {
+          this.getstudentspastors = this.pastor;
+        }
+      });
+    } else if (this.pastor && this.pastor.length > 0) {
+      this.getstudentspastors = this.pastor;
+    } else {
+      this.getpastor();
+    }
+  }
 
 
 
@@ -678,8 +706,8 @@ export class StudentregisterComponent {
   }
 
 
-  church: any;
-  pastor: any;
+  church: any = [];
+  pastor: any = [];
 
   getchurch() {
     this.service.getchurch().subscribe(res => {
@@ -687,6 +715,9 @@ export class StudentregisterComponent {
         Swal.fire(res.message);
       } else if (res.status == 200) {
         this.church = res.data;
+        if (!this.getchurchstudentfilter || this.getchurchstudentfilter.length === 0) {
+          this.getchurchstudentfilter = res.data;
+        }
       }
     }, error => {
 

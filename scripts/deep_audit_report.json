@@ -1,0 +1,142 @@
+[
+  {
+    "component": "addbusiness",
+    "ctrl": "ministry_id",
+    "arrayVar": "ministryname",
+    "issue": "MINISTRY_POPULATED_FROM_BELIEVERS",
+    "details": "this.ministryname is populated by getbeliversdata() instead of getministry()! Believer objects do not have ministryname."
+  },
+  {
+    "component": "addinstitute",
+    "ctrl": "ministry_id",
+    "arrayVar": "ministryname",
+    "issue": "MINISTRY_POPULATED_FROM_BELIEVERS",
+    "details": "this.ministryname is populated by getbeliversdata() instead of getministry()! Believer objects do not have ministryname."
+  },
+  {
+    "component": "addmarriages",
+    "ctrl": "ministry_id",
+    "arrayVar": "ministryname",
+    "issue": "MINISTRY_POPULATED_FROM_BELIEVERS",
+    "details": "this.ministryname is populated by getbeliversdata() instead of getministry()! Believer objects do not have ministryname."
+  },
+  {
+    "component": "addmeetings",
+    "ctrl": "ministry_id",
+    "arrayVar": "ministryname",
+    "issue": "MINISTRY_POPULATED_FROM_BELIEVERS",
+    "details": "this.ministryname is populated by getbeliversdata() instead of getministry()! Believer objects do not have ministryname."
+  },
+  {
+    "component": "business",
+    "ctrl": "ministry_id",
+    "arrayVar": "ministryname",
+    "issue": "MINISTRY_POPULATED_FROM_BELIEVERS",
+    "details": "this.ministryname is populated by getbeliversdata() instead of getministry()! Believer objects do not have ministryname."
+  },
+  {
+    "component": "church-timings",
+    "ctrl": "ministry_id",
+    "arrayVar": "ministryname",
+    "issue": "MINISTRY_POPULATED_FROM_BELIEVERS",
+    "details": "this.ministryname is populated by getbeliversdata() instead of getministry()! Believer objects do not have ministryname."
+  },
+  {
+    "component": "churchregister",
+    "ctrl": "ministry_id",
+    "arrayVar": "ministryname",
+    "issue": "MINISTRY_POPULATED_FROM_BELIEVERS",
+    "details": "this.ministryname is populated by getbeliversdata() instead of getministry()! Believer objects do not have ministryname."
+  },
+  {
+    "component": "events",
+    "ctrl": "ministry_id",
+    "arrayVar": "ministryname",
+    "issue": "MINISTRY_POPULATED_FROM_BELIEVERS",
+    "details": "this.ministryname is populated by getbeliversdata() instead of getministry()! Believer objects do not have ministryname."
+  },
+  {
+    "component": "institute",
+    "ctrl": "ministry_id",
+    "arrayVar": "ministryname",
+    "issue": "MINISTRY_POPULATED_FROM_BELIEVERS",
+    "details": "this.ministryname is populated by getbeliversdata() instead of getministry()! Believer objects do not have ministryname."
+  },
+  {
+    "component": "marriages",
+    "ctrl": "ministry_id",
+    "arrayVar": "ministryname",
+    "issue": "MINISTRY_POPULATED_FROM_BELIEVERS",
+    "details": "this.ministryname is populated by getbeliversdata() instead of getministry()! Believer objects do not have ministryname."
+  },
+  {
+    "component": "organisationregister",
+    "ctrl": "ministry_id",
+    "arrayVar": "ministryname",
+    "issue": "MINISTRY_POPULATED_FROM_BELIEVERS",
+    "details": "this.ministryname is populated by getbeliversdata() instead of getministry()! Believer objects do not have ministryname."
+  },
+  {
+    "component": "organization",
+    "ctrl": "ministry_id",
+    "arrayVar": "ministryname",
+    "issue": "MINISTRY_POPULATED_FROM_BELIEVERS",
+    "details": "this.ministryname is populated by getbeliversdata() instead of getministry()! Believer objects do not have ministryname."
+  },
+  {
+    "component": "profile",
+    "ctrl": "ministry_id",
+    "arrayVar": "ministryname",
+    "issue": "MINISTRY_POPULATED_FROM_BELIEVERS",
+    "details": "this.ministryname is populated by getbeliversdata() instead of getministry()! Believer objects do not have ministryname."
+  },
+  {
+    "component": "profile",
+    "ctrl": "ministry_id",
+    "arrayVar": "ministryname",
+    "issue": "MINISTRY_POPULATED_FROM_BELIEVERS",
+    "details": "this.ministryname is populated by getbeliversdata() instead of getministry()! Believer objects do not have ministryname."
+  },
+  {
+    "component": "profile",
+    "ctrl": "ministry_id",
+    "arrayVar": "ministryname",
+    "issue": "MINISTRY_POPULATED_FROM_BELIEVERS",
+    "details": "this.ministryname is populated by getbeliversdata() instead of getministry()! Believer objects do not have ministryname."
+  },
+  {
+    "component": "profile",
+    "ctrl": "ministry_id",
+    "arrayVar": "ministryname",
+    "issue": "MINISTRY_POPULATED_FROM_BELIEVERS",
+    "details": "this.ministryname is populated by getbeliversdata() instead of getministry()! Believer objects do not have ministryname."
+  },
+  {
+    "component": "signup",
+    "ctrl": "ministry_id",
+    "arrayVar": "ministryname",
+    "issue": "MINISTRY_POPULATED_FROM_BELIEVERS",
+    "details": "this.ministryname is populated by getbeliversdata() instead of getministry()! Believer objects do not have ministryname."
+  },
+  {
+    "component": "signup",
+    "ctrl": "ministry_id",
+    "arrayVar": "ministryname",
+    "issue": "MINISTRY_POPULATED_FROM_BELIEVERS",
+    "details": "this.ministryname is populated by getbeliversdata() instead of getministry()! Believer objects do not have ministryname."
+  },
+  {
+    "component": "update",
+    "ctrl": "ministry_id",
+    "arrayVar": "ministryname",
+    "issue": "MINISTRY_POPULATED_FROM_BELIEVERS",
+    "details": "this.ministryname is populated by getbeliversdata() instead of getministry()! Believer objects do not have ministryname."
+  },
+  {
+    "component": "update",
+    "ctrl": "ministry_id",
+    "arrayVar": "ministryname",
+    "issue": "MINISTRY_POPULATED_FROM_BELIEVERS",
+    "details": "this.ministryname is populated by getbeliversdata() instead of getministry()! Believer objects do not have ministryname."
+  }
+]

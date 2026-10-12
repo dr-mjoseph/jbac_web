@@ -306,7 +306,7 @@ export class ChurchregisterComponent {
     this.getbelivers();
     // this.getchurch();
     this.getbeliver();
-    // this.getpastor();
+    this.getpastor();
     this.getpastorassciation();
     this.getwing();
     this.getservice();
@@ -521,21 +521,28 @@ export class ChurchregisterComponent {
       })
     }
   }
-  getchurchpastors: any;
+  getchurchpastors: any = [];
   churchpastorfilter() {
-    if (this.churchregsiterform.value.district_id == null || this.churchregsiterform.value.constituency_id == null) {
-      alert("Please Fill the Districts, Constituency & Mandal")
-    } else {
+    const dist = this.churchregsiterform.value.district_id;
+    const constId = this.churchregsiterform.value.constituency_id;
+    const mandalId = this.churchregsiterform.value.mandal_id;
+    if (dist && constId) {
       var data = {
-        districts: this.churchregsiterform.value.district_id,
-        constituencyname: this.churchregsiterform.value.constituency_id,
-        mandal_id: this.churchregsiterform.value.mandal_id,
+        districts: dist,
+        constituencyname: constId,
+        mandal_id: mandalId || '',
       }
-      console.log(data);
-
       this.service.getpastorsfilters(data).subscribe((res: any) => {
-        this.getchurchpastors = res.data;
+        if (res && res.data && res.data.length > 0) {
+          this.getchurchpastors = res.data;
+        } else if (this.pastor && this.pastor.length > 0) {
+          this.getchurchpastors = this.pastor;
+        }
       })
+    } else if (this.pastor && this.pastor.length > 0) {
+      this.getchurchpastors = this.pastor;
+    } else {
+      this.getpastor();
     }
   }
   postbeliversignup() {
@@ -757,7 +764,20 @@ export class ChurchregisterComponent {
     this.showSpinner = false;
   }
   church: any;
-  pastor: any;
+  pastor: any = [];
+
+  getpastor() {
+    this.service.getpastor().subscribe((res: any) => {
+      if (res && res.data) {
+        this.pastor = res.data;
+        if (!this.getchurchpastors || this.getchurchpastors.length === 0) {
+          this.getchurchpastors = res.data;
+        }
+      }
+    }, error => {
+      console.error(error);
+    });
+  }
 
   getchurch() {
     this.service.getchurch().subscribe(res => {
@@ -772,11 +792,9 @@ export class ChurchregisterComponent {
   }
 
   getbeliver() {
-    this.service.getbeliversdata().subscribe(res => {
-      if (res.status == 202) {
-        Swal.fire(res.message);
-      } else if (res.status == 200) {
-        this.ministryname = res.data;
+    this.service.getministry().subscribe((res: any) => {
+      if (res && res.data) {
+        this.ministryname = (res.data || []).filter((m: any) => m && (m.ministryname || m.name) && (m.ministryname || m.name).trim() !== '').map((m: any) => ({ ...m, ministryname: (m.ministryname || m.name).trim() }));
       }
     }, error => {
 

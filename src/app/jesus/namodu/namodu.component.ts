@@ -376,23 +376,30 @@ export class NamoduComponent {
   }
   
  
-  //getministrypastors: any;
-  // ministrypastorsfilterdata() {
-  //   if (this.entryform.value.district_id == null || this.entryform.value.constituency_id == null || this.entryform.value.mandal_id == null) {
-  //     alert("Please Fill the Districts, Constituency & Mandal")
-  //   } else {
-  //     var data = {
-  //       districts: this.entryform.value.district_id,
-  //       constituencyname: this.entryform.value.constituency_id,
-  //       mandal_id: this.entryform.value.mandal_id,
-  //     }
-  //     console.log(data);
-
-  //     this.service.getpastorsfilters(data).subscribe((res: any) => {
-  //       this.getministrypastors = res.data;
-  //     })
-  //   }
-  // }
+  getministrypastors: any = [];
+  ministrypastorsfilterdata() {
+    const dist = this.entryform.value.district_id;
+    const constId = this.entryform.value.constituency_id;
+    const mandalId = this.entryform.value.mandal_id;
+    if (dist && constId) {
+      var data = {
+        districts: dist,
+        constituencyname: constId,
+        mandal_id: mandalId || '',
+      }
+      this.service.getpastorsfilters(data).subscribe((res: any) => {
+        if (res && res.data) {
+          this.getministrypastors = res.data;
+        }
+      })
+    } else {
+      this.service.getpastor().subscribe((res: any) => {
+        if (res && res.data) {
+          this.getministrypastors = res.data;
+        }
+      });
+    }
+  }
 
   // chat gpt code on 08-02-2025 start
   postregform() {

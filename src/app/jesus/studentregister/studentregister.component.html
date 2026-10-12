@@ -797,7 +797,7 @@
                                                         <option value="" selected disabled>Select Your Pastor</option>
                                                         <option value="{{item.id}}"
                                                             *ngFor="let item of getstudentspastors">
-                                                            {{item.pastorname}}
+                                                            {{item.pastorname || item.name}}
                                                         </option>
                                                     </select>
 

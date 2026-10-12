@@ -1,4 +1,308 @@
 {
-  "webIssues": [],
-  "mobileIssues": []
+  "webIssues": [
+    {
+      "component": "doctorregister",
+      "forms": [
+        "doctorForm"
+      ],
+      "dropdowns": [
+        {
+          "name": "specialization",
+          "sourceArray": "specializations",
+          "changeHandler": null
+        },
+        {
+          "name": "available_days",
+          "sourceArray": "availableDaysList",
+          "changeHandler": null
+        }
+      ],
+      "buttons": [
+        {
+          "action": "togglePasswordVisibility()"
+        }
+      ],
+      "fileUploads": [
+        {
+          "tag": "<input\n                  type=\"file\"\n                  class=\"form-control\"\n                  accept=\"image/*\"\n                  (change)=\"onImageChange($event)\"\n                />",
+          "handler": "onImageChange($event)"
+        }
+      ],
+      "issues": [
+        "Dropdown 'specialization': source array 'specializations' is declared but NEVER assigned/populated in TS!",
+        "Dropdown 'available_days': source array 'availableDaysList' is declared but NEVER assigned/populated in TS!"
+      ]
+    },
+    {
+      "component": "family-councelling",
+      "forms": [
+        "doctorProfileForm",
+        "bookingForm",
+        "statusUpdateForm"
+      ],
+      "dropdowns": [
+        {
+          "name": "selectedSpecialization",
+          "sourceArray": "specializationList",
+          "changeHandler": "applyFilters()"
+        },
+        {
+          "name": "unnamed-dropdown",
+          "sourceArray": "doctors",
+          "changeHandler": "onAdminSelectDoctorToEdit($event)"
+        },
+        {
+          "name": "specialization",
+          "sourceArray": null,
+          "changeHandler": null
+        },
+        {
+          "name": "appointment_time",
+          "sourceArray": null,
+          "changeHandler": null
+        },
+        {
+          "name": "counselling_type",
+          "sourceArray": null,
+          "changeHandler": null
+        },
+        {
+          "name": "status",
+          "sourceArray": null,
+          "changeHandler": null
+        }
+      ],
+      "buttons": [
+        {
+          "action": "switchTab('doctor_schedule')"
+        },
+        {
+          "action": "switchTab('doctor_profile')"
+        },
+        {
+          "action": "switchTab('browse')"
+        },
+        {
+          "action": "switchTab('browse')"
+        },
+        {
+          "action": "switchTab('my_bookings')"
+        },
+        {
+          "action": "switchTab('doctor_profile')"
+        },
+        {
+          "action": "switchTab('doctor_schedule')"
+        },
+        {
+          "action": "openBookingModal(doc, bookingModal)"
+        },
+        {
+          "action": "switchTab('browse')"
+        },
+        {
+          "action": "switchTab('browse')"
+        },
+        {
+          "action": "cancelMyBooking(appt)"
+        },
+        {
+          "action": "loadDoctorSchedule()"
+        },
+        {
+          "action": "openDoctorVoiceReplyModal(appt, doctorVoiceModal)"
+        },
+        {
+          "action": "quickStatusChange(appt, 'Confirmed')"
+        },
+        {
+          "action": "quickStatusChange(appt, 'Completed')"
+        },
+        {
+          "action": "openStatusModal(appt, statusModal)"
+        },
+        {
+          "action": "quickStatusChange(appt, 'Cancelled')"
+        },
+        {
+          "action": "modal.dismiss()"
+        },
+        {
+          "action": "setUserLanguage('te-IN')"
+        },
+        {
+          "action": "setUserLanguage('en-IN')"
+        },
+        {
+          "action": "setUserLanguage('hi-IN')"
+        },
+        {
+          "action": "startUserVoiceRecording()"
+        },
+        {
+          "action": "stopUserVoiceRecording()"
+        },
+        {
+          "action": "triggerUserAudioUpload()"
+        },
+        {
+          "action": "clearUserVoiceRecording()"
+        },
+        {
+          "action": "modal.dismiss()"
+        },
+        {
+          "action": "modal.dismiss()"
+        },
+        {
+          "action": "modal.dismiss()"
+        },
+        {
+          "action": "modal.dismiss()"
+        },
+        {
+          "action": "setDoctorReplyLanguage('te-IN')"
+        },
+        {
+          "action": "setDoctorReplyLanguage('en-IN')"
+        },
+        {
+          "action": "setDoctorReplyLanguage('hi-IN')"
+        },
+        {
+          "action": "startDoctorVoiceRecording()"
+        },
+        {
+          "action": "stopDoctorVoiceRecording()"
+        },
+        {
+          "action": "triggerDoctorAudioUpload()"
+        },
+        {
+          "action": "clearDoctorVoiceRecording()"
+        },
+        {
+          "action": "modal.dismiss()"
+        },
+        {
+          "action": "sendDoctorVoiceReply()"
+        }
+      ],
+      "fileUploads": [
+        {
+          "tag": "<input\n                type=\"file\"\n                class=\"form-control\"\n                accept=\"image/*\"\n                (change)=\"onImageChange($event)\"\n              />",
+          "handler": "onImageChange($event)"
+        },
+        {
+          "tag": "<input\n                type=\"file\"\n                id=\"userAudioFileInput\"\n                accept=\"audio/*\"\n                (change)=\"onUserAudioFileSelected($event)\"\n                style=\"display: none;\"\n              />",
+          "handler": "onUserAudioFileSelected($event)"
+        },
+        {
+          "tag": "<input\n          type=\"file\"\n          id=\"doctorAudioFileInput\"\n          accept=\"audio/*\"\n          (change)=\"onDoctorAudioFileSelected($event)\"\n          style=\"display: none;\"\n        />",
+          "handler": "onDoctorAudioFileSelected($event)"
+        }
+      ],
+      "issues": [
+        "Dropdown 'selectedSpecialization': source array 'specializationList' is declared but NEVER assigned/populated in TS!",
+        "Button click handler 'modal.dismiss' not implemented in TS!",
+        "Button click handler 'modal.dismiss' not implemented in TS!",
+        "Button click handler 'modal.dismiss' not implemented in TS!",
+        "Button click handler 'modal.dismiss' not implemented in TS!",
+        "Button click handler 'modal.dismiss' not implemented in TS!",
+        "Button click handler 'modal.dismiss' not implemented in TS!"
+      ]
+    }
+  ],
+  "mobileIssues": [
+    {
+      "page": "family-councelling",
+      "dropdowns": [
+        {
+          "name": "bookingData.appointment_time",
+          "sourceArray": "timeSlots",
+          "changeHandler": null
+        }
+      ],
+      "buttons": [
+        {
+          "action": "gotohome()"
+        },
+        {
+          "action": "gotoDoctorRegister()"
+        },
+        {
+          "action": "viewMode = 'doctor_schedule'"
+        },
+        {
+          "action": "viewMode = 'doctor_profile'"
+        },
+        {
+          "action": "openBookingForm(doc)"
+        },
+        {
+          "action": "setLanguage('te-IN')"
+        },
+        {
+          "action": "setLanguage('en-IN')"
+        },
+        {
+          "action": "setLanguage('hi-IN')"
+        },
+        {
+          "action": "startUserVoiceRecording()"
+        },
+        {
+          "action": "stopUserVoiceRecording()"
+        },
+        {
+          "action": "clearUserVoiceRecording()"
+        },
+        {
+          "action": "cancelBooking()"
+        },
+        {
+          "action": "submitAppointment()"
+        },
+        {
+          "action": "viewMode = 'browse'"
+        },
+        {
+          "action": "saveDoctorProfile()"
+        },
+        {
+          "action": "closeDoctorVoiceReply()"
+        },
+        {
+          "action": "setDoctorLanguage('te-IN')"
+        },
+        {
+          "action": "setDoctorLanguage('en-IN')"
+        },
+        {
+          "action": "setDoctorLanguage('hi-IN')"
+        },
+        {
+          "action": "startDoctorVoiceRecording()"
+        },
+        {
+          "action": "stopDoctorVoiceRecording()"
+        },
+        {
+          "action": "clearDoctorVoiceRecording()"
+        },
+        {
+          "action": "sendDoctorVoiceReply()"
+        },
+        {
+          "action": "openDoctorVoiceReply(appt)"
+        },
+        {
+          "action": "updateStatus(appt, 'Completed')"
+        }
+      ],
+      "issues": [
+        "Mobile Dropdown 'bookingData.appointment_time': source array 'timeSlots' is NEVER populated/assigned in family-councelling.ts!"
+      ]
+    }
+  ]
 }
