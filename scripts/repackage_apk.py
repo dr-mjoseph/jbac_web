@@ -57,6 +57,12 @@ with zipfile.ZipFile(backup_apk, "r") as zin:
                 data = zin.read(name)
                 zout.writestr(item, data, compress_type=item.compress_type)
 
+        # Add any new files that were not in the original APK
+        for name, data in replacement_files.items():
+            if name not in seen:
+                zout.writestr(name, data, compress_type=zipfile.ZIP_DEFLATED)
+                print(f"Added NEW file to APK: {name}")
+
 print("Unsigned APK written successfully to:", unsigned_apk)
 
 print("=== Step 2: Running zipalign ===")
