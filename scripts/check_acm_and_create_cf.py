@@ -58,11 +58,11 @@ def create_cloudfront_distribution():
             "ViewerProtocolPolicy": "redirect-to-https",
             "AllowedMethods": {
                 "Quantity": 3,
-                "Items": ["GET", "HEAD", "OPTIONS"]
-            },
-            "CachedMethods": {
-                "Quantity": 2,
-                "Items": ["GET", "HEAD"]
+                "Items": ["GET", "HEAD", "OPTIONS"],
+                "CachedMethods": {
+                    "Quantity": 2,
+                    "Items": ["GET", "HEAD"]
+                }
             },
             "ForwardedValues": {
                 "QueryString": False,
@@ -104,9 +104,7 @@ def create_cloudfront_distribution():
         "ViewerCertificate": {
             "ACMCertificateArn": CERT_ARN,
             "SSLSupportMethod": "sni-only",
-            "MinimumProtocolVersion": "TLSv1.2_2021",
-            "Certificate": CERT_ARN,
-            "CertificateSource": "acm"
+            "MinimumProtocolVersion": "TLSv1.2_2021"
         },
         "Restrictions": {
             "GeoRestriction": {
