@@ -64,7 +64,7 @@ echo "Using IAM Role ARN: ${ROLE_ARN}"
 
 # 2. Create or Update Lambda Function
 echo "[2/5] Deploying Lambda Function: ${FUNCTION_NAME}..."
-ENV_VARS="Variables={DB_HOST=jbac-mysql-db-v2.cdeeuw0s2trf.ap-southeast-2.rds.amazonaws.com,DB_USER=admin,DB_PASSWORD=biUt2TrZ9EZAqn6GXhiA,DB_NAME=jbac_jbac,DB_PORT=3306}"
+ENV_VARS="Variables={DB_HOST=13.236.218.42,DB_USER=admin,DB_PASSWORD=biUt2TrZ9EZAqn6GXhiA,DB_NAME=jbac_jbac,DB_PORT=3306}"
 
 if aws lambda get-function --function-name "${FUNCTION_NAME}" --region "${REGION}" >/dev/null 2>&1; then
   echo "Updating existing function code..."
