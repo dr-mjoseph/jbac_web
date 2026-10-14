@@ -603,3 +603,35 @@ The user reported that the previous `.apk` file was not working/updating on devi
      - `C:\Users\rajes\StudioProjects\jbac_app\jbacApp-0.0.24.apk`
      - `c:\Users\rajes\Documents\jbac_web\dist\churchwebsite\jbacApp-0.0.24.apk`
      - `c:\Users\rajes\Documents\jbac_web\dist\churchwebsite\jbacApp.apk`
+
+---
+
+## 19. GoDaddy DNS ACM SSL Validation & Zero-Downtime RDS KMS Encryption Migration (October 14, 2026)
+
+### 1. GoDaddy DNS & AWS ACM SSL Certificate Issuance
+- Configured DNS CNAME validation records for jbac.in and www.jbac.in on GoDaddy authoritative nameservers (ns47.domaincontrol.com, ns48.domaincontrol.com):
+  - _74c3f6934e813bdd0d3a9afcfed54fd3.jbac.in -> _1808a492f2fb9f88d0cebf7de9fba31b.wzccmgtwzk.acm-validations.aws
+  - _79650f0814a2011e612d8061cedaf2b8.www.jbac.in -> _8d2e2e81669348215b1b80ecfa436ec0.wzccmgtwzk.acm-validations.aws
+- Global DNS propagation verified across Google DNS (8.8.8.8) and Cloudflare (1.1.1.1).
+- AWS ACM successfully issued custom SSL Certificate:
+  - ARN: arn:aws:acm:us-east-1:298363284024:certificate/afc4eb7f-c265-4fd1-b33d-a80692c82db9
+  - Status: ISSUED (Amazon Trust Services).
+- Submitted official AWS Support Case for account verification to enable CloudFront edge distribution provisioning.
+- Preserved existing GoDaddy cPanel hosting A record (68.178.175.219) reverse-proxying to S3 for zero web downtime during CloudFront verification.
+
+### 2. Zero-Downtime RDS Storage Encryption Migration (jbac-mysql-db-v3)
+- Remediated AWS RDS security recommendation by enabling AWS KMS storage encryption at rest at zero additional cost.
+- Automated Workflow (scripts/migrate_rds_to_encrypted.py):
+  - Captured manual snapshot jbac-mysql-db-v2-snapshot of unencrypted jbac-mysql-db-v2.
+  - Created KMS-encrypted snapshot copy jbac-mysql-db-v2-encrypted-snap using key alias/aws/rds.
+  - Restored new encrypted database instance:
+    - DB Identifier: jbac-mysql-db-v3
+    - Instance Class: db.t4g.micro (gp3, 20 GB)
+    - Endpoint: jbac-mysql-db-v3.cdeeuw0s2trf.ap-southeast-2.rds.amazonaws.com
+    - Parameter Group: jbac-mysql-84 (Preserving Telugu UTF-8 characters)
+    - Security Group: sg-066e03d2e84e5a536 (jbac-aurora-sg, TCP 3306)
+    - Storage Encrypted: true
+- Live AWS Lambda Cutover:
+  - Seamlessly updated jbac-backend-api environment variable DB_HOST to jbac-mysql-db-v3.cdeeuw0s2trf.ap-southeast-2.rds.amazonaws.com.
+  - Executed live API Gateway verification (/dashboardapi/getdistricts): returned 200 OK with all 26 districts and verified uncorrupted Telugu Unicode strings.
+  - Old instance jbac-mysql-db-v2 preserved pending final user deletion confirmation.
