@@ -42,10 +42,15 @@ GitHub Issue: [#1](https://github.com/dr-mjoseph/jbac_web/issues/1)
 - [x] Execute `python scripts/check_acm_and_create_cf.py` to provision CloudFront CDN distribution (`EOBBU8SU7H3BI` / `d2wtiz94oy03oy.cloudfront.net`) for `jbac.in` and `www.jbac.in` with custom ACM SSL certificate
 - [x] Verify global HTTPS edge caching and SPA client-side routing (rewriting 403/404 to `/index.html` with status 200)
 
-### 2. 🌐 GoDaddy DNS Final Cutover & Cleanup
-- [x] Update `www.jbac.in` CNAME in GoDaddy DNS to point directly to CloudFront CDN distribution (`d2wtiz94oy03oy.cloudfront.net`)
-- [x] Configure root domain (`jbac.in`) forwarding to `https://www.jbac.in`
-- [x] Verify live traffic resolution over CloudFront CDN edge with active SSL certificate
+### 2. 🌐 DNS Cutover & Cloud-Native Route 53 Migration (Zero-Hosting Target)
+- [x] Provision AWS Route 53 Public Hosted Zone (`Z04439382BRRO1T3Y6B16`) for `jbac.in`
+- [x] Pre-populate all active DNS records in Route 53 via `scripts/populate_route53_records.py`:
+  - `jbac.in` root A & AAAA Alias ➔ CloudFront `d2wtiz94oy03oy.cloudfront.net`
+  - `www.jbac.in` A & AAAA Alias ➔ CloudFront `d2wtiz94oy03oy.cloudfront.net`
+  - Microsoft 365 Outlook MX, SPF, Autodiscover & SIP records
+  - ACM Certificate validation CNAME records & subdomains
+- [ ] Update GoDaddy nameservers to AWS Route 53 (`ns-201.awsdns-25.com`, `ns-819.awsdns-38.net`, `ns-1386.awsdns-45.org`, `ns-1853.awsdns-39.co.uk`)
+- [ ] Safely terminate legacy GoDaddy cPanel hosting service once Route 53 propagation completes
 
 ### 3. 🗄️ Database & Production Go-Live Operations
 - [ ] Restart RDS database instance `jbac-mysql-db-v3` before going live (`aws rds start-db-instance`)
