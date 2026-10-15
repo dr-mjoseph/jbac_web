@@ -43,9 +43,9 @@ GitHub Issue: [#1](https://github.com/dr-mjoseph/jbac_web/issues/1)
 - [x] Verify global HTTPS edge caching and SPA client-side routing (rewriting 403/404 to `/index.html` with status 200)
 
 ### 2. 🌐 GoDaddy DNS Final Cutover & Cleanup
-- [ ] Update `www.jbac.in` CNAME in GoDaddy DNS to point directly to CloudFront CDN distribution (or `@`)
-- [ ] Configure root domain (`jbac.in`) forwarding or ALIAS to CloudFront
-- [ ] Remove old GoDaddy cPanel hosting A record (`68.178.175.219`) and obsolete `load.wcard.io` CNAME once CloudFront traffic is verified
+- [x] Update `www.jbac.in` CNAME in GoDaddy DNS to point directly to CloudFront CDN distribution (`d2wtiz94oy03oy.cloudfront.net`)
+- [x] Configure root domain (`jbac.in`) forwarding to `https://www.jbac.in`
+- [x] Verify live traffic resolution over CloudFront CDN edge with active SSL certificate
 
 ### 3. 🗄️ Database & Production Go-Live Operations
 - [ ] Restart RDS database instance `jbac-mysql-db-v3` before going live (`aws rds start-db-instance`)
