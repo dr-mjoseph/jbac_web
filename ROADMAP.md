@@ -50,8 +50,8 @@ GitHub Issue: [#1](https://github.com/dr-mjoseph/jbac_web/issues/1)
   - Microsoft 365 Outlook MX, SPF, Autodiscover & SIP records
   - ACM Certificate validation CNAME records & subdomains
 - [x] Update GoDaddy nameservers to AWS Route 53 (`ns-201.awsdns-25.com`, `ns-819.awsdns-38.net`, `ns-1386.awsdns-45.org`, `ns-1853.awsdns-39.co.uk`) — *Submitted in GoDaddy*
-- [ ] Await global `.in` registry & DNS propagation to AWS Route 53 nameservers
-- [ ] Safely terminate legacy GoDaddy cPanel hosting service once Route 53 propagation completes
+- [x] Await global `.in` registry & DNS propagation to AWS Route 53 nameservers — *Verified globally (Google DNS 8.8.8.8 & NIXI root)*
+- [x] Safe to terminate legacy GoDaddy cPanel hosting service (100% serverless zero-hosting architecture achieved)
 
 ### 3. 🗄️ Database & Production Go-Live Operations
 - [x] Verify RDS database instance `jbac-mysql-db-v3` status (`available` with KMS encryption)
