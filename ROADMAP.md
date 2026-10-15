@@ -49,11 +49,12 @@ GitHub Issue: [#1](https://github.com/dr-mjoseph/jbac_web/issues/1)
   - `www.jbac.in` A & AAAA Alias ➔ CloudFront `d2wtiz94oy03oy.cloudfront.net`
   - Microsoft 365 Outlook MX, SPF, Autodiscover & SIP records
   - ACM Certificate validation CNAME records & subdomains
-- [ ] Update GoDaddy nameservers to AWS Route 53 (`ns-201.awsdns-25.com`, `ns-819.awsdns-38.net`, `ns-1386.awsdns-45.org`, `ns-1853.awsdns-39.co.uk`)
+- [x] Update GoDaddy nameservers to AWS Route 53 (`ns-201.awsdns-25.com`, `ns-819.awsdns-38.net`, `ns-1386.awsdns-45.org`, `ns-1853.awsdns-39.co.uk`) — *Submitted in GoDaddy*
+- [ ] Await global `.in` registry & DNS propagation to AWS Route 53 nameservers
 - [ ] Safely terminate legacy GoDaddy cPanel hosting service once Route 53 propagation completes
 
 ### 3. 🗄️ Database & Production Go-Live Operations
-- [ ] Restart RDS database instance `jbac-mysql-db-v3` before going live (`aws rds start-db-instance`)
+- [x] Verify RDS database instance `jbac-mysql-db-v3` status (`available` with KMS encryption)
 - [ ] Run end-to-end automated smoke tests across all registration forms, pastor logins, and directory search on live domain
 
 ### 4. 📲 Google Play Store Production Release
