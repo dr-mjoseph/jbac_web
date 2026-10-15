@@ -60,5 +60,5 @@ GitHub Issue: [#1](https://github.com/dr-mjoseph/jbac_web/issues/1)
 ### 4. 📲 Google Play Store Production Release
 - [x] Configure `targetSdkVersion 36` (Android 16 API level requirement) and bump version to `29` (`0.0.29`)
 - [x] Compile and sign production release bundle (`C:\Users\rajes\StudioProjects\jbac_app\app-release.aab` / `appreleasesigned.aab`) with `Jbac.keystore`
-- [ ] Upload production release bundle (`app-release.aab` v29) to Google Play Console
+- [x] Upload production release bundle (`app-release.aab` v29) to Google Play Console
 - [ ] Complete Google Play Store app listing review and rollout to production
