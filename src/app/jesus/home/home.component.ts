@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, OnInit, AfterViewInit, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
 import { ServiceService } from 'src/app/jesus/service.service';
 import Swal from 'sweetalert2';
@@ -9,17 +9,28 @@ import Swal from 'sweetalert2';
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.css']
 })
-export class HomeComponent {
+export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
   name: any;
   usr_id: any;
-  logincon: boolean = false
+  logincon: boolean = false;
   musical: any;
   img: boolean = true;
 
-  slideIndex: any;
+  slideIndex: number = 0;
   slides: any;
   dots: any;
   timeoutId: any;
+
+  banners: string[] = [
+    'assets/images/Banner01.png',
+    'assets/images/Banner02.png',
+    'assets/images/Banner03.png',
+    'assets/images/Banner04.png',
+    'assets/images/Banner05.png',
+    'assets/images/Banner06.png',
+    'assets/images/Banner07.png',
+    'assets/images/Banner08.png'
+  ];
 
   constructor(private service: ServiceService, private router: Router) { }
 
@@ -36,45 +47,81 @@ export class HomeComponent {
   }
 
   ngAfterViewInit() {
-    this.slideIndex = 0;
-    this.timeoutId = null;
     this.slides = document.getElementsByClassName("mySlides");
     this.dots = document.getElementsByClassName("dot");
-    this.showSlides();
+    this.showSlide(0);
+    this.startAutoTimer();
   }
 
-  currentSlide(index: any) {
-    this.slideIndex = index;
-    this.showSlides();
+  ngOnDestroy(): void {
+    if (this.timeoutId) {
+      clearTimeout(this.timeoutId);
+      this.timeoutId = null;
+    }
   }
 
-  plusSlides(step: any) {
-    if (step < 0) {
-      this.slideIndex -= 2;
-      if (this.slideIndex < 0) {
-        this.slideIndex = this.slides.length - 1;
-      }
+  currentSlide(index: number) {
+    this.showSlide(index);
+    this.startAutoTimer();
+  }
+
+  plusSlides(step: number) {
+    const total = this.slides && this.slides.length > 0 ? this.slides.length : 8;
+    let nextIndex = (this.slideIndex + step) % total;
+    if (nextIndex < 0) {
+      nextIndex = total - 1;
+    }
+    this.showSlide(nextIndex);
+    this.startAutoTimer();
+  }
+
+  showSlide(index: number) {
+    if (!this.slides || this.slides.length === 0) {
+      this.slides = document.getElementsByClassName("mySlides");
+    }
+    if (!this.dots || this.dots.length === 0) {
+      this.dots = document.getElementsByClassName("dot");
+    }
+
+    const total = this.slides ? this.slides.length : 0;
+    if (total === 0) return;
+
+    this.slideIndex = (index + total) % total;
+
+    for (let i = 0; i < this.slides.length; i++) {
+      this.slides[i].style.display = "none";
+    }
+    for (let i = 0; i < this.dots.length; i++) {
+      this.dots[i].classList.remove('active');
+    }
+
+    if (this.slides[this.slideIndex]) {
+      this.slides[this.slideIndex].style.display = "block";
+    }
+    if (this.dots[this.slideIndex]) {
+      this.dots[this.slideIndex].classList.add('active');
     }
   }
 
   showSlides() {
+    this.plusSlides(1);
+  }
 
-    for (let i = 0; i < this.slides.length; i++) {
-      this.slides[i].style.display = "none";
-      this.dots[i].classList.remove('active');
-    }
-    this.slideIndex++;
-    if (this.slideIndex > this.slides.length) {
-      this.slideIndex = 1
-    }
-    this.slides[this.slideIndex - 1].style.display = "block";
-    this.dots[this.slideIndex - 1].classList.add('active');
+  startAutoTimer() {
     if (this.timeoutId) {
       clearTimeout(this.timeoutId);
     }
     this.timeoutId = setTimeout(() => {
-      this.showSlides();
-    }, 4000); // Change image every 5 seconds
+      this.plusSlides(1);
+    }, 5000);
+  }
+
+  onBannerError(event: any, index: number) {
+    const num = (index + 1).toString().padStart(2, '0');
+    const fallbackUrl = `https://jbac.in/baneers/Banner${num}.png`;
+    if (event && event.target && event.target.src !== fallbackUrl) {
+      event.target.src = fallbackUrl;
+    }
   }
 
 

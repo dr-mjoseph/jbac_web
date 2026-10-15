@@ -192,12 +192,13 @@ var HomePage = /** @class */ (function () {
         this.modalCtrl = modalCtrl;
         this.banners = [
             { id: '1', banner: 'https://jbac.in/baneers/Banner01.png' },
-            // { id: '2', banner: 'https://jbac.in/baneers/Banner02.png' },
+            { id: '2', banner: 'https://jbac.in/baneers/Banner02.png' },
             { id: '3', banner: 'https://jbac.in/baneers/Banner03.png' },
             { id: '4', banner: 'https://jbac.in/baneers/Banner04.png' },
             { id: '5', banner: 'https://jbac.in/baneers/Banner05.png' },
             { id: '6', banner: 'https://jbac.in/baneers/Banner06.png' },
             { id: '7', banner: 'https://jbac.in/baneers/Banner07.png' },
+            { id: '8', banner: 'https://jbac.in/baneers/Banner08.png' },
         ];
         this.main = 0;
         this.maintrue = false;

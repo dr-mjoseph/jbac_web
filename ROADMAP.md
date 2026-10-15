@@ -22,6 +22,7 @@ GitHub Issue: [#1](https://github.com/dr-mjoseph/jbac_web/issues/1)
 ## 🌐 Web Application Remediation & Audits
 - [x] Remediate cascading location dropdowns (District ➔ Constituency ➔ Mandal ➔ Village/Panchayat)
 - [x] Fix proof modal dismissal, profile image uploads, and type-of-payment bindings
+- [x] Restore homepage 8-image banner carousel (`Banner01.png` – `Banner08.png`), sync media to AWS S3 & CloudFront, fix navigation arrows and dot indicators
 - [x] Compile clean production bundle in `dist/churchwebsite` with 0 compile errors
 - [x] Maintain zero downtime on `https://jbac.in` via reverse-proxy integration
 
