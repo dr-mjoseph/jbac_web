@@ -37,6 +37,9 @@ export class LoginComponent {
     });
   }
 
+  Submitlogindata: boolean = false;
+  returnUrl: string = '';
+
   ngOnInit(): void {
     this.route.queryParams.subscribe((params: any) => {
       if (params['cat']) {
@@ -45,13 +48,14 @@ export class LoginComponent {
           mobile_number: params['phone'] || ''
         });
       }
+      if (params['redirect']) {
+        this.returnUrl = params['redirect'];
+      }
     });
   }
 
   get f() { return this.passwordform.controls }
   get i() { return this.checkform.controls }
-
-  Submitlogindata: boolean = false;
 
   fillDemoUser(category: string = '1') {
     const isDoc = (category === '8');
@@ -106,7 +110,9 @@ export class LoginComponent {
       timer: 1600,
       showConfirmButton: false
     }).then(() => {
-      if (isDoc) {
+      if (this.returnUrl) {
+        this.router.navigateByUrl(this.returnUrl);
+      } else if (isDoc) {
         // Direct doctor to doctor schedule and profile setup in family counselling
         this.router.navigate(['/family-councelling'], { queryParams: { tab: 'doctor_schedule' } });
       } else {
