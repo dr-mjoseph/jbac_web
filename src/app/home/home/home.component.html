@@ -1,28 +1,52 @@
 <div class="slideshow-container">
 
-    <div class="mySlides fade" style="display: block;">
-        <img src="assets/images/Banner01.png" (error)="onBannerError($event, 0)" alt="JBAC Banner 1">
+    <div class="mySlides active-slide">
+        <picture>
+            <source srcset="assets/images/Banner01.webp" type="image/webp">
+            <img src="assets/images/Banner01.png" (error)="onBannerError($event, 0)" alt="JBAC Banner 1" loading="eager" fetchpriority="high">
+        </picture>
     </div>
-    <div class="mySlides fade">
-        <img src="assets/images/Banner02.png" (error)="onBannerError($event, 1)" alt="JBAC Banner 2">
+    <div class="mySlides">
+        <picture>
+            <source srcset="assets/images/Banner02.webp" type="image/webp">
+            <img src="assets/images/Banner02.png" (error)="onBannerError($event, 1)" alt="JBAC Banner 2" loading="eager">
+        </picture>
     </div>
-    <div class="mySlides fade">
-        <img src="assets/images/Banner03.png" (error)="onBannerError($event, 2)" alt="JBAC Banner 3">
+    <div class="mySlides">
+        <picture>
+            <source srcset="assets/images/Banner03.webp" type="image/webp">
+            <img src="assets/images/Banner03.png" (error)="onBannerError($event, 2)" alt="JBAC Banner 3" loading="eager">
+        </picture>
     </div>
-    <div class="mySlides fade">
-        <img src="assets/images/Banner04.png" (error)="onBannerError($event, 3)" alt="JBAC Banner 4">
+    <div class="mySlides">
+        <picture>
+            <source srcset="assets/images/Banner04.webp" type="image/webp">
+            <img src="assets/images/Banner04.png" (error)="onBannerError($event, 3)" alt="JBAC Banner 4" loading="eager">
+        </picture>
     </div>
-    <div class="mySlides fade">
-        <img src="assets/images/Banner05.png" (error)="onBannerError($event, 4)" alt="JBAC Banner 5">
+    <div class="mySlides">
+        <picture>
+            <source srcset="assets/images/Banner05.webp" type="image/webp">
+            <img src="assets/images/Banner05.png" (error)="onBannerError($event, 4)" alt="JBAC Banner 5" loading="eager">
+        </picture>
     </div>
-    <div class="mySlides fade">
-        <img src="assets/images/Banner06.png" (error)="onBannerError($event, 5)" alt="JBAC Banner 6">
+    <div class="mySlides">
+        <picture>
+            <source srcset="assets/images/Banner06.webp" type="image/webp">
+            <img src="assets/images/Banner06.png" (error)="onBannerError($event, 5)" alt="JBAC Banner 6" loading="eager">
+        </picture>
     </div>
-    <div class="mySlides fade">
-        <img src="assets/images/Banner07.png" (error)="onBannerError($event, 6)" alt="JBAC Banner 7">
+    <div class="mySlides">
+        <picture>
+            <source srcset="assets/images/Banner07.webp" type="image/webp">
+            <img src="assets/images/Banner07.png" (error)="onBannerError($event, 6)" alt="JBAC Banner 7" loading="eager">
+        </picture>
     </div>
-    <div class="mySlides fade">
-        <img src="assets/images/Banner08.png" (error)="onBannerError($event, 7)" alt="JBAC Banner 8">
+    <div class="mySlides">
+        <picture>
+            <source srcset="assets/images/Banner08.webp" type="image/webp">
+            <img src="assets/images/Banner08.png" (error)="onBannerError($event, 7)" alt="JBAC Banner 8" loading="eager">
+        </picture>
     </div>
     
     <a class="prev" (click)="plusSlides(-1)" aria-label="Previous banner">&#10094;</a>

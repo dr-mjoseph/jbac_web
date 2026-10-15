@@ -37,6 +37,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
   constructor(private service: ServiceService, private router: Router) { }
 
   ngOnInit(): void {
+    this.preloadBanners();
     this.usr_id = sessionStorage.getItem('usr_id');
     this.checklogin();
     this.name = sessionStorage.getItem('name');
@@ -45,6 +46,18 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
       this.logincon = true;
     } else {
       this.logincon = false;
+    }
+  }
+
+  preloadBanners(): void {
+    if (typeof window !== 'undefined') {
+      for (let i = 1; i <= 8; i++) {
+        const num = i.toString().padStart(2, '0');
+        const webpImg = new Image();
+        webpImg.src = `assets/images/Banner${num}.webp`;
+        const pngImg = new Image();
+        pngImg.src = `assets/images/Banner${num}.png`;
+      }
     }
   }
 
@@ -88,20 +101,30 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     const total = this.slides ? this.slides.length : 0;
     if (total === 0) return;
 
+    const previousIndex = this.slideIndex;
     this.slideIndex = (index + total) % total;
 
     for (let i = 0; i < this.slides.length; i++) {
-      this.slides[i].style.display = "none";
-    }
-    for (let i = 0; i < this.dots.length; i++) {
-      this.dots[i].classList.remove('active');
+      const slide = this.slides[i];
+      slide.style.display = "";
+
+      if (i === this.slideIndex) {
+        slide.classList.remove('prev-slide');
+        slide.classList.add('active-slide');
+      } else if (i === previousIndex && previousIndex !== this.slideIndex) {
+        slide.classList.remove('active-slide');
+        slide.classList.add('prev-slide');
+      } else {
+        slide.classList.remove('active-slide', 'prev-slide');
+      }
     }
 
-    if (this.slides[this.slideIndex]) {
-      this.slides[this.slideIndex].style.display = "block";
-    }
-    if (this.dots[this.slideIndex]) {
-      this.dots[this.slideIndex].classList.add('active');
+    for (let i = 0; i < this.dots.length; i++) {
+      if (i === this.slideIndex) {
+        this.dots[i].classList.add('active');
+      } else {
+        this.dots[i].classList.remove('active');
+      }
     }
   }
 
