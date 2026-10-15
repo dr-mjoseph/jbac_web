@@ -38,9 +38,9 @@ GitHub Issue: [#1](https://github.com/dr-mjoseph/jbac_web/issues/1)
 ## 🎨 Features & Pending Tasks to Build
 
 ### 1. ☁️ AWS CloudFront CDN Edge Deployment
-- [ ] Receive confirmation on AWS Support account verification case
-- [ ] Execute `python scripts/check_acm_and_create_cf.py` to provision CloudFront CDN distribution for `jbac.in` and `www.jbac.in` with custom ACM SSL certificate
-- [ ] Verify global HTTPS edge caching and SPA client-side routing (rewriting 403/404 to `/index.html` with status 200)
+- [x] Receive confirmation on AWS Support account verification case (Resolved by AWS Support)
+- [x] Execute `python scripts/check_acm_and_create_cf.py` to provision CloudFront CDN distribution (`EOBBU8SU7H3BI` / `d2wtiz94oy03oy.cloudfront.net`) for `jbac.in` and `www.jbac.in` with custom ACM SSL certificate
+- [x] Verify global HTTPS edge caching and SPA client-side routing (rewriting 403/404 to `/index.html` with status 200)
 
 ### 2. 🌐 GoDaddy DNS Final Cutover & Cleanup
 - [ ] Update `www.jbac.in` CNAME in GoDaddy DNS to point directly to CloudFront CDN distribution (or `@`)
