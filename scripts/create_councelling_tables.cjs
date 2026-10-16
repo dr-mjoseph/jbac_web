@@ -1,7 +1,7 @@
 const mysql = require('../backend/node_modules/mysql2/promise');
 
 async function createTables() {
-  const conn = await mysql.createConnection('mysql://admin:biUt2TrZ9EZAqn6GXhiA@jbac-mysql-db-v2.cdeeuw0s2trf.ap-southeast-2.rds.amazonaws.com:3306/jbac_jbac');
+  const conn = await mysql.createConnection('mysql://admin:biUt2TrZ9EZAqn6GXhiA@jbac-mysql-db-v3.cdeeuw0s2trf.ap-southeast-2.rds.amazonaws.com:3306/jbac_jbac');
   console.log('Connected to RDS successfully.');
 
   await conn.query(`

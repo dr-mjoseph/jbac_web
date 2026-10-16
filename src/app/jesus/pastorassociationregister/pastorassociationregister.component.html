@@ -219,12 +219,18 @@
                                            <div class="row">
                                              <div class="col-md-6 mb-4 pb-2">
                                                 <div class="form-outline">
-                                                    <label class="form-label">మీ ఫోన్ నంబర్ </label>
+                                                    <label class="form-label">మీ ఫోన్ నంబర్ <span
+                                                            style="color:red; -webkit-text-stroke-width:thick;"> *</span></label>
                                                     <input type="text" formControlName="phonenumber"
                                                         class="form-control"
                                                         placeholder="ఇక్కడ క్లిక్ చేసి ఎంటర్ చేయండి" maxlength="10"
-                                                        minlength="10" (keypress)="numericOnly($event)" />
-
+                                                        minlength="10" (keypress)="numericOnly($event)"
+                                                        [ngClass]="{'is-invalid': submitted && g['phonenumber'].errors }" />
+                                                    <div *ngIf="submitted && g['phonenumber'].errors"
+                                                        class="invalid-feedback">
+                                                        <div *ngIf="g['phonenumber'].errors['required']">ఫోన్ నంబర్ ఎంటర్ చేయండి </div>
+                                                        <div *ngIf="g['phonenumber'].errors['maxlength']">10 అంకెల ఫోన్ నంబర్ మాత్రమే ఎంటర్ చేయండి </div>
+                                                    </div>
                                                 </div>
                                             </div>
                                             <div class="col-md-6 mb-4 pb-2">
@@ -334,21 +340,14 @@
                                                 </div>
                                                  <div class="col-md-6 mb-4 pb-2">
                                                 <div class="form-outline">
-                                                    <label class="form-label">పంచాయితి <span
-                                                            style="color:red; -webkit-text-stroke-width:thick;">*</span>
-                                                    </label>
+                                                    <label class="form-label">పంచాయితి / వార్డు (ఐచ్ఛికము)</label>
                                                     <select class="form-control" formControlName="village_id"
-                                                        style="height:37px;width: 273px;"
-                                                        [ngClass]="{'is-invalid': submitted && g['village_id'].errors }">
+                                                        style="height:37px;width: 273px;">
                                                         <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
                                                         <option value="{{item.id}}" *ngFor="let item of panchayati">
                                                             {{item.pnchyt_nm}}
                                                         </option>
                                                     </select>
-                                                    <div *ngIf="submitted && g['village_id'].errors"
-                                                        class="invalid-feedback">
-                                                        <div *ngIf="g['village_id'].errors['required']">పంచాయితి ఎంచుకోండి </div>
-                                                    </div>
                                                 </div>
                                             </div> </div>
                                              <div class="row">
@@ -416,39 +415,32 @@
                                         </div>
                                     </div>
                                     <br> -->
-                                        <!-- <div class="row">
-                                            - <div class="col-md-6 mb-4 pb-2">
-                                            <div class="form-outline">
-                                                <label class="form-label">పాస్‌వర్డ్ <span
-                                                        style="color:red; -webkit-text-stroke-width:thick;">*</span></label>
-                                                <input type="password" formControlName="password" class="form-control"
-                                                    placeholder="ఇక్కడ క్లిక్ చేసి పాస్‌వర్డ్ సెట్ చేసుకోండి" maxlength="16" minlength="4"
-                                                    [ngClass]="{'is-invalid': submitted && g['password'].errors }" />
-                                                <div *ngIf="submitted && g['password'].errors" class="invalid-feedback">
-                                                    <div *ngIf="g['password'].errors['required']">పాస్‌వర్డ్ సెట్ చేసుకోండి</div>
-                                                    <div *ngIf="g['password'].errors['minlength']">పాస్‌వర్డ్ 4 నుండి 16 అక్షరాలు / అంకెలు
-                                                        మధ్య ఉండాలి</div>
+                                        <div class="row">
+                                            <div class="col-md-6 mb-4 pb-2">
+                                                <div class="form-outline">
+                                                    <label class="form-label">పాస్‌వర్డ్ సెట్ చేసుకోండి (లాగిన్ కొరకు - ఐచ్ఛికము)</label>
+                                                    <input type="password" formControlName="password" class="form-control"
+                                                        placeholder="ఇక్కడ క్లిక్ చేసి పాస్‌వర్డ్ సెట్ చేసుకోండి (కనీసం 6 అక్షరాలు)" maxlength="16" minlength="6"
+                                                        [ngClass]="{'is-invalid': submitted && g['password'].errors }" />
+                                                    <div *ngIf="submitted && g['password'].errors" class="invalid-feedback">
+                                                        <div *ngIf="g['password'].errors['minlength']">పాస్‌వర్డ్ కనీసం 6 అక్షరాలు / అంకెలు ఉండాలి</div>
+                                                    </div>
                                                 </div>
-                                            </div>
-                                        </div> 
-                                             <div class="col-md-6 mb-4 pb-2">
-                                            <div class="form-outline">
-                                                <label class="form-label">Retype-Password<span
-                                                        style="color:red; -webkit-text-stroke-width:thick;">*</span></label>
-                                                <input type="password" formControlName="retypepassword"
-                                                    class="form-control" placeholder="Enter Your Retype-Password"
-                                                    maxlength="16" minlength="6"
-                                                    [ngClass]="{'is-invalid': submitted && g['retypepassword'].errors }" />
-                                                <div *ngIf="submitted && g['retypepassword'].errors"
-                                                    class="invalid-feedback">
-                                                    <div *ngIf="g['retypepassword'].errors['required']">Retype-Password
-                                                        is required </div>
-                                                    <div *ngIf="g['retypepassword'].errors['minlength']">Password
-                                                        between 6 to 16 Characters / Digits / Specialchracters</div>
+                                            </div> 
+                                            <div class="col-md-6 mb-4 pb-2">
+                                                <div class="form-outline">
+                                                    <label class="form-label">పాస్‌వర్డ్ మరలా ధృవీకరించండి (Retype-Password)</label>
+                                                    <input type="password" formControlName="retypepassword"
+                                                        class="form-control" placeholder="పాస్‌వర్డ్ మరలా ఎంటర్ చేయండి"
+                                                        maxlength="16" minlength="6"
+                                                        [ngClass]="{'is-invalid': submitted && g['retypepassword'].errors }" />
+                                                    <div *ngIf="submitted && g['retypepassword'].errors"
+                                                        class="invalid-feedback">
+                                                        <div *ngIf="g['retypepassword'].errors['minlength']">పాస్‌వర్డ్ కనీసం 6 అక్షరాలు / అంకెలు ఉండాలి</div>
+                                                    </div>
                                                 </div>
-                                            </div>
-                                        </div> 
-                                        </div> -->
+                                            </div> 
+                                        </div>
 
                                         <!-- <div class="row">
                                         <div class="col-md-6 mb-4 pb-2">

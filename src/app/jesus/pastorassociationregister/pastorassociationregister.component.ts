@@ -285,8 +285,8 @@ export class PastorassociationregisterComponent {
       website: [''],
       workingareas: [''],
       description: [''],
-      password: ['', [Validators.required, Validators.minLength(6)]],
-      retypepassword: ['', [Validators.required, Validators.minLength(6)]],
+      password: [''],
+      retypepassword: [''],
       term: [''],
 
     })
@@ -787,29 +787,96 @@ export class PastorassociationregisterComponent {
   }
   postpastorassociations() {
     this.submitted = true;
-    
-    this.showSpinner = true;
+
+    // Validate password if user entered one
+    const pass = this.pastorsassociations.value.password ? String(this.pastorsassociations.value.password).trim() : '';
+    const repass = this.pastorsassociations.value.retypepassword ? String(this.pastorsassociations.value.retypepassword).trim() : '';
+
+    if (pass && pass.length < 6) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'గమనిక',
+        text: 'పాస్‌వర్డ్ కనీసం 6 అక్షరాలు / అంకెలు ఉండాలి'
+      });
+      return;
+    }
+
+    if (pass && repass && pass !== repass) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'గమనిక',
+        text: 'పాస్‌వర్డ్ మరియు Retype-Password సరిపోలడం లేదు'
+      });
+      return;
+    }
+
+    // Default password to phone number or '123456' if left empty so login always works
+    if (!pass) {
+      const defaultPass = this.pastorsassociations.value.phonenumber || '123456';
+      this.pastorsassociations.patchValue({
+        password: defaultPass,
+        retypepassword: defaultPass
+      });
+    }
 
     if (this.pastorsassociations.invalid) {
-      Swal.fire(' * మార్క్ చేసిన వివరాలను తప్పనిసరిగా పూరించాలి  ');
-    
-      this.showSpinner = false; // Stop spinner on validation failure
+      const invalidFields: string[] = [];
+      const controls = this.pastorsassociations.controls;
+      if (controls['pa_name']?.invalid) invalidFields.push('పాస్టర్ అస్సోసియేషన్ పేరు');
+      if (controls['totalleadrs']?.invalid) invalidFields.push('పాస్టర్స్ సంఖ్య');
+      if (controls['headname']?.invalid) invalidFields.push('మీ పేరు');
+      if (controls['phonenumber']?.invalid) invalidFields.push('ఫోన్ నంబర్ (10 అంకెలు)');
+      if (controls['district_id']?.invalid) invalidFields.push('జిల్లా');
+      if (controls['constituency_id']?.invalid) invalidFields.push('నియోజకవర్గం');
+      if (controls['mandal_id']?.invalid) invalidFields.push('మండలం');
+
+      const msg = invalidFields.length > 0
+        ? `దయచేసి ఈ క్రింది వివరాలను తప్పనిసరిగా పూరించండి:\n• ${invalidFields.join('\n• ')}`
+        : '* మార్క్ చేసిన వివరాలను తప్పనిసరిగా పూరించాలి';
+
+      Swal.fire({
+        icon: 'warning',
+        title: 'గమనిక',
+        text: msg
+      });
       return;
-    } else if (this.pastorsassociations.value.password != this.pastorsassociations.value.retypepassword) {
-      Swal.fire("Passwords are Unmatched");
-      return;
-    } else {
-      this.service.postpastorassociationss(this.pastorsassociations.value).subscribe((res: any) => {
+    }
+
+    this.showSpinner = true;
+    this.service.postpastorassociationss(this.pastorsassociations.value).subscribe(
+      (res: any) => {
+        this.showSpinner = false;
         if (res.status == 200) {
-          Swal.fire('మీరు విజయవంతముగా నమోదు చేసినారు')
+          Swal.fire({
+            icon: 'success',
+            title: 'విజయం!',
+            text: 'మీరు విజయవంతముగా నమోదు చేసినారు'
+          });
           this.pastorsassociations.reset();
           this.submitted = false;
-          
+        } else if (res.status == 451) {
+          Swal.fire({
+            icon: 'info',
+            title: 'గమనిక',
+            text: 'ఇదే ఫోన్ నెంబర్ తో ఇంతకుముందే రిజిస్టర్ అయ్యారు'
+          });
+        } else {
+          Swal.fire({
+            icon: 'error',
+            title: 'లోపం',
+            text: res.message || 'నమోదు చేయడంలో సమస్య వచ్చింది. దయచేసి మరలా ప్రయత్నించండి.'
+          });
         }
       },
-        error => {
-        })
-    }
+      (error: any) => {
+        this.showSpinner = false;
+        Swal.fire({
+          icon: 'error',
+          title: 'లోపం',
+          text: 'సర్వర్ సమస్య వచ్చింది. దయచేసి మరలా ప్రయత్నించండి.'
+        });
+      }
+    );
   }
 
   postpastorsignup() {

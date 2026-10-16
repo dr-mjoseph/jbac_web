@@ -24,7 +24,7 @@ app.use((req, _res, next) => {
 
 // Configure AWS Aurora RDS MySQL Connection
 const rawHost = process.env.DB_HOST;
-const dbHost = (rawHost && !rawHost.startsWith('://')) ? rawHost : 'jbac-mysql-db-v2.cdeeuw0s2trf.ap-southeast-2.rds.amazonaws.com';
+const dbHost = (rawHost && !rawHost.startsWith('://')) ? rawHost : 'jbac-mysql-db-v3.cdeeuw0s2trf.ap-southeast-2.rds.amazonaws.com';
 const dbUser = process.env.DB_USER || 'admin';
 const dbPassword = process.env.DB_PASSWORD || 'biUt2TrZ9EZAqn6GXhiA';
 const dbName = (process.env.DB_NAME && process.env.DB_NAME !== 'sys') ? process.env.DB_NAME : 'jbac_jbac';
@@ -1032,10 +1032,34 @@ app.all(['/dashboardapi/getorganizations', '/dashboardapi/searchorganization', '
 // Pastor Associations (pastors_associations)
 app.post(['/dashboardapi/postpastorassociations', '/api/postpastorassociations'], async (req: any, res: any) => {
     try {
-        const a = req.body;
+        const a = req.body || {};
         a.d_in = 0;
-        const result = await dynamicInsert('pastors_associations', a);
+        
+        // Map frontend field aliases to MySQL table columns
+        if (a.pa_name && !a.paname) a.paname = a.pa_name;
+        if (!a.paname && a.name) a.paname = a.name;
+        if (a.pa_secretory && !a.secretory) a.secretory = a.pa_secretory;
+        if (a.pa_president && !a.president) a.president = a.pa_president;
+        if (a.district_id && !a.districtname) a.districtname = a.district_id;
+        if (a.constituency_id && !a.constituencyname) a.constituencyname = a.constituency_id;
+        if (a.mandal_id && !a.mandals) a.mandals = a.mandal_id;
+        if (a.village_id && !a.panchaiti) a.panchaiti = a.village_id;
+        if (a.term && !a.terms) a.terms = a.term;
+        if (!a.cts) a.cts = new Date().toISOString().slice(0, 19).replace('T', ' ');
+
         const phone = a.phonenumber || a.whatsapp_number || a.mobile_number;
+        if (phone) {
+            const [existing]: any = await db.query('SELECT id FROM pastors_associations WHERE phonenumber = ? AND d_in = 0', [phone]);
+            if (existing && existing.length > 0) {
+                return res.json({ status: 451, message: 'Already registered with this phone number' });
+            }
+        }
+
+        if (!a.password) {
+            a.password = phone || '123456';
+        }
+
+        const result = await dynamicInsert('pastors_associations', a);
         if (phone && a.password) {
             try {
                 await dynamicInsert('users', {

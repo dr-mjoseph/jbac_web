@@ -294,5 +294,5 @@ if [ -n "${GITHUB_STEP_SUMMARY}" ]; then
   echo "- **Primary HTTPS URL**: [${TARGET_BACKEND_URL}](${TARGET_BACKEND_URL})" >> "${GITHUB_STEP_SUMMARY}"
   echo "- **API Gateway URL**: [${API_GATEWAY_URL}](${API_GATEWAY_URL})" >> "${GITHUB_STEP_SUMMARY}"
   echo "- **Admin Cockpit**: [${TARGET_BACKEND_URL}api/admin-database-view](${TARGET_BACKEND_URL}api/admin-database-view)" >> "${GITHUB_STEP_SUMMARY}"
-  echo "- **Database Cluster**: \`jbac-mysql-db-v2.cdeeuw0s2trf.ap-southeast-2.rds.amazonaws.com:3306\`" >> "${GITHUB_STEP_SUMMARY}"
+  echo "- **Database Cluster**: \`jbac-mysql-db-v3.cdeeuw0s2trf.ap-southeast-2.rds.amazonaws.com:3306\`" >> "${GITHUB_STEP_SUMMARY}"
 fi

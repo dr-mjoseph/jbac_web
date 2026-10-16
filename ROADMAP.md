@@ -56,6 +56,8 @@ GitHub Issue: [#1](https://github.com/dr-mjoseph/jbac_web/issues/1)
 
 ### 3. 🗄️ Database & Production Go-Live Operations
 - [x] Verify RDS database instance `jbac-mysql-db-v3` status (`available` with KMS encryption)
+- [x] Document official AWS RDS connection settings in `DATABASE_CONNECTION.md`
+- [x] Fix Pastors Association registration form validation (`pastorassociationregister`) and backend database column mapping
 - [ ] Run end-to-end automated smoke tests across all registration forms, pastor logins, and directory search on live domain
 
 ### 4. 📲 Google Play Store Production Release
