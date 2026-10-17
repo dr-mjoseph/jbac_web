@@ -624,8 +624,11 @@ export class SignupComponent {
         if (res.status == 451) {
           Swal.fire('ఇదే ఫోన్ నెంబర్ తో ఇంతకుముందే రిజిస్టర్ అయ్యారు')
         } else if (res.status == 200) {
-          Swal.fire('Your Church is Submited Successfully,Please Submit your Church Service Timings')
-          this.router.navigate(['/profile'], { queryParams: { id: "1" } });
+          Swal.fire({
+            icon: 'success',
+            title: 'విజయం!',
+            text: 'చర్చి వివరాలు విజయవంతముగా నమోదు చేయబడ్డాయి. మీరు మీ ఫోన్ నెంబర్ మరియు పాస్‌వర్డ్‌తో లాగిన్ అవ్వవచ్చు.'
+          });
           this.churchregsiterform.reset();
           this.submitted = false;
         }

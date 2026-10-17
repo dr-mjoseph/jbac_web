@@ -699,9 +699,17 @@ export class ChurchregisterComponent {
             Swal.fire({
               icon: 'success',
               title: 'విజయం!',
-              text: 'చర్చి విజయవంతముగా నమోదు చేయబడింది, దయచేసి చర్చి సర్వీస్ టైమింగ్స్ నమోదు చేయండి.'
+              text: 'చర్చి వివరాలు విజయవంతముగా నమోదు చేయబడ్డాయి. మీరు మీ ఫోన్ నెంబర్ మరియు పాస్‌వర్డ్‌తో లాగిన్ అవ్వవచ్చు.',
+              showCancelButton: true,
+              confirmButtonColor: '#3085d6',
+              cancelButtonColor: '#6c757d',
+              confirmButtonText: 'లాగిన్ అవ్వండి (Login)',
+              cancelButtonText: 'సరే (OK)'
+            }).then((result) => {
+              if (result.isConfirmed) {
+                this.router.navigate(['/login']);
+              }
             });
-            this.router.navigate(['/profile'], { queryParams: { id: "1" } });
             this.churchregsiterform.reset();
             this.submitted = false;
           } else {
