@@ -635,3 +635,100 @@ The user reported that the previous `.apk` file was not working/updating on devi
   - Seamlessly updated jbac-backend-api environment variable DB_HOST to jbac-mysql-db-v3.cdeeuw0s2trf.ap-southeast-2.rds.amazonaws.com.
   - Executed live API Gateway verification (/dashboardapi/getdistricts): returned 200 OK with all 26 districts and verified uncorrupted Telugu Unicode strings.
   - Old instance jbac-mysql-db-v2 preserved pending final user deletion confirmation.
+
+
+---
+
+## 20. Categorical Database Routing for Namodu & Entry Forms (October 2026)
+
+### Context & Requirements
+- **Background**: Previously, submissions from `/entry` and `/namodu` were stored globally into a single `reg_form` table.
+- **User Requirement**:
+  1. Registrations from `/namodu` must route directly into category-specific database tables (e.g. `student_reg`, `church_reg`, `pastors_tbl`, etc.) based on the selected category dropdown.
+  2. Submissions from `/namodu` must **not** be inserted into `reg_form` to prevent redundant records and table bloating.
+  3. The `/entry` form submissions should populate the categorical tables while maintaining backward compatibility.
+
+### Architectural & Implementation Details
+1. **Dynamic Category Mapping**:
+   - Analyzed category values:
+     - `Student` ➔ `student_reg` table
+     - `Pastor` ➔ `pastors_tbl` table
+     - `Church` ➔ `church_reg` table
+     - `Organisation` / `Ministry` / `Believer` ➔ Corresponding specific database tables
+   - Mapped categorical column schemas including personal information, contact numbers, locations (district, mandal, village), and timestamps.
+2. **Backend Query Routing**:
+   - Refactored submission endpoints in the backend API to inspect form origin and category code.
+   - For `/namodu`, bypassed `INSERT INTO reg_form` entirely and executed direct parameterized SQL queries against the respective category table.
+   - Preserved transaction integrity and UTF-8 collation (`utf8mb4`) across all inserts.
+
+---
+
+## 21. Android Mobile App Release v0.0.32: Play Console SDK 24+ Automatic Protection Compliance, Doctor Portal & Login Integration, Doctor Registration UI Redesign, and Signed Artifact Delivery (October 2026)
+
+### Context & Problem Analysis
+1. **Google Play Console Requirement**:
+   - Google Play rejected bundle upload: *"Play automatic protection requires a minimum SDK version of 24 or higher. The uploaded App Bundle has a minimum SDK version of 21."*
+   - Target SDK required to be at or above API 36 (`targetSdkVersion 36`).
+2. **Family Counselling & Doctor Portal Flaws**:
+   - Unauthenticated users could access the appointment booking form without logging in.
+   - Unresponsive action buttons:
+     - "Book here" (top right) and "Register here" on the Family Counselling dashboard.
+     - "Doctor Register" in the login registration modal.
+     - "Doctor/Counselor Registration? Register here" on the login screen.
+   - Doctor management tools were incorrectly showing on standard user profiles.
+   - Top-bar navigation items ("My Bookings", "Schedule", "Profile Edit") were not functioning properly.
+3. **Doctor Registration Form UI Collision**:
+   - The Doctor Registration form suffered from double-text headings and placeholder collisions caused by Ionic 3 `<ion-label floating>` simultaneously sharing input coordinates with `<ion-input placeholder="...">`.
+4. **Missing Doctor Login Category**:
+   - The App Login category dropdown lacked an option for Doctors/Counsellors, preventing them from logging into their dedicated management portal.
+
+### Technical Implementation & Remediation
+
+1. **SDK Upgrades & Build Configurations**:
+   - Set `minSdkVersion` to `24` in:
+     - `platforms/android/app/build.gradle` (`defaultConfig.minSdkVersion = 24`)
+     - `platforms/android/cdv-gradle-config.json` (`MIN_SDK_VERSION: 24`)
+     - `platforms/android/app/src/main/AndroidManifest.xml` (`<uses-sdk android:minSdkVersion="24" ... />`)
+   - Set `targetSdkVersion` to `36`:
+     - `platforms/android/app/build.gradle` (`defaultConfig.targetSdkVersion = 36`)
+     - `platforms/android/cdv-gradle-config.json` (`SDK_VERSION: 36`)
+   - Updated version code to `32` and version name to `0.0.32`:
+     - `config.xml` (`version="0.0.32"`, `android-versionCode="32"`)
+     - `platforms/android/app/src/main/AndroidManifest.xml` (`android:versionCode="32"`, `android:versionName="0.0.32"`)
+
+2. **Doctor Category Addition to App Login**:
+   - Added category option `8` (`డాక్టర్ / కౌన్సిలర్ (Doctor / Counsellor)`) to:
+     - `src/pages/login/login.html`
+     - Webpack bundle chunks `0.js` (`platforms/android/app/src/main/assets/www/build/0.js` and `www/build/0.js`).
+   - In `passlogin()`, handled category `8`:
+     - Sets `localStorage.setItem('category', 'Doctor')`
+     - Sets `localStorage.setItem('is_doctor', '1')`
+     - Automatically routes authenticated doctors to `'FamilyCouncellingPage'`.
+
+3. **Doctor Registration Form Layout Overhaul**:
+   - Replaced `<ion-label floating>` with `<ion-label stacked>` in `src/pages/doctorregister/doctorregister.html` and chunks `52.js` and `50.js`.
+   - Updated `main.css`:
+     - Stacked labels above inputs on separate lines with `#1e293b` text color.
+     - Kept `<span class="req">*</span>` cleanly styled in red (`#ef4444`).
+     - Styled input containers with white backgrounds, `#cbd5e1` borders, 8px border-radius, and 8px 12px padding.
+     - Separated labels from input placeholders, completely eliminating overlapping text.
+
+4. **Access Control & Navigation Gating**:
+   - Added authentication verification to "Book Your Appointment": unauthenticated clicks trigger a friendly modal prompting the user to log in first.
+   - Connected click handlers for "Register here", "Doctor Register", and login page registration links.
+   - Secured "My Bookings", "Schedule", and "Profile Edit" in the top bar to verify login state and route to their respective views.
+   - Gated the Doctor portal section so it only renders on Doctor dashboards.
+
+5. **Release Build & Verification**:
+   - Created and executed `scripts/build_and_sign_release_v32.ps1`.
+   - Optimized Gradle heap (`-Xmx3072m -Xss8m`).
+   - Ran `assembleRelease` and `bundleRelease` with exit code 0.
+   - Zipaligned and signed APK using `apksigner` with `Jbac.keystore`.
+   - Signed AAB using `jarsigner` with `Jbac.keystore`.
+   - Verified badging via `aapt`:
+     - `package: name='io.ionic.starterjbac' versionCode='32' versionName='0.0.32'`
+     - `sdkVersion: '24'`
+     - `targetSdkVersion: '36'`
+   - Generated Artifacts:
+     - `C:\Users\rajes\StudioProjects\jbac_app\jbacApp-0.0.32.apk` (118.68 MB)
+     - `C:\Users\rajes\StudioProjects\jbac_app\jbacApp-0.0.32.aab` (115.81 MB)

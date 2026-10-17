@@ -49,12 +49,12 @@ A private, browser-based database cockpit GUI panel. It aggregates separate, int
 
 ---
 
-## 🔒 Environment Properties Configuration (AWS Elastic Beanstalk)
-To run without hitting network timeout errors, pass these identical key-value parameters directly within your AWS Elastic Beanstalk Software dashboard memory pane:
+## 🔒 Environment Properties Configuration (AWS Elastic Beanstalk / Lambda)
+To run without hitting network timeout errors, pass these identical key-value parameters directly within your AWS Elastic Beanstalk or Lambda environment configuration:
 
-- `DB_HOST`: `jbac-db-cluster.cluster-cdeeuw0s2trf.ap-southeast-2.rds.amazonaws.com`
+- `DB_HOST`: `jbac-mysql-db-v3.cdeeuw0s2trf.ap-southeast-2.rds.amazonaws.com`
 - `DB_USER`: `admin`
-- `DB_NAME`: `jbac_db`
+- `DB_NAME`: `jbac_jbac`
 - `DB_PASSWORD`: `biUt2TrZ9EZAqn6GXhiA`
 - `PORT`: `8081`
 
@@ -79,9 +79,9 @@ To run without hitting network timeout errors, pass these identical key-value pa
 
 ### 1. Run Server Locally
 ```bash
-export DB_HOST="jbac-db-cluster.cluster-cdeeuw0s2trf.ap-southeast-2.rds.amazonaws.com"
+export DB_HOST="jbac-mysql-db-v3.cdeeuw0s2trf.ap-southeast-2.rds.amazonaws.com"
 export DB_USER="admin"
-export DB_NAME="jbac_db"
+export DB_NAME="jbac_jbac"
 export DB_PASSWORD="biUt2TrZ9EZAqn6GXhiA"
 export PORT="8081"
 
