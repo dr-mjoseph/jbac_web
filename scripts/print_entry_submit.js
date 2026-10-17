@@ -1,5 +1,4 @@
 const fs = require('fs');
-const tsPath = 'C:\\Users\\rajes\\StudioProjects\\jbac_app\\src\\pages\\entry-form\\entry-form.ts';
-const content = fs.readFileSync(tsPath, 'utf8');
+const content = fs.readFileSync('c:/Users/rajes/Documents/jbac_web/src/app/jesus/entry/entry.component.ts', 'utf8');
 const lines = content.split('\n');
-console.log(lines.slice(185, 230).join('\n'));
+console.log(lines.slice(380, 460).join('\n'));

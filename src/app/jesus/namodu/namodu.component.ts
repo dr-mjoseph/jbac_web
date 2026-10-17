@@ -419,8 +419,13 @@ export class NamoduComponent {
       return;
     }
 
-    const submittedPhone = this.entryform.value?.phonenum || '';
-    this.service.postregform(this.entryform.value).subscribe(
+    const submittedPhone = this.entryform.value?.phonenum || this.entryform.value?.number || '';
+    const payload = {
+      ...this.entryform.value,
+      source: 'namodu',
+      is_namodu: true
+    };
+    this.service.postregform(payload).subscribe(
       (res: any) => {
         if (res.status === 200) {
           Swal.fire({
