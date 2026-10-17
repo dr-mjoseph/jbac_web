@@ -1,74 +1,65 @@
 const fs = require('fs');
-const path = require('path');
-const vm = require('vm');
 
-const appRoot = 'C:/Users/rajes/StudioProjects/jbac_app';
-
-console.log('=== Adding Doctor Register direct link to LoginPage ===');
-
-// 1. src/pages/login/login.html
-const lHtmlPath = path.join(appRoot, 'src/pages/login/login.html');
-if (fs.existsSync(lHtmlPath)) {
-  let html = fs.readFileSync(lHtmlPath, 'utf8');
-  if (!html.includes('gotodoctorregister()')) {
-    const target = '<p class="signup-link" (click)="gotoformspage()">ఇంతకముందు రిజిస్టర్ కాకపోతే ? <a>రిజిస్టర్ </a></p>';
-    const addition = target + '\n        <p class="signup-link" style="margin-top: 8px;" (click)="gotodoctorregister()">🩺 డాక్టర్ / కౌన్సిలర్ రిజిస్ట్రేషన్ ? <a>ఇక్కడ నమోదు చేయండి</a></p>';
-    html = html.replace(target, addition);
-    fs.writeFileSync(lHtmlPath, html, 'utf8');
-    console.log('[OK] Added gotodoctorregister to src login.html');
-  }
-}
-
-// 2. src/pages/login/login.ts
-const lTsPath = path.join(appRoot, 'src/pages/login/login.ts');
-if (fs.existsSync(lTsPath)) {
-  let ts = fs.readFileSync(lTsPath, 'utf8');
-  if (!ts.includes('gotodoctorregister()')) {
-    const target = 'gotoformspage() {';
-    const addition = `gotodoctorregister() {
-    this.navCtrl.push('DoctorregisterPage');
-  }
-
-  gotoformspage() {`;
-    ts = ts.replace(target, addition);
-    fs.writeFileSync(lTsPath, ts, 'utf8');
-    console.log('[OK] Added gotodoctorregister to src login.ts');
-  }
-}
-
-// 3. Compiled 0.js in www and platforms/android assets
-const zeroJsPaths = [
-  path.join(appRoot, 'www/build/0.js'),
-  path.join(appRoot, 'platforms/android/app/src/main/assets/www/build/0.js')
+const dirs = [
+  'C:/Users/rajes/StudioProjects/jbac_app/www/build/0.js',
+  'C:/Users/rajes/StudioProjects/jbac_app/platforms/android/app/src/main/assets/www/build/0.js'
 ];
 
-for (const zPath of zeroJsPaths) {
-  if (fs.existsSync(zPath)) {
-    let code = fs.readFileSync(zPath, 'utf8');
-    
-    // In template
-    const tTarget = '<p class="signup-link" (click)="gotoformspage()">ఇంతకముందు రిజిస్టర్ కాకపోతే ? <a>రిజిస్టర్ </a></p>';
-    const tAddition = '<p class="signup-link" (click)="gotoformspage()">ఇంతకముందు రిజిస్టర్ కాకపోతే ? <a>రిజిస్టర్ </a></p>\\n        <p class="signup-link" style="margin-top: 8px;" tappable (click)="gotodoctorregister()">🩺 డాక్టర్ / కౌన్సిలర్ రిజిస్ట్రేషన్ ? <a>ఇక్కడ నమోదు చేయండి</a></p>';
-    if (code.includes(tTarget) && !code.includes('gotodoctorregister()')) {
-      code = code.replace(tTarget, tAddition);
-    }
+for (const p of dirs) {
+  let content = fs.readFileSync(p, 'utf8');
 
-    // In JS method
-    const mTarget = 'LoginPage.prototype.gotoformspage = function () {';
-    const mAddition = `LoginPage.prototype.gotodoctorregister = function () {
-        this.navCtrl.push('DoctorregisterPage');
-    };
-    LoginPage.prototype.gotoformspage = function () {`;
-    if (code.includes(mTarget) && !code.includes('LoginPage.prototype.gotodoctorregister')) {
-      code = code.replace(mTarget, mAddition);
-    }
+  // 1. Update <select> options in 0.js template
+  const targetOption6 = '<option value="6">క్రిస్టియన్ ఆర్గనైజెషన్ / కంపెనీ</option>';
+  const doctorOption = '\n\n          <option value="8">డాక్టర్ / కౌన్సిలర్ (Doctor / Counsellor)</option>';
 
-    try {
-      new vm.Script(code);
-      fs.writeFileSync(zPath, code, 'utf8');
-      console.log('[OK] Updated and verified 0.js at:', zPath);
-    } catch (e) {
-      console.error('[ERROR] 0.js syntax error:', e.message);
+  if (content.includes(targetOption6) && !content.includes('value="8"')) {
+    content = content.replace(targetOption6, targetOption6 + doctorOption);
+    console.log(`[OK] Added doctor option to template in ${p}`);
+  } else if (content.includes('value="8"')) {
+    console.log(`[INFO] Doctor option already in template in ${p}`);
+  } else {
+    console.log(`[WARN] targetOption6 not found in ${p}`);
+  }
+
+  // 2. Update passlogin() category 8 handling and redirection in 0.js
+  const targetCat7 = "else if (_this.passloginform.value.category == 7) {\n                                localStorage.setItem('category', 'Pastors Association ');\n                            }";
+  const doctorLogic = `else if (_this.passloginform.value.category == 7) {
+                                localStorage.setItem('category', 'Pastors Association ');
+                            }
+                            else if (_this.passloginform.value.category == 8) {
+                                localStorage.setItem('category', 'Doctor');
+                                localStorage.setItem('is_doctor', '1');
+                            }`;
+
+  if (content.includes(targetCat7) && !content.includes('value.category == 8')) {
+    content = content.replace(targetCat7, doctorLogic);
+    console.log(`[OK] Added category 8 handling to passlogin in ${p}`);
+  } else if (content.includes('value.category == 8')) {
+    console.log(`[INFO] Category 8 handling already in passlogin in ${p}`);
+  } else {
+    // Try regex replacement
+    const regCat7 = /else if \(_this\.passloginform\.value\.category == 7\) \{[\s\S]*?localStorage\.setItem\('category', 'Pastors Association '\);[\s\S]*?\}/;
+    if (regCat7.test(content) && !content.includes('value.category == 8')) {
+      content = content.replace(regCat7, doctorLogic);
+      console.log(`[OK] Added category 8 handling via regex in ${p}`);
+    } else {
+      console.log(`[WARN] targetCat7 not matched in ${p}`);
     }
   }
+
+  // Update redirect logic if category == 8
+  const oldRedirect = `_this.navCtrl.setRoot(__WEBPACK_IMPORTED_MODULE_3__home_home__["a" /* HomePage */]);`;
+  const newRedirect = `var redirect = _this.navParams.get('redirect');
+                            if (redirect === 'FamilyCouncellingPage' || redirect === 'family-councelling' || _this.passloginform.value.category == 8) {
+                                _this.navCtrl.setRoot('FamilyCouncellingPage');
+                            } else {
+                                _this.navCtrl.setRoot(__WEBPACK_IMPORTED_MODULE_3__home_home__["a" /* HomePage */]);
+                            }`;
+
+  if (content.includes(oldRedirect) && !content.includes("redirect === 'FamilyCouncellingPage'")) {
+    content = content.replace(oldRedirect, newRedirect);
+    console.log(`[OK] Added doctor / family counselling redirect in ${p}`);
+  }
+
+  fs.writeFileSync(p, content, 'utf8');
 }
