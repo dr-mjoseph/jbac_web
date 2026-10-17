@@ -1,16 +1,19 @@
-import express from 'express';
-import serverless from 'serverless-http';
-import mysql from 'mysql2/promise';
-import cors from 'cors';
-import fs from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const app = express();
-app.use(express.json({ limit: '50mb' }));
-app.use(express.urlencoded({ extended: true, limit: '50mb' }));
-app.use(cors());
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.handler = void 0;
+const express_1 = __importDefault(require("express"));
+const serverless_http_1 = __importDefault(require("serverless-http"));
+const promise_1 = __importDefault(require("mysql2/promise"));
+const cors_1 = __importDefault(require("cors"));
+const fs_1 = __importDefault(require("fs"));
+const path_1 = __importDefault(require("path"));
+const app = (0, express_1.default)();
+app.use(express_1.default.json({ limit: '50mb' }));
+app.use(express_1.default.urlencoded({ extended: true, limit: '50mb' }));
+app.use((0, cors_1.default)());
 // Strip AWS API Gateway Stage / Basepath prefix if present
 app.use((req, _res, next) => {
     if (req.url.startsWith('/default/jbac-backend-api')) {
@@ -25,7 +28,7 @@ const dbUser = process.env.DB_USER || 'admin';
 const dbPassword = process.env.DB_PASSWORD || 'biUt2TrZ9EZAqn6GXhiA';
 const dbName = (process.env.DB_NAME && process.env.DB_NAME !== 'sys') ? process.env.DB_NAME : 'jbac_jbac';
 const dbPort = Number(process.env.DB_PORT) || 3306;
-const db = mysql.createPool({
+const db = promise_1.default.createPool({
     host: dbHost,
     port: dbPort,
     user: dbUser,
@@ -133,23 +136,20 @@ async function dynamicInsert(tableName, data) {
                 fields.push(`\`${actualCol}\``);
                 placeholders.push('?');
                 let val = typeof v === 'object' && v !== null ? JSON.stringify(v) : (v === undefined ? null : v);
-                
-                const isNumericCol = meta && (
-                    meta.type.startsWith('int') ||
+                const isNumericCol = meta && (meta.type.startsWith('int') ||
                     meta.type.startsWith('bigint') ||
                     meta.type.startsWith('smallint') ||
                     meta.type.startsWith('tinyint') ||
                     meta.type.startsWith('decimal') ||
                     meta.type.startsWith('float') ||
                     meta.type.startsWith('double') ||
-                    meta.type.startsWith('numeric')
-                );
-
+                    meta.type.startsWith('numeric'));
                 if (typeof val === 'string' && val.trim() === '') {
                     if (isNumericCol || lk.endsWith('_id') || lk === 'constituencyname' || lk === 'districts' || lk === 'mandals' || lk === 'districtname' || lk === 'panchaiti') {
                         val = meta && !meta.nullable ? (meta.defaultVal !== null && !isNaN(Number(meta.defaultVal)) ? Number(meta.defaultVal) : 0) : null;
                     }
-                } else if (isNumericCol && val !== null && val !== undefined) {
+                }
+                else if (isNumericCol && val !== null && val !== undefined) {
                     if (!isNaN(Number(val))) {
                         val = Number(val);
                     }
@@ -203,9 +203,9 @@ app.get(['/api/tables', '/dashboardapi/tables', '/tables'], async (_req, res) =>
 app.get(['/admin-db', '/api/admin-db', '/dashboardapi/admin-db', '/api/admin-database-view'], (_req, res) => {
     res.setHeader('Content-Type', 'text/html; charset=utf-8');
     try {
-        const htmlPath = path.join(__dirname, 'admin_db.html');
-        if (fs.existsSync(htmlPath)) {
-            return res.send(fs.readFileSync(htmlPath, 'utf8'));
+        const htmlPath = path_1.default.join(__dirname, 'admin_db.html');
+        if (fs_1.default.existsSync(htmlPath)) {
+            return res.send(fs_1.default.readFileSync(htmlPath, 'utf8'));
         }
     }
     catch (_) { }
@@ -1151,26 +1151,37 @@ app.post(['/dashboardapi/postpastorassociations', '/api/postpastorassociations']
     try {
         const a = req.body || {};
         a.d_in = 0;
-        
         // Map frontend field aliases to MySQL table columns
-        if (a.pa_name && !a.paname) a.paname = a.pa_name;
-        if (!a.paname && a.name) a.paname = a.name;
-        if (a.pa_secretory && !a.secretory) a.secretory = a.pa_secretory;
-        if (a.pa_president && !a.president) a.president = a.pa_president;
-        if (a.district_id && !a.districtname) a.districtname = a.district_id;
-        if (a.constituency_id && !a.constituencyname) a.constituencyname = a.constituency_id;
-        if (a.mandal_id && !a.mandals) a.mandals = a.mandal_id;
-        if (a.village_id && !a.panchaiti) a.panchaiti = a.village_id;
-        if (a.std_phonenumber && !a.stdph) a.stdph = a.std_phonenumber;
-        if (a.term && !a.terms) a.terms = a.term;
-        if (!a.terms) a.terms = 'YES';
-        if (!a.cts) a.cts = new Date().toISOString().slice(0, 19).replace('T', ' ');
+        if (a.pa_name && !a.paname)
+            a.paname = a.pa_name;
+        if (!a.paname && a.name)
+            a.paname = a.name;
+        if (a.pa_secretory && !a.secretory)
+            a.secretory = a.pa_secretory;
+        if (a.pa_president && !a.president)
+            a.president = a.pa_president;
+        if (a.district_id && !a.districtname)
+            a.districtname = a.district_id;
+        if (a.constituency_id && !a.constituencyname)
+            a.constituencyname = a.constituency_id;
+        if (a.mandal_id && !a.mandals)
+            a.mandals = a.mandal_id;
+        if (a.village_id && !a.panchaiti)
+            a.panchaiti = a.village_id;
+        if (a.std_phonenumber && !a.stdph)
+            a.stdph = a.std_phonenumber;
+        if (a.term && !a.terms)
+            a.terms = a.term;
+        if (!a.terms)
+            a.terms = 'YES';
+        if (!a.cts)
+            a.cts = new Date().toISOString().slice(0, 19).replace('T', ' ');
         if (a.districtname !== undefined && a.districtname !== null && a.districtname !== '') {
             a.districtname = Number(a.districtname);
-        } else {
+        }
+        else {
             a.districtname = null;
         }
-
         const phone = a.phonenumber || a.whatsapp_number || a.mobile_number;
         if (phone) {
             const [existing] = await db.query('SELECT id FROM pastors_associations WHERE phonenumber = ? AND d_in = 0', [phone]);
@@ -1178,11 +1189,9 @@ app.post(['/dashboardapi/postpastorassociations', '/api/postpastorassociations']
                 return res.json({ status: 451, message: 'Already registered with this phone number' });
             }
         }
-
         if (!a.password) {
             a.password = phone || '123456';
         }
-
         const result = await dynamicInsert('pastors_associations', a);
         if (phone && a.password) {
             try {
@@ -1193,7 +1202,8 @@ app.post(['/dashboardapi/postpastorassociations', '/api/postpastorassociations']
                     otp: a.password,
                     d_in: 0
                 });
-            } catch (_) { }
+            }
+            catch (_) { }
         }
         res.json({ status: 200, message: 'Pastor Association registration successful', insertId: result?.insertId });
     }
@@ -1534,8 +1544,76 @@ app.post(['/dashboardapi/postregform', '/api/postregform'], async (req, res) => 
     try {
         const body = req.body || {};
         body.d_in = 0;
+        const phone = String(body.phonenum || body.phnumber || body.mobile_number || body.phone || body.number || '').trim();
+        if (phone) {
+            body.phonenum = phone;
+            if (!body.password) {
+                body.password = phone;
+            }
+            if (body.is_first_login === undefined || body.is_first_login === null) {
+                body.is_first_login = 1;
+            }
+        }
         const result = await dynamicInsert('reg_form', body);
-        res.json({ status: 200, message: 'Registration submitted successfully', insertId: result?.insertId });
+        res.json({
+            status: 200,
+            message: 'registered successfully, you can login with username and password with the same mobile number and if you want to change you can change while login or by clicking forgot password.',
+            insertId: result?.insertId
+        });
+    }
+    catch (err) {
+        res.status(500).json({ status: 500, error: err.message });
+    }
+});
+// Family Members by Mobile Number (for Multi-Family Member Registrations)
+app.all(['/dashboardapi/getfamilymembers', '/api/getfamilymembers'], async (req, res) => {
+    try {
+        const phone = String(req.body?.mobile_number || req.body?.phonenum || req.body?.phone || req.query?.mobile_number || req.query?.phone || '').trim();
+        if (!phone) {
+            return res.json({ status: 400, message: 'Mobile number required' });
+        }
+        const [members] = await db.query('SELECT `reg-id` as id, name, phonenum as mobile_number, category, is_first_login, password, district_id, constituency_id, mandal_id, panchayat_id FROM reg_form WHERE phonenum = ? ORDER BY `reg-id` ASC', [phone]);
+        res.json({
+            status: 200,
+            message: 'Family members fetched successfully',
+            count: members?.length || 0,
+            members: members || []
+        });
+    }
+    catch (err) {
+        res.status(500).json({ status: 500, error: err.message });
+    }
+});
+// Update Password for Specific Family Member or User
+app.all(['/dashboardapi/updatefamilymemberpassword', '/api/updatefamilymemberpassword'], async (req, res) => {
+    try {
+        const b = req.body || {};
+        const phone = String(b.mobile_number || b.phonenum || b.phone || b.number || '').trim();
+        const newPassword = String(b.password || b.new_password || b.repassword || '').trim();
+        const memberId = b.member_id || b.id || b['reg-id'] || null;
+        const memberName = b.member_name || b.name || null;
+        if (!phone || !newPassword) {
+            return res.json({ status: 400, message: 'Phone number and new password are required' });
+        }
+        let updateSql = 'UPDATE reg_form SET password = ?, is_first_login = 0 WHERE phonenum = ?';
+        const params = [newPassword, phone];
+        if (memberId) {
+            updateSql += ' AND `reg-id` = ?';
+            params.push(memberId);
+        }
+        else if (memberName) {
+            updateSql += ' AND name = ?';
+            params.push(memberName);
+        }
+        const [regResult] = await db.query(updateSql, params);
+        await db.query('UPDATE users SET otp = ? WHERE number = ?', [newPassword, phone]).catch(() => { });
+        await db.query('UPDATE signup_form SET password = ? WHERE mobile_number = ?', [newPassword, phone]).catch(() => { });
+        await db.query('UPDATE belivers_tbl SET password = ? WHERE mobile_number = ?', [newPassword, phone]).catch(() => { });
+        res.json({
+            status: 200,
+            message: 'Password updated successfully',
+            affectedRows: regResult?.affectedRows || 0
+        });
     }
     catch (err) {
         res.status(500).json({ status: 500, error: err.message });
@@ -1736,8 +1814,53 @@ app.post(['/dashboardapi/passwordwebsitelogin', '/api/login'], async (req, res) 
                 return res.json({ status: 200, message: 'Login successful', data: [formatUser(rows[0], cfg.category_id, cfg.category_name)] });
             }
         }
-        // 4. Distinguish wrong password vs unregistered phone
+        // 4. Check reg_form for family members registered via entry form
+        const [regMembers] = await db.query('SELECT `reg-id` as id, name, phonenum as mobile_number, category, is_first_login, password FROM reg_form WHERE phonenum = ? ORDER BY `reg-id` ASC', [phone]);
+        if (regMembers && regMembers.length > 0) {
+            const memberId = req.body.member_id || req.body.id;
+            let targetMember = null;
+            if (memberId) {
+                targetMember = regMembers.find((m) => String(m.id) === String(memberId));
+            }
+            else {
+                const matched = regMembers.filter((m) => m.password === pwd || (!m.password && pwd === phone));
+                if (matched.length > 0) {
+                    targetMember = matched[0];
+                }
+            }
+            if (targetMember && (targetMember.password === pwd || (!targetMember.password && pwd === phone))) {
+                const isInitialPwd = (pwd === phone || targetMember.password === phone || targetMember.is_first_login == 1);
+                const userObj = formatUser({
+                    id: targetMember.id,
+                    name: targetMember.name,
+                    mobile_number: targetMember.mobile_number,
+                    category_id: targetMember.category || cat || '1'
+                }, targetMember.category || cat || '1', 'Believer');
+                if (isInitialPwd) {
+                    return res.json({
+                        status: 201,
+                        first_login: true,
+                        message: 'First login or multiple family members detected. You can change password now or continue.',
+                        members: regMembers,
+                        selected_member: targetMember,
+                        data: [userObj]
+                    });
+                }
+                else {
+                    return res.json({
+                        status: 200,
+                        message: 'Login successful',
+                        members: regMembers,
+                        selected_member: targetMember,
+                        data: [userObj]
+                    });
+                }
+            }
+        }
+        // 5. Distinguish wrong password vs unregistered phone
         let phoneFound = false;
+        if (regMembers && regMembers.length > 0)
+            phoneFound = true;
         const [userExists] = await db.query('SELECT id FROM users WHERE number = ?', [phone]);
         if (userExists && userExists.length > 0)
             phoneFound = true;
@@ -1813,9 +1936,19 @@ app.post(['/dashboardapi/checkotp', '/api/checkotp'], async (_req, res) => {
 });
 app.post(['/dashboardapi/createfrgetpassword', '/api/resetpassword'], async (req, res) => {
     try {
-        const { mobile_number, password } = req.body;
-        await db.query('UPDATE users SET otp = ? WHERE number = ?', [password, mobile_number]);
-        await db.query('UPDATE signup_form SET password = ? WHERE mobile_number = ?', [password, mobile_number]);
+        const { mobile_number, password, member_id, id } = req.body;
+        const phone = String(mobile_number || '').trim();
+        const pwd = String(password || '').trim();
+        const memId = member_id || id || null;
+        if (memId) {
+            await db.query('UPDATE reg_form SET password = ?, is_first_login = 0 WHERE phonenum = ? AND `reg-id` = ?', [pwd, phone, memId]).catch(() => { });
+        }
+        else {
+            await db.query('UPDATE reg_form SET password = ?, is_first_login = 0 WHERE phonenum = ?', [pwd, phone]).catch(() => { });
+        }
+        await db.query('UPDATE users SET otp = ? WHERE number = ?', [pwd, phone]).catch(() => { });
+        await db.query('UPDATE signup_form SET password = ? WHERE mobile_number = ?', [pwd, phone]).catch(() => { });
+        await db.query('UPDATE belivers_tbl SET password = ? WHERE mobile_number = ?', [pwd, phone]).catch(() => { });
         res.json({ status: 200, message: 'Password updated successfully' });
     }
     catch (err) {
@@ -1925,8 +2058,13 @@ app.all(['/dashboardapi/updatecount', '/api/updatecount'], async (_req, res) => 
 app.all(['/dashboardapi/checknumberpassword', '/api/checknumberpassword'], async (req, res) => {
     try {
         const b = req.body || {};
-        const phone = b.mobile_number || b.number || b.phone || b.contactnumber || '';
+        const phone = String(b.mobile_number || b.number || b.phone || b.contactnumber || '').trim();
         const cat = Number(b.category) || 1;
+        // 1. Check reg_form for family members registered via entry form
+        const [regRows] = await db.query('SELECT `reg-id` as id, name, phonenum as mobile_number, category, password, is_first_login FROM reg_form WHERE phonenum = ? ORDER BY `reg-id` ASC', [phone]);
+        if (regRows && regRows.length > 0) {
+            return res.json({ status: 200, message: 'User found', data: regRows, members: regRows });
+        }
         let table = 'belivers_tbl';
         let phoneCol = 'mobile_number';
         if (cat === 2) {
@@ -1955,7 +2093,7 @@ app.all(['/dashboardapi/checknumberpassword', '/api/checknumberpassword'], async
         }
         const [rows] = await db.query(`SELECT * FROM \`${table}\` WHERE \`${phoneCol}\` = ? AND d_in = 0 LIMIT 1`, [phone]);
         if (rows.length > 0) {
-            res.json({ status: 200, message: 'User found', data: rows });
+            res.json({ status: 200, message: 'User found', data: rows, members: rows });
         }
         else {
             res.json({ status: 404, message: 'User not found' });
@@ -1968,9 +2106,20 @@ app.all(['/dashboardapi/checknumberpassword', '/api/checknumberpassword'], async
 app.all(['/dashboardapi/upadtedpassword', '/dashboardapi/updatedpassword', '/api/upadtedpassword', '/api/updatedpassword'], async (req, res) => {
     try {
         const b = req.body || {};
-        const phone = b.mobile_number || b.number || b.phone || b.contactnumber || '';
-        const newPass = b.password || b.repassword || '';
+        const phone = String(b.mobile_number || b.number || b.phone || b.contactnumber || '').trim();
+        const newPass = String(b.password || b.repassword || b.new_password || '').trim();
+        const memberId = b.member_id || b.id || b['reg-id'] || null;
+        const memberName = b.member_name || b.name || null;
         const cat = Number(b.category) || 1;
+        if (memberId) {
+            await db.query('UPDATE reg_form SET password = ?, is_first_login = 0 WHERE phonenum = ? AND `reg-id` = ?', [newPass, phone, memberId]).catch(() => { });
+        }
+        else if (memberName) {
+            await db.query('UPDATE reg_form SET password = ?, is_first_login = 0 WHERE phonenum = ? AND name = ?', [newPass, phone, memberName]).catch(() => { });
+        }
+        else {
+            await db.query('UPDATE reg_form SET password = ?, is_first_login = 0 WHERE phonenum = ?', [newPass, phone]).catch(() => { });
+        }
         let table = 'belivers_tbl';
         let phoneCol = 'mobile_number';
         if (cat === 2) {
@@ -1997,7 +2146,9 @@ app.all(['/dashboardapi/upadtedpassword', '/dashboardapi/updatedpassword', '/api
             table = 'ministry_signup';
             phoneCol = 'headnmber';
         }
-        await db.query(`UPDATE \`${table}\` SET password = ? WHERE \`${phoneCol}\` = ? AND d_in = 0`, [newPass, phone]);
+        await db.query(`UPDATE \`${table}\` SET password = ? WHERE \`${phoneCol}\` = ? AND d_in = 0`, [newPass, phone]).catch(() => { });
+        await db.query('UPDATE users SET otp = ? WHERE number = ?', [newPass, phone]).catch(() => { });
+        await db.query('UPDATE signup_form SET password = ? WHERE mobile_number = ?', [newPass, phone]).catch(() => { });
         res.json({ status: 200, message: 'Password updated successfully' });
     }
     catch (err) {
@@ -2253,17 +2404,19 @@ app.all(['/dashboardapi/savecouncellingdoctor', '/api/savecouncellingdoctor', '/
     try {
         await ensureCouncellingTables();
         const b = req.body || {};
-        if (!b.doctor_name || !b.phone_number) {
+        const doctorName = (b.doctor_name || b.name || '').trim();
+        const phoneNumber = String(b.phone_number || b.phone || b.mobile_number || '').trim();
+        if (!doctorName || !phoneNumber) {
             return res.json({ status: 400, message: 'Doctor name and phone number are required' });
         }
         const img = extractUploadedImage(b) || b.image || 'assets/images/pastor.png';
         const docData = {
-            user_id: b.user_id || null,
-            doctor_name: b.doctor_name,
+            user_id: b.user_id || b.usr_id || null,
+            doctor_name: doctorName,
             specialization: b.specialization || 'Family Counsellor',
             qualification: b.qualification || '',
             experience_years: b.experience_years || '',
-            phone_number: b.phone_number,
+            phone_number: phoneNumber,
             email: b.email || '',
             consultation_fee: b.consultation_fee || 'Free / Volunteer Service',
             available_days: b.available_days || 'Monday to Saturday',
@@ -2648,11 +2801,10 @@ app.get('/', (_req, res) => {
         }
     });
 });
-export const handler = serverless(app);
+exports.handler = (0, serverless_http_1.default)(app);
 if (!process.env.AWS_LAMBDA_FUNCTION_NAME) {
     const PORT = process.env.PORT || 8081;
     app.listen(PORT, async () => {
         console.log(`JBAC Backend API listening on port ${PORT}`);
     });
 }
-//# sourceMappingURL=server.js.map

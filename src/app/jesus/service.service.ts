@@ -77,6 +77,15 @@ export class ServiceService {
     return this.http.post(this.testApi + 'passwordwebsitelogin', data)
   }
 
+  getFamilyMembers(phone: any): Observable<any> {
+    const payload = typeof phone === 'object' ? phone : { mobile_number: phone };
+    return this.http.post<any>(this.testApi + 'getfamilymembers', payload);
+  }
+
+  updateFamilyMemberPassword(data: any): Observable<any> {
+    return this.http.post<any>(this.testApi + 'updatefamilymemberpassword', data);
+  }
+
   getevents() {
     var data = {}
     return this.http.post<any>(this.testApi + `getupdateevents`, data).pipe(map(res => {

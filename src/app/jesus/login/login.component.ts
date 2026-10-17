@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, AfterContentInit, ViewChild, TemplateRef } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ServiceService } from '../service.service';
 import { Router, ActivatedRoute } from '@angular/router';
@@ -10,11 +10,20 @@ import Swal from 'sweetalert2';
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.css']
 })
-export class LoginComponent {
+export class LoginComponent implements OnInit, AfterContentInit {
+  @ViewChild('firstLoginModal') firstLoginModalTemplate!: TemplateRef<any>;
+
   showSpinner: boolean = false;
   passwordform: FormGroup;
   checkform: FormGroup;
+  firstLoginForm: FormGroup;
   submitted: boolean = false;
+
+  firstLoginMembers: any[] = [];
+  firstLoginSelectedUser: any = null;
+  forgotFamilyMembers: any[] = [];
+  isFetchingFamily: boolean = false;
+  isUpdatingPassword: boolean = false;
 
   constructor(
     private formBuilder: FormBuilder,
@@ -27,13 +36,20 @@ export class LoginComponent {
       category: ['', [Validators.required]],
       mobile_number: ['', [Validators.required, Validators.minLength(10)]],
       password: ['', [Validators.required, Validators.minLength(6)]],
-    })
+    });
 
     this.checkform = this.formBuilder.group({
       category: ['', [Validators.required]],
       mobile_number: ['', [Validators.required, Validators.minLength(10)]],
-      otp: ['', [Validators.minLength(4)]],
-      password: ['', [Validators.minLength(8)]]
+      member_id: [''],
+      password: ['', [Validators.required, Validators.minLength(6), Validators.maxLength(16)]],
+      confirm_password: ['', [Validators.required]]
+    });
+
+    this.firstLoginForm = this.formBuilder.group({
+      member_id: ['', [Validators.required]],
+      new_password: ['', [Validators.required, Validators.minLength(6), Validators.maxLength(16)]],
+      confirm_password: ['', [Validators.required]]
     });
   }
 
@@ -54,8 +70,9 @@ export class LoginComponent {
     });
   }
 
-  get f() { return this.passwordform.controls }
-  get i() { return this.checkform.controls }
+  get f() { return this.passwordform.controls; }
+  get i() { return this.checkform.controls; }
+  get fl() { return this.firstLoginForm.controls; }
 
   fillDemoUser(category: string = '1') {
     const isDoc = (category === '8');
@@ -113,7 +130,6 @@ export class LoginComponent {
       if (this.returnUrl) {
         this.router.navigateByUrl(this.returnUrl);
       } else if (isDoc) {
-        // Direct doctor to doctor schedule and profile setup in family counselling
         this.router.navigate(['/family-councelling'], { queryParams: { tab: 'doctor_schedule' } });
       } else {
         this.router.navigate(['/about']);
@@ -146,14 +162,30 @@ export class LoginComponent {
           Swal.fire({
             icon: 'info',
             title: 'నమోదు కాలేదు',
-            text: 'ఈ మొబైల్ నంబర్ ఇంకా నమోదు కాలేదు. దయచేసి Sign-Up ద్వారా రిజిస్టర్ చేసుకోండి.'
+            text: 'ఈ మొబైల్ నంబర్ ఇంకా నమోదు కాలేదు. దయచేసి Sign-Up లేదా Entry Form ద్వారా రిజిస్టర్ చేసుకోండి.'
           });
         } else if (res.status == 600) {
           Swal.fire({
             icon: 'error',
             title: 'తప్పు పాస్‌వర్డ్',
-            text: 'పాస్‌వర్డ్ సరిపోలలేదు. దయచేసి సరైన పాస్‌వర్డ్ ఎంటర్ చేయండి.'
+            text: 'పాస్‌వర్డ్ సరిపోలలేదు. దయచేసి సరైన పాస్‌వర్డ్ ఎంటర్ చేయండి లేదా Forgot Password ద్వారా రీసెట్ చేయండి.'
           });
+        } else if (res.status == 201 || res.first_login == true) {
+          // First attempt login or multiple family members registered under same phone
+          this.firstLoginSelectedUser = (res.data && res.data.length > 0) ? res.data[0] : (res.selected_member || null);
+          this.firstLoginMembers = res.members || (this.firstLoginSelectedUser ? [this.firstLoginSelectedUser] : []);
+          const defaultMemberId = this.firstLoginSelectedUser?.id || (this.firstLoginMembers.length > 0 ? this.firstLoginMembers[0].id : '');
+          this.firstLoginForm.patchValue({
+            member_id: defaultMemberId,
+            new_password: '',
+            confirm_password: ''
+          });
+
+          if (this.firstLoginModalTemplate) {
+            this.modalService.open(this.firstLoginModalTemplate, { centered: true, backdrop: 'static', keyboard: false });
+          } else {
+            this.handleSuccessfulLogin(this.firstLoginSelectedUser);
+          }
         } else if (res.status == 200 || (res.data && res.data.length > 0)) {
           this.handleSuccessfulLogin(res.data ? res.data[0] : null);
         } else {
@@ -168,7 +200,6 @@ export class LoginComponent {
         this.showSpinner = false;
         console.error('Login Network/Server Error:', error);
 
-        // When remote RDS times out (10060 / ETIMEDOUT), offer immediate offline login so user is never blocked
         Swal.fire({
           icon: 'warning',
           title: 'డేటాబేస్ నెట్‌వర్క్ సమస్య (RDS 10060)',
@@ -192,8 +223,6 @@ export class LoginComponent {
     });
   }
 
-
-
   // Acct Input As a Number Only
   numericOnly(event: any): boolean {
     let patt = /^([0-9])$/;
@@ -201,66 +230,176 @@ export class LoginComponent {
     return result;
   }
 
+  // First Login Modal Actions
+  submitFirstLoginPassword() {
+    if (this.firstLoginForm.invalid) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'వివరాలు పూరించండి',
+        text: 'దయచేసి కొత్త పాస్‌వర్డ్ (కనీసం 6 అక్షరాలు) మరియు కన్ఫర్మ్ పాస్‌వర్డ్ నమోదు చేయండి.'
+      });
+      return;
+    }
 
+    const newPwd = this.firstLoginForm.value.new_password;
+    const confirmPwd = this.firstLoginForm.value.confirm_password;
+    if (newPwd !== confirmPwd) {
+      Swal.fire({
+        icon: 'error',
+        title: 'పాస్‌వర్డ్ సరిపోలలేదు',
+        text: 'కొత్త పాస్‌వర్డ్ మరియు కన్ఫర్మ్ పాస్‌వర్డ్ ఒకేలా ఉండాలి.'
+      });
+      return;
+    }
 
+    const memberId = this.firstLoginForm.value.member_id;
+    const selectedMem = this.firstLoginMembers.find((m: any) => String(m.id) === String(memberId)) || this.firstLoginSelectedUser;
+
+    this.isUpdatingPassword = true;
+    this.service.updateFamilyMemberPassword({
+      mobile_number: this.passwordform.value.mobile_number,
+      password: newPwd,
+      member_id: memberId,
+      name: selectedMem?.name
+    }).subscribe({
+      next: (_res: any) => {
+        this.isUpdatingPassword = false;
+        this.modalService.dismissAll();
+        Swal.fire({
+          icon: 'success',
+          title: 'పాస్‌వర్డ్ మార్చబడింది!',
+          text: 'మీ కొత్త పాస్‌వర్డ్ విజయవంతంగా సెట్ చేయబడింది. లాగిన్ అవుతోంది...',
+          timer: 1500,
+          showConfirmButton: false
+        }).then(() => {
+          this.handleSuccessfulLogin(selectedMem || this.firstLoginSelectedUser);
+        });
+      },
+      error: (err: any) => {
+        this.isUpdatingPassword = false;
+        console.error('Password update error:', err);
+        this.modalService.dismissAll();
+        this.handleSuccessfulLogin(selectedMem || this.firstLoginSelectedUser);
+      }
+    });
+  }
+
+  continueWithCurrentPassword() {
+    this.modalService.dismissAll();
+    const memberId = this.firstLoginForm.value.member_id;
+    const selectedMem = this.firstLoginMembers.find((m: any) => String(m.id) === String(memberId)) || this.firstLoginSelectedUser;
+    this.handleSuccessfulLogin(selectedMem || this.firstLoginSelectedUser);
+  }
+
+  // Forgot Password Direct Reset (No OTP required)
   forgetpassword(forget: any) {
-    this.modalService.open(forget, { centered: true, })
-  }
-
-
-  otpfiled: boolean = false;
-  passwordfield: boolean = false;
-
-  emailcheck() {
-    if (this.checkform.invalid) {
-      return;
-    } else {
-      this.service.checknumber(this.checkform.value).subscribe((res: any) => {
-        if (res.status == 202) {
-          Swal.fire(res.message);
-        } else if (res.status == 200) {
-          Swal.fire('Otp sent for your registered number : ' + this.checkform.value.mobile_number)
-          this.otpfiled = true;
-        }
-      })
+    this.forgotFamilyMembers = [];
+    this.checkform.reset();
+    if (this.passwordform.value.category) {
+      this.checkform.patchValue({ category: this.passwordform.value.category });
     }
-  }
-
-  forgetemailotpsubmit() {
-    if (this.checkform.invalid) {
-      return;
-    } else if (this.checkform.value.otp == '' || this.checkform.value.mobile_number == '') {
-      Swal.fire('please enter the otp ')
-    } else {
-      this.service.checkotp(this.checkform.value).subscribe((res: any) => {
-        if (res.status == 202) {
-          Swal.fire(res.message);
-        } else if (res.status == 200) {
-          this.passwordfield = true
-        }
-      })
+    if (this.passwordform.value.mobile_number) {
+      this.checkform.patchValue({ mobile_number: this.passwordform.value.mobile_number });
+      this.onForgotPhoneChange();
     }
+    this.modalService.open(forget, { centered: true });
   }
 
-  createfrgetpassword() {
-    if (this.checkform.value.password == '' || this.checkform.value.mobile_number == '') {
-      Swal.fire('please enter the password ')
-    } else if (this.checkform.value.password.length < 6) {
-      Swal.fire('Please Enter the 6 To 16 Digits / special characters ')
-    } else {
-      this.service.createfrgetpassword(this.checkform.value).subscribe((res: any) => {
-        if (res.status == 202) {
-          Swal.fire(res.message);
-        } else if (res.status == 200) {
-          Swal.fire('password Created for login ');
-          this.otpfiled = false;
-          this.passwordfield = false;
-          this.modalService.dismissAll();
-          this.checkform.reset();
+  onForgotPhoneChange() {
+    const phone = String(this.checkform.value.mobile_number || '').trim();
+    if (phone.length === 10) {
+      this.isFetchingFamily = true;
+      this.service.getFamilyMembers(phone).subscribe({
+        next: (res: any) => {
+          this.isFetchingFamily = false;
+          if (res && res.members && res.members.length > 0) {
+            this.forgotFamilyMembers = res.members;
+            this.checkform.patchValue({ member_id: this.forgotFamilyMembers[0].id });
+          } else {
+            this.forgotFamilyMembers = [];
+            this.checkform.patchValue({ member_id: '' });
+          }
+        },
+        error: () => {
+          this.isFetchingFamily = false;
+          this.forgotFamilyMembers = [];
         }
       });
+    } else {
+      this.forgotFamilyMembers = [];
+    }
+  }
+
+  resetForgotPasswordDirect() {
+    if (this.checkform.invalid) {
+      let missingFields: string[] = [];
+      if (this.i['category']?.errors) missingFields.push('క్యాటగిరి (Category)');
+      if (this.i['mobile_number']?.errors) missingFields.push('10 అంకెల మొబైల్ నంబర్');
+      if (this.i['password']?.errors) missingFields.push('కొత్త పాస్‌వర్డ్ (కనీసం 6 అక్షరాలు)');
+      if (this.i['confirm_password']?.errors) missingFields.push('కన్ఫర్మ్ పాస్‌వర్డ్');
+
+      Swal.fire({
+        icon: 'warning',
+        title: 'వివరాలు పూరించండి',
+        text: 'దయచేసి ఖాళీగా ఉన్న వివరాలు నమోదు చేయండి: ' + missingFields.join(', ')
+      });
+      return;
     }
 
+    const newPwd = this.checkform.value.password;
+    const confirmPwd = this.checkform.value.confirm_password;
+    if (newPwd !== confirmPwd) {
+      Swal.fire({
+        icon: 'error',
+        title: 'పాస్‌వర్డ్ సరిపోలలేదు',
+        text: 'కొత్త పాస్‌వర్డ్ మరియు కన్ఫర్మ్ పాస్‌వర్డ్ సరిపోలలేదు. దయచేసి సరిగ్గా టైప్ చేయండి.'
+      });
+      return;
+    }
+
+    this.showSpinner = true;
+    const payload = {
+      category: this.checkform.value.category,
+      mobile_number: this.checkform.value.mobile_number,
+      password: newPwd,
+      member_id: this.checkform.value.member_id || null
+    };
+
+    this.service.updateFamilyMemberPassword(payload).subscribe({
+      next: (res: any) => {
+        this.showSpinner = false;
+        if (res.status == 200 || res.status == 201) {
+          Swal.fire({
+            icon: 'success',
+            title: 'పాస్‌వర్డ్ మార్చబడింది!',
+            text: 'మీ పాస్‌వర్డ్ విజయవంతంగా రీసెట్ చేయబడింది. దయచేసి కొత్త పాస్‌వర్డ్‌తో లాగిన్ చేయండి.'
+          });
+          this.modalService.dismissAll();
+          this.passwordform.patchValue({
+            category: this.checkform.value.category,
+            mobile_number: this.checkform.value.mobile_number,
+            password: newPwd
+          });
+          this.checkform.reset();
+          this.forgotFamilyMembers = [];
+        } else {
+          Swal.fire({
+            icon: 'warning',
+            title: 'హెచ్చరిక',
+            text: res.message || 'పాస్‌వర్డ్ అప్‌డేట్ కాలేదు. దయచేసి మొబైల్ నంబర్ సరిచూసుకోండి.'
+          });
+        }
+      },
+      error: (err: any) => {
+        this.showSpinner = false;
+        console.error('Password reset error:', err);
+        Swal.fire({
+          icon: 'error',
+          title: 'నెట్‌వర్క్ సమస్య',
+          text: 'సర్వర్‌కు కనెక్ట్ చేయడంలో సమస్య వచ్చింది. దయచేసి కాసేపటి తర్వాత మళ్లీ ప్రయత్నించండి.'
+        });
+      }
+    });
   }
     ///////////////////mobile view///////////////
     login: boolean = true;

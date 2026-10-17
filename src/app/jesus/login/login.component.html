@@ -155,51 +155,128 @@
     <br>
 </div>
 
+<!-- Direct Forgot Password Modal (No OTP Required) -->
 <ng-template #forget let-modal>
-    <form [formGroup]="checkform">
-        <div class="row" style="padding: 39px;">
-            <div class="col-sm-12">
-                <h3>Enter Category</h3>
-                <select formControlName="category" class="form-control"
-                    [ngClass]="{'is-invalid': Submitlogindata && f['category'].errors }">
-                    <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
-                    <option value="1">Believer</option>
-                    <option value="2">Student</option>
-                    <option value="3">Ministry</option>
-                    <option value="4">Pastor</option>
-                    <option value="5">Church </option>
-                    <option value="6">Independent organization </option>
+    <div class="modal-header" style="background: #237e8d; color: white; border-top-left-radius: 8px; border-top-right-radius: 8px;">
+        <h4 class="modal-title m-0 text-white" style="font-weight: 600;">పాస్‌వర్డ్ రీసెట్ (Reset Password)</h4>
+        <button type="button" class="btn-close btn-close-white" aria-label="Close" (click)="modal.dismiss('Cross click')"></button>
+    </div>
+    <div class="modal-body p-4" style="background: #fbfbfb;">
+        <form [formGroup]="checkform">
+            <div class="mb-3">
+                <label class="form-label" style="font-weight: 600; color: #333;">క్యాటగిరి (Category) <span class="text-danger">*</span></label>
+                <select formControlName="category" class="form-control" [ngClass]="{'is-invalid': checkform.get('category')?.touched && checkform.get('category')?.invalid}">
+                    <option value="" selected disabled>క్యాటగిరి ఎంచుకోండి</option>
+                    <option value="1">విశ్వాసి (Believer)</option>
+                    <option value="4">పాస్టర్ (Pastor)</option>
+                    <option value="2">విద్యార్థి (Student)</option>
+                    <option value="7">పాస్టర్ల అసోసియేషన్ (Pastors Association)</option>
+                    <option value="3">మినిస్ట్రీస్ (Ministry)</option>
+                    <option value="5">చర్చి (Church)</option>
+                    <option value="6">ఇండిపెండెంట్ ఆర్గనైజేషన్</option>
+                    <option value="8">డాక్టర్ / కౌన్సిలర్ (Doctor / Counsellor)</option>
                 </select>
             </div>
-            <div class="col-sm-12">
-                <h3>Enter Your Number</h3>
-                <input type="text" class="form-control" placeholder="Enter Number" formControlName="mobile_number"
-                    (keypress)="numericOnly($event)">
+
+            <div class="mb-3">
+                <label class="form-label" style="font-weight: 600; color: #333;">మొబైల్ నంబర్ (Mobile Number) <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" placeholder="10 అంకెల మొబైల్ నంబర్..." formControlName="mobile_number"
+                    maxlength="10" (keypress)="numericOnly($event)" (input)="onForgotPhoneChange()">
+                <small *ngIf="isFetchingFamily" class="text-primary mt-1 d-block">
+                    <span style="display:inline-block; width:12px; height:12px; border:2px solid #237e8d; border-right-color:transparent; border-radius:50%; animation:spin 0.75s linear infinite;"></span>
+                    కుటుంబ సభ్యుల వివరాలు లోడ్ అవుతున్నాయి...
+                </small>
             </div>
 
-            <div class="col-sm-12" *ngIf="otpfiled">
-                <h3>Enter Your Otp</h3>
-                <input type="text" class="form-control" placeholder="Enter Otp" formControlName="otp" maxlength="4"
-                    minlength="4" (keypress)="numericOnly($event)">
+            <!-- Associated Family Members Dropdown (if phone has multiple registered members) -->
+            <div class="mb-3" *ngIf="forgotFamilyMembers.length > 0">
+                <label class="form-label" style="font-weight: 600; color: #1c5e69;">
+                    <i class="fa fa-users me-1"></i> సంబంధిత కుటుంబ సభ్యుడు (Associated Family Member)
+                </label>
+                <select formControlName="member_id" class="form-control" style="border: 2px solid #237e8d; background-color: #f0f8ff;">
+                    <option *ngFor="let m of forgotFamilyMembers" [value]="m.id">
+                        {{ m.name }} (ID: {{ m.id }} - {{ m.category || 'Member' }})
+                    </option>
+                </select>
+                <small class="text-muted">ఒకే మొబైల్ నంబరుతో ఉన్న కుటుంబ సభ్యుల కోసం మీ పేరును ఎంచుకోండి.</small>
             </div>
 
-            <div class="col-sm-12" *ngIf="passwordfield">
-                <h3>Enter Your password</h3>
-                <input type="text" class="form-control" placeholder="Enter password" formControlName="password"
+            <div class="mb-3">
+                <label class="form-label" style="font-weight: 600; color: #333;">కొత్త పాస్‌వర్డ్ (New Password) <span class="text-danger">*</span></label>
+                <input type="password" class="form-control" placeholder="కనీసం 6 అక్షరాలు / సంఖ్యలు" formControlName="password"
                     maxlength="16" minlength="6">
             </div>
 
-
-            <div class="col-sm-4"></div>
-            <div class="col-sm-4">
-                <button *ngIf="!otpfiled" class="btn  btn-primary" (click)="emailcheck()">Request Otp
-                </button>
-                <button *ngIf="otpfiled && !passwordfield " class="btn  btn-primary"
-                    (click)="forgetemailotpsubmit()">Sumbit Otp</button>
-                <button *ngIf="passwordfield" class="btn  btn-primary" (click)="createfrgetpassword()">Submit</button>
+            <div class="mb-4">
+                <label class="form-label" style="font-weight: 600; color: #333;">పాస్‌వర్డ్ ధృవీకరించండి (Confirm Password) <span class="text-danger">*</span></label>
+                <input type="password" class="form-control" placeholder="మళ్లీ పాస్‌వర్డ్ నమోదు చేయండి" formControlName="confirm_password"
+                    maxlength="16" minlength="6">
             </div>
+
+            <div class="d-flex justify-content-end gap-2">
+                <button type="button" class="btn btn-secondary" (click)="modal.dismiss('Cancel')">రద్దు (Cancel)</button>
+                <button type="button" class="btn btn-success" style="background: #237e8d; border-color: #237e8d;" (click)="resetForgotPasswordDirect()">
+                    పాస్‌వర్డ్ రీసెట్ చేయండి (Reset Password)
+                </button>
+            </div>
+        </form>
+    </div>
+</ng-template>
+
+<!-- First-Time Login / Family Member Selection & Password Setup Modal -->
+<ng-template #firstLoginModal let-modal>
+    <div class="modal-header" style="background: #198754; color: white; border-top-left-radius: 8px; border-top-right-radius: 8px;">
+        <h4 class="modal-title m-0 text-white" style="font-weight: 600;">
+            <i class="fa fa-user-check me-2"></i> మొదటిసారి లాగిన్ - పాస్‌వర్డ్ సెటప్
+        </h4>
+        <button type="button" class="btn-close btn-close-white" aria-label="Close" (click)="continueWithCurrentPassword()"></button>
+    </div>
+    <div class="modal-body p-4" style="background: #fbfbfb;">
+        <div class="alert alert-info py-2 px-3 mb-3" style="font-size: 13.5px; border-radius: 8px;">
+            <i class="fa fa-info-circle me-1"></i>
+            మీరు మొదటిసారి లాగిన్ అవుతున్నారు లేదా ఒకే నంబర్‌తో నమోదు చేయబడిన ఖాతాను వాడుతున్నారు. మీ భద్రత కోసం కొత్త పాస్‌వర్డ్ సెట్ చేసుకోండి, లేదా ప్రస్తుత పాస్‌వర్డ్‌తో కొనసాగవచ్చు.
         </div>
-    </form>
+
+        <form [formGroup]="firstLoginForm">
+            <div class="mb-3">
+                <label class="form-label" style="font-weight: 600; color: #333;">నమోదిత మొబైల్ నంబర్</label>
+                <input type="text" class="form-control" [value]="passwordform.value.mobile_number" disabled style="background:#e9ecef; font-weight:600;">
+            </div>
+
+            <div class="mb-3" *ngIf="firstLoginMembers.length > 0">
+                <label class="form-label" style="font-weight: 600; color: #198754;">
+                    <i class="fa fa-user me-1"></i> లాగిన్ అవుతున్న సభ్యుడు (Select Member Profile) <span class="text-danger">*</span>
+                </label>
+                <select formControlName="member_id" class="form-control" style="border: 2px solid #198754; background: #f4fff7;">
+                    <option *ngFor="let m of firstLoginMembers" [value]="m.id">
+                        {{ m.name }} (ID: {{ m.id }} - {{ m.category || 'Member' }})
+                    </option>
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label" style="font-weight: 600; color: #333;">కొత్త పాస్‌వర్డ్ (New Password) <span class="text-danger">*</span></label>
+                <input type="password" class="form-control" placeholder="కనీసం 6 అక్షరాలు లేదా సంఖ్యలు..." formControlName="new_password"
+                    maxlength="16" minlength="6">
+            </div>
+
+            <div class="mb-4">
+                <label class="form-label" style="font-weight: 600; color: #333;">పాస్‌వర్డ్ ధృవీకరించండి (Confirm Password) <span class="text-danger">*</span></label>
+                <input type="password" class="form-control" placeholder="మళ్లీ కొత్త పాస్‌వర్డ్ నమోదు చేయండి..." formControlName="confirm_password"
+                    maxlength="16" minlength="6">
+            </div>
+
+            <div class="d-flex flex-column flex-sm-row justify-content-between align-items-stretch gap-2 pt-2 border-top">
+                <button type="button" class="btn btn-outline-secondary" (click)="continueWithCurrentPassword()">
+                    ప్రస్తుత పాస్‌వర్డ్‌తో లాగిన్ అవ్వండి (Continue)
+                </button>
+                <button type="button" class="btn btn-success" [disabled]="isUpdatingPassword" (click)="submitFirstLoginPassword()">
+                    <span *ngIf="isUpdatingPassword" style="display:inline-block; width:12px; height:12px; border:2px solid #fff; border-right-color:transparent; border-radius:50%; animation:spin 0.75s linear infinite; vertical-align:middle; margin-right:4px;"></span>
+                    కొత్త పాస్‌వర్డ్ సెట్ చేసి లాగిన్ అవ్వండి
+                </button>
+            </div>
+        </form>
+    </div>
 </ng-template>
 <br><br>
 <div class="my-overlay" *ngIf="showSpinner">

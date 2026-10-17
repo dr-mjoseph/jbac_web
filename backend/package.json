@@ -1,5 +1,5 @@
 {
-  "type": "module",
+  "type": "commonjs",
   "name": "jbac-backend",
   "version": "1.0.0",
   "description": "",

@@ -1,0 +1,9 @@
+const fs = require('fs');
+const tsPath = 'C:\\Users\\rajes\\StudioProjects\\jbac_app\\src\\pages\\family-councelling\\family-councelling.ts';
+const content = fs.readFileSync(tsPath, 'utf8');
+const lines = content.split('\n');
+lines.forEach((l, i) => {
+    if (l.includes('openBookingForm')) {
+        console.log(lines.slice(i, i + 35).join('\n'));
+    }
+});

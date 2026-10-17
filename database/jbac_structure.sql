@@ -1642,6 +1642,8 @@ CREATE TABLE `reg_form` (
   `mandal_id` int NOT NULL,
   `panchayat_id` int NOT NULL,
   `description` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `password` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `is_first_login` tinyint(1) DEFAULT '1',
   PRIMARY KEY (`reg-id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1240 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;

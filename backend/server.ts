@@ -4,11 +4,6 @@ import mysql from 'mysql2/promise';
 import cors from 'cors';
 import fs from 'fs';
 import path from 'path';
-import { fileURLToPath } from 'url';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
 const app = express();
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
@@ -1312,8 +1307,84 @@ app.post(['/dashboardapi/postregform', '/api/postregform'], async (req: any, res
     try {
         const body = req.body || {};
         body.d_in = 0;
+        const phone = String(body.phonenum || body.phnumber || body.mobile_number || body.phone || body.number || '').trim();
+        if (phone) {
+            body.phonenum = phone;
+            if (!body.password) {
+                body.password = phone;
+            }
+            if (body.is_first_login === undefined || body.is_first_login === null) {
+                body.is_first_login = 1;
+            }
+        }
         const result = await dynamicInsert('reg_form', body);
-        res.json({ status: 200, message: 'Registration submitted successfully', insertId: result?.insertId });
+        res.json({
+            status: 200,
+            message: 'registered successfully, you can login with username and password with the same mobile number and if you want to change you can change while login or by clicking forgot password.',
+            insertId: result?.insertId
+        });
+    } catch (err: any) {
+        res.status(500).json({ status: 500, error: err.message });
+    }
+});
+
+// Family Members by Mobile Number (for Multi-Family Member Registrations)
+app.all(['/dashboardapi/getfamilymembers', '/api/getfamilymembers'], async (req: any, res: any) => {
+    try {
+        const phone = String(req.body?.mobile_number || req.body?.phonenum || req.body?.phone || req.query?.mobile_number || req.query?.phone || '').trim();
+        if (!phone) {
+            return res.json({ status: 400, message: 'Mobile number required' });
+        }
+        const [members]: any = await db.query(
+            'SELECT `reg-id` as id, name, phonenum as mobile_number, category, is_first_login, password, district_id, constituency_id, mandal_id, panchayat_id FROM reg_form WHERE phonenum = ? ORDER BY `reg-id` ASC',
+            [phone]
+        );
+        res.json({
+            status: 200,
+            message: 'Family members fetched successfully',
+            count: members?.length || 0,
+            members: members || []
+        });
+    } catch (err: any) {
+        res.status(500).json({ status: 500, error: err.message });
+    }
+});
+
+// Update Password for Specific Family Member or User
+app.all(['/dashboardapi/updatefamilymemberpassword', '/api/updatefamilymemberpassword'], async (req: any, res: any) => {
+    try {
+        const b = req.body || {};
+        const phone = String(b.mobile_number || b.phonenum || b.phone || b.number || '').trim();
+        const newPassword = String(b.password || b.new_password || b.repassword || '').trim();
+        const memberId = b.member_id || b.id || b['reg-id'] || null;
+        const memberName = b.member_name || b.name || null;
+
+        if (!phone || !newPassword) {
+            return res.json({ status: 400, message: 'Phone number and new password are required' });
+        }
+
+        let updateSql = 'UPDATE reg_form SET password = ?, is_first_login = 0 WHERE phonenum = ?';
+        const params: any[] = [newPassword, phone];
+
+        if (memberId) {
+            updateSql += ' AND `reg-id` = ?';
+            params.push(memberId);
+        } else if (memberName) {
+            updateSql += ' AND name = ?';
+            params.push(memberName);
+        }
+
+        const [regResult]: any = await db.query(updateSql, params);
+
+        await db.query('UPDATE users SET otp = ? WHERE number = ?', [newPassword, phone]).catch(() => {});
+        await db.query('UPDATE signup_form SET password = ? WHERE mobile_number = ?', [newPassword, phone]).catch(() => {});
+        await db.query('UPDATE belivers_tbl SET password = ? WHERE mobile_number = ?', [newPassword, phone]).catch(() => {});
+
+        res.json({
+            status: 200,
+            message: 'Password updated successfully',
+            affectedRows: regResult?.affectedRows || 0
+        });
     } catch (err: any) {
         res.status(500).json({ status: 500, error: err.message });
     }
@@ -1520,8 +1591,56 @@ app.post(['/dashboardapi/passwordwebsitelogin', '/api/login'], async (req: any, 
             }
         }
 
-        // 4. Distinguish wrong password vs unregistered phone
+        // 4. Check reg_form for family members registered via entry form
+        const [regMembers]: any = await db.query(
+            'SELECT `reg-id` as id, name, phonenum as mobile_number, category, is_first_login, password FROM reg_form WHERE phonenum = ? ORDER BY `reg-id` ASC',
+            [phone]
+        );
+        if (regMembers && regMembers.length > 0) {
+            const memberId = req.body.member_id || req.body.id;
+            let targetMember = null;
+            if (memberId) {
+                targetMember = regMembers.find((m: any) => String(m.id) === String(memberId));
+            } else {
+                const matched = regMembers.filter((m: any) => m.password === pwd || (!m.password && pwd === phone));
+                if (matched.length > 0) {
+                    targetMember = matched[0];
+                }
+            }
+
+            if (targetMember && (targetMember.password === pwd || (!targetMember.password && pwd === phone))) {
+                const isInitialPwd = (pwd === phone || targetMember.password === phone || targetMember.is_first_login == 1);
+                const userObj = formatUser({
+                    id: targetMember.id,
+                    name: targetMember.name,
+                    mobile_number: targetMember.mobile_number,
+                    category_id: targetMember.category || cat || '1'
+                }, targetMember.category || cat || '1', 'Believer');
+
+                if (isInitialPwd) {
+                    return res.json({
+                        status: 201,
+                        first_login: true,
+                        message: 'First login or multiple family members detected. You can change password now or continue.',
+                        members: regMembers,
+                        selected_member: targetMember,
+                        data: [userObj]
+                    });
+                } else {
+                    return res.json({
+                        status: 200,
+                        message: 'Login successful',
+                        members: regMembers,
+                        selected_member: targetMember,
+                        data: [userObj]
+                    });
+                }
+            }
+        }
+
+        // 5. Distinguish wrong password vs unregistered phone
         let phoneFound = false;
+        if (regMembers && regMembers.length > 0) phoneFound = true;
         const [userExists]: any = await db.query('SELECT id FROM users WHERE number = ?', [phone]);
         if (userExists && userExists.length > 0) phoneFound = true;
 
@@ -1604,11 +1723,20 @@ app.post(['/dashboardapi/checkotp', '/api/checkotp'], async (_req, res) => {
 
 app.post(['/dashboardapi/createfrgetpassword', '/api/resetpassword'], async (req, res) => {
     try {
-        const { mobile_number, password } = req.body;
-        await db.query('UPDATE users SET otp = ? WHERE number = ?', [password, mobile_number]);
-        await db.query('UPDATE signup_form SET password = ? WHERE mobile_number = ?', [password, mobile_number]);
+        const { mobile_number, password, member_id, id } = req.body;
+        const phone = String(mobile_number || '').trim();
+        const pwd = String(password || '').trim();
+        const memId = member_id || id || null;
+        if (memId) {
+            await db.query('UPDATE reg_form SET password = ?, is_first_login = 0 WHERE phonenum = ? AND `reg-id` = ?', [pwd, phone, memId]).catch(() => {});
+        } else {
+            await db.query('UPDATE reg_form SET password = ?, is_first_login = 0 WHERE phonenum = ?', [pwd, phone]).catch(() => {});
+        }
+        await db.query('UPDATE users SET otp = ? WHERE number = ?', [pwd, phone]).catch(() => {});
+        await db.query('UPDATE signup_form SET password = ? WHERE mobile_number = ?', [pwd, phone]).catch(() => {});
+        await db.query('UPDATE belivers_tbl SET password = ? WHERE mobile_number = ?', [pwd, phone]).catch(() => {});
         res.json({ status: 200, message: 'Password updated successfully' });
-    } catch (err) {
+    } catch (err: any) {
         res.status(500).json({ status: 500, error: err.message });
     }
 });
@@ -1718,8 +1846,15 @@ app.all(['/dashboardapi/updatecount', '/api/updatecount'], async (_req: any, res
 app.all(['/dashboardapi/checknumberpassword', '/api/checknumberpassword'], async (req: any, res: any) => {
     try {
         const b = req.body || {};
-        const phone = b.mobile_number || b.number || b.phone || b.contactnumber || '';
+        const phone = String(b.mobile_number || b.number || b.phone || b.contactnumber || '').trim();
         const cat = Number(b.category) || 1;
+        
+        // 1. Check reg_form for family members registered via entry form
+        const [regRows]: any = await db.query('SELECT `reg-id` as id, name, phonenum as mobile_number, category, password, is_first_login FROM reg_form WHERE phonenum = ? ORDER BY `reg-id` ASC', [phone]);
+        if (regRows && regRows.length > 0) {
+            return res.json({ status: 200, message: 'User found', data: regRows, members: regRows });
+        }
+
         let table = 'belivers_tbl';
         let phoneCol = 'mobile_number';
         if (cat === 2) { table = 'student_reg'; phoneCol = 'number'; }
@@ -1731,7 +1866,7 @@ app.all(['/dashboardapi/checknumberpassword', '/api/checknumberpassword'], async
         
         const [rows]: any = await db.query(`SELECT * FROM \`${table}\` WHERE \`${phoneCol}\` = ? AND d_in = 0 LIMIT 1`, [phone]);
         if (rows.length > 0) {
-            res.json({ status: 200, message: 'User found', data: rows });
+            res.json({ status: 200, message: 'User found', data: rows, members: rows });
         } else {
             res.json({ status: 404, message: 'User not found' });
         }
@@ -1743,9 +1878,20 @@ app.all(['/dashboardapi/checknumberpassword', '/api/checknumberpassword'], async
 app.all(['/dashboardapi/upadtedpassword', '/dashboardapi/updatedpassword', '/api/upadtedpassword', '/api/updatedpassword'], async (req: any, res: any) => {
     try {
         const b = req.body || {};
-        const phone = b.mobile_number || b.number || b.phone || b.contactnumber || '';
-        const newPass = b.password || b.repassword || '';
+        const phone = String(b.mobile_number || b.number || b.phone || b.contactnumber || '').trim();
+        const newPass = String(b.password || b.repassword || b.new_password || '').trim();
+        const memberId = b.member_id || b.id || b['reg-id'] || null;
+        const memberName = b.member_name || b.name || null;
         const cat = Number(b.category) || 1;
+
+        if (memberId) {
+            await db.query('UPDATE reg_form SET password = ?, is_first_login = 0 WHERE phonenum = ? AND `reg-id` = ?', [newPass, phone, memberId]).catch(() => {});
+        } else if (memberName) {
+            await db.query('UPDATE reg_form SET password = ?, is_first_login = 0 WHERE phonenum = ? AND name = ?', [newPass, phone, memberName]).catch(() => {});
+        } else {
+            await db.query('UPDATE reg_form SET password = ?, is_first_login = 0 WHERE phonenum = ?', [newPass, phone]).catch(() => {});
+        }
+
         let table = 'belivers_tbl';
         let phoneCol = 'mobile_number';
         if (cat === 2) { table = 'student_reg'; phoneCol = 'number'; }
@@ -1755,7 +1901,10 @@ app.all(['/dashboardapi/upadtedpassword', '/dashboardapi/updatedpassword', '/api
         else if (cat === 6) { table = 'pastors_associations'; phoneCol = 'number'; }
         else if (cat === 7) { table = 'ministry_signup'; phoneCol = 'headnmber'; }
 
-        await db.query(`UPDATE \`${table}\` SET password = ? WHERE \`${phoneCol}\` = ? AND d_in = 0`, [newPass, phone]);
+        await db.query(`UPDATE \`${table}\` SET password = ? WHERE \`${phoneCol}\` = ? AND d_in = 0`, [newPass, phone]).catch(() => {});
+        await db.query('UPDATE users SET otp = ? WHERE number = ?', [newPass, phone]).catch(() => {});
+        await db.query('UPDATE signup_form SET password = ? WHERE mobile_number = ?', [newPass, phone]).catch(() => {});
+
         res.json({ status: 200, message: 'Password updated successfully' });
     } catch (err: any) {
         res.status(500).json({ status: 500, error: err.message });
