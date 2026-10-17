@@ -342,10 +342,12 @@
                                                 <div class="form-outline">
                                                     <label class="form-label">పంచాయితి / వార్డు (ఐచ్ఛికము)</label>
                                                     <select class="form-control" formControlName="village_id"
+                                                        (click)="onPanchayatClick()"
+                                                        (focus)="onPanchayatClick()"
                                                         style="height:37px;width: 273px;">
                                                         <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
                                                         <option value="{{item.id}}" *ngFor="let item of panchayati">
-                                                            {{item.pnchyt_nm}}
+                                                            {{item.pnchyt_nm || item.panchayatname || item.name}}
                                                         </option>
                                                     </select>
                                                 </div>

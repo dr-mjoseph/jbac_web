@@ -5,6 +5,7 @@ import { DatePipe } from '@angular/common';
 import Swal from 'sweetalert2';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { FALLBACK_DROPDOWN_DATA } from '../dropdown_fallback_data';
 
 @Component({
   selector: 'app-pastorregister', 
@@ -37,7 +38,7 @@ godOptions: string[] = [
   pattern: any;
   districts: any;
   mandals: any;
-  panchayati: any;
+  panchayati: any = (FALLBACK_DROPDOWN_DATA as any).panchayatis || [];
   bliversdata: any;
   studentform: FormGroup;
   pastorform: FormGroup;
@@ -561,54 +562,35 @@ geteducational() {
   //   })
   // }
   gepanchayati(event: any) {
-      const id = event.target.value?.trim(); // Ensure valid ID
-    
-      if (!id) {
-        Swal.fire({
-          icon: 'warning',
-          title: 'గమనిక!',
-          text: 'దయచేసి సరైన మండలాన్ని ఎంచుకోండి.',
-        });
-        return;
-      }
-    
-      this.showSpinner = true; // Show loading spinner
-    
-      this.service.gepanchayatis(id).subscribe(
-        (res: any) => {
-          if (res && res.data && res.data.length > 0) {
-            this.panchayati = res.data.filter((data: any) => !id || data.mndl_id == id);
-    
-            if (this.panchayati.length === 0) {
-              Swal.fire({
-                icon: 'info',
-                title: 'సమాచారం',
-                text: 'ఎంచుకున్న మండలానికి పంచాయితీలు / వార్డులు లభ్యం కావడంలేదు.',
-              });
-            }
-          } else {
-            Swal.fire({
-              icon: 'warning',
-              title: 'గమనిక!',
-              text: 'పంచాయితీ / వార్డు వివరాలు అందుబాటులో లేవు.',
-            });
-          }
-    
-          this.showSpinner = false; // Hide loading spinner
-          console.log('Panchayati Data:', this.panchayati);
-        },
-        (error) => {
-          console.error('Error fetching panchayati:', error);
-          Swal.fire({
-            icon: 'error',
-            title: 'లోపం!',
-            text: 'పంచాయితీ / వార్డ్ నంబర్ పొందడంలో సమస్య, దయచేసి మరల ప్రయత్నించండి.',
-          });
-    
-          this.showSpinner = false; // Hide spinner in case of error
+    const id = event?.target?.value !== undefined ? event.target.value?.trim() : event;
+    if (!id) return;
+    this.showSpinner = true;
+    this.service.gepanchayatis(id).subscribe({
+      next: (res: any) => {
+        this.showSpinner = false;
+        if (res && res.data && Array.isArray(res.data) && res.data.length > 0) {
+          this.panchayati = res.data;
+        } else {
+          this.panchayati = (FALLBACK_DROPDOWN_DATA as any).panchayatis || [];
         }
-      );
+      },
+      error: () => {
+        this.showSpinner = false;
+        this.panchayati = (FALLBACK_DROPDOWN_DATA as any).panchayatis || [];
+      }
+    });
+  }
+
+  onPanchayatClick() {
+    if (!this.panchayati || this.panchayati.length === 0) {
+      const mandalVal = this.pastorform?.get('mandal_id')?.value;
+      if (mandalVal) {
+        this.gepanchayati(mandalVal);
+      } else {
+        this.panchayati = (FALLBACK_DROPDOWN_DATA as any).panchayatis || [];
+      }
     }
+  }
   getpastorsdatas: any;
 
   getpastorsdata() {
@@ -872,32 +854,83 @@ geteducational() {
 
   postpastorsignup() {
     this.submitted = true;
-    // this.showSpinner = true;
     if (this.pastorform.invalid) {
-      Swal.fire('* ఉన్న తప్పనిసరి  ఫీల్డ్స్ ఎంటర్ చేయండి');
+      const invalidFields: string[] = [];
+      const controls = this.pastorform.controls;
+      if (controls['pastorname']?.invalid) invalidFields.push('పాస్టర్ పేరు');
+      if (controls['phonenumber']?.invalid) invalidFields.push('ఫోన్ నంబర్');
+      if (controls['district_id']?.invalid) invalidFields.push('జిల్లా');
+      if (controls['constituency_id']?.invalid) invalidFields.push('నియోజకవర్గం');
+      if (controls['mandal_id']?.invalid) invalidFields.push('మండలం');
+      if (controls['panchayat_id']?.invalid) invalidFields.push('పంచాయతీ');
+      if (controls['villagename']?.invalid) invalidFields.push('గ్రామం / స్ట్రీట్ పేరు');
+      if (controls['denomination_id']?.invalid) invalidFields.push('డినామినేషన్');
+      if (controls['leaders']?.invalid) invalidFields.push('లీడర్షిప్ వివరాలు');
+      if (controls['password']?.invalid) invalidFields.push('పాస్‌వర్డ్ (కనీసం 6 అక్షరాలు)');
+      if (controls['retypepassword']?.invalid) invalidFields.push('రీ-టైప్ పాస్‌వర్డ్');
+
+      const msg = invalidFields.length > 0
+        ? `దయచేసి ఈ క్రింది వివరాలను తప్పనిసరిగా పూరించండి:\n• ${invalidFields.join('\n• ')}`
+        : '* ఉన్న తప్పనిసరి ఫీల్డ్స్ ఎంటర్ చేయండి';
+
+      Swal.fire({
+        icon: 'warning',
+        title: 'గమనిక',
+        text: msg
+      });
       return;
     } else if (this.pastorform.value.password != this.pastorform.value.retypepassword) {
-      Swal.fire("Passwords are Unmatched");
+      Swal.fire({
+        icon: 'warning',
+        title: 'పాస్‌వర్డ్ సరిపోలలేదు',
+        text: 'పాస్‌వర్డ్ మరియు రీ-టైప్ పాస్‌వర్డ్ ఒకేలా ఉండాలి.'
+      });
       return;
     } else {
-      this.service.postrpastor(this.pastorform.value).subscribe((res: any) => {
-        if (res.status == 451) {
-          Swal.fire('ఇదే ఫోన్ నెంబర్ తో ఇంతకుముందే రిజిస్టర్ అయ్యారు')
-          // this.showSpinner = false;
-        } else if (res.status == 200) {
-          // this.showSpinner = false;
-          Swal.fire('విజయవంతముగా నమోదు చేయబడింది, మీ ఫోన్ నెంబర్ మరియు పాస్వర్డ్ తో లాగిన్ అవగలరు')
-          this.pastorform.reset();
-          
-        } else {
-          alert('సర్వర్ డౌన్ వుంది, దయచేసి తరువాత ప్రయత్నిచండి')
-        }
-      },
-        error => {
-          // this.showSpinner = false;
-        })
-    }
+      this.showSpinner = true;
+      const formVal = this.pastorform.value;
+      const payload = {
+        ...formVal,
+        village_id: formVal.panchayat_id || formVal.village_id,
+        leadership: formVal.leaders || formVal.leadership,
+        god: Array.isArray(formVal.god) ? formVal.god.join(', ') : formVal.god
+      };
 
+      this.service.postrpastor(payload).subscribe({
+        next: (res: any) => {
+          this.showSpinner = false;
+          if (res.status == 200) {
+            Swal.fire({
+              icon: 'success',
+              title: 'విజయం!',
+              text: 'విజయవంతముగా నమోదు చేయబడింది, మీ ఫోన్ నెంబర్ మరియు పాస్వర్డ్ తో లాగిన్ అవగలరు'
+            });
+            this.pastorform.reset();
+            this.submitted = false;
+          } else if (res.status == 451) {
+            Swal.fire({
+              icon: 'info',
+              title: 'గమనిక',
+              text: 'ఇదే ఫోన్ నెంబర్ తో ఇంతకుముందే రిజిస్టర్ అయ్యారు'
+            });
+          } else {
+            Swal.fire({
+              icon: 'error',
+              title: 'లోపం',
+              text: res.message || 'నమోదు చేయడంలో సమస్య వచ్చింది. దయచేసి మరలా ప్రయత్నించండి.'
+            });
+          }
+        },
+        error: (error: any) => {
+          this.showSpinner = false;
+          Swal.fire({
+            icon: 'error',
+            title: 'లోపం',
+            text: error?.error?.message || error?.error?.error || 'సర్వర్ సమస్య వచ్చింది. దయచేసి మరలా ప్రయత్నించండి.'
+          });
+        }
+      });
+    }
   }
 
   // Image Upload Function //

@@ -5,7 +5,7 @@ import { DatePipe } from '@angular/common';
 import Swal from 'sweetalert2';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-;
+import { FALLBACK_DROPDOWN_DATA } from '../dropdown_fallback_data';
 
 @Component({
   selector: 'app-pastorassociationregister',
@@ -27,7 +27,7 @@ export class PastorassociationregisterComponent {
   pattern: any;
   districts: any;
   mandals: any;
-  panchayati: any;
+  panchayati: any = (FALLBACK_DROPDOWN_DATA as any).panchayatis || [];
   bliversdata: any;
   studentform: FormGroup;
   pastorform: FormGroup;
@@ -499,54 +499,35 @@ export class PastorassociationregisterComponent {
       );
     }
   gepanchayati(event: any) {
-      const id = event.target.value?.trim(); // Ensure valid ID
-    
-      if (!id) {
-        Swal.fire({
-          icon: 'warning',
-          title: 'గమనిక!',
-          text: 'దయచేసి సరైన మండలాన్ని ఎంచుకోండి.',
-        });
-        return;
-      }
-    
-      this.showSpinner = true; // Show loading spinner
-    
-      this.service.gepanchayatis(id).subscribe(
-        (res: any) => {
-          if (res && res.data && res.data.length > 0) {
-            this.panchayati = res.data.filter((data: any) => !id || data.mndl_id == id);
-    
-            if (this.panchayati.length === 0) {
-              Swal.fire({
-                icon: 'info',
-                title: 'సమాచారం',
-                text: 'ఎంచుకున్న మండలానికి పంచాయితీలు / వార్డులు లభ్యం కావడంలేదు.',
-              });
-            }
-          } else {
-            Swal.fire({
-              icon: 'warning',
-              title: 'గమనిక!',
-              text: 'పంచాయితీ / వార్డు వివరాలు అందుబాటులో లేవు.',
-            });
-          }
-    
-          this.showSpinner = false; // Hide loading spinner
-          console.log('Panchayati Data:', this.panchayati);
-        },
-        (error) => {
-          console.error('Error fetching panchayati:', error);
-          Swal.fire({
-            icon: 'error',
-            title: 'లోపం!',
-            text: 'పంచాయితీ / వార్డ్ నంబర్ పొందడంలో సమస్య, దయచేసి మరల ప్రయత్నించండి.',
-          });
-    
-          this.showSpinner = false; // Hide spinner in case of error
+    const id = event?.target?.value !== undefined ? event.target.value?.trim() : event;
+    if (!id) return;
+    this.showSpinner = true;
+    this.service.gepanchayatis(id).subscribe({
+      next: (res: any) => {
+        this.showSpinner = false;
+        if (res && res.data && Array.isArray(res.data) && res.data.length > 0) {
+          this.panchayati = res.data;
+        } else {
+          this.panchayati = (FALLBACK_DROPDOWN_DATA as any).panchayatis || [];
         }
-      );
+      },
+      error: () => {
+        this.showSpinner = false;
+        this.panchayati = (FALLBACK_DROPDOWN_DATA as any).panchayatis || [];
+      }
+    });
+  }
+
+  onPanchayatClick() {
+    if (!this.panchayati || this.panchayati.length === 0) {
+      const mandalVal = this.pastorsassociations?.get('mandal_id')?.value;
+      if (mandalVal) {
+        this.gepanchayati(mandalVal);
+      } else {
+        this.panchayati = (FALLBACK_DROPDOWN_DATA as any).panchayatis || [];
+      }
     }
+  }
   getpastorsdatas: any;
 
   getpastorsdata() {
@@ -843,7 +824,23 @@ export class PastorassociationregisterComponent {
     }
 
     this.showSpinner = true;
-    this.service.postpastorassociationss(this.pastorsassociations.value).subscribe(
+    const formVal = this.pastorsassociations.value;
+    const payload = {
+      ...formVal,
+      paname: formVal.pa_name || formVal.paname,
+      headname: formVal.headname,
+      phonenumber: formVal.phonenumber,
+      secretory: formVal.pa_secretory || formVal.secretory || '',
+      president: formVal.pa_president || formVal.president || '',
+      districtname: formVal.district_id || formVal.districtname,
+      constituencyname: formVal.constituency_id || formVal.constituencyname,
+      mandals: formVal.mandal_id || formVal.mandals,
+      panchaiti: formVal.village_id || formVal.panchaiti || '',
+      terms: formVal.term || formVal.terms || 'YES',
+      stdph: formVal.std_phonenumber || formVal.stdph || ''
+    };
+
+    this.service.postpastorassociationss(payload).subscribe(
       (res: any) => {
         this.showSpinner = false;
         if (res.status == 200) {
@@ -870,10 +867,11 @@ export class PastorassociationregisterComponent {
       },
       (error: any) => {
         this.showSpinner = false;
+        const msg = error?.error?.message || error?.error?.error || error?.message || 'సర్వర్ సమస్య వచ్చింది. దయచేసి మరలా ప్రయత్నించండి.';
         Swal.fire({
           icon: 'error',
           title: 'లోపం',
-          text: 'సర్వర్ సమస్య వచ్చింది. దయచేసి మరలా ప్రయత్నించండి.'
+          text: msg
         });
       }
     );

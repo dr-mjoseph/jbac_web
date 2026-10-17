@@ -5,6 +5,7 @@ import { DatePipe } from '@angular/common';
 import Swal from 'sweetalert2';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { FALLBACK_DROPDOWN_DATA } from '../dropdown_fallback_data';
 
 @Component({
   selector: 'app-churchregister',
@@ -26,7 +27,7 @@ export class ChurchregisterComponent {
   pattern: any;
   districts: any;
   mandals: any;
-  panchayati: any;
+  panchayati: any = (FALLBACK_DROPDOWN_DATA as any).panchayatis || [];
   bliversdata: any;
   studentform: FormGroup;
   pastorform: FormGroup;
@@ -216,7 +217,7 @@ export class ChurchregisterComponent {
       facebook: [''],
       youtube: [''],
       remarks: [''],
-      village_name: ['', [Validators.required]],
+      village_name: [''],
       term: [true, [Validators.required]],
 
     })
@@ -393,10 +394,31 @@ export class ChurchregisterComponent {
   }
 
   gepanchayati(event: any) {
-    var id = event.target.value;
-    this.service.gepanchayatis(id).subscribe(res => {
-      this.panchayati = res.data ? res.data.filter((data: any) => !id || data.mndl_id == id) : [];
-    })
+    const id = event?.target?.value !== undefined ? event.target.value : event;
+    if (!id) return;
+    this.service.gepanchayatis(id).subscribe(
+      (res: any) => {
+        if (res && res.data && Array.isArray(res.data) && res.data.length > 0) {
+          this.panchayati = res.data;
+        } else {
+          this.panchayati = (FALLBACK_DROPDOWN_DATA as any).panchayatis || [];
+        }
+      },
+      () => {
+        this.panchayati = (FALLBACK_DROPDOWN_DATA as any).panchayatis || [];
+      }
+    );
+  }
+
+  onPanchayatClick() {
+    if (!this.panchayati || this.panchayati.length === 0) {
+      const mandalVal = this.churchregsiterform?.get('mandal_id')?.value;
+      if (mandalVal) {
+        this.gepanchayati(mandalVal);
+      } else {
+        this.panchayati = (FALLBACK_DROPDOWN_DATA as any).panchayatis || [];
+      }
+    }
   }
   getpastorsdatas: any;
 
@@ -621,27 +643,84 @@ export class ChurchregisterComponent {
 
   postchurchregister() {
     this.submitted = true;
-    if (this.churchregsiterform.invalid) {
-      Swal.fire('* ఉన్న తప్పనిసరి  ఫీల్డ్స్ ఎంటర్ చేయండి');
-      return;
-    } else if (this.churchregsiterform.value.password != this.churchregsiterform.value.retypepassword) {
-      Swal.fire("Passwords are Unmatched")
-    }
-    else {
-      this.service.postchurchregister(this.churchregsiterform.value).subscribe((res: any) => {
-        if (res.status == 451) {
-          Swal.fire('ఇదే ఫోన్ నెంబర్ తో ఇంతకుముందే రిజిస్టర్ అయ్యారు')
-        } else if (res.status == 200) {
-          Swal.fire('Your Church is Submited Successfully,Please Submit your Church Service Timings')
-          this.router.navigate(['/profile'], { queryParams: { id: "1" } });
-          this.churchregsiterform.reset();
-          this.submitted = false;
-        }
-      },
-        error => {
-        })
+
+    // Auto-populate village_name from panchayati or street if empty
+    if (!this.churchregsiterform.value.village_name) {
+      const vId = this.churchregsiterform.value.village_id;
+      const matched = this.panchayati?.find((p: any) => p.id == vId);
+      const vName = matched?.pnchyt_nm || matched?.panchayatname || this.churchregsiterform.value.street || 'Village';
+      this.churchregsiterform.patchValue({ village_name: vName });
     }
 
+    if (this.churchregsiterform.invalid) {
+      const invalidFields: string[] = [];
+      const controls = this.churchregsiterform.controls;
+      if (controls['church_name']?.invalid) invalidFields.push('చర్చి పేరు (Church Name)');
+      if (controls['contactnumber']?.invalid) invalidFields.push('ఫోన్ నంబర్ (Contact Number)');
+      if (controls['total_members']?.invalid) invalidFields.push('మొత్తం సభ్యులు (Total Members)');
+      if (controls['denomination_id']?.invalid) invalidFields.push('డినామినేషన్ (Denomination)');
+      if (controls['district_id']?.invalid) invalidFields.push('జిల్లా (District)');
+      if (controls['constituency_id']?.invalid) invalidFields.push('నియోజకవర్గం (Constituency)');
+      if (controls['mandal_id']?.invalid) invalidFields.push('మండలం (Mandal)');
+      if (controls['village_id']?.invalid) invalidFields.push('పంచాయతీ (Panchayat)');
+      if (controls['street']?.invalid) invalidFields.push('స్ట్రీట్ పేరు (Street Name)');
+      if (controls['pastor_id']?.invalid) invalidFields.push('పాస్టర్ (Pastor)');
+      if (controls['password']?.invalid) invalidFields.push('పాస్‌వర్డ్ (కనీసం 6 అక్షరాలు)');
+      if (controls['retypepassword']?.invalid) invalidFields.push('రీ-టైప్ పాస్‌వర్డ్');
+
+      const msg = invalidFields.length > 0
+        ? `దయచేసి ఈ క్రింది వివరాలను తప్పనిసరిగా పూరించండి:\n• ${invalidFields.join('\n• ')}`
+        : '* ఉన్న తప్పనిసరి ఫీల్డ్స్ ఎంటర్ చేయండి';
+
+      Swal.fire({
+        icon: 'warning',
+        title: 'గమనిక',
+        text: msg
+      });
+      return;
+    } else if (this.churchregsiterform.value.password != this.churchregsiterform.value.retypepassword) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'పాస్‌వర్డ్ సరిపోలలేదు',
+        text: 'పాస్‌వర్డ్ మరియు రీ-టైప్ పాస్‌వర్డ్ ఒకేలా ఉండాలి.'
+      });
+      return;
+    } else {
+      const payload = { ...this.churchregsiterform.value };
+      this.service.postchurchregister(payload).subscribe({
+        next: (res: any) => {
+          if (res.status == 451) {
+            Swal.fire({
+              icon: 'info',
+              title: 'గమనిక',
+              text: 'ఇదే ఫోన్ నెంబర్ తో ఇంతకుముందే రిజిస్టర్ అయ్యారు'
+            });
+          } else if (res.status == 200) {
+            Swal.fire({
+              icon: 'success',
+              title: 'విజయం!',
+              text: 'చర్చి విజయవంతముగా నమోదు చేయబడింది, దయచేసి చర్చి సర్వీస్ టైమింగ్స్ నమోదు చేయండి.'
+            });
+            this.router.navigate(['/profile'], { queryParams: { id: "1" } });
+            this.churchregsiterform.reset();
+            this.submitted = false;
+          } else {
+            Swal.fire({
+              icon: 'error',
+              title: 'లోపం',
+              text: res.message || 'నమోదు చేయడంలో సమస్య వచ్చింది. దయచేసి మరలా ప్రయత్నించండి.'
+            });
+          }
+        },
+        error: (error: any) => {
+          Swal.fire({
+            icon: 'error',
+            title: 'లోపం',
+            text: error?.error?.message || error?.error?.error || 'సర్వర్ సమస్య వచ్చింది. దయచేసి మరలా ప్రయత్నించండి.'
+          });
+        }
+      });
+    }
   }
   postpastorassociations() {
     this.submitted = true;

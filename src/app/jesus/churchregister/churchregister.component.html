@@ -235,11 +235,13 @@
                                                             style="color:red; -webkit-text-stroke-width:thick;">*</span>
                                                     </label>
                                                     <select class="form-control" formControlName="village_id"
+                                                        (click)="onPanchayatClick()"
+                                                        (focus)="onPanchayatClick()"
                                                         style="height:37px;width: 273px;"
                                                         [ngClass]="{'is-invalid': submitted && k['village_id'].errors }">
                                                         <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
                                                         <option value="{{item.id}}" *ngFor="let item of panchayati">
-                                                            {{item.pnchyt_nm}}
+                                                            {{item.pnchyt_nm || item.panchayatname || item.name}}
                                                         </option>
                                                     </select>
                                                     <div *ngIf="submitted && k['village_id'].errors"
@@ -335,16 +337,9 @@
                                     <div class="row">
                                         <div class="col-md-6 mb-4 pb-2">
                                             <div class="form-outline">
-                                                <label class="form-label">Village Name<span
-                                                        style="color:red; -webkit-text-stroke-width:thick;">*</span></label>
+                                                <label class="form-label">Village / Locality Name (గ్రామం / ప్రాంతం పేరు)</label>
                                                 <input type="text" formControlName="village_name" class="form-control"
-                                                    placeholder="Enter Your Village Name"
-                                                    [ngClass]="{'is-invalid': submitted && k['village_name'].errors }" />
-                                                <div *ngIf="submitted && k['village_name'].errors"
-                                                    class="invalid-feedback">
-                                                    <div *ngIf="k['village_name'].errors['required']">Street Name
-                                                        is required </div>
-                                                </div>
+                                                    placeholder="Enter Your Village / Locality Name" />
                                             </div>
                                         </div>
                                         <div class="col-md-6 mb-4 pb-2">

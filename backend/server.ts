@@ -41,7 +41,7 @@ const db = mysql.createPool({
     connectionLimit: 15,
     enableKeepAlive: true,
     keepAliveInitialDelay: 10000,
-    connectTimeout: 3000
+    connectTimeout: 20000
 });
 
 // Whitelist of valid database tables
@@ -95,10 +95,17 @@ function extractUploadedImage(body) {
 // Dynamic insert helper: matches input fields to real table columns
 async function dynamicInsert(tableName, data) {
     try {
-        const [cols] = await db.query(`DESCRIBE \`${tableName}\``);
+        const [cols]: any = await db.query(`DESCRIBE \`${tableName}\``);
         const colMap = new Map();
+        const colMetaMap = new Map();
         for (const c of cols) {
-            colMap.set(c.Field.toLowerCase(), c.Field);
+            const lk = c.Field.toLowerCase();
+            colMap.set(lk, c.Field);
+            colMetaMap.set(lk, {
+                type: String(c.Type || '').toLowerCase(),
+                nullable: String(c.Null || '').toUpperCase() === 'YES',
+                defaultVal: c.Default
+            });
         }
 
         // Auto-extract image if table has image column and data has reviewImg/imagesData
@@ -126,11 +133,30 @@ async function dynamicInsert(tableName, data) {
             const lk = k.toLowerCase();
             if (lk !== 'id' && colMap.has(lk)) {
                 const actualCol = colMap.get(lk);
+                const meta = colMetaMap.get(lk);
                 fields.push(`\`${actualCol}\``);
                 placeholders.push('?');
                 let val: any = typeof v === 'object' && v !== null ? JSON.stringify(v) : (v === undefined ? null : v);
-                if (typeof val === 'string' && val.trim() === '' && (lk.endsWith('_id') || lk === 'constituencyname' || lk === 'districts' || lk === 'mandals')) {
-                    val = null;
+                
+                const isNumericCol = meta && (
+                    meta.type.startsWith('int') ||
+                    meta.type.startsWith('bigint') ||
+                    meta.type.startsWith('smallint') ||
+                    meta.type.startsWith('tinyint') ||
+                    meta.type.startsWith('decimal') ||
+                    meta.type.startsWith('float') ||
+                    meta.type.startsWith('double') ||
+                    meta.type.startsWith('numeric')
+                );
+
+                if (typeof val === 'string' && val.trim() === '') {
+                    if (isNumericCol || lk.endsWith('_id') || lk === 'constituencyname' || lk === 'districts' || lk === 'mandals' || lk === 'districtname' || lk === 'panchaiti') {
+                        val = meta && !meta.nullable ? (meta.defaultVal !== null && !isNaN(Number(meta.defaultVal)) ? Number(meta.defaultVal) : 0) : null;
+                    }
+                } else if (isNumericCol && val !== null && val !== undefined) {
+                    if (!isNaN(Number(val))) {
+                        val = Number(val);
+                    }
                 }
                 values.push(val);
             }
@@ -139,7 +165,7 @@ async function dynamicInsert(tableName, data) {
         const sql = `INSERT INTO \`${tableName}\` (${fields.join(',')}) VALUES (${placeholders.join(',')})`;
         const [res] = await db.query(sql, values);
         return res;
-    } catch (e) {
+    } catch (e: any) {
         console.error(`dynamicInsert error in ${tableName}:`, e.message);
         throw e;
     }
@@ -1044,8 +1070,15 @@ app.post(['/dashboardapi/postpastorassociations', '/api/postpastorassociations']
         if (a.constituency_id && !a.constituencyname) a.constituencyname = a.constituency_id;
         if (a.mandal_id && !a.mandals) a.mandals = a.mandal_id;
         if (a.village_id && !a.panchaiti) a.panchaiti = a.village_id;
+        if (a.std_phonenumber && !a.stdph) a.stdph = a.std_phonenumber;
         if (a.term && !a.terms) a.terms = a.term;
+        if (!a.terms) a.terms = 'YES';
         if (!a.cts) a.cts = new Date().toISOString().slice(0, 19).replace('T', ' ');
+        if (a.districtname !== undefined && a.districtname !== null && a.districtname !== '') {
+            a.districtname = Number(a.districtname);
+        } else {
+            a.districtname = null;
+        }
 
         const phone = a.phonenumber || a.whatsapp_number || a.mobile_number;
         if (phone) {

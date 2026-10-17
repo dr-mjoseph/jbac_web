@@ -393,12 +393,14 @@
                                                             style="color:red; -webkit-text-stroke-width:thick;">*</span>
                                                     </label>
                                                     <select class="form-control" formControlName="panchayat_id"
+                                                        (click)="onPanchayatClick()"
+                                                        (focus)="onPanchayatClick()"
                                                         style="height:37px;width: 273px;"
                                                         [ngClass]="{'is-invalid': submitted && o['panchayat_id'].errors }">
                                                         <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి
                                                         </option>
                                                         <option value="{{item.id}}" *ngFor="let item of panchayati">
-                                                            {{item.pnchyt_nm}}
+                                                            {{item.pnchyt_nm || item.panchayatname || item.name}}
                                                         </option>
                                                     </select>
                                                     <div *ngIf="submitted && o['panchayat_id'].errors"
@@ -746,7 +748,7 @@
                                                 </label>
 
                                                 <div class="form-check" *ngFor="let option of godOptions">
-                                                    <input class="form-check-input" type="checkbox" formControlName="god"  [value]="option"
+                                                    <input class="form-check-input" type="checkbox" [value]="option"
                                                         (change)="onGodCheckboxChange($event)" />
                                                     <label class="form-check-label">{{ option }}</label>
                                                 </div>

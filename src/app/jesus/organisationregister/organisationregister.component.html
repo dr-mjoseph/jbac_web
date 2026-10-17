@@ -331,11 +331,13 @@
                                                             style="color:red; -webkit-text-stroke-width:thick;">*</span>
                                                     </label>
                                                     <select class="form-control" formControlName="panchayati"
+                                                        (click)="onPanchayatClick()"
+                                                        (focus)="onPanchayatClick()"
                                                         style="height:37px;width: 273px;"
                                                         [ngClass]="{'is-invalid': submitted && i['panchayati'].errors }">
                                                         <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
                                                         <option value="{{item.id}}" *ngFor="let item of panchayati">
-                                                            {{item.pnchyt_nm}}
+                                                            {{item.pnchyt_nm || item.panchayatname || item.name}}
                                                         </option>
                                                     </select>
                                                     <div *ngIf="submitted && i['panchayati'].errors"

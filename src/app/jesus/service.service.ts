@@ -220,21 +220,28 @@ postwishform(data: any) {
     if (mandalId !== undefined && mandalId !== null && mandalId !== '') {
       data = typeof mandalId === 'object' && mandalId !== null ? mandalId : { mandal_id: mandalId };
     }
+    const numMandalId = (mandalId && typeof mandalId !== 'object') ? Number(mandalId) : (mandalId?.mandal_id ? Number(mandalId.mandal_id) : undefined);
+    const getFallbackList = () => {
+      return ((FALLBACK_DROPDOWN_DATA as any).panchayatis || []).map((p: any) => ({
+        ...p,
+        mndl_id: numMandalId !== undefined ? numMandalId : p.id
+      }));
+    };
     return this.http.post<any>(this.testApi + `gepanchayati`, data).pipe(
       map(res => {
         if (!res || !res.data || !Array.isArray(res.data) || res.data.length === 0) {
-          return { status: 200, data: (FALLBACK_DROPDOWN_DATA as any).panchayatis , message: "Success" } as any;
+          return { status: 200, data: getFallbackList(), message: "Success" } as any;
         }
         const normalized = res.data.map((p: any) => ({
           ...p,
           pnchyt_nm: p.pnchyt_nm || p.panchayatname || p.name || `గ్రామం / పంచాయతీ #${p.id}`,
           panchayatname: p.panchayatname || p.pnchyt_nm || p.name || `గ్రామం / పంచాయతీ #${p.id}`,
           name: p.name || p.pnchyt_nm || p.panchayatname || `గ్రామం / పంచాయతీ #${p.id}`,
-          mndl_id: p.mndl_id !== undefined && p.mndl_id !== null ? Number(p.mndl_id) : p.mndl_id
+          mndl_id: p.mndl_id !== undefined && p.mndl_id !== null ? Number(p.mndl_id) : (numMandalId !== undefined ? numMandalId : p.mndl_id)
         }));
         return { status: 200, data: normalized , message: "Success" } as any;
       }),
-      catchError(() => of({ status: 200, data: (FALLBACK_DROPDOWN_DATA as any).panchayatis , message: "Success" } as any))
+      catchError(() => of({ status: 200, data: getFallbackList(), message: "Success" } as any))
     );
   }
   gempanchayatis(mandalId?: any): Observable<any> {

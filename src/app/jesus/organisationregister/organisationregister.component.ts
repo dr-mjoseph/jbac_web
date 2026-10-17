@@ -5,6 +5,7 @@ import { DatePipe } from '@angular/common';
 import Swal from 'sweetalert2';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { FALLBACK_DROPDOWN_DATA } from '../dropdown_fallback_data';
 
 @Component({
   selector: 'app-organisationregister',
@@ -26,7 +27,7 @@ export class OrganisationregisterComponent {
   pattern: any;
   districts: any;
   mandals: any;
-  panchayati: any;
+  panchayati: any = (FALLBACK_DROPDOWN_DATA as any).panchayatis || [];
   bliversdata: any;
   studentform: FormGroup;
   pastorform: FormGroup;
@@ -393,10 +394,31 @@ export class OrganisationregisterComponent {
   }
 
   gepanchayati(event: any) {
-    var id = event.target.value;
-    this.service.gepanchayatis(id).subscribe(res => {
-      this.panchayati = res.data ? res.data.filter((data: any) => !id || data.mndl_id == id) : [];
-    })
+    const id = event?.target?.value !== undefined ? event.target.value : event;
+    if (!id) return;
+    this.service.gepanchayatis(id).subscribe(
+      (res: any) => {
+        if (res && res.data && Array.isArray(res.data) && res.data.length > 0) {
+          this.panchayati = res.data;
+        } else {
+          this.panchayati = (FALLBACK_DROPDOWN_DATA as any).panchayatis || [];
+        }
+      },
+      () => {
+        this.panchayati = (FALLBACK_DROPDOWN_DATA as any).panchayatis || [];
+      }
+    );
+  }
+
+  onPanchayatClick() {
+    if (!this.panchayati || this.panchayati.length === 0) {
+      const mandalVal = this.independentorgainsationform?.get('mandals')?.value;
+      if (mandalVal) {
+        this.gepanchayati(mandalVal);
+      } else {
+        this.panchayati = (FALLBACK_DROPDOWN_DATA as any).panchayatis || [];
+      }
+    }
   }
   getpastorsdatas: any;
 
@@ -589,26 +611,83 @@ export class OrganisationregisterComponent {
   postindepedentorganisation() {
     this.submitted = true;
 
+    // Auto-populate villagename if empty from selected panchayati
+    if (!this.independentorgainsationform.value.villagename) {
+      const pId = this.independentorgainsationform.value.panchayati;
+      const matched = this.panchayati?.find((p: any) => p.id == pId);
+      const vName = matched?.pnchyt_nm || matched?.panchayatname || this.independentorgainsationform.value.ward || 'Panchayat';
+      this.independentorgainsationform.patchValue({ villagename: vName });
+    }
+
     if (this.independentorgainsationform.invalid) {
-      Swal.fire('please fiil the details ');
+      const invalidFields: string[] = [];
+      const controls = this.independentorgainsationform.controls;
+      if (controls['organisation_name']?.invalid) invalidFields.push('సంస్థ పేరు (Organisation Name)');
+      if (controls['contact_num']?.invalid) invalidFields.push('ఫోన్ నంబర్ (10 అంకెలు)');
+      if (controls['service_name']?.invalid) invalidFields.push('సర్వీస్ పేరు (Service Name)');
+      if (controls['organizationtype']?.invalid) invalidFields.push('సంస్థ రకం (Type of Organization)');
+      if (controls['location']?.invalid) invalidFields.push('లొకేషన్ (Location)');
+      if (controls['denomation']?.invalid) invalidFields.push('డినామినేషన్ (Denomination)');
+      if (controls['districts']?.invalid) invalidFields.push('జిల్లా (District)');
+      if (controls['constituencyname']?.invalid) invalidFields.push('నియోజకవర్గం (Constituency)');
+      if (controls['mandals']?.invalid) invalidFields.push('మండలం (Mandal)');
+      if (controls['panchayati']?.invalid) invalidFields.push('పంచాయతీ (Panchayat)');
+      if (controls['villagename']?.invalid) invalidFields.push('గ్రామం / స్ట్రీట్ పేరు (Village/Street)');
+      if (controls['ward']?.invalid) invalidFields.push('హౌస్ నంబర్ / స్ట్రీట్ (House Number/Street)');
+      if (controls['password']?.invalid) invalidFields.push('పాస్‌వర్డ్ (కనీసం 6 అక్షరాలు)');
+      if (controls['retypepassword']?.invalid) invalidFields.push('రీ-టైప్ పాస్‌వర్డ్');
+      if (controls['term']?.invalid) invalidFields.push('నిబంధనలు అంగీకరించాలి');
+
+      const msg = invalidFields.length > 0
+        ? `దయచేసి ఈ క్రింది వివరాలను తప్పనిసరిగా పూరించండి:\n• ${invalidFields.join('\n• ')}`
+        : '* ఉన్న తప్పనిసరి ఫీల్డ్స్ ఎంటర్ చేయండి';
+
+      Swal.fire({
+        icon: 'warning',
+        title: 'గమనిక',
+        text: msg
+      });
       return;
     } else if (this.independentorgainsationform.value.password != this.independentorgainsationform.value.retypepassword) {
-      Swal.fire("Passwords are Unmatched");
+      Swal.fire({
+        icon: 'warning',
+        title: 'గమనిక',
+        text: 'పాస్‌వర్డ్ మరియు Retype-Password సరిపోలడం లేదు'
+      });
+      return;
     } else {
-      this.service.postindepedentorganisation(this.independentorgainsationform.value).subscribe((res: any) => {
-        if (res.status == 451) {
-          Swal.fire('ఇదే ఫోన్ నెంబర్ తో ఇంతకుముందే రిజిస్టర్ అయ్యారు');
-        } else if (res.status == 200) {
-
-          Swal.fire('విజయవంతముగా నమోదు చేయబడింది, మీ ఫోన్ నెంబర్ మరియు పాస్వర్డ్ తో లాగిన్ అవగలరు');
-          this.independentorgainsationform.reset();
-          this.submitted = false;
-
-        } else {
-          alert('Error');
+      this.service.postindepedentorganisation(this.independentorgainsationform.value).subscribe({
+        next: (res: any) => {
+          if (res.status == 451) {
+            Swal.fire({
+              icon: 'info',
+              title: 'గమనిక',
+              text: 'ఇదే ఫోన్ నెంబర్ తో ఇంతకుముందే రిజిస్టర్ అయ్యారు'
+            });
+          } else if (res.status == 200) {
+            Swal.fire({
+              icon: 'success',
+              title: 'విజయం!',
+              text: 'విజయవంతముగా నమోదు చేయబడింది, మీ ఫోన్ నెంబర్ మరియు పాస్వర్డ్ తో లాగిన్ అవగలరు'
+            });
+            this.independentorgainsationform.reset();
+            this.submitted = false;
+          } else {
+            Swal.fire({
+              icon: 'error',
+              title: 'లోపం',
+              text: res.message || 'నమోదు చేయడంలో సమస్య వచ్చింది. దయచేసి మరలా ప్రయత్నించండి.'
+            });
+          }
+        },
+        error: (error: any) => {
+          Swal.fire({
+            icon: 'error',
+            title: 'లోపం',
+            text: error?.error?.message || error?.error?.error || 'సర్వర్ సమస్య వచ్చింది. దయచేసి మరలా ప్రయత్నించండి.'
+          });
         }
-
-      })
+      });
     }
   }
 
