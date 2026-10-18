@@ -732,3 +732,104 @@ The user reported that the previous `.apk` file was not working/updating on devi
    - Generated Artifacts:
      - `C:\Users\rajes\StudioProjects\jbac_app\jbacApp-0.0.32.apk` (118.68 MB)
      - `C:\Users\rajes\StudioProjects\jbac_app\jbacApp-0.0.32.aab` (115.81 MB)
+
+
+---
+
+## 23. Namodu Form Overhaul, Believer Schema Alignment & Role Registration Isolation
+
+### A. Context & Objectives
+1. **Namodu Form (/namodu)**:
+   - Clean up the phone number field label by removing redundant bracketed text `(10 అంకెలు మీ ఫోన్ నెంబర్ ఏ, లాగిన్ ఐడి) *)`.
+   - Replace the password field with a WhatsApp phone number field (numeric, `type="tel"`, standard placeholder, no password watermark).
+2. **Current Timestamp (cts) Standardization**:
+   - Add current timestamp (`cts` in IST `YYYY-MM-DD HH:mm:ss`) for every registration entry, positioned immediately after `id` (before the name column).
+3. **Namodu Believer Storage (signup_form)**:
+   - Direct registrations selecting "BELIEVER" (Category 1) from the Namodu form into the `signup_form` table in the database.
+4. **Regular Believer Geographic Data Persistence**:
+   - Fix missing `district_id`, `constituency_id`, `mandal_id`, and `panchayat_id` values when users register via the standard believer registration pages (`/signup`, `/believerregister`).
+5. **Initial Password Scope Isolation**:
+   - Restrict the "phone number as default password with first-login change password modal" workflow strictly to `/namodu` and `/entry` forms.
+   - Retain traditional password and confirm password fields for all other registration forms (Student, Pastor, Church, Pastors Association, Ministry, Organization) and log them in normally (status 200).
+
+---
+
+### B. Database Schema Migrations (AWS Aurora RDS MySQL)
+Executed migrations on live AWS Aurora RDS database (`jbac_jbac`):
+1. **Current Timestamp (cts) Columns**:
+   - Added `cts VARCHAR(255) DEFAULT NULL AFTER id` to:
+     - `student_reg`
+     - `pastor_reg`
+     - `ministry_signup`
+     - `independentorganisation_reg`
+   *(Verified: `signup_form`, `church_reg`, `pastors_associations`, `business_table`, and `reg_form` already possessed `cts` after `id`).*
+2. **WhatsApp Columns**:
+   - Added `whatsapp VARCHAR(25) DEFAULT NULL` to:
+     - `student_reg` (after `number`)
+     - `pastor_reg` (after `phonenumber`)
+     - `church_reg` (after `contactnumber`)
+     - `ministry_signup` (after `headnmber`)
+     - `independentorganisation_reg` (after `contact_num`)
+   *(Verified: `signup_form`, `pastors_associations`, and `reg_form` already had `whatsapp`/`whatsappno`).*
+3. **First Login Tracking**:
+   - Added `is_first_login TINYINT(1) DEFAULT 0` across all category tables to track initial password state.
+4. **Offline Schema Synchronization**:
+   - Updated repository reference dump file `database/jbac_structure.sql`.
+
+---
+
+### C. Frontend Enhancements (Angular 15)
+1. **Namodu Form (`src/app/jesus/namodu/namodu.component.html` & `.ts`)**:
+   - Label updated from `మీ ఫోన్ నంబర్ (10 అంకెలు మీ ఫోన్ నెంబర్ ఏ, లాగిన్ ఐడి) *` to **`మీ ఫోన్ నంబర్ *`**.
+   - Replaced password field with WhatsApp input:
+     - Label: **`వాట్సాప్ ఫోన్ నంబర్`**
+     - Control: `formControlName="whatsapp"`
+     - Input Attributes: `type="tel"`, `maxlength="10"`, `minlength="10"`, `(keypress)="numericOnly($event)"`
+     - Placeholder: `"ఇక్కడ క్లిక్ చేసి ఎంటర్ చేయండి"` (password watermark removed)
+   - Updated `postregform()` payload:
+     - Sets `password: phone` (phone as initial password for Namodu)
+     - Sends `whatsapp: whatsappVal`
+2. **Regular Believer Registration (`signup.component.ts` & `believerregister.component.ts`)**:
+   - Explicitly mapped `district_id`, `constituency_id`, `mandal_id`, `panchayat_id` from Angular form controls `districts`, `constituencyname`, `mandals`, `panchayati`.
+3. **Role Registration Password Form Isolation**:
+   - **Student Registration (`studentregister.component.ts`)**: Restored `Validators.required` and `Validators.minLength(4)` on `password` and `retypepassword`.
+   - **Pastor Association Registration (`pastorassociationregister.component.ts` & `.html`)**: Restored required password validators and labels (`*`).
+   - Kept explicit password creation on Church, Pastor, Ministry, and Organization forms.
+
+---
+
+### D. Backend API Implementation (`backend/server.ts` & `backend/server.js`)
+1. **IST Timestamp Helper (`getIndianCts`)**:
+   - Implemented standard Indian Standard Time generator returning `YYYY-MM-DD HH:mm:ss`.
+2. **Category 1 Believer Routing in `postregform`**:
+   - Added explicit Category 1 (`'1'`, `'believer'`, `'విశ్వాసి'`) handler inserting directly into `signup_form`:
+     - Sets `cts: getIndianCts()`, `fname: name`, `mobile_number: phone`, `whatsapp: whatsappPhone`.
+     - Maps geographic IDs (`district_id`, `constituency_id`, `mandal_id`, `panchayat_id`).
+     - Sets `password: phone`, `is_first_login: 1`, `from_signup: 'believer'`.
+3. **Geographic Field Parsing in `postregform`**:
+   - Added fallbacks so `distId`, `constId`, `mandalId`, and `villageId` accept form aliases (`districts`, `constituencyname`, `mandals`, `panchayati`).
+4. **Regular Believer Registration (`postbeliversignup`)**:
+   - Mapped `district_id`, `constituency_id`, `mandal_id`, `panchayat_id`.
+   - Sets `cts: getIndianCts()`, `is_first_login: 0`.
+5. **Login Authentication & First-Login Flow (`passwordwebsitelogin`)**:
+   - Included `is_first_login` in SELECT queries across all category tables.
+   - If `user.is_first_login == 1` (Namodu & Entry registrants), returns `{ status: 201, first_login: true }` to trigger the change password modal.
+   - If `user.is_first_login == 0` (Regular registrations), returns `{ status: 200, message: 'Login successful' }` for direct, normal login.
+   - Updated password reset endpoints (`updatefamilymemberpassword`, `createfrgetpassword`, `upadtedpassword`) to set `is_first_login = 0`.
+
+---
+
+### E. Build, Deployment & End-to-End Verification
+1. **Angular Production Build**:
+   - Compiled with 0 errors via `ng build --configuration production` (`main.36281428eee98d29.js`).
+2. **AWS Lambda Backend Deployment**:
+   - Packaged `backend-deploy.zip` with updated `server.js` and dependencies.
+   - Deployed to AWS Lambda function `jbac-backend-api` (ap-southeast-2).
+3. **AWS S3 & CloudFront Deployment**:
+   - Synchronized build assets to `s3://jbac-web-production-298363284024`.
+   - Invalidated CloudFront cache for distribution `EOBBU8SU7H3BI` (`/*`).
+4. **Live Verification Results**:
+   - **Namodu Believer Registration**: `POST /dashboardapi/postregform` -> Stored in `signup_form` with `cts: '2026-10-18 09:57:29'`, `whatsapp`, `district_id: '1'`, `mandal_id: '20'`, `panchayat_id: '30'`, `password: phone`, `is_first_login: 1`. (Status: **PASS**)
+   - **Namodu First-Login**: `POST /dashboardapi/passwordwebsitelogin` -> Returned `{ status: 201, first_login: true }`. (Status: **PASS**)
+   - **Regular Believer Registration**: `POST /dashboardapi/postbeliversignup` -> Stored in `signup_form` with `district_id: '1'`, `constituency_id: '10'`, `mandal_id: '20'`, `panchayat_id: '30'`, `cts`, `is_first_login: 0`. (Status: **PASS**)
+   - **Regular Believer Login**: `POST /dashboardapi/passwordwebsitelogin` -> Returned `{ status: 200, message: 'Login successful' }`. (Status: **PASS**)

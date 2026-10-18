@@ -33,6 +33,15 @@ CREATE TABLE IF NOT EXISTS jbac_db.registrations (
 );
 ```
 
+3. **Role-Specific Registration Tables:**
+   - **`signup_form` (Believers):** Stores believer registrations from both standard forms and `/namodu`. Key columns: `id`, `cts` (IST timestamp, positioned before name), `fname`, `lname`, `mobile_number`, `whatsapp`, `district_id`, `constituency_id`, `mandal_id`, `panchayat_id`, `password`, `is_first_login`, `from_signup`.
+   - **`student_reg` (Students):** Key columns: `id`, `cts`, `studentname`, `number`, `whatsapp`, `district_id`, `constituency_id`, `mandal_id`, `village_id`, `password`, `is_first_login`.
+   - **`pastor_reg` (Pastors):** Key columns: `id`, `cts`, `pastorname`, `phonenumber`, `whatsapp`, `district_id`, `constituency_id`, `mandal_id`, `village_id`, `password`, `is_first_login`.
+   - **`church_reg` (Churches):** Key columns: `id`, `cts`, `church_name`, `contactnumber`, `whatsapp`, `district_id`, `constituency_id`, `mandal_id`, `village_id`, `password`, `is_first_login`.
+   - **`pastors_associations` (Pastors Associations):** Key columns: `id`, `cts`, `paname`, `phonenumber`, `whatsapp`, `district_id`, `constituency_id`, `mandal_id`, `village_id`, `password`, `is_first_login`.
+   - **`ministry_signup` (Ministries):** Key columns: `id`, `cts`, `ministryname`, `headnmber`, `whatsapp`, `district_id`, `constituency_id`, `mandal_id`, `village_id`, `password`, `is_first_login`.
+   - **`independentorganisation_reg` (Independent Organizations):** Key columns: `id`, `cts`, `organisation_name`, `contact_num`, `whatsapp`, `district_id`, `constituency_id`, `mandal_id`, `village_id`, `password`, `is_first_login`.
+
 ---
 
 ## ⚙️ Core Application Routes
@@ -44,7 +53,22 @@ Fetches a list of system notifications and landing-page metadata records.
 Consumes multi-form request bodies, dynamically flattening custom data fields into the open MySQL JSON property column block.
 - **Payload Structure:** `{ registrationType, firstName, lastName, email, phone, ...customMetadata }`
 
-### 3. `GET /api/admin-database-view`
+### 3. `POST /dashboardapi/postregform` (Namodu & Entry Form Submissions)
+Processes unified entry and `/namodu` submissions, routing to role-specific tables:
+- **Category 1 (Believer):** Stores directly into `signup_form` with `cts` (IST timestamp), `whatsapp`, `district_id`, `constituency_id`, `mandal_id`, `panchayat_id`, `from_signup: 'believer'`, and sets initial `password = phone`, `is_first_login = 1`.
+- **Other Categories:** Student (`student_reg`), Pastor (`pastor_reg`), Church (`church_reg`), Pastors Association (`pastors_associations`), Ministry (`ministry_signup`), Independent Organization (`independentorganisation_reg`). All store `cts`, `whatsapp`, and `is_first_login = 1`.
+
+### 4. `POST /dashboardapi/postbeliversignup` (Regular Believer Registration)
+Stores regular believer registrations into `signup_form`:
+- Maps geographic fields: `district_id`, `constituency_id`, `mandal_id`, `panchayat_id`.
+- Stores `cts` (IST timestamp), dedicated user password, and sets `is_first_login = 0`.
+
+### 5. `POST /dashboardapi/passwordwebsitelogin` (Authentication)
+Authenticates users across all category tables:
+- **First Login (Namodu & Entry):** If `is_first_login == 1`, returns `{ status: 201, first_login: true }` which triggers the change password modal on the frontend.
+- **Regular Registrations:** If `is_first_login == 0`, returns `{ status: 200, message: 'Login successful' }` for direct, normal login without the modal.
+
+### 6. `GET /api/admin-database-view`
 A private, browser-based database cockpit GUI panel. It aggregates separate, interactive spreadsheet rows viewable natively inside your standard browser window pane to view incoming registrations cleanly by roles without looking at terminal blocks.
 
 ---
