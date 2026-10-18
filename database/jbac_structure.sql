@@ -91,6 +91,7 @@ CREATE TABLE `about_tbl` (
   `para3` longtext,
   `image` longtext,
   `d_in` int NOT NULL DEFAULT '0',
+  `is_first_login` tinyint(1) DEFAULT '0',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -315,6 +316,7 @@ CREATE TABLE `church_reg` (
   `pastor_id` varchar(255) DEFAULT NULL,
   `location` longtext,
   `contactnumber` varchar(255) NOT NULL,
+  `whatsapp` varchar(25) DEFAULT NULL,
   `d_in` int NOT NULL DEFAULT '0',
   `youtube` longtext,
   `facebook` longtext,
@@ -325,6 +327,7 @@ CREATE TABLE `church_reg` (
   `village_name` varchar(255) DEFAULT NULL,
   `term` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT 'No',
   `approval_ind` int NOT NULL DEFAULT '0',
+  `is_first_login` tinyint(1) DEFAULT '0',
   PRIMARY KEY (`id`),
   KEY `district_id` (`district_id`),
   KEY `village_id` (`village_id`),
@@ -895,6 +898,7 @@ DROP TABLE IF EXISTS `independentorganisation_reg`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `independentorganisation_reg` (
   `id` int NOT NULL AUTO_INCREMENT,
+  `cts` varchar(255) DEFAULT NULL,
   `ctsdate` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
   `organisation_name` varchar(255) DEFAULT NULL,
   `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
@@ -902,6 +906,7 @@ CREATE TABLE `independentorganisation_reg` (
   `pastor_id` varchar(10) DEFAULT NULL,
   `location` longtext,
   `contact_num` varchar(255) DEFAULT NULL,
+  `whatsapp` varchar(25) DEFAULT NULL,
   `email` varchar(255) DEFAULT NULL,
   `website` longtext,
   `d_in` int NOT NULL DEFAULT '0',
@@ -919,6 +924,7 @@ CREATE TABLE `independentorganisation_reg` (
   `password` varchar(255) DEFAULT NULL,
   `remarks` varchar(255) DEFAULT NULL,
   `approval_ind` int NOT NULL DEFAULT '0',
+  `is_first_login` tinyint(1) DEFAULT '0',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=49 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -1276,6 +1282,7 @@ DROP TABLE IF EXISTS `ministry_signup`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `ministry_signup` (
   `id` int NOT NULL AUTO_INCREMENT,
+  `cts` varchar(255) DEFAULT NULL,
   `dts` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
   `ministryname` varchar(255) DEFAULT NULL,
   `denomation_id` varchar(255) DEFAULT NULL,
@@ -1283,6 +1290,7 @@ CREATE TABLE `ministry_signup` (
   `ministryemail` varchar(255) DEFAULT NULL,
   `ministrywebsite` varchar(255) DEFAULT NULL,
   `headnmber` varchar(255) DEFAULT NULL,
+  `whatsapp` varchar(25) DEFAULT NULL,
   `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
   `number_ofchurches` varchar(255) DEFAULT NULL,
   `number_ofmembers` varchar(255) DEFAULT NULL,
@@ -1424,9 +1432,11 @@ DROP TABLE IF EXISTS `pastor_reg`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `pastor_reg` (
   `id` int NOT NULL AUTO_INCREMENT,
+  `cts` varchar(255) DEFAULT NULL,
   `i_ts` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
   `pastorname` varchar(255) DEFAULT NULL,
   `phonenumber` varchar(255) DEFAULT NULL,
+  `whatsapp` varchar(25) DEFAULT NULL,
   `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
   `gender` varchar(200) DEFAULT NULL,
   `staus` varchar(200) DEFAULT NULL,
@@ -1795,9 +1805,11 @@ DROP TABLE IF EXISTS `student_reg`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `student_reg` (
   `id` int NOT NULL AUTO_INCREMENT,
+  `cts` varchar(255) DEFAULT NULL,
   `i_ts` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
   `studentname` varchar(255) DEFAULT NULL,
   `number` varchar(255) DEFAULT NULL,
+  `whatsapp` varchar(25) DEFAULT NULL,
   `parentnum` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
   `pastornum` varchar(255) DEFAULT NULL,
   `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
@@ -1848,6 +1860,7 @@ CREATE TABLE `student_reg` (
   `d_in` int NOT NULL DEFAULT '0',
   `approval_ind` int NOT NULL DEFAULT '0',
   `password` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `is_first_login` tinyint(1) DEFAULT '0',
   PRIMARY KEY (`id`),
   KEY `church_id` (`church_id`),
   KEY `pastor_id` (`pastor_id`),

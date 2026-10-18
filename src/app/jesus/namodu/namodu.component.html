@@ -134,7 +134,7 @@
                                         <div class="row">
                                             <div class="col-md-6 mb-4 pb-2">
                                                 <div class="form-outline">
-                                                    <label class="form-label">మీ ఫోన్ నంబర్ (10 అంకెలు మీ ఫోన్ నెంబర్ ఏ, లాగిన్ ఐడి) <span
+                                                    <label class="form-label">మీ ఫోన్ నంబర్ <span
                                                             style="color:red; -webkit-text-stroke-width:thick;">*</span></label>
                                                     <input type="tel" formControlName="number" class="form-control"
                                                         placeholder="ఇక్కడ క్లిక్ చేసి ఎంటర్ చేయండి"
@@ -145,57 +145,25 @@
                                                         class="invalid-feedback">
                                                         <div *ngIf="r['number'].errors['required']">
                                                             మీ ఫోన్ నంబర్ ఎంటర్ చేయండి</div>
-                                                        <div *ngIf="r['number'].errors['maxLength']">10 అంకెలు ఫోన్
+                                                        <div *ngIf="r['number'].errors['maxLength'] || r['number'].errors['minlength']">10 అంకెలు ఫోన్
                                                             నంబర్ మాత్రమే ఎంటర్ చేయండి
                                                         </div>
                                                     </div>
                                                 </div>
 
-                                                <!-- <div class="col-md-6 mb-4">
-                                                <div class="form-outline">
-                                                    <label class="form-label">మీటింగ్ తేదీ సెలెక్ట్ చేయండి <span
-                                                            style="color:red; -webkit-text-stroke-width:thick;">*</span></label>
-                                                    <input type="date" class="form-control" formControlName="meetdate">
-                                                </div>
-                                            </div> -->
-
-
-                                                <!-- <div class="col-md-6 mb-4 pb-2">
-                                                <div class="form-outline">
-                                                    <label class="form-label">మీరు ఏ రోజు వస్తున్నారో సెలెక్ట్ చేయండి  <span style="color:red; -webkit-text-stroke-width:thick;">*</span></label>
-                                                    <select formControlName="optselect" class="form-control">
-                                                        <option value="" disabled selected>ఇక్కడ క్లిక్ చేసి
-                                                            సెలెక్ట్ చేయండి
-                                                        </option>
-                                                        
-                                                        <option value="డిసెంబర్ 7-Conference">పరిస్కార సూచనల కాన్ఫరెన్స్ &  డిసెంబర్ 7న  రాత్రి మీటింగ్</option>
-                                                        <option value="Conference only">పరిస్కార సూచనల కాన్ఫరెన్స్ మాత్రమే</option>
-                                                        <option value="రెండు రోజులు వస్తాను">రెండు రాత్రులు వస్తాను</option>
-                                                        <option value="డిసెంబర్ 7">డిసెంబర్ 7న  శనివారం మీటింగ్</option>
-                                                        <option value="డిసెంబర్ 8">డిసెంబర్ 8న ఆదివారం మీటింగ్</option>
-                                                       
-                                                    </select>
-                                                      <div *ngIf="submitted && r['category'].errors"
-                                                    class="invalid-feedback">
-                                                    <div *ngIf="r['category'].errors['required']">ఏ రోజు వస్తున్నారో సెలెక్ట్ చేయండి </div>
-                                                </div>  
-                                                </div> 
-                                            </div>  -->
-
                                             </div>
                                             <div class="col-md-6 mb-4 pb-2">
                                                 <div class="form-outline">
-                                                    <label class="form-label">పాస్ వర్డ్ (సెట్ చేసుకోండి, 10 అంకెలు మీ ఫోన్ నెంబర్ పాస్ వర్డ్ 
-                                                        <span
-                                                            style="color:red; -webkit-text-stroke-width:thick;">*</span></label>
-                                                    <input type="password" formControlName="password" class="form-control"
-                                                        placeholder="ఇక్కడ క్లిక్ చేసి పాస్ వర్డ్ ఎంటర్ చేయండి" 
-                                                        [ngClass]="{'is-invalid': submitted && r['password'].errors }" />
-                                                    <div *ngIf="submitted && r['password'].errors" class="invalid-feedback">
-                                                        <div *ngIf="r['password'].errors['required']">పాస్ వర్డ్  తప్పనిసరిగా సెట్ చేసుకో వాలి
+                                                    <label class="form-label">వాట్సాప్ ఫోన్ నంబర్</label>
+                                                    <input type="tel" formControlName="whatsapp" class="form-control"
+                                                        placeholder="ఇక్కడ క్లిక్ చేసి ఎంటర్ చేయండి"
+                                                        maxlength="10" minlength="10"
+                                                        (keypress)="numericOnly($event)"
+                                                        [ngClass]="{'is-invalid': submitted && r['whatsapp']?.errors }" />
+                                                    <div *ngIf="submitted && r['whatsapp']?.errors" class="invalid-feedback">
+                                                        <div *ngIf="r['whatsapp']?.errors?.['minlength'] || r['whatsapp']?.errors?.['maxlength']">
+                                                            10 అంకెలు వాట్సాప్ నంబర్ మాత్రమే ఎంటర్ చేయండి
                                                         </div>
-                                                        <!-- <div *ngIf="r['password'].errors['minlength']">Password between 6 to
-                                                            16 Characters / Digits / Specialchracters</div> -->
                                                     </div>
                                                 </div>
                                             </div>

@@ -285,8 +285,8 @@ export class PastorassociationregisterComponent {
       website: [''],
       workingareas: [''],
       description: [''],
-      password: [''],
-      retypepassword: [''],
+      password: ['', [Validators.required, Validators.minLength(6)]],
+      retypepassword: ['', [Validators.required, Validators.minLength(6)]],
       term: [''],
 
     })
@@ -794,13 +794,9 @@ export class PastorassociationregisterComponent {
       return;
     }
 
-    // Default password to phone number or '123456' if left empty so login always works
+    // Password validation check
     if (!pass) {
-      const defaultPass = this.pastorsassociations.value.phonenumber || '123456';
-      this.pastorsassociations.patchValue({
-        password: defaultPass,
-        retypepassword: defaultPass
-      });
+      // password is required
     }
 
     if (this.pastorsassociations.invalid) {

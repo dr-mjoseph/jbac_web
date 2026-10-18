@@ -68,6 +68,7 @@ export class NamoduComponent {
     this.entryform = this.formBuilder.group({
       category: ['', [Validators.required]],
       number: ['', [Validators.required, Validators.minLength(10)]],
+      whatsapp: [''],
       password: [''],
       // optselect:[''],
       // meetdate:[''],
@@ -420,10 +421,15 @@ export class NamoduComponent {
     }
 
     const submittedPhone = this.entryform.value?.phonenum || this.entryform.value?.number || '';
+    const whatsappVal = this.entryform.value?.whatsapp || '';
     const payload = {
       ...this.entryform.value,
+      password: submittedPhone,
       source: 'namodu',
-      is_namodu: true
+      is_namodu: true,
+      whatsapp: whatsappVal,
+      whatsappno: whatsappVal,
+      whatsapp_number: whatsappVal
     };
     this.service.postregform(payload).subscribe(
       (res: any) => {

@@ -544,7 +544,15 @@ export class SignupComponent {
     } else if (this.beliverform.value.password != this.beliverform.value.retypepassword) {
       Swal.fire("Passwords are Unmatched")
     } else {
-      this.service.postbeliver(this.beliverform.value).subscribe((res: any) => {
+      const val = this.beliverform.value;
+      const payload = {
+        ...val,
+        district_id: val.districts || val.district_id,
+        constituency_id: val.constituencyname || val.constituency_id,
+        mandal_id: val.mandals || val.mandal_id,
+        panchayat_id: val.panchayati || val.panchayat_id || val.village_id
+      };
+      this.service.postbeliver(payload).subscribe((res: any) => {
         if (res.status == 451) {
           Swal.fire('ఇదే ఫోన్ నెంబర్ తో ఇంతకుముందే రిజిస్టర్ అయ్యారు');
         } else if (res.status == 200) {
