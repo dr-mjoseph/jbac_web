@@ -95,7 +95,26 @@ GitHub Issue: [#1](https://github.com/dr-mjoseph/jbac_web/issues/1)
 
 ---
 
-## 🎯 7. Pending Launch & Post-Release Tasks
+## 🎪 7. Events Portal Overhaul & Dynamic Ribbon (`d_in` Filtering)
+- [x] **Ribbon Data Source Migration**:
+  - Migrated scrolling ribbon in `/events` from `adds_data` table to `events` table.
+  - Enforced condition: display in ribbon if and only if `d_in == 1`; exclude completely when `d_in == 0`.
+- [x] **Backend Endpoint Parity**:
+  - Refactored `server.ts` and `server.js` queries to remove hardcoded `WHERE d_in = 0`.
+  - Added dedicated endpoint `/dashboardapi/getribbonevents` and dynamic `d_in` filtering support.
+  - Added `getRibbonEvents()` method in `ServiceService` with fallback to `crud/events?d_in=1`.
+- [x] **UI & Layout Remediation**:
+  - Eliminated broken browser image icons (`[x] images.`, `[x] Church Meeting Poster`) with `getSafeImageUrl()` and `(error)` fallbacks to `assets/images/no.jpg`.
+  - Fixed marquee red News badge clipping ("ews" ➔ "News") via flexbox wrapper.
+  - Extracted filter container outside `.events-heading-row` to resolve flexbox distortion on toggle.
+  - Replaced fixed width cards (`style="width: 244px;"`) with responsive 3-column Bootstrap grid (`col-12 col-md-6 col-lg-4 d-flex align-items-stretch`).
+  - Fixed Telugu typo: `పోస్టర్ పెద్దదిగా చూచుటకు పోస్టర్ మీద క్లిక్ చేయము` ➔ `పోస్టర్ పెద్దదిగా చూచుటకు పోస్టర్ మీద క్లిక్ చేయండి`.
+  - Removed harsh green borders (`border: 1px solid green;`), cleaned component CSS, and added uniform action buttons for Location, YouTube, Facebook, and Phone.
+
+---
+
+## 🎯 8. Pending Launch & Post-Release Tasks
 - [ ] Complete Google Play Console Review & Rollout for Release 33.
 - [ ] Monitor crash telemetry and user feedback via Google Play Console dashboard.
 - [ ] Run automated end-to-end smoke testing across all live production forms on https://jbac.in.
+

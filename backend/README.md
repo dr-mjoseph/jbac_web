@@ -46,8 +46,13 @@ CREATE TABLE IF NOT EXISTS jbac_db.registrations (
 
 ## ⚙️ Core Application Routes
 
-### 1. `GET /api/events`
-Fetches a list of system notifications and landing-page metadata records.
+### 1. `GET /api/events` & `POST /dashboardapi/getupdateevents`
+Fetches upcoming meetings and landing-page metadata from the `events` table:
+- **Filtering Options**: Supports `?current_date_only=true` (meetings covering current date) and `?d_in=0` or `?d_in=1` (filtering by display-in ribbon status).
+- **Default Behavior**: Automatically hides past meetings (`enddate < CURDATE()`), while returning `d_in` and `activestatus` fields.
+
+### 1a. `GET/POST /api/getribbonevents` & `POST /dashboardapi/getribbonevents`
+Dedicated endpoint returning small horizontal ribbon items from `events` where `d_in = 1` ordered by `id DESC`. Meetings with `d_in = 0` are excluded from this endpoint.
 
 ### 2. `POST /api/register-all`
 Consumes multi-form request bodies, dynamically flattening custom data fields into the open MySQL JSON property column block.

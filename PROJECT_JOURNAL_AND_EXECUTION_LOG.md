@@ -903,3 +903,90 @@ Executed migrations on live AWS Aurora RDS database (`jbac_jbac`):
 - **Generated Production Release Outputs**:
   - **Play Store Upload Bundle**: `C:\Users\rajes\StudioProjects\jbac_app\appreleasesigned.aab` *(115.81 MB)*
   - **Direct Device APK**: `C:\Users\rajes\StudioProjects\jbac_app\jbacApp-0.0.33.apk` *(118.68 MB)*
+
+---
+
+## 17. Events Portal Overhaul, Ribbon `d_in` Filtering & Comprehensive UI Remediation
+
+### A. Problem Statement & User Requirements
+1. **Meeting Details Ribbon Source & Condition**:
+   - The horizontal scrolling ribbon on `/events` was previously bound to `adds_data` table records via `getadds()`.
+   - The requirement was to display small boxes in the ribbon from the **`events`** table instead of `adds_data` **if and only if `d_in == 1`**.
+   - If the value in `d_in` column is `0`, the meeting must NOT be displayed in the ribbon.
+2. **Comprehensive UI Remediation**:
+   - Eliminate text unalignments, broken image icons, and layout glitches across the entire `/events` page.
+   - Resolve marquee title clipping (the red News pill appearing as "ews").
+   - Fix broken images (`[x] images.` and `[x] Church Meeting Poster`).
+   - Fix filter dropdown overflow and layout distortion when opening filters.
+   - Fix 60% empty screen space caused by fixed-width 244px cards and replace with modern responsive grid.
+   - Correct Telugu typo in poster zoom text (`చేయము` -> `చేయండి`).
+
+### B. Root Cause Analysis
+1. **Hardcoded SQL Exclusion**:
+   - Backend queries in `backend/server.ts` and `backend/server.js` contained hardcoded `WHERE d_in = 0`. This actively blocked any meeting marked `d_in = 1` from being fetched by `/dashboardapi/getevents`, `/dashboardapi/getupdateevents`, and `searchingdata`.
+2. **Frontend Misbinding**:
+   - `events.component.ts` invoked `this.getadds()` and bound the ribbon template to `adds` from `adds_data`, ignoring the `events` table entirely.
+3. **Broken Image Icons**:
+   - Images in `events` table were stored variously as full HTTPS URLs, data URIs, empty strings, `'undefined'`, or bare filenames (e.g., `1735898717188.jpeg`).
+   - Without path resolution to `https://jbac.in/websiteimages/` and without an `(error)` handler, invalid image strings caused native browser broken image icons (`[x] images.` and `[x] Church Meeting Poster`) to render.
+4. **Marquee Layout Clipping**:
+   - The red News badge (`.block-2`) in the marquee header lacked flexbox alignment and minimum width, causing its left margin to overflow and visually cut "News" to "ews".
+5. **Filter Container Nesting Bug**:
+   - The filter markup `<div class="row" *ngIf="showFilters">` was placed *inside* the flexbox container `.events-heading-row`, forcing the entire multi-column filter form into a tiny flex child next to the toggle button.
+   - In addition, `<select>` elements had hardcoded `style="height:37px;width: 273px;"` inside `col-md-2`, causing horizontal overflow across all viewports.
+6. **Card Grid Collapse & Layout Shifts**:
+   - Meeting cards had hardcoded `style="width: 244px;"` and invalid `style="width:px;"`, rendering cards at a tiny fixed width and leaving 60% of desktop displays completely empty.
+7. **Telugu Spelling Typo**:
+   - The caption read `పోస్టర్ పెద్దదిగా చూచుటకు పోస్టర్ మీద క్లిక్ చేయము` ("చేయము" = "we do not"), which contradicted the intent to encourage users to click for full poster preview.
+
+### C. Technical Implementation
+
+#### 1. Backend API (`backend/server.ts` & `backend/server.js`)
+- **Query Refactoring**:
+  - Updated `/api/events`, `/dashboardapi/getevents`, `/dashboardapi/getupdateevents`, `/api/getupdateevents`, and `searchMeetingsHandler` to include `d_in, activestatus` in the SELECT projection.
+  - Replaced hardcoded `WHERE d_in = 0` with `WHERE 1=1`.
+  - Added support for dynamic `d_in` query/body parameter (`if (dIn !== null && dIn !== '') { sql += ' AND d_in = ?'; params.push(Number(dIn)); }`).
+- **Dedicated Ribbon Endpoint**:
+  - Implemented `/dashboardapi/getribbonevents` and `/api/getribbonevents` returning events where `d_in = 1` ordered by `id DESC`.
+
+#### 2. Angular Service Layer (`src/app/jesus/service.service.ts`)
+- Added `getRibbonEvents(): Observable<any>`:
+  - Invokes `POST /dashboardapi/getribbonevents`.
+  - Includes seamless fallback via `catchError` to `GET /dashboardapi/crud/events?d_in=1` to ensure continuous operation across both local and serverless cloud gateways.
+
+#### 3. Component Controller (`src/app/jesus/events/events.component.ts`)
+- **State & Lifecycle**:
+  - Replaced `adds` binding with `ribbonEvents: any[] = []`.
+  - Replaced `this.getadds()` with `this.getRibbonEvents()` in `ngOnInit()`.
+  - Enforced strict filtering: `this.ribbonEvents = raw.filter(item => item && (item.d_in == 1 || item.d_in === '1'))`.
+  - In `searechevents()`, added automatic fallback to populate `ribbonEvents` from returned meeting sets if `ribbonEvents` was empty.
+- **Image Fallback Engine**:
+  - Created `getSafeImageUrl(url: any): string`:
+    - Safely returns `assets/images/no.jpg` for `null`, `undefined`, empty, or `'undefined'` string literals.
+    - Preserves absolute `http://`, `https://`, and `data:` URIs.
+    - Automatically prepends `https://jbac.in/websiteimages/` for bare filename strings (e.g. `1735898717188.jpeg`).
+  - Created `onImageError(event: any)`:
+    - Gracefully switches `event.target.src` to `assets/images/no.jpg` on 404 or network load failure, preventing broken browser image icons completely.
+
+#### 4. Template & UI Layout (`src/app/jesus/events/events.component.html`)
+- **News Marquee**: Wrapped with flex container `.latest-update-block` and minimum width badge `.block-2`, fixing the "ews" clipping bug.
+- **Filter Placement**: Moved filter container outside `.events-heading-row` into a dedicated responsive grid (`col-lg-2 col-md-4 col-sm-6 col-12`) with standard Bootstrap select styling, eliminating form overflow.
+- **Scrolling Ribbon**:
+  - Bound to `ribbonEvents`, conditioned with `*ngIf="ribbonEvents && ribbonEvents.length > 0"`.
+  - Displays event name, description snippet via `trimString`, and speaker attribution.
+  - Clicking ribbon images opens high-resolution preview modal.
+- **Meeting Cards Grid**:
+  - Replaced fixed width with responsive grid: `col-12 col-md-6 col-lg-4 mb-4 d-flex align-items-stretch`.
+  - Cards now render in clean, equal-height layouts with rounded corners (12px), subtle shadows, and zoom hint badges.
+  - Corrected Telugu text to `పోస్టర్ పెద్దదిగా చూచుటకు పోస్టర్ మీద క్లిక్ చేయండి`.
+  - Structured dates using calendar badges and added uniform circular action buttons for Location, YouTube, Facebook, and Phone.
+
+#### 5. Component Stylesheet (`src/app/jesus/events/events.component.css`)
+- Cleaned out conflicting global `body` resets, demo styles, and harsh green borders (`border: 1px solid green;`).
+- Designed polished, scoped card elevation and hover zoom effects under `:host`.
+
+### D. Verification & Quality Assurance
+- **Compilation**: Ran `ng build --configuration=development` via Node.js runtime:
+  - `√ Browser application bundle generation complete.` (Exit code: 0, 0 compile errors).
+- **Database Parity**: Verified with live RDS database via `GET /dashboardapi/crud/events?d_in=1` that items with `d_in = 1` are properly filtered and returned.
+
