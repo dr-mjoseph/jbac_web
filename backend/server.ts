@@ -422,9 +422,16 @@ app.all(['/api/events', '/dashboardapi/getevents', '/dashboardapi/getupdateevent
     try {
         const isCurrentDateOnly = req.query?.current_date_only === 'true' || req.body?.current_date_only === true;
         const showAll = req.query?.all === 'true' || req.body?.all === true || req.query?.admin === 'true';
+        const dIn = req.query?.d_in !== undefined ? req.query.d_in : (req.body?.d_in !== undefined ? req.body.d_in : null);
 
-        let sql = 'SELECT id, eventname as title, eventname, eventname as event_name, orgname, meetsize, description, startdate, startdate as event_date, enddate, starttime, starttime as event_time, endtime, location, address, facebook, youtube, phone, eventcontactnumber, image, speaker1, speaker2, speaker3, speaker4, district_id, constituency_id, mandal_id, panchayat_id FROM events WHERE d_in = 0';
-        
+        let sql = 'SELECT id, eventname as title, eventname, eventname as event_name, orgname, meetsize, description, startdate, startdate as event_date, enddate, starttime, starttime as event_time, endtime, location, address, facebook, youtube, phone, eventcontactnumber, image, speaker1, speaker2, speaker3, speaker4, district_id, constituency_id, mandal_id, panchayat_id, d_in, activestatus FROM events WHERE 1=1';
+        const params: any[] = [];
+
+        if (dIn !== null && dIn !== '') {
+            sql += ' AND d_in = ?';
+            params.push(Number(dIn));
+        }
+
         if (isCurrentDateOnly) {
             sql += ' AND ((startdate <= CURDATE() AND (enddate >= CURDATE() OR enddate IS NULL OR enddate = "")) OR startdate = CURDATE())';
         } else if (!showAll) {
@@ -433,8 +440,19 @@ app.all(['/api/events', '/dashboardapi/getevents', '/dashboardapi/getupdateevent
         }
 
         sql += ' ORDER BY id DESC';
-        const [eventsRows] = await db.query(sql);
+        const [eventsRows] = await db.query(sql, params);
         res.json({ status: 200, data: eventsRows });
+    } catch (err: any) {
+        res.status(500).json({ status: 500, error: err.message });
+    }
+});
+
+// Dedicated ribbon events endpoint (meetings with d_in = 1)
+app.all(['/dashboardapi/getribbonevents', '/api/getribbonevents'], async (_req: any, res: any) => {
+    try {
+        const sql = 'SELECT id, eventname as title, eventname, eventname as event_name, orgname, meetsize, description, startdate, startdate as event_date, enddate, starttime, starttime as event_time, endtime, location, address, facebook, youtube, phone, eventcontactnumber, image, speaker1, speaker2, speaker3, speaker4, district_id, constituency_id, mandal_id, panchayat_id, d_in, activestatus FROM events WHERE d_in = 1 ORDER BY id DESC';
+        const [rows] = await db.query(sql);
+        res.json({ status: 200, data: rows });
     } catch (err: any) {
         res.status(500).json({ status: 500, error: err.message });
     }
@@ -499,7 +517,7 @@ app.post(['/dashboardapi/postmeetings', '/dashboardapi/postchuechmeetings', '/da
 const searchMeetingsHandler = async (req: any, res: any) => {
     try {
         const body = req.body || {};
-        let sql = 'SELECT id, eventname as title, eventname, eventname as event_name, orgname, meetsize, description, startdate, startdate as event_date, enddate, starttime, starttime as event_time, endtime, location, address, facebook, youtube, phone, eventcontactnumber, image, speaker1, speaker2, speaker3, speaker4, district_id, constituency_id, mandal_id, panchayat_id FROM events WHERE d_in = 0';
+        let sql = 'SELECT id, eventname as title, eventname, eventname as event_name, orgname, meetsize, description, startdate, startdate as event_date, enddate, starttime, starttime as event_time, endtime, location, address, facebook, youtube, phone, eventcontactnumber, image, speaker1, speaker2, speaker3, speaker4, district_id, constituency_id, mandal_id, panchayat_id, d_in, activestatus FROM events WHERE 1=1';
         const params: any[] = [];
         
         if (body.district_id) { sql += ' AND district_id = ?'; params.push(body.district_id); }
@@ -510,6 +528,10 @@ const searchMeetingsHandler = async (req: any, res: any) => {
         if (body.ministry_id) { sql += ' AND ministry_id = ?'; params.push(body.ministry_id); }
         if (body.mettingtype) { sql += ' AND (LOWER(eventname) LIKE ? OR eventname = ?)'; params.push(`%${body.mettingtype}%`, body.mettingtype); }
         if (body.speakerone) { sql += ' AND (speaker1 LIKE ? OR speaker2 LIKE ?)'; params.push(`%${body.speakerone}%`, `%${body.speakerone}%`); }
+        if (body.d_in !== undefined && body.d_in !== null && body.d_in !== '') {
+            sql += ' AND d_in = ?';
+            params.push(Number(body.d_in));
+        }
         
         if (body.startdate) {
             // Match event that covers this date
@@ -555,7 +577,7 @@ const getMeetingHandler = (type: string) => async (_req: any, res: any) => {
             queryParams.push(`%${kw}%`, `%${kw}%`);
         }
         const [rows]: any = await db.query(
-            `SELECT id, eventname as mettingtype, speaker1 as speakerone, speaker2 as speakertwo, speaker3 as speakerthree, speaker4 as speakerfour, startdate as fromdate, enddate as todate, starttime as fromtime, endtime as totime, image, district_id as districtname, constituency_id as constituencyname, mandal_id as mandals, panchayat_id as village_name, description, address, location, facebook, youtube, denomation_id as denomation, user_id as usr_id FROM events WHERE d_in = 0 AND (${whereClauses.join(' OR ')}) ORDER BY id DESC`,
+            `SELECT id, eventname as mettingtype, speaker1 as speakerone, speaker2 as speakertwo, speaker3 as speakerthree, speaker4 as speakerfour, startdate as fromdate, enddate as todate, starttime as fromtime, endtime as totime, image, district_id as districtname, constituency_id as constituencyname, mandal_id as mandals, panchayat_id as village_name, description, address, location, facebook, youtube, denomation_id as denomation, user_id as usr_id, d_in, activestatus FROM events WHERE (${whereClauses.join(' OR ')}) ORDER BY id DESC`,
             queryParams
         );
         res.json({ status: 200, data: rows });

@@ -95,6 +95,21 @@ export class ServiceService {
     }));
   }
 
+  getRibbonEvents(): Observable<any> {
+    return this.http.post<any>(this.testApi + `getribbonevents`, {}).pipe(
+      catchError(() => {
+        return this.http.get<any>(this.testApi + `crud/events?d_in=1`).pipe(
+          map(res => {
+            if (Array.isArray(res)) return { status: 200, data: res };
+            if (res && res.data) return { status: 200, data: res.data };
+            return { status: 200, data: [] };
+          }),
+          catchError(() => of({ status: 200, data: [] }))
+        );
+      })
+    );
+  }
+
   postbeliver(data: any) {
     return this.http.post(this.testApi + 'postbeliversignup', data)
   }
