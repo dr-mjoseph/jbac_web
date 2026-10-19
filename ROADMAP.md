@@ -77,7 +77,25 @@ GitHub Issue: [#1](https://github.com/dr-mjoseph/jbac_web/issues/1)
 
 ---
 
-## 🎯 6. Pending Launch & Post-Release Tasks
-- [ ] Complete Google Play Console Review & Rollout for Release 32.
+## 📱 6. Mobile App Navigation Fixes & Google Play Release v0.0.33
+- [x] **Consecutive Multi-User Registration**:
+  - Resolved form validation lock on consecutive registrations across `/entry`, `/namodu`, and all individual registration forms.
+  - Implemented clean form state, touch state, and location array resets.
+  - Pre-populated/auto-checked terms and conditions checkbox on form reset.
+- [x] **User Profile Management**:
+  - Added "Edit Profile" (ప్రొఫైల్‌ని సవరించండి) option to mobile drawer menu and web portal with secure login route guards.
+- [x] **Mobile Registration Unresponsiveness Resolution**:
+  - Diagnosed unresponsiveness on Church, Ministry, and Organisation cards in `FormsPage`.
+  - Restored missing `term`, `retypepassword`, and `r` getter in controllers and runtime chunks (`35.js`, `21.js`, `18.js`, `38.js`).
+  - Automated control parity audit across all 7 registration pages (Church, Ministry, Organisation, Association, Pastor, Believer, Student).
+- [x] **Release Packaging & Signing (v0.0.33)**:
+  - Bumped version code to `33` and semantic version to `0.0.33` with `targetSdkVersion 36`.
+  - Built and signed release APK: `jbacApp-0.0.33.apk` (118.68 MB).
+  - Built and signed release Android App Bundle: `jbacApp-0.0.33.aab` / `appreleasesigned.aab` (115.81 MB).
+
+---
+
+## 🎯 7. Pending Launch & Post-Release Tasks
+- [ ] Complete Google Play Console Review & Rollout for Release 33.
 - [ ] Monitor crash telemetry and user feedback via Google Play Console dashboard.
-- [ ] Run automated end-to-end smoke testing across all live production forms on `https://jbac.in`.
+- [ ] Run automated end-to-end smoke testing across all live production forms on https://jbac.in.

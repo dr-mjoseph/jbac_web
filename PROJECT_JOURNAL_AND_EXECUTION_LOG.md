@@ -833,3 +833,73 @@ Executed migrations on live AWS Aurora RDS database (`jbac_jbac`):
    - **Namodu First-Login**: `POST /dashboardapi/passwordwebsitelogin` -> Returned `{ status: 201, first_login: true }`. (Status: **PASS**)
    - **Regular Believer Registration**: `POST /dashboardapi/postbeliversignup` -> Stored in `signup_form` with `district_id: '1'`, `constituency_id: '10'`, `mandal_id: '20'`, `panchayat_id: '30'`, `cts`, `is_first_login: 0`. (Status: **PASS**)
    - **Regular Believer Login**: `POST /dashboardapi/passwordwebsitelogin` -> Returned `{ status: 200, message: 'Login successful' }`. (Status: **PASS**)
+
+---
+
+## 14. Multi-User Consecutive Registration Bug Fix & Profile Edit Implementation
+
+### A. The Multi-User Registration Lock Issue
+- **Symptom**: When a user registered for one person on any registration form (such as `/entry`, `/namodu`, or individual role forms like Believer, Student, Pastor), the submission succeeded. However, if the same user attempted to register another person immediately on the same form, filling out all fields and clicking submit showed an error: *"All fields are mandatory"*, even though all visible fields were filled.
+- **Root Cause**:
+  1. On successful submission, form resets (`form.reset()`) cleared field values but left underlying reactive form validation states, touch states, or boolean flags (such as `submitted = true`, or unselected terms/checkboxes) in an invalid/un-reset state.
+  2. Geographic dropdown arrays (`constituency`, `mandals`, `panchayati`) retained selections from the prior registrant or were cleared without re-enabling default valid states.
+  3. Terms and conditions checkboxes (`term`) became `false` or `null` upon `.reset()`, failing the `Validators.requiredTrue` constraint silently and blocking the second submission.
+- **Resolution**:
+  - Implemented comprehensive form reset handlers across both web (`entry.component.ts`, `namodu.component.ts`, `believerregister.component.ts`, `pastorassociationregister.component.ts`) and mobile app pages.
+  - Reset `this.submitted = false` upon submission success.
+  - Pre-populated/auto-checked terms and conditions (`term: true`) upon form reset so consecutive registrations are ready for immediate entry.
+  - Reset cascaded geographic arrays cleanly (`this.constituency = []`, `this.mandals = []`, `this.panchayati = []`).
+
+### B. Edit Profile Feature
+- Added an **"Edit Profile (ప్రొఫైల్‌ని సవరించండి)"** option in the authenticated user drawer and profile menu matching the user's registered role fields.
+- Added session route guards: if a user is authenticated, navigating to "Edit Profile" loads their existing profile data for update; if unauthenticated, they are redirected to login.
+
+---
+
+## 15. Mobile App Registration Unresponsiveness Root Cause & Control Parity Audit
+
+### A. Root Cause of "Church", "Ministry", and "Organization" Unresponsiveness
+- **Symptom**: In the mobile app (`jbac_app`), when tapping on **"Church"**, **"Ministry"**, or **"Organization"** in the registration list (`FormsPage`), the cards were unresponsive.
+- **Diagnosis**:
+  1. In `src/pages/church/church.ts` and `src/pages/organisation/organisation.ts`, `retypepassword` had been commented out in the `FormGroup` constructor (`this.formBuilder.group`).
+  2. In `church.ts` and `ministry.ts`, the `term` control definition was also omitted from the `FormGroup`.
+  3. However, the HTML templates (`church.html`, `organisation.html`, `ministry.html`) still declared `formControlName="retypepassword"`, `formControlName="term"`, and `form.get('retypepassword').errors`.
+  4. When the user tapped on the card, Angular attempted to instantiate the page. Because the form controls were missing from the `FormGroup`, Angular threw runtime exceptions (`Cannot find control with name: 'term'` and `TypeError: Cannot read properties of null (reading 'errors')`).
+  5. The uncaught error aborted the navigation push silently before the view could transition, making the card look completely unresponsive.
+
+### B. Automated Control Parity Audit & Fix
+- Developed an automated AST/regex parity audit script (`scripts/audit_form_controls.cjs`) scanning all HTML templates against both TypeScript sources and compiled JavaScript bundles (`www/build/` and `platforms/android/.../www/build/`).
+- Verified 100% control parity across all 7 registration pages:
+  - **Church** (`35.js` / `church.ts`): Restored `retypepassword` and `term: [true]`.
+  - **Ministry** (`21.js` / `ministry.ts`): Restored `retypepassword`, `term: [true]`, and added the `r` getter prototype for `r['field'].errors` template bindings.
+  - **Organisation** (`18.js` / `organisation.ts`): Restored `retypepassword` and `term: [true]`.
+  - **Association** (`38.js` / `association.ts`): Restored `retypepassword` and `term: [true]`.
+  - **Pastor** (`16.js` / `pastor.ts`): Restored `retypepassword` and clean reset.
+  - **Believer** (`37.js` / `believer.ts`): Verified all 38 controls.
+  - **Student** (`12.js` / `student.ts`): Verified all 41 controls.
+- Cleaned accidental syntax artifacts across all TypeScript sources.
+- Verified JavaScript syntax across all bundles using Node.js `vm.Script`.
+
+---
+
+## 16. Google Play Store Release v0.0.33 Packaging (.apk & .aab)
+
+### A. Version Bump & SDK Compliance
+- Executed `scripts/set_version_33.js` updating:
+  - `config.xml`: `version="0.0.33"`, `android-versionCode="33"`, `android-targetSdkVersion="36"`.
+  - `platforms/android/app/src/main/res/xml/config.xml`: Version 33 / SDK 36.
+  - `platforms/android/app/src/main/AndroidManifest.xml`: `android:versionCode="33"`, `android:versionName="0.0.33"`.
+  - `platforms/android/app/build.gradle`: `targetSdkVersion 36`, `compileSdkVersion 34`, `minSdkVersion 24`.
+
+### B. Build Execution & Artifact Verification
+- Executed automated build and signing pipeline (`scripts/build_and_sign_release_v33.ps1`):
+  1. Ran Gradle release compilation: `assembleRelease` & `bundleRelease`.
+  2. Aligned and signed APK with `Jbac.keystore` via `apksigner` (v2 & v3 signature schemes).
+  3. Signed Android App Bundle (`.aab`) with `Jbac.keystore` via `jarsigner` (SHA256withRSA).
+  4. Verified APK badging via `aapt dump badging`:
+     - `package: name='io.ionic.starterjbac' versionCode='33' versionName='0.0.33'`
+     - `sdkVersion: '24'`
+     - `targetSdkVersion: '36'`
+- **Generated Production Release Outputs**:
+  - **Play Store Upload Bundle**: `C:\Users\rajes\StudioProjects\jbac_app\appreleasesigned.aab` *(115.81 MB)*
+  - **Direct Device APK**: `C:\Users\rajes\StudioProjects\jbac_app\jbacApp-0.0.33.apk` *(118.68 MB)*
