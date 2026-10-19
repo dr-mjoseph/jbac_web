@@ -52,7 +52,7 @@ Fetches upcoming meetings and landing-page metadata from the `events` table:
 - **Default Behavior**: Automatically hides past meetings (`enddate < CURDATE()`), while returning `d_in` and `activestatus` fields.
 
 ### 1a. `GET/POST /api/getribbonevents` & `POST /dashboardapi/getribbonevents`
-Dedicated endpoint returning small horizontal ribbon items from `events` where `d_in = 1` ordered by `id DESC`. Meetings with `d_in = 0` are excluded from this endpoint.
+Dedicated endpoint returning small horizontal ribbon items from `events` where `d_in = 1` and dates have not passed (`enddate >= CURDATE()` or `startdate >= CURDATE()`) ordered by `id DESC`. Meetings with `d_in = 0` as well as expired meetings are automatically excluded from this endpoint.
 
 ### 2. `POST /api/register-all`
 Consumes multi-form request bodies, dynamically flattening custom data fields into the open MySQL JSON property column block.

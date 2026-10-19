@@ -54,17 +54,17 @@ Welcome to the **Jesus Believers Association Council (JBAC)** unified ecosystem 
 
 1. **Member & Ministry Directory**:
    - Comprehensive directory covering Pastors, Churches, Believers, Organisations, Ministries, and Students across 26 districts of Andhra Pradesh & Telangana.
-   - Cascading geographic filters (District ➔ Parliamentary / Assembly Constituency ➔ Mandal ➔ Village / Panchayat).
+   - Cascading geographic filters (District ➔ Parliamentary / Assembly Constituency ➔ Mandal ➔ Village / Panchayat) and streamlined navigation menus.
 2. **Dynamic Multi-Stream Registration**:
    - Distinct, role-based registration flows: Pastors, Pastors Association, Churches, Organisations, Ministries, Believers, and Students.
-   - Dedicated `/namodu` and `/entry` registration forms with automatic routing into category-specific database tables (`student_reg`, `church_reg`, `pastors_tbl`, etc.).
+   - Dedicated `/namodu` and `/entry` registration forms with automatic routing into category-specific database tables (`student_reg`, `church_reg`, `pastors_tbl`, etc.) and modernized SweetAlert2 confirmation dialogs featuring `"Exit"` and `"Login Now"` options.
 3. **Marriage & Family Counselling Portal**:
    - Comprehensive counselling dashboard with appointment scheduling, slot booking, and history.
    - Role-gated Doctor & Counsellor workspace with dedicated registration and login category options.
    - Login-gated appointment bookings preventing anonymous submissions.
 4. **News, Events & Notifications**:
-   - Interactive 8-slide hero banner carousel, live announcements, job postings, and media galleries.
-   - Dynamic **Events & Meetings Portal** with horizontal scrolling ribbon powered by the `events` table (displaying if and only if `d_in == 1`), date-based tabs ("నేటి మీటింగ్స్" vs "రాబోయే మీటింగ్స్"), cascading geographic filters, and responsive 3-column meeting cards with poster zoom previews.
+   - Interactive 6-slide hero banner carousel (optimized with preloaded WebP assets), live announcements, job postings, and media galleries.
+   - Dynamic **Events & Meetings Portal** with horizontal scrolling ribbon powered by the `events` table with automatic date-based expiration (displaying if and only if `d_in == 1` and meeting date is current or upcoming, automatically expiring upon completion without requiring manual database resets), date-based tabs ("నేటి మీటింగ్స్" vs "రాబోయే మీటింగ్స్"), cascading geographic filters, and responsive 3-column meeting cards with poster zoom previews.
 5. **Native Android Application (`jbac_app`)**:
    - Android app compliant with Google Play Store standards (`targetSdkVersion 36`, `minSdkVersion 24`, release version `0.0.33` / `versionCode 33`).
    - Official production release signing via `Jbac.keystore`.

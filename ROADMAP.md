@@ -113,8 +113,33 @@ GitHub Issue: [#1](https://github.com/dr-mjoseph/jbac_web/issues/1)
 
 ---
 
-## 🎯 8. Pending Launch & Post-Release Tasks
+## 🎨 8. Navigation Menu Tuning, Hero Carousel Optimization & Dynamic Event Expiration
+- [x] **Navigation Menu Customization**:
+  - Temporarily hid "ఆంధ్ర క్రైస్తవుల ఓట్ ఎవరికీ / క్రైస్తవులకి అన్యాయం" (`/apchristianpolitics`) from both desktop and mobile drawer navigation menus in `src/app/shared/header/header.component.html`.
+  - Preserved component files and router path declarations in `app-routing.module.ts` for clean re-enabling in future election/political campaigns.
+- [x] **Homepage Hero Banner Carousel Optimization**:
+  - Removed Banner 02 (`Banner02`) and Banner 08 (`Banner08`) from active slide rotation in `src/app/home/home/home.component.html` and `src/app/jesus/home/home.component.html`.
+  - Streamlined active banners array to 6 slides (`['01', '03', '04', '05', '06', '07']`) in `home.component.ts`.
+  - Updated dot indicators and click bindings from 8 dots down to 6 dots (indices 0 through 5).
+  - Updated banner preloader in `home.component.ts` and `src/index.html` (preloading active `Banner03.webp` instead of disabled `Banner02.webp`).
+- [x] **Automated Date-Based Meeting Expiration on Events Portal (`/events`)**:
+  - Implemented dual client-side and backend database query date filtering for scrolling event ribbon items.
+  - Backend query in `/dashboardapi/getribbonevents` and `/api/getribbonevents` enforced:
+    `WHERE d_in = 1 AND ((enddate IS NOT NULL AND enddate != "" AND enddate >= CURDATE()) OR ((enddate IS NULL OR enddate = "") AND (startdate IS NULL OR startdate >= CURDATE()))) ORDER BY id DESC`.
+  - Frontend controller `events.component.ts` hardened with `!isOldMeeting(item)` filter and regex-based date parser (`formatDateString`) preventing UTC midnight timezone shifts.
+  - Expired meetings disappear automatically upon meeting conclusion without requiring manual administrative database resets of `d_in` from `1` to `0`.
+- [x] **Registration Success Confirmation Modal Update**:
+  - Updated SweetAlert2 confirmation dialog on both `/entry` and `/namodu` registration portals (`entry.component.ts` and `namodu.component.ts`).
+  - Replaced secondary button label `"సరే (OK)"` with `"Exit"`.
+  - Retained primary action `"లాగిన్ పేజీకి వెళ్లండి (Login Now)"` redirecting newly registered users to `/login`.
+- [x] **Compilation & Regression Verification**:
+  - Executed Angular CLI build (`ng build --configuration=development`): zero compilation errors, bundle successfully generated.
+
+---
+
+## 🎯 9. Pending Launch & Post-Release Tasks
 - [ ] Complete Google Play Console Review & Rollout for Release 33.
 - [ ] Monitor crash telemetry and user feedback via Google Play Console dashboard.
 - [ ] Run automated end-to-end smoke testing across all live production forms on https://jbac.in.
+
 

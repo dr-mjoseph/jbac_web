@@ -990,3 +990,81 @@ Executed migrations on live AWS Aurora RDS database (`jbac_jbac`):
   - `√ Browser application bundle generation complete.` (Exit code: 0, 0 compile errors).
 - **Database Parity**: Verified with live RDS database via `GET /dashboardapi/crud/events?d_in=1` that items with `d_in = 1` are properly filtered and returned.
 
+---
+
+## 18. Navigation Menu Adjustment, Home Banner Tuning, Automatic Date Expiration for Event Ribbon, and Modal Button Update
+
+### A. Objectives & User Requirements
+1. **Menu Item Visibility**:
+   - Hide the page "ఆంధ్ర క్రైస్తవుల ఓట్ ఎవరికీ / క్రైస్తవులకి అన్యాయం" (To Whom Andhra Christians Vote For / Injustice for Christians, route `/apchristianpolitics`) from the navigation menu on the website.
+2. **Homepage Hero Banner Pruning**:
+   - Hide Banner 2 and Banner 8 from the homepage scrolling carousel, adjusting navigation dots and preloading accordingly.
+3. **Automatic Date Expiration for Event Ribbon Meetings**:
+   - For `/events`, along with the existing `d_in == 1` condition, automatically hide meetings whose dates have passed (`enddate < today`, or `startdate < today` if no enddate is specified).
+   - Ensure meetings disappear automatically once their dates pass without requiring manual database updates to set `d_in` back to `0`.
+4. **Registration Success Modal Button Replacement**:
+   - On the registration success confirmation dialog (as shown on `/entry` and `/namodu`), replace the secondary button `"సరే (OK)"` with `"Exit"`.
+
+### B. Technical Implementation Details
+
+#### 1. Header Navigation Menu (`src/app/shared/header/header.component.html`)
+- Commented out the menu item for `/apchristianpolitics` (`ఆంధ్ర క్రైస్తవుల ఓట్ ఎవరికీ / క్రైస్తవులకి అన్యాయం`) in the main desktop menu navigation.
+- Ensured clean comment tagging and valid closing `</li>` tags in both desktop and responsive mobile drawer navigation menus.
+
+#### 2. Homepage Hero Banner & Slider (`src/app/home/home/` & `src/app/jesus/home/`)
+- In `home.component.html` (both standalone `src/app/home/home/` and module-linked `src/app/jesus/home/`):
+  - Commented out the slide elements for `Banner02` and `Banner08`.
+  - Re-indexed pagination dots from 8 to 6 active indicators (`1`, `2`, `3`, `4`, `5`, `6`) bound directly to active slide indices 0 through 5.
+- In `home.component.ts`:
+  - Updated `banners` array to retain only active banners: `['01', '03', '04', '05', '06', '07']`.
+  - Updated `preloadBanners()` loop to only preload the 6 active banners.
+  - Adjusted `plusSlides()` fallback total calculation from `8` to `6`.
+- In `src/index.html`:
+  - Updated head image preloading: replaced `Banner02.webp` with `Banner03.webp`.
+
+#### 3. Automatic Date Expiration for Event Ribbon (`src/app/jesus/events/events.component.ts` & Backend APIs)
+- **Frontend Controller**:
+  - Initialized `now` property directly with current date string (`yyyy-MM-dd`) using `DatePipe`.
+  - Hardened `formatDateString()` with regex-based date string extraction (`YYYY-MM-DD` and `DD-MM-YYYY`) to avoid UTC/timezone offsets.
+  - Updated `isOldMeeting()` and `isCurrentDateEvent()` to compare start/end dates against today's date safely.
+  - Updated `getRibbonEvents()` to filter `(raw || []).filter(item => item && (item.d_in == 1 || item.d_in === '1') && !this.isOldMeeting(item))`.
+  - Updated `searechevents()` fallback ribbon extraction to also apply `!this.isOldMeeting(item)`.
+- **Backend Server (`backend/server.ts` & `backend/server.js`)**:
+  - Updated the `/dashboardapi/getribbonevents` and `/api/getribbonevents` query:
+    ```sql
+    WHERE d_in = 1 
+      AND ((enddate IS NOT NULL AND enddate != "" AND enddate >= CURDATE()) 
+        OR ((enddate IS NULL OR enddate = "") AND (startdate IS NULL OR startdate >= CURDATE())))
+    ```
+  - Both client-side and server-side logic now ensure that past meetings disappear as soon as their event dates pass without waiting for manual database updates.
+
+#### 4. Registration Confirmation Modal Button (`src/app/jesus/entry/entry.component.ts` & `src/app/jesus/namodu/namodu.component.ts`)
+- In `entry.component.ts` and `namodu.component.ts`:
+  - Updated the SweetAlert2 success modal configuration:
+  - Replaced `cancelButtonText: 'సరే (OK)'` with `cancelButtonText: 'Exit'`.
+  - Retained `confirmButtonText: 'లాగిన్ పేజీకి వెళ్లండి (Login Now)'` and primary routing to `/login`.
+
+### C. Build Verification & Parity
+- Executed Angular CLI production build using local Node.js environment:
+  - `ng build --configuration=development`
+  - Output: `√ Browser application bundle generation complete.` (Exit code: 0, 0 compile errors).
+
+### D. Summary of Modified Files & Traceability
+
+| Component / File | Purpose & Changes Applied |
+|---|---|
+| [`src/app/shared/header/header.component.html`](src/app/shared/header/header.component.html) | Commented out `/apchristianpolitics` in both desktop header navigation and mobile drawer navigation. |
+| [`src/app/home/home/home.component.html`](src/app/home/home/home.component.html) | Commented out Banner 02 & Banner 08 slides; reduced pagination dots from 8 to 6. |
+| [`src/app/home/home/home.component.ts`](src/app/home/home/home.component.ts) | Trimmed `banners` to 6 items (`01`, `03`, `04`, `05`, `06`, `07`), updated `preloadBanners()`, and set fallback total to 6. |
+| [`src/app/jesus/home/home.component.html`](src/app/jesus/home/home.component.html) | Mirrored Banner 02 & 08 removal and 6-dot pagination adjustment for parity. |
+| [`src/app/jesus/home/home.component.ts`](src/app/jesus/home/home.component.ts) | Mirrored active banner trimming and preloader updates. |
+| [`src/index.html`](src/index.html) | Updated preloaded header link from `Banner02.webp` to `Banner03.webp`. |
+| [`src/app/jesus/events/events.component.ts`](src/app/jesus/events/events.component.ts) | Initialized `now` property; added regex date parser in `formatDateString()`; applied `!isOldMeeting(item)` to ribbon filtering and search fallback. |
+| [`backend/server.ts`](backend/server.ts) & [`backend/server.js`](backend/server.js) | Enforced unexpired date SQL condition in `/dashboardapi/getribbonevents` and `/api/getribbonevents` (`enddate >= CURDATE()` or `startdate >= CURDATE()`). |
+| [`src/app/jesus/entry/entry.component.ts`](src/app/jesus/entry/entry.component.ts) | Replaced SweetAlert2 `cancelButtonText: 'సరే (OK)'` with `'Exit'`. |
+| [`src/app/jesus/namodu/namodu.component.ts`](src/app/jesus/namodu/namodu.component.ts) | Replaced SweetAlert2 `cancelButtonText: 'సరే (OK)'` with `'Exit'`. |
+| [`backend/README.md`](backend/README.md) | Documented date expiration condition for ribbon events in Section 1a. |
+| [`ROADMAP.md`](ROADMAP.md) | Added Milestone 8 documenting navigation tuning, carousel optimization, automated ribbon expiration, and modal buttons. |
+| [`README.md`](README.md) | Updated key capabilities (6-slide carousel, automated date-based event expiration, modal actions, and navigation updates). |
+
+
