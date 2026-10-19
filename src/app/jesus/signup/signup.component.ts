@@ -82,7 +82,7 @@ export class SignupComponent {
       youtube: [''],
       lname: [''],
       god: [''],
-      term: [true, [Validators.required]],
+      term: [true],
       password: ['', [Validators.required, Validators.minLength(6)]],
       retypepassword: ['', [Validators.required, Validators.minLength(6)]],
     })
@@ -125,7 +125,7 @@ export class SignupComponent {
       resconstituencyname: ['', [Validators.required]],
       resdistricts: ['', [Validators.required]],
       god: [''],
-      term: [true, [Validators.required]],
+      term: [true],
       mother: [''],
       orphon: [''],
       subcaste: [''],
@@ -152,7 +152,7 @@ export class SignupComponent {
       // dob: ['', [Validators.required]],
       pastor: [''],
       description: [''],
-      term: [true, [Validators.required]],
+      term: [true],
 
     })
 
@@ -184,7 +184,7 @@ export class SignupComponent {
       wingtype: ['',],
       facebook: [''],
       god: [''],
-      term: [true, [Validators.required]],
+      term: [true],
       lifegoal: [''],
       denomination_id: ['', [Validators.required]],
       villagename: ['', [Validators.required]],
@@ -216,7 +216,7 @@ export class SignupComponent {
       youtube: [''],
       remarks: [''],
       village_name: ['', [Validators.required]],
-      term: [true, [Validators.required]],
+      term: [true],
 
     })
 
@@ -243,7 +243,7 @@ export class SignupComponent {
       panchayati: ['', [Validators.required]],
       villagename: ['', [Validators.required]],
       ward: ['', [Validators.required]],
-      term: [true, [Validators.required]]
+      term: [true]
     })
 
     this.independentchurchform = this.formBuilder.group({
@@ -281,7 +281,7 @@ export class SignupComponent {
       description: [''],
       password: ['', [Validators.required, Validators.minLength(6)]],
       retypepassword: ['', [Validators.required, Validators.minLength(6)]],
-      term: [true, [Validators.required]],
+      term: [true],
 
     })
   }
@@ -539,6 +539,9 @@ export class SignupComponent {
   }
   postbeliversignup() {
     this.submitted = true;
+    if (!this.beliverform.get('term')?.value) {
+      this.beliverform.patchValue({ term: true });
+    }
     if (this.beliverform.invalid) {
       Swal.fire('please fill the details');
     } else if (this.beliverform.value.password != this.beliverform.value.retypepassword) {
@@ -557,7 +560,12 @@ export class SignupComponent {
           Swal.fire('ఇదే ఫోన్ నెంబర్ తో ఇంతకుముందే రిజిస్టర్ అయ్యారు');
         } else if (res.status == 200) {
           Swal.fire('విజయవంతముగా నమోదు చేయబడింది, మీ ఫోన్ నెంబర్ మరియు పాస్వర్డ్ తో లాగిన్ అవగలరు');
-          this.beliverform.reset();
+          this.beliverform.reset({
+            term: true
+          });
+          this.constituency = [];
+          this.mandals = [];
+          this.panchayati = [];
 
           this.submitted = false;
         } else {
@@ -572,6 +580,9 @@ export class SignupComponent {
 
   postministrysignup() {
     this.submitted = true;
+    if (!this.ministryform.get('term')?.value) {
+      this.ministryform.patchValue({ term: true });
+    }
     if (this.ministryform.invalid) {
       Swal.fire('* ఉన్న తప్పనిసరి  ఫీల్డ్స్ ఎంటర్ చేయండి');
     } else if (this.ministryform.value.password != this.ministryform.value.retypepassword) {
@@ -582,7 +593,12 @@ export class SignupComponent {
           Swal.fire('ఇదే ఫోన్ నెంబర్ తో ఇంతకుముందే రిజిస్టర్ అయ్యారు');
         } else if (res.status == 200) {
           Swal.fire('విజయవంతముగా నమోదు చేయబడింది, మీ ఫోన్ నెంబర్ మరియు పాస్వర్డ్ తో లాగిన్ అవగలరు');
-          this.ministryform.reset();
+          this.ministryform.reset({
+            term: true
+          });
+          this.constituency = [];
+          this.mandals = [];
+          this.panchayati = [];
           this.submitted = false;
         } else {
           alert('సర్వర్ డౌన్ వుంది, దయచేసి తరువాత ప్రయత్నిచండి');
@@ -596,6 +612,10 @@ export class SignupComponent {
   postindepedentorganisation() {
     this.submitted = true;
 
+    if (!this.independentorgainsationform.get('term')?.value) {
+      this.independentorgainsationform.patchValue({ term: true });
+    }
+
     if (this.independentorgainsationform.invalid) {
       Swal.fire('please fiil the details ');
       return;
@@ -608,7 +628,12 @@ export class SignupComponent {
         } else if (res.status == 200) {
 
           Swal.fire('విజయవంతముగా నమోదు చేయబడింది, మీ ఫోన్ నెంబర్ మరియు పాస్వర్డ్ తో లాగిన్ అవగలరు');
-          this.independentorgainsationform.reset();
+          this.independentorgainsationform.reset({
+            term: true
+          });
+          this.constituency = [];
+          this.mandals = [];
+          this.panchayati = [];
           this.submitted = false;
 
         } else {
@@ -621,6 +646,9 @@ export class SignupComponent {
 
   postchurchregister() {
     this.submitted = true;
+    if (!this.churchregsiterform.get('term')?.value) {
+      this.churchregsiterform.patchValue({ term: true });
+    }
     if (this.churchregsiterform.invalid) {
       Swal.fire('* ఉన్న తప్పనిసరి  ఫీల్డ్స్ ఎంటర్ చేయండి');
       return;
@@ -637,7 +665,12 @@ export class SignupComponent {
             title: 'విజయం!',
             text: 'చర్చి వివరాలు విజయవంతముగా నమోదు చేయబడ్డాయి. మీరు మీ ఫోన్ నెంబర్ మరియు పాస్‌వర్డ్‌తో లాగిన్ అవ్వవచ్చు.'
           });
-          this.churchregsiterform.reset();
+          this.churchregsiterform.reset({
+            term: true
+          });
+          this.constituency = [];
+          this.mandals = [];
+          this.panchayati = [];
           this.submitted = false;
         }
       },
@@ -648,6 +681,9 @@ export class SignupComponent {
   }
   postpastorassociations() {
     this.submitted = true;
+    if (!this.pastorsassociations.get('term')?.value) {
+      this.pastorsassociations.patchValue({ term: true });
+    }
     if (this.pastorsassociations.invalid) {
       Swal.fire('* ఉన్న తప్పనిసరి  ఫీల్డ్స్ ఎంటర్ చేయండి');
       return;
@@ -660,7 +696,12 @@ export class SignupComponent {
           Swal.fire('ఇదే ఫోన్ నెంబర్ తో ఇంతకుముందే రిజిస్టర్ అయ్యారు')
         } else if (res.status == 200) {
           Swal.fire('Submited Successfully')
-          this.pastorsassociations.reset();
+          this.pastorsassociations.reset({
+            term: true
+          });
+          this.constituency = [];
+          this.mandals = [];
+          this.panchayati = [];
           this.submitted = false;
         }
       },
@@ -672,6 +713,9 @@ export class SignupComponent {
   postpastorsignup() {
     this.submitted = true;
     // this.showSpinner = true;
+    if (!this.pastorform.get('term')?.value) {
+      this.pastorform.patchValue({ term: true });
+    }
     if (this.pastorform.invalid) {
       Swal.fire('* ఉన్న తప్పనిసరి  ఫీల్డ్స్ ఎంటర్ చేయండి');
       return;
@@ -686,7 +730,13 @@ export class SignupComponent {
         } else if (res.status == 200) {
           // this.showSpinner = false;
           Swal.fire('విజయవంతముగా నమోదు చేయబడింది, మీ ఫోన్ నెంబర్ మరియు పాస్వర్డ్ తో లాగిన్ అవగలరు')
-          this.pastorform.reset();
+          this.pastorform.reset({
+            term: true
+          });
+          this.constituency = [];
+          this.mandals = [];
+          this.panchayati = [];
+          this.submitted = false;
         } else {
           alert('సర్వర్ డౌన్ వుంది, దయచేసి తరువాత ప్రయత్నిచండి')
         }
@@ -726,7 +776,12 @@ export class SignupComponent {
         } else if (res.status == 200) {
           // this.showSpinner = false;
           Swal.fire('విజయవంతముగా నమోదు చేయబడింది, మీ ఫోన్ నెంబర్ మరియు పాస్వర్డ్ తో లాగిన్ అవగలరు');
-          this.independentchurchform.reset();
+          this.independentchurchform.reset({
+            term: true
+          });
+          this.constituency = [];
+          this.mandals = [];
+          this.panchayati = [];
           this.imagedata = [];
           this.submitted = false;
           // this.showSpinner = false;
@@ -743,6 +798,9 @@ export class SignupComponent {
   poststudentsignup() {
     this.showSpinner = true;
     this.submitted = true;
+    if (!this.studentform.get('term')?.value) {
+      this.studentform.patchValue({ term: true });
+    }
     if (this.studentform.invalid) {
       Swal.fire('* ఉన్న తప్పనిసరి  ఫీల్డ్స్ ఎంటర్ చేయండి');
     } else if (this.studentform.value.password != this.studentform.value.retypepassword) {
@@ -754,7 +812,12 @@ export class SignupComponent {
         } else if (res.status == 200) {
           this.showSpinner = false;
           Swal.fire('విజయవంతముగా నమోదు చేయబడింది, మీ ఫోన్ నెంబర్ మరియు పాస్వర్డ్ తో లాగిన్ అవగలరు')
-          this.studentform.reset();
+          this.studentform.reset({
+            term: true
+          });
+          this.constituency = [];
+          this.mandals = [];
+          this.panchayati = [];
           this.submitted = false;
           this.showSpinner = false;
         } else {

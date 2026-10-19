@@ -19,7 +19,26 @@ export class UpdateComponent {
   studentform: FormGroup;
   independentorgainsationform: FormGroup;
   pastorsassociations: FormGroup;
-  ministryform: FormGroup
+  ministryform: FormGroup;
+  doctorform: FormGroup;
+  entryform: FormGroup;
+  specializations: string[] = [
+    'Family Counsellor & Clinical Psychologist',
+    'Marriage & Relationship Counsellor',
+    'Youth & Family Mental Wellness Counsellor',
+    'Parent-Child Dynamics Specialist',
+    'Christian Spiritual & Emotional Healing',
+    'Addiction & Behavioral Therapy',
+    'General Family Physician & Counsellor'
+  ];
+  availableDaysList: string[] = [
+    'Monday to Saturday',
+    'Monday to Friday',
+    'Tuesday to Sunday',
+    'Weekends Only (Saturday & Sunday)',
+    'All 7 Days'
+  ];
+  passwordVisible: boolean = false;
   profiledata: any = [];
   form_ind: any;
   now: any;
@@ -266,14 +285,61 @@ export class UpdateComponent {
       personal_secretary: [''],
       remarks: [''],
       description: ['']
-    })
+    });
 
+    this.doctorform = this.formBuilder.group({
+      doctor_name: [''],
+      license_number: [''],
+      specialization: ['Family Counsellor & Clinical Psychologist'],
+      qualification: [''],
+      experience_years: [''],
+      phone_number: [''],
+      email: [''],
+      password: [''],
+      consultation_fee: ['Free / Volunteer Service'],
+      available_days: ['Monday to Saturday'],
+      available_time_start: ['10:00 AM'],
+      available_time_end: ['05:00 PM'],
+      location: ['Vijayawada & Online Consultation'],
+      address: [''],
+      bio: [''],
+      image: ['assets/images/pastor.png']
+    });
 
+    this.entryform = this.formBuilder.group({
+      category: [''],
+      name: [''],
+      phnumber: [''],
+      whatsapnum: [''],
+      denomation: [''],
+      district_id: [''],
+      constituency_id: [''],
+      mandal_id: [''],
+      village_id: [''],
+      address: [''],
+      description: ['']
+    });
 
-    this.categoryid = sessionStorage.getItem("category_id");
-    this.category = sessionStorage.getItem("category");
+    this.categoryid = this.normalizeCategoryId(sessionStorage.getItem("category_id") || sessionStorage.getItem("category"));
+    this.category = sessionStorage.getItem("category") || 'Member';
     this.name = sessionStorage.getItem("name");
     this.mobile_number = sessionStorage.getItem("mobile_number");
+  }
+
+  normalizeCategoryId(cat: any): string {
+    const isDoc = sessionStorage.getItem('is_doctor') === '1';
+    if (isDoc) return '8';
+    const s = String(cat || '').trim().toLowerCase();
+    if (s === '1' || s.includes('believer') || s.includes('విశ్వాసి')) return '1';
+    if (s === '2' || s.includes('student') || s.includes('విద్యార్థి')) return '2';
+    if (s === '3' || s.includes('ministr') || s.includes('మినిస్ట్రీ')) return '3';
+    if (s === '4' || ((s.includes('pastor') || s.includes('పాస్టర్')) && !s.includes('association') && !s.includes('అసోసియేషన్'))) return '4';
+    if (s === '5' || s.includes('church') || s.includes('చర్చి')) return '5';
+    if (s === '6' || s.includes('organization') || s.includes('organisation') || s.includes('ఆర్గనైజేషన్') || s.includes('కంపెనీ')) return '6';
+    if (s === '7' || s.includes('association') || s.includes('అసోసియేషన్')) return '7';
+    if (s === '8' || s.includes('doctor') || s.includes('డాక్టర్') || s.includes('councellor') || s.includes('కౌన్సిలర్')) return '8';
+    if (s === '9' || s.includes('entry') || s.includes('namodu') || s.includes('నమోదు') || s.includes('ఎంట్రీ')) return '9';
+    return s || '1';
   }
 
   ngOnInit(): void {
@@ -463,13 +529,18 @@ export class UpdateComponent {
   geteditdtails() {
     var data = {
       category_id: this.categoryid,
-      usr_id: sessionStorage.getItem('usr_id')
-    }
+      usr_id: sessionStorage.getItem('usr_id'),
+      mobile_number: sessionStorage.getItem('mobile_number')
+    };
     this.service.geteditdtails(data).subscribe((res: any) => {
-      this.details = res.data[0];
+      this.details = (res.data && res.data.length > 0) ? res.data[0] : {};
+      if (this.details.category_id) {
+        this.categoryid = this.normalizeCategoryId(this.details.category_id);
+      }
+
       this.pastorform.patchValue({
-        pastorname: this.details.pastorname,
-        phonenumber: this.details.phonenumber,
+        pastorname: this.details.pastorname || this.details.name,
+        phonenumber: this.details.phonenumber || this.details.mobile_number,
         dob: this.details.dob,
         gender: this.details.gender,
         designation: this.details.designation,
@@ -493,17 +564,14 @@ export class UpdateComponent {
         fellowship: this.details.fellowship,
         position: this.details.position,
         assicoation_id: this.details.assicoation_id
-
-
-      })
-
+      });
 
       this.churchregsiterform.patchValue({
-        church_name: this.details.church_name,
+        church_name: this.details.church_name || this.details.name,
         denomination_id: this.details.denomination_id,
         pastor_id: this.details.pastor_id,
         total_members: this.details.total_members,
-        contactnumber: this.details.contactnumber,
+        contactnumber: this.details.contactnumber || this.details.mobile_number,
         description: this.details.description,
         district_id: this.details.district_id,
         constituency_id: this.details.constituency_id,
@@ -517,12 +585,12 @@ export class UpdateComponent {
         ministry_id: this.details.ministry_id,
         youtube: this.details.youtube,
         facebook: this.details.facebook
-      })
-      this.updateprofileministry.patchValue({
+      });
 
-        firstname: this.details.firstname,
-        headnmber: this.details.headnmber,
-        denomation: this.details.denomation,
+      this.updateprofileministry.patchValue({
+        firstname: this.details.firstname || this.details.headname || this.details.ministryname,
+        headnmber: this.details.headnmber || this.details.mobile_number,
+        denomation: this.details.denomation || this.details.denomation_id,
         ministryemail: this.details.ministryemail,
         ministrywebsite: this.details.ministrywebsite,
         number_ofchurches: this.details.number_ofchurches,
@@ -535,9 +603,10 @@ export class UpdateComponent {
         pastor: this.details.pastor,
         description: this.details.description,
         term: this.details.term
-      })
+      });
+
       this.beliverform.patchValue({
-        fname: this.details.fname,
+        fname: this.details.fname || this.details.name,
         whatsapp: this.details.whatsapp,
         dob: this.details.dob,
         gender: this.details.gender,
@@ -575,10 +644,11 @@ export class UpdateComponent {
         youtube: this.details.youtube,
         lname: this.details.lname,
         god: this.details.god,
-      })
+      });
+
       this.studentform.patchValue({
-        studentname: this.details.studentname,
-        number: this.details.number,
+        studentname: this.details.studentname || this.details.name,
+        number: this.details.number || this.details.mobile_number,
         study: this.details.study,
         schname: this.details.schname,
         fathername: this.details.fathername,
@@ -591,7 +661,6 @@ export class UpdateComponent {
         mandal_id: this.details.mandal_id,
         village_id: this.details.village_id,
         password: this.details.password,
-
         church: this.details.church_id,
         pastor: this.details.pastor_id,
         leadership: this.details.leadership,
@@ -618,18 +687,17 @@ export class UpdateComponent {
         mother: this.details.mother,
         orphon: this.details.orphonintersted,
         subcaste: this.details.subcaste,
+      });
 
-      })
       this.independentorgainsationform.patchValue({
-
-        organisation_name: this.details.organisation_name,
+        organisation_name: this.details.organisation_name || this.details.name,
         checkbox: this.details.organizationtype,
         believer_id: this.details.believer_id,
         pastor_id: this.details.pastor_id,
         denomation: this.details.denomation,
         org_address: this.details.org_address,
         location: this.details.location,
-        contact_num: this.details.contact_num,
+        contact_num: this.details.contact_num || this.details.mobile_number,
         email: this.details.email,
         website: this.details.website,
         service_name: this.details.service_name,
@@ -643,37 +711,32 @@ export class UpdateComponent {
         villagename: this.details.villagename,
         ward: this.details.ward,
         term: this.details.term,
-      })
+      });
 
       this.pastorsassociations.patchValue({
-        pa_name: this.details.paname,
+        pa_name: this.details.paname || this.details.pa_name || this.details.name,
         pastor_id: this.details.headname,
         level: this.details.level,
-        phonenumber: this.details.phonenumber,
+        phonenumber: this.details.phonenumber || this.details.mobile_number,
         whatsapp_number: this.details.whatsapp_number,
         totalleadrs: this.details.totalleadrs,
         address: this.details.address,
-        district_id: this.details.districtname,
-        constituency_id: this.details.constituencyname,
-        mandal_id: this.details.mandals,
-        village_id: this.details.panchaiti,
+        district_id: this.details.districtname || this.details.district_id,
+        constituency_id: this.details.constituencyname || this.details.constituency_id,
+        mandal_id: this.details.mandals || this.details.mandal_id,
+        village_id: this.details.panchaiti || this.details.village_id,
         website: this.details.website,
         workingareas: this.details.workingareas,
         description: this.details.description,
-        // password: this.details.password,
-
-        // term: this.details.term,
-
-      })
-
+      });
 
       this.ministryform.patchValue({
-        ministryname: this.details.ministryname,
+        ministryname: this.details.ministryname || this.details.name,
         denomation_id: this.details.denomation_id,
         headname: this.details.headname,
         ministryemail: this.details.ministryemail,
         ministrywebsite: this.details.ministrywebsite,
-        headnmber: this.details.headnmber,
+        headnmber: this.details.headnmber || this.details.mobile_number,
         number_ofchurches: this.details.number_ofchurches,
         number_ofmembers: this.details.number_ofmembers,
         district_id: this.details.district_id,
@@ -684,32 +747,82 @@ export class UpdateComponent {
         personal_secretary: this.details.personal_secretary,
         remarks: this.details.remarks,
         description: this.details.description,
-      })
-    })
+      });
+
+      this.doctorform.patchValue({
+        doctor_name: this.details.doctor_name || this.details.name,
+        license_number: this.details.license_number,
+        specialization: this.details.specialization || 'Family Counsellor & Clinical Psychologist',
+        qualification: this.details.qualification,
+        experience_years: this.details.experience_years,
+        phone_number: this.details.phone_number || this.details.mobile_number,
+        email: this.details.email,
+        password: this.details.password,
+        consultation_fee: this.details.consultation_fee || 'Free / Volunteer Service',
+        available_days: this.details.available_days || 'Monday to Saturday',
+        available_time_start: this.details.available_time_start || '10:00 AM',
+        available_time_end: this.details.available_time_end || '05:00 PM',
+        location: this.details.location || 'Vijayawada & Online Consultation',
+        address: this.details.address,
+        bio: this.details.bio,
+        image: this.details.image || 'assets/images/pastor.png'
+      });
+
+      this.entryform.patchValue({
+        category: this.details.category,
+        name: this.details.name,
+        phnumber: this.details.phonenum || this.details.phnumber || this.details.mobile_number,
+        whatsapnum: this.details.whatsappno || this.details.whatsapnum || this.details.whatsapp,
+        denomation: this.details.denomation,
+        district_id: this.details.district_id,
+        constituency_id: this.details.constituency_id,
+        mandal_id: this.details.mandal_id,
+        village_id: this.details.village_id || this.details.panchayat_id,
+        address: this.details.address,
+        description: this.details.description
+      });
+
+      // Pre-populate cascading location dropdowns
+      const distId = this.details.district_id || this.details.districts || this.details.districtname || this.details.resdistricts;
+      const constId = this.details.constituency_id || this.details.constituencyname || this.details.resconstituencyname;
+      const mandalId = this.details.mandal_id || this.details.mandals || this.details.resmandals;
+
+      if (distId) {
+        this.service.getconsistencys().subscribe((cRes: any) => {
+          this.constituency = cRes.data ? cRes.data.filter((d: any) => d.dstrct_id == distId) : [];
+        });
+      }
+      if (constId) {
+        this.service.getmandals().subscribe((mRes: any) => {
+          this.mandals = mRes.data ? mRes.data.filter((d: any) => d.const_id == constId) : [];
+        });
+      }
+      if (mandalId) {
+        this.service.gepanchayatis(mandalId).subscribe((pRes: any) => {
+          this.panchayati = pRes.data ? pRes.data.filter((d: any) => !mandalId || d.mndl_id == mandalId) : [];
+        });
+      }
+    });
   }
 
   //////////////////////pastor change/////////////////////
   assicoation: boolean = false;
   pastorassicoation(event: any) {
-    var as = event.value
+    var as = event.value;
     if (as == 'yes') {
-      this.assicoation = true
+      this.assicoation = true;
     } else {
-      this.assicoation = false
+      this.assicoation = false;
     }
   }
   wingtypesystem: boolean = false;
   onradioleadertyperajkumar(event: any) {
-
-
-    var apple = event.target.value
+    var apple = event.target.value;
     if (apple == "YES") {
       this.wingtypesystem = true;
-
     } else {
       this.wingtypesystem = false;
       this.leadtype = false;
-
     }
   }
 
@@ -717,107 +830,157 @@ export class UpdateComponent {
   getpastorassciation() {
     this.service.getpastorassci().subscribe(res => {
       this.assicoations = res.data;
-
-
-    })
+    });
   }
   editpastor() {
     const usr_id = sessionStorage.getItem('usr_id');
-    const data = Object.assign({}, this.pastorform.value, { usr_id });
+    const mobile_number = sessionStorage.getItem('mobile_number');
+    const data = Object.assign({}, this.pastorform.value, { usr_id, mobile_number, id: this.details?.id });
     this.service.editpastor(data).subscribe((res: any) => {
       if (res.status == 200) {
-        Swal.fire('విజయవంతముగా అప్‌డేట్ చేయబడింది / Updated Successfully')
+        Swal.fire('విజయవంతముగా అప్‌డేట్ చేయబడింది / Updated Successfully');
       } else {
-        Swal.fire('లోపం!', 'సర్వర్ లో సమస్య ఉంది, దయచేసి తర్వాత ప్రయత్నించండి', 'error')
+        Swal.fire('లోపం!', 'సర్వర్ లో సమస్య ఉంది, దయచేసి తర్వాత ప్రయత్నించండి', 'error');
       }
-    }, (error: any) => {
-      Swal.fire('లోపం!', 'సర్వర్ లో సమస్య ఉంది, దయచేసి తర్వాత ప్రయత్నించండి', 'error')
-    })
+    }, () => {
+      Swal.fire('లోపం!', 'సర్వర్ లో సమస్య ఉంది, దయచేసి తర్వాత ప్రయత్నించండి', 'error');
+    });
   }
 
   editchurch() {
     const usr_id = sessionStorage.getItem('usr_id');
-    const data = Object.assign({}, this.churchregsiterform.value, { usr_id });
+    const mobile_number = sessionStorage.getItem('mobile_number');
+    const data = Object.assign({}, this.churchregsiterform.value, { usr_id, mobile_number, id: this.details?.id });
     this.service.editchurch(data).subscribe((res: any) => {
       if (res.status == 200) {
-        Swal.fire('విజయవంతముగా అప్‌డేట్ చేయబడింది / Updated Successfully')
+        Swal.fire('విజయవంతముగా అప్‌డేట్ చేయబడింది / Updated Successfully');
       } else {
-        Swal.fire('లోపం!', 'సర్వర్ లో సమస్య ఉంది, దయచేసి తర్వాత ప్రయత్నించండి', 'error')
+        Swal.fire('లోపం!', 'సర్వర్ లో సమస్య ఉంది, దయచేసి తర్వాత ప్రయత్నించండి', 'error');
       }
-    }, (error: any) => {
-      Swal.fire('లోపం!', 'సర్వర్ లో సమస్య ఉంది, దయచేసి తర్వాత ప్రయత్నించండి', 'error')
-    })
+    }, () => {
+      Swal.fire('లోపం!', 'సర్వర్ లో సమస్య ఉంది, దయచేసి తర్వాత ప్రయత్నించండి', 'error');
+    });
   }
 
   editindependentorgainsation() {
     const usr_id = sessionStorage.getItem('usr_id');
-    const data = Object.assign({}, this.independentorgainsationform.value, { usr_id });
+    const mobile_number = sessionStorage.getItem('mobile_number');
+    const data = Object.assign({}, this.independentorgainsationform.value, { usr_id, mobile_number, id: this.details?.id });
     this.service.editindependentorgainsation(data).subscribe((res: any) => {
       if (res.status == 200) {
-        Swal.fire('విజయవంతముగా అప్‌డేట్ చేయబడింది / Updated Successfully')
+        Swal.fire('విజయవంతముగా అప్‌డేట్ చేయబడింది / Updated Successfully');
       } else {
-        Swal.fire('లోపం!', 'సర్వర్ లో సమస్య ఉంది, దయచేసి తర్వాత ప్రయత్నించండి', 'error')
+        Swal.fire('లోపం!', 'సర్వర్ లో సమస్య ఉంది, దయచేసి తర్వాత ప్రయత్నించండి', 'error');
       }
-    }, (error: any) => {
-      Swal.fire('లోపం!', 'సర్వర్ లో సమస్య ఉంది, దయచేసి తర్వాత ప్రయత్నించండి', 'error')
-    })
+    }, () => {
+      Swal.fire('లోపం!', 'సర్వర్ లో సమస్య ఉంది, దయచేసి తర్వాత ప్రయత్నించండి', 'error');
+    });
   }
 
   editindepastororgainsation() {
     const usr_id = sessionStorage.getItem('usr_id');
-    const data = Object.assign({}, this.pastorsassociations.value, { usr_id });
+    const mobile_number = sessionStorage.getItem('mobile_number');
+    const data = Object.assign({}, this.pastorsassociations.value, { usr_id, mobile_number, id: this.details?.id });
     this.service.editpastororgainsation(data).subscribe((res: any) => {
       if (res.status == 200) {
-        Swal.fire('విజయవంతముగా అప్‌డేట్ చేయబడింది / Updated Successfully')
+        Swal.fire('విజయవంతముగా అప్‌డేట్ చేయబడింది / Updated Successfully');
       } else {
-        Swal.fire('లోపం!', 'సర్వర్ లో సమస్య ఉంది, దయచేసి తర్వాత ప్రయత్నించండి', 'error')
+        Swal.fire('లోపం!', 'సర్వర్ లో సమస్య ఉంది, దయచేసి తర్వాత ప్రయత్నించండి', 'error');
       }
-    }, (error: any) => {
-      Swal.fire('లోపం!', 'సర్వర్ లో సమస్య ఉంది, దయచేసి తర్వాత ప్రయత్నించండి', 'error')
-    })
+    }, () => {
+      Swal.fire('లోపం!', 'సర్వర్ లో సమస్య ఉంది, దయచేసి తర్వాత ప్రయత్నించండి', 'error');
+    });
   }
 
   editbeliver() {
     const usr_id = sessionStorage.getItem('usr_id');
-    const data = Object.assign({}, this.beliverform.value, { usr_id });
+    const mobile_number = sessionStorage.getItem('mobile_number');
+    const data = Object.assign({}, this.beliverform.value, { usr_id, mobile_number, id: this.details?.id });
     this.service.editbeliver(data).subscribe((res: any) => {
       if (res.status == 200) {
-        Swal.fire('విజయవంతముగా అప్‌డేట్ చేయబడింది / Updated Successfully')
+        Swal.fire('విజయవంతముగా అప్‌డేట్ చేయబడింది / Updated Successfully');
       } else {
-        Swal.fire('లోపం!', 'సర్వర్ లో సమస్య ఉంది, దయచేసి తర్వాత ప్రయత్నించండి', 'error')
+        Swal.fire('లోపం!', 'సర్వర్ లో సమస్య ఉంది, దయచేసి తర్వాత ప్రయత్నించండి', 'error');
       }
-    }, (error: any) => {
-      Swal.fire('లోపం!', 'సర్వర్ లో సమస్య ఉంది, దయచేసి తర్వాత ప్రయత్నించండి', 'error')
-    })
+    }, () => {
+      Swal.fire('లోపం!', 'సర్వర్ లో సమస్య ఉంది, దయచేసి తర్వాత ప్రయత్నించండి', 'error');
+    });
   }
 
   editstudent() {
     const usr_id = sessionStorage.getItem('usr_id');
-    const data = Object.assign({}, this.studentform.value, { usr_id });
+    const mobile_number = sessionStorage.getItem('mobile_number');
+    const data = Object.assign({}, this.studentform.value, { usr_id, mobile_number, id: this.details?.id });
     this.service.editstudent(data).subscribe((res: any) => {
       if (res.status == 200) {
-        Swal.fire('విజయవంతముగా అప్‌డేట్ చేయబడింది / Updated Successfully')
+        Swal.fire('విజయవంతముగా అప్‌డేట్ చేయబడింది / Updated Successfully');
       } else {
-        Swal.fire('లోపం!', 'సర్వర్ లో సమస్య ఉంది, దయచేసి తర్వాత ప్రయత్నించండి', 'error')
+        Swal.fire('లోపం!', 'సర్వర్ లో సమస్య ఉంది, దయచేసి తర్వాత ప్రయత్నించండి', 'error');
       }
-    }, (error: any) => {
-      Swal.fire('లోపం!', 'సర్వర్ లో సమస్య ఉంది, దయచేసి తర్వాత ప్రయత్నించండి', 'error')
-    })
+    }, () => {
+      Swal.fire('లోపం!', 'సర్వర్ లో సమస్య ఉంది, దయచేసి తర్వాత ప్రయత్నించండి', 'error');
+    });
   }
 
   postministryupdate() {
     const usr_id = sessionStorage.getItem('usr_id');
+    const mobile_number = sessionStorage.getItem('mobile_number');
     const sourceData = this.updateprofileministry ? this.updateprofileministry.value : this.ministryform.value;
-    const data = Object.assign({}, this.ministryform ? this.ministryform.value : {}, sourceData, { usr_id });
+    const data = Object.assign({}, this.ministryform ? this.ministryform.value : {}, sourceData, { usr_id, mobile_number, id: this.details?.id });
     this.service.editministry(data).subscribe((res: any) => {
       if (res.status == 200) {
-        Swal.fire('విజయవంతముగా అప్‌డేట్ చేయబడింది / Updated Successfully')
+        Swal.fire('విజయవంతముగా అప్‌డేట్ చేయబడింది / Updated Successfully');
       } else {
-        Swal.fire('లోపం!', 'సర్వర్ లో సమస్య ఉంది, దయచేసి తర్వాత ప్రయత్నించండి', 'error')
+        Swal.fire('లోపం!', 'సర్వర్ లో సమస్య ఉంది, దయచేసి తర్వాత ప్రయత్నించండి', 'error');
       }
-    }, (error: any) => {
-      Swal.fire('లోపం!', 'సర్వర్ లో సమస్య ఉంది, దయచేసి తర్వాత ప్రయత్నించండి', 'error')
-    })
+    }, () => {
+      Swal.fire('లోపం!', 'సర్వర్ లో సమస్య ఉంది, దయచేసి తర్వాత ప్రయత్నించండి', 'error');
+    });
+  }
+
+  editdoctor() {
+    const usr_id = sessionStorage.getItem('usr_id');
+    const mobile_number = sessionStorage.getItem('mobile_number');
+    const data = Object.assign({}, this.doctorform.value, { usr_id, mobile_number, id: this.details?.id });
+    this.service.editdoctor(data).subscribe((res: any) => {
+      if (res.status == 200) {
+        Swal.fire('విజయవంతముగా అప్‌డేట్ చేయబడింది / Updated Successfully');
+      } else {
+        Swal.fire('లోపం!', 'సర్వర్ లో సమస్య ఉంది, దయచేసి తర్వాత ప్రయత్నించండి', 'error');
+      }
+    }, () => {
+      Swal.fire('లోపం!', 'సర్వర్ లో సమస్య ఉంది, దయచేసి తర్వాత ప్రయత్నించండి', 'error');
+    });
+  }
+
+  editentry() {
+    const usr_id = sessionStorage.getItem('usr_id');
+    const mobile_number = sessionStorage.getItem('mobile_number');
+    const data = Object.assign({}, this.entryform.value, { usr_id, mobile_number, id: this.details?.id || this.details?.['reg-id'] });
+    this.service.editentry(data).subscribe((res: any) => {
+      if (res.status == 200) {
+        Swal.fire('విజయవంతముగా అప్‌డేట్ చేయబడింది / Updated Successfully');
+      } else {
+        Swal.fire('లోపం!', 'సర్వర్ లో సమస్య ఉంది, దయచేసి తర్వాత ప్రయత్నించండి', 'error');
+      }
+    }, () => {
+      Swal.fire('లోపం!', 'సర్వర్ లో సమస్య ఉంది, దయచేసి తర్వాత ప్రయత్నించండి', 'error');
+    });
+  }
+
+  onDoctorImageChange(event: any): void {
+    const file = event.target.files && event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        this.doctorform.patchValue({ image: reader.result });
+      };
+      reader.readAsDataURL(file);
+    }
+  }
+
+  togglePasswordVisibility(): void {
+    this.passwordVisible = !this.passwordVisible;
   }
 
 

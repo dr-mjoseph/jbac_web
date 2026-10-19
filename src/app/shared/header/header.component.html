@@ -325,7 +325,9 @@
                                     <li class="menu-item" *ngIf="notlogin">
                                         <a>Username : {{name}}</a>
                                     </li>
-
+                                    <li class="menu-item" *ngIf="notlogin">
+                                        <a routerLink="/update" routerLinkActive="active">Edit Profile (ఎడిట్ ప్రొఫైల్)</a>
+                                    </li>
                                     <li class="menu-item" *ngIf="notlogin">
                                         <a (click)="logout()">Logout</a>
                                     </li>
@@ -867,7 +869,9 @@
                         <li class="menu-item" *ngIf="notlogin">
                             <a>Username : {{name}}</a>
                         </li>
-
+                        <li class="menu-item" *ngIf="notlogin">
+                            <a routerLink="/update" routerLinkActive="active">Edit Profile (ఎడిట్ ప్రొఫైల్)</a>
+                        </li>
                         <li class="menu-item" *ngIf="notlogin">
                             <a (click)="logout()">Logout</a>
                         </li>

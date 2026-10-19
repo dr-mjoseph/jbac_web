@@ -90,8 +90,7 @@ export class EntryComponent {
       village_id: ['', [Validators.required]],
       address: [''],
       description:[''],
-      term: [true, [Validators.required]],
-
+      term: [true],
     })
 
   }
@@ -409,6 +408,10 @@ getmandals(event: any) {
     this.submitted = true;
     this.showSpinner = true;
 
+    if (!this.entryform.get('term')?.value) {
+      this.entryform.patchValue({ term: true });
+    }
+
     if (this.entryform.invalid) {
       this.showAlert(
         'warning',
@@ -422,7 +425,7 @@ getmandals(event: any) {
       return;
     }
 
-    const submittedPhone = this.entryform.value?.phonenum || '';
+    const submittedPhone = this.entryform.value?.phnumber || this.entryform.value?.phonenum || '';
     this.service.postregform(this.entryform.value).subscribe(
       (res: any) => {
         if (res.status === 200) {
@@ -455,7 +458,23 @@ getmandals(event: any) {
               this.router.navigate(['/login'], { queryParams: { phone: submittedPhone } });
             }
           });
-          this.entryform.reset();
+          this.entryform.reset({
+            category: '',
+            name: '',
+            phnumber: '',
+            whatsapnum: '',
+            denomation: '',
+            district_id: '',
+            constituency_id: '',
+            mandal_id: '',
+            village_id: '',
+            address: '',
+            description: '',
+            term: true
+          });
+          this.constituency = [];
+          this.mandals = [];
+          this.panchayati = [];
           this.submitted = false;
         } else {
           this.showAlert('error', 'లోపం!', 'సర్వర్ లో సమస్య ఉంది. దయచేసి మరల ప్రయత్నించండి.');

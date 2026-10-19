@@ -95,7 +95,7 @@ godOptions: string[] = [
       youtube: [''],
       lname: [''],
       god: [''],
-      term: [true, [Validators.required]],
+      term: [true],
       password: ['', [Validators.required, Validators.minLength(6)]],
       retypepassword: ['', [Validators.required, Validators.minLength(6)]],
     })
@@ -138,7 +138,7 @@ godOptions: string[] = [
       resconstituencyname: ['', [Validators.required]],
       resdistricts: ['', [Validators.required]],
       god: [''],
-      term: [true, [Validators.required]],
+      term: [true],
       mother: [''],
       orphon: [''],
       subcaste: [''],
@@ -165,7 +165,7 @@ godOptions: string[] = [
       // dob: ['', [Validators.required]],
       pastor: [''],
       description: [''],
-      term: [true, [Validators.required]],
+      term: [true],
 
     })
 
@@ -198,7 +198,7 @@ godOptions: string[] = [
       wingtype: ['',],
       facebook: [''],
       //god: [''],
-      term: [true, [Validators.required]],
+      term: [true],
       lifegoal: [''],
       denomination_id: ['', [Validators.required]],
       villagename: ['', [Validators.required]],
@@ -230,7 +230,7 @@ godOptions: string[] = [
       youtube: [''],
       remarks: [''],
       village_name: ['', [Validators.required]],
-      term: [true, [Validators.required]],
+      term: [true],
 
     })
 
@@ -257,7 +257,7 @@ godOptions: string[] = [
       panchayati: ['', [Validators.required]],
       villagename: ['', [Validators.required]],
       ward: ['', [Validators.required]],
-      term: [true, [Validators.required]]
+      term: [true]
     })
 
     this.independentchurchform = this.formBuilder.group({
@@ -295,7 +295,7 @@ godOptions: string[] = [
       description: [''],
       password: ['', [Validators.required, Validators.minLength(6)]],
       retypepassword: ['', [Validators.required, Validators.minLength(6)]],
-      term: [true, [Validators.required]],
+      term: [true],
 
     })
   }
@@ -857,6 +857,9 @@ geteducational() {
 
   postpastorsignup() {
     this.submitted = true;
+    if (!this.pastorform.get('term')?.value) {
+      this.pastorform.patchValue({ term: true });
+    }
     if (this.pastorform.invalid) {
       const invalidFields: string[] = [];
       const controls = this.pastorform.controls;
@@ -908,7 +911,12 @@ geteducational() {
               title: 'విజయం!',
               text: 'విజయవంతముగా నమోదు చేయబడింది, మీ ఫోన్ నెంబర్ మరియు పాస్వర్డ్ తో లాగిన్ అవగలరు'
             });
-            this.pastorform.reset();
+            this.pastorform.reset({
+              term: true
+            });
+            this.constituency = [];
+            this.mandals = [];
+            this.panchayati = [];
             this.submitted = false;
           } else if (res.status == 451) {
             Swal.fire({

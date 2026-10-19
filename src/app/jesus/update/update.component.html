@@ -2571,6 +2571,299 @@
             </div>
         </div>
     </section>
+
+    <section class="gradient-custom" *ngIf="categoryid==8">
+        <div class="container py-5 h-100">
+            <h2 style="text-align: center;">డాక్టర్ / కౌన్సిలర్ ప్రొఫైల్ ఎడిట్ (Doctor Profile Edit)</h2>
+            <div class="row justify-content-center align-items-center h-100">
+                <div class="col-12 col-lg-10 col-xl-9">
+                    <div class="card shadow-2-strong card-registration" style="border-radius: 15px;">
+                        <div class="card-body p-4 p-md-5">
+                            <h3 class="mb-4 pb-2 pb-md-0 mb-md-5">Profile Details :</h3>
+                            <form [formGroup]="doctorform">
+                                <div class="row">
+                                    <div class="col-md-6 mb-4">
+                                        <div class="form-outline">
+                                            <label class="form-label">డాక్టర్ పూర్తి పేరు (Full Name)</label>
+                                            <input type="text" formControlName="doctor_name" class="form-control"
+                                                placeholder="ఉదా: Dr. Mary Grace" />
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 mb-4">
+                                        <div class="form-outline">
+                                            <label class="form-label">కౌన్సిల్ / లైసెన్స్ నంబర్ (Registration No)</label>
+                                            <input type="text" formControlName="license_number" class="form-control"
+                                                placeholder="ఉదా: APMC-2018-8421" />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6 mb-4">
+                                        <div class="form-outline">
+                                            <label class="form-label">స్పెషలైజేషన్ (Specialization)</label>
+                                            <select formControlName="specialization" class="form-control">
+                                                <option *ngFor="let s of specializations" [value]="s">{{s}}</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 mb-4">
+                                        <div class="form-outline">
+                                            <label class="form-label">విద్యార్హత (Qualification)</label>
+                                            <input type="text" formControlName="qualification" class="form-control"
+                                                placeholder="ఉదా: MBBS, MD, MSW, M.Sc Psychology" />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6 mb-4">
+                                        <div class="form-outline">
+                                            <label class="form-label">అనుభవం (సంవత్సరాలలో / Experience Years)</label>
+                                            <input type="text" formControlName="experience_years" class="form-control"
+                                                placeholder="ఉదా: 8" (keypress)="numericOnly($event)" />
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 mb-4">
+                                        <div class="form-outline">
+                                            <label class="form-label">ఫోన్ నంబర్ (Phone Number)</label>
+                                            <input type="text" formControlName="phone_number" class="form-control"
+                                                placeholder="10-digit mobile number" maxlength="10" minlength="10"
+                                                (keypress)="numericOnly($event)" />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6 mb-4">
+                                        <div class="form-outline">
+                                            <label class="form-label">ఈమెయిల్ (Email)</label>
+                                            <input type="email" formControlName="email" class="form-control"
+                                                placeholder="doctor@example.com" />
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 mb-4">
+                                        <div class="form-outline">
+                                            <label class="form-label">కన్సల్టేషన్ ఫీజు (Consultation Fee)</label>
+                                            <input type="text" formControlName="consultation_fee" class="form-control"
+                                                placeholder="Free / Rs 200" />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6 mb-4">
+                                        <div class="form-outline">
+                                            <label class="form-label">అందుబాటులో ఉండే రోజులు (Available Days)</label>
+                                            <select formControlName="available_days" class="form-control">
+                                                <option *ngFor="let day of availableDaysList" [value]="day">{{day}}</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 mb-4">
+                                        <div class="form-outline">
+                                            <label class="form-label">ప్రారంభ సమయం (Start)</label>
+                                            <input type="text" formControlName="available_time_start" class="form-control"
+                                                placeholder="10:00 AM" />
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 mb-4">
+                                        <div class="form-outline">
+                                            <label class="form-label">ముగింపు సమయం (End)</label>
+                                            <input type="text" formControlName="available_time_end" class="form-control"
+                                                placeholder="05:00 PM" />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6 mb-4">
+                                        <div class="form-outline">
+                                            <label class="form-label">ప్రాంతం / క్లినిక్ లొకేషన్ (Location)</label>
+                                            <input type="text" formControlName="location" class="form-control"
+                                                placeholder="విజయవాడ, గుంటూరు లేదా ఆన్‌లైన్" />
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 mb-4">
+                                        <div class="form-outline">
+                                            <label class="form-label">పాస్‌వర్డ్ (Password)</label>
+                                            <input type="text" formControlName="password" class="form-control"
+                                                placeholder="Password" />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-12 mb-4">
+                                        <div class="form-outline">
+                                            <label class="form-label">పూర్తి చిరునామా (Full Address)</label>
+                                            <textarea formControlName="address" class="form-control" rows="2"
+                                                placeholder="క్లినిక్ / హాస్పిటల్ పూర్తి చిరునామా"></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-12 mb-4">
+                                        <div class="form-outline">
+                                            <label class="form-label">డాక్టర్ గురించి సంక్షిప్త వివరాలు (Bio & Experience)</label>
+                                            <textarea formControlName="bio" class="form-control" rows="3"
+                                                placeholder="మీ అనుభవం, కౌన్సిలింగ్ విధానం గురించి రాయండి"></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6 mb-4">
+                                        <div class="form-outline">
+                                            <label class="form-label">ప్రొఫైల్ ఫోటో (Profile Photo)</label>
+                                            <input type="file" (change)="onDoctorImageChange($event)" class="form-control" accept="image/*" />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-12 text-center">
+                                        <button type="button" (click)="editdoctor()"
+                                            class="btn btn-primary btn-lg" style="min-width: 180px; font-weight: bold;">
+                                            Update Doctor Profile
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="gradient-custom" *ngIf="categoryid==9">
+        <div class="container py-5 h-100">
+            <h2 style="text-align: center;">ఎంట్రీ / నమోదు ప్రొఫైల్ ఎడిట్ (Entry Profile Edit)</h2>
+            <div class="row justify-content-center align-items-center h-100">
+                <div class="col-12 col-lg-9 col-xl-7">
+                    <div class="card shadow-2-strong card-registration" style="border-radius: 15px;">
+                        <div class="card-body p-4 p-md-5">
+                            <h3 class="mb-4 pb-2 pb-md-0 mb-md-5">Profile Details :</h3>
+                            <form [formGroup]="entryform">
+                                <div class="row">
+                                    <div class="col-md-6 mb-4">
+                                        <div class="form-outline">
+                                            <label class="form-label">క్యాటగిరి (Category)</label>
+                                            <select formControlName="category" class="form-control">
+                                                <option value="" disabled selected>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
+                                                <option value="విశ్వాసి">విశ్వాసి</option>
+                                                <option value="పాస్టర్">పాస్టర్</option>
+                                                <option value="చర్చి">చర్చి</option>
+                                                <option value="విద్యార్థి">విద్యార్థి</option>
+                                                <option value="పాస్టర్ల అసోసియేషన్ ">పాస్టర్ల అసోసియేషన్</option>
+                                                <option value="ఆఫీస్ / కంపెనీ">ఆఫీస్ / కంపెనీ</option>
+                                                <option value="మినిస్ట్రీస్">మినిస్ట్రీస్</option>
+                                                <option value="క్రిస్టియన్ ఆర్గనైజెషన్ / కంపెనీ">క్రిస్టియన్ ఆర్గనైజెషన్ / కంపెనీ</option>
+                                                <option value="ఇతరులు">ఇతరులు</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 mb-4">
+                                        <div class="form-outline">
+                                            <label class="form-label">పేరు (ఇంటి పేరుతో సహా / Full Name)</label>
+                                            <input type="text" formControlName="name" class="form-control"
+                                                placeholder="ఇక్కడ క్లిక్ చేసి ఎంటర్ చేయండి" />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6 mb-4">
+                                        <div class="form-outline">
+                                            <label class="form-label">ఫోన్ నంబర్ (Phone Number)</label>
+                                            <input type="text" formControlName="phnumber" class="form-control"
+                                                placeholder="10-digit mobile number" maxlength="10" minlength="10"
+                                                (keypress)="numericOnly($event)" />
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 mb-4">
+                                        <div class="form-outline">
+                                            <label class="form-label">ఫోన్ నెంబర్-2 / వాట్స్ యాప్ నెంబర్</label>
+                                            <input type="text" formControlName="whatsapnum" class="form-control"
+                                                placeholder="WhatsApp Number" maxlength="10" minlength="10"
+                                                (keypress)="numericOnly($event)" />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6 mb-4">
+                                        <div class="form-outline">
+                                            <label class="form-label">1) జిల్లా (District)</label>
+                                            <select class="form-control" formControlName="district_id"
+                                                (change)="getconstency($event);">
+                                                <option value="" selected disabled>జిల్లా ఎంచుకోండి</option>
+                                                <option value="{{item.id}}" *ngFor="let item of districts">
+                                                    {{item.distrct_nm}}
+                                                </option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 mb-4">
+                                        <div class="form-outline">
+                                            <label class="form-label">2) నియోజకవర్గం (Constituency)</label>
+                                            <select class="form-control" formControlName="constituency_id"
+                                                (change)="getmandals($event);">
+                                                <option value="" selected disabled>నియోజకవర్గం ఎంచుకోండి</option>
+                                                <option value="{{item.id}}" *ngFor="let item of constituency">
+                                                    {{item.const_nm}}
+                                                </option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6 mb-4">
+                                        <div class="form-outline">
+                                            <label class="form-label">3) మండలం / మున్సిపాలిటీ (Mandal)</label>
+                                            <select class="form-control" formControlName="mandal_id"
+                                                (change)="gepanchayati($event);">
+                                                <option value="" selected disabled>మండలం ఎంచుకోండి</option>
+                                                <option value="{{item.id}}" *ngFor="let item of mandals">
+                                                    {{item.mndl_nm}}
+                                                </option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 mb-4">
+                                        <div class="form-outline">
+                                            <label class="form-label">4) పంచాయితీ / వార్డ్ నంబర్ (Panchayat)</label>
+                                            <select class="form-control" formControlName="village_id">
+                                                <option value="" selected disabled>పంచాయితీ ఎంచుకోండి</option>
+                                                <option value="{{item.id}}" *ngFor="let item of panchayati">
+                                                    {{item.pnchyt_nm}}
+                                                </option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6 mb-4">
+                                        <div class="form-outline">
+                                            <label class="form-label">విలేజ్ / స్ట్రీట్ / లోకల్ అడ్రస్ (Address)</label>
+                                            <input type="text" formControlName="address" class="form-control"
+                                                placeholder="ఇక్కడ క్లిక్ చేసి రాయండి" />
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 mb-4">
+                                        <div class="form-outline">
+                                            <label class="form-label">సందేహాలు / సమస్య గురుంచి (Description)</label>
+                                            <input type="text" formControlName="description" class="form-control"
+                                                placeholder="ఇక్కడ క్లిక్ చేసి రాయండి" />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-12 text-center">
+                                        <button type="button" (click)="editentry()"
+                                            class="btn btn-primary btn-lg" style="min-width: 180px; font-weight: bold;">
+                                            Update Profile
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 </div>
 
 <ng-template #serviceadding let-modal>

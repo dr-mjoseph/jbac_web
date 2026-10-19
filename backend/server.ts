@@ -1988,17 +1988,263 @@ app.post(['/dashboardapi/createfrgetpassword', '/api/resetpassword'], async (req
 });
 
 // Profile Management
-app.all(['/dashboardapi/getpersonal', '/dashboardapi/geteditdtails', '/dashboardapi/getuserprofilereport'], async (req, res) => {
+async function dynamicUpdate(tableName: string, whereClause: string, whereParams: any[], data: any) {
+    try {
+        const exclude = ['usr_id', 'id', 'reg-id', 'term', 'confirm_password', 'terms'];
+        const entries = Object.entries(data).filter(([k, v]) => !exclude.includes(k) && v !== undefined && v !== null);
+        if (entries.length === 0) return null;
+
+        const [cols]: any = await db.query(`SHOW COLUMNS FROM \`${tableName}\``);
+        const validColNames = new Set(cols.map((c: any) => c.Field));
+
+        const setChunks: string[] = [];
+        const values: any[] = [];
+        for (const [k, v] of entries) {
+            if (validColNames.has(k)) {
+                setChunks.push(`\`${k}\` = ?`);
+                values.push(v);
+            }
+        }
+        if (setChunks.length === 0) return null;
+
+        const sql = `UPDATE \`${tableName}\` SET ${setChunks.join(', ')} WHERE ${whereClause}`;
+        return await db.query(sql, [...values, ...whereParams]);
+    } catch (err: any) {
+        console.error(`dynamicUpdate error for ${tableName}:`, err?.message);
+        return null;
+    }
+}
+
+app.all(['/dashboardapi/getpersonal', '/dashboardapi/geteditdtails', '/dashboardapi/getuserprofilereport'], async (req: any, res: any) => {
     try {
         const id = req.body.id || req.body.usr_id;
-        const [rows] = await db.query('SELECT * FROM users WHERE id = ?', [id]);
-        res.json({ status: 200, data: rows });
-    } catch (err) {
+        const phone = req.body.mobile_number || req.body.phonenumber || req.body.phone || req.body.phnumber;
+        const rawCat = String(req.body.category_id || req.body.category || '').trim().toLowerCase();
+
+        let cat = '1';
+        if (rawCat === '1' || rawCat.includes('believer') || rawCat.includes('విశ్వాసి')) cat = '1';
+        else if (rawCat === '2' || rawCat.includes('student') || rawCat.includes('విద్యార్థి')) cat = '2';
+        else if (rawCat === '3' || rawCat.includes('ministr') || rawCat.includes('మినిస్ట్రీ')) cat = '3';
+        else if (rawCat === '4' || ((rawCat.includes('pastor') || rawCat.includes('పాస్టర్')) && !rawCat.includes('association') && !rawCat.includes('అసోసియేషన్'))) cat = '4';
+        else if (rawCat === '5' || rawCat.includes('church') || rawCat.includes('చర్చి')) cat = '5';
+        else if (rawCat === '6' || rawCat.includes('organization') || rawCat.includes('organisation') || rawCat.includes('ఆర్గనైజేషన్')) cat = '6';
+        else if (rawCat === '7' || rawCat.includes('association') || rawCat.includes('అసోసియేషన్')) cat = '7';
+        else if (rawCat === '8' || rawCat.includes('doctor') || rawCat.includes('డాక్టర్') || rawCat.includes('councellor')) cat = '8';
+        else if (rawCat === '9' || rawCat.includes('entry') || rawCat.includes('namodu') || rawCat.includes('నమోదు')) cat = '9';
+        else if (rawCat) cat = rawCat;
+
+        const configs: Record<string, { table: string; idCol: string; phoneCols: string[] }> = {
+            '1': { table: 'signup_form', idCol: 'id', phoneCols: ['mobile_number', 'whatsapp'] },
+            '2': { table: 'student_reg', idCol: 'id', phoneCols: ['number', 'whatsapp'] },
+            '3': { table: 'ministry_signup', idCol: 'id', phoneCols: ['headnmber', 'whatsapp'] },
+            '4': { table: 'pastor_reg', idCol: 'id', phoneCols: ['phonenumber', 'phonenumber2', 'pa_phonenumber'] },
+            '5': { table: 'church_reg', idCol: 'id', phoneCols: ['contactnumber', 'whatsapp'] },
+            '6': { table: 'independentorganisation_reg', idCol: 'id', phoneCols: ['contact_num', 'whatsapp'] },
+            '7': { table: 'pastors_associations', idCol: 'id', phoneCols: ['phonenumber', 'whatsapp_number'] },
+            '8': { table: 'family_councelling_doctors', idCol: 'id', phoneCols: ['phone_number'] },
+            '9': { table: 'reg_form', idCol: 'reg-id', phoneCols: ['phonenum', 'whatsappno'] }
+        };
+
+        let resultRow: any = null;
+        let matchedCat = cat;
+
+        if (configs[cat]) {
+            const cfg = configs[cat];
+            if (id) {
+                const [rows]: any = await db.query(`SELECT * FROM \`${cfg.table}\` WHERE \`${cfg.idCol}\` = ?`, [id]);
+                if (rows && rows.length > 0) resultRow = rows[0];
+            }
+            if (!resultRow && phone) {
+                for (const col of cfg.phoneCols) {
+                    const [rows]: any = await db.query(`SELECT * FROM \`${cfg.table}\` WHERE \`${col}\` = ? ORDER BY \`${cfg.idCol}\` DESC`, [phone]);
+                    if (rows && rows.length > 0) {
+                        resultRow = rows[0];
+                        break;
+                    }
+                }
+            }
+        }
+
+        if (!resultRow && phone) {
+            for (const [key, cfg] of Object.entries(configs)) {
+                if (key === cat) continue;
+                for (const col of cfg.phoneCols) {
+                    try {
+                        const [rows]: any = await db.query(`SELECT * FROM \`${cfg.table}\` WHERE \`${col}\` = ? ORDER BY \`${cfg.idCol}\` DESC`, [phone]);
+                        if (rows && rows.length > 0) {
+                            resultRow = rows[0];
+                            matchedCat = key;
+                            break;
+                        }
+                    } catch (_) {}
+                }
+                if (resultRow) break;
+            }
+        }
+
+        if (!resultRow && id) {
+            const [users]: any = await db.query('SELECT * FROM users WHERE id = ?', [id]);
+            if (users && users.length > 0) resultRow = users[0];
+        }
+
+        if (!resultRow && phone) {
+            const [users]: any = await db.query('SELECT * FROM users WHERE number = ?', [phone]);
+            if (users && users.length > 0) resultRow = users[0];
+        }
+
+        if (resultRow) {
+            resultRow.category_id = matchedCat;
+            return res.json({ status: 200, data: [resultRow] });
+        } else {
+            return res.json({ status: 200, data: [{}] });
+        }
+    } catch (err: any) {
+        return res.status(500).json({ status: 500, error: err.message });
+    }
+});
+
+app.all(['/dashboardapi/editpastor', '/api/editpastor'], async (req: any, res: any) => {
+    try {
+        const b = req.body || {};
+        const id = b.id || b.usr_id;
+        const phone = b.phonenumber || b.mobile_number;
+        await dynamicUpdate('pastor_reg', 'id = ? OR phonenumber = ?', [id || -1, phone || ''], b);
+        if (b.pastorname && phone) {
+            await db.query('UPDATE users SET name = ? WHERE number = ?', [b.pastorname, phone]);
+        }
+        res.json({ status: 200, message: 'Profile updated successfully' });
+    } catch (err: any) {
         res.status(500).json({ status: 500, error: err.message });
     }
 });
 
-app.all(['/dashboardapi/updateprofile', '/dashboardapi/updatebeliver', '/dashboardapi/updatedetails', '/dashboardapi/editbeliver', '/dashboardapi/editchurch', '/dashboardapi/editindependentorgainsation', '/dashboardapi/editministry', '/dashboardapi/editpastor', '/dashboardapi/editpastororgainsation', '/dashboardapi/editpastorsassociations', '/dashboardapi/editstudent'], async (_req, res) => {
+app.all(['/dashboardapi/editchurch', '/api/editchurch'], async (req: any, res: any) => {
+    try {
+        const b = req.body || {};
+        const id = b.id || b.usr_id;
+        const phone = b.contactnumber || b.mobile_number;
+        await dynamicUpdate('church_reg', 'id = ? OR contactnumber = ?', [id || -1, phone || ''], b);
+        if (b.church_name && phone) {
+            await db.query('UPDATE users SET name = ? WHERE number = ?', [b.church_name, phone]);
+        }
+        res.json({ status: 200, message: 'Profile updated successfully' });
+    } catch (err: any) {
+        res.status(500).json({ status: 500, error: err.message });
+    }
+});
+
+app.all(['/dashboardapi/editministry', '/api/editministry'], async (req: any, res: any) => {
+    try {
+        const b = req.body || {};
+        const id = b.id || b.usr_id;
+        const phone = b.headnmber || b.mobile_number;
+        await dynamicUpdate('ministry_signup', 'id = ? OR headnmber = ?', [id || -1, phone || ''], b);
+        if (b.ministryname && phone) {
+            await db.query('UPDATE users SET name = ? WHERE number = ?', [b.ministryname, phone]);
+        }
+        res.json({ status: 200, message: 'Profile updated successfully' });
+    } catch (err: any) {
+        res.status(500).json({ status: 500, error: err.message });
+    }
+});
+
+app.all(['/dashboardapi/editbeliver', '/dashboardapi/updatebeliver', '/api/editbeliver'], async (req: any, res: any) => {
+    try {
+        const b = req.body || {};
+        const id = b.id || b.usr_id;
+        const phone = b.mobile_number || b.whatsapp;
+        await dynamicUpdate('signup_form', 'id = ? OR mobile_number = ?', [id || -1, phone || ''], b);
+        if (b.fname && phone) {
+            const fullName = `${b.fname} ${b.lname || ''}`.trim();
+            await db.query('UPDATE users SET name = ? WHERE number = ?', [fullName, phone]);
+        }
+        res.json({ status: 200, message: 'Profile updated successfully' });
+    } catch (err: any) {
+        res.status(500).json({ status: 500, error: err.message });
+    }
+});
+
+app.all(['/dashboardapi/editstudent', '/api/editstudent'], async (req: any, res: any) => {
+    try {
+        const b = req.body || {};
+        const id = b.id || b.usr_id;
+        const phone = b.number || b.mobile_number;
+        await dynamicUpdate('student_reg', 'id = ? OR number = ?', [id || -1, phone || ''], b);
+        if (b.studentname && phone) {
+            await db.query('UPDATE users SET name = ? WHERE number = ?', [b.studentname, phone]);
+        }
+        res.json({ status: 200, message: 'Profile updated successfully' });
+    } catch (err: any) {
+        res.status(500).json({ status: 500, error: err.message });
+    }
+});
+
+app.all(['/dashboardapi/editindependentorgainsation', '/api/editindependentorgainsation'], async (req: any, res: any) => {
+    try {
+        const b = req.body || {};
+        const id = b.id || b.usr_id;
+        const phone = b.contact_num || b.mobile_number;
+        await dynamicUpdate('independentorganisation_reg', 'id = ? OR contact_num = ?', [id || -1, phone || ''], b);
+        if (b.organisation_name && phone) {
+            await db.query('UPDATE users SET name = ? WHERE number = ?', [b.organisation_name, phone]);
+        }
+        res.json({ status: 200, message: 'Profile updated successfully' });
+    } catch (err: any) {
+        res.status(500).json({ status: 500, error: err.message });
+    }
+});
+
+app.all(['/dashboardapi/editpastororgainsation', '/dashboardapi/editpastorsassociations', '/api/editpastororgainsation'], async (req: any, res: any) => {
+    try {
+        const b = req.body || {};
+        const id = b.id || b.usr_id;
+        const phone = b.phonenumber || b.whatsapp_number || b.mobile_number;
+        await dynamicUpdate('pastors_associations', 'id = ? OR phonenumber = ?', [id || -1, phone || ''], b);
+        if (b.pa_name && phone) {
+            await db.query('UPDATE users SET name = ? WHERE number = ?', [b.pa_name, phone]);
+        }
+        res.json({ status: 200, message: 'Profile updated successfully' });
+    } catch (err: any) {
+        res.status(500).json({ status: 500, error: err.message });
+    }
+});
+
+app.all(['/dashboardapi/editdoctor', '/api/editdoctor'], async (req: any, res: any) => {
+    try {
+        const b = req.body || {};
+        const id = b.id || b.usr_id;
+        const phone = b.phone_number || b.mobile_number;
+        await dynamicUpdate('family_councelling_doctors', 'id = ? OR phone_number = ?', [id || -1, phone || ''], b);
+        if (b.doctor_name && phone) {
+            await db.query('UPDATE users SET name = ? WHERE number = ?', [b.doctor_name, phone]);
+        }
+        res.json({ status: 200, message: 'Profile updated successfully' });
+    } catch (err: any) {
+        res.status(500).json({ status: 500, error: err.message });
+    }
+});
+
+app.all(['/dashboardapi/editentry', '/api/editentry'], async (req: any, res: any) => {
+    try {
+        const b = req.body || {};
+        const id = b.id || b['reg-id'] || b.usr_id;
+        const phone = b.phnumber || b.phonenum || b.mobile_number;
+        const payload = {
+            ...b,
+            phonenum: phone,
+            whatsappno: b.whatsapnum || b.whatsappno || phone
+        };
+        await dynamicUpdate('reg_form', '`reg-id` = ? OR phonenum = ?', [id || -1, phone || ''], payload);
+        if (b.name && phone) {
+            await db.query('UPDATE users SET name = ? WHERE number = ?', [b.name, phone]);
+        }
+        res.json({ status: 200, message: 'Profile updated successfully' });
+    } catch (err: any) {
+        res.status(500).json({ status: 500, error: err.message });
+    }
+});
+
+app.all(['/dashboardapi/updateprofile', '/dashboardapi/updatedetails'], async (_req, res) => {
     res.json({ status: 200, message: 'Profile updated successfully' });
 });
 

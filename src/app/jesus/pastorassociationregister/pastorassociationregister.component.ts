@@ -84,7 +84,7 @@ export class PastorassociationregisterComponent {
       youtube: [''],
       lname: [''],
       god: [''],
-      term: [true, [Validators.required]],
+      term: [true],
       password: ['', [Validators.required, Validators.minLength(6)]],
       retypepassword: ['', [Validators.required, Validators.minLength(6)]],
     })
@@ -127,7 +127,7 @@ export class PastorassociationregisterComponent {
       resconstituencyname: ['', [Validators.required]],
       resdistricts: ['', [Validators.required]],
       god: [''],
-      term: [true, [Validators.required]],
+      term: [true],
       mother: [''],
       orphon: [''],
       subcaste: [''],
@@ -154,7 +154,7 @@ export class PastorassociationregisterComponent {
       // dob: ['', [Validators.required]],
       pastor: [''],
       description: [''],
-      term: [true, [Validators.required]],
+      term: [true],
 
     })
 
@@ -186,7 +186,7 @@ export class PastorassociationregisterComponent {
       wingtype: ['',],
       facebook: [''],
       god: [''],
-      term: [true, [Validators.required]],
+      term: [true],
       lifegoal: [''],
       denomination_id: ['', [Validators.required]],
       villagename: ['', [Validators.required]],
@@ -218,7 +218,7 @@ export class PastorassociationregisterComponent {
       youtube: [''],
       remarks: [''],
       village_name: ['', [Validators.required]],
-      term: [true, [Validators.required]],
+      term: [true],
 
     })
 
@@ -245,7 +245,7 @@ export class PastorassociationregisterComponent {
       panchayati: ['', [Validators.required]],
       villagename: ['', [Validators.required]],
       ward: ['', [Validators.required]],
-      term: [true, [Validators.required]]
+      term: [true]
     })
 
     this.independentchurchform = this.formBuilder.group({
@@ -799,6 +799,10 @@ export class PastorassociationregisterComponent {
       // password is required
     }
 
+    if (!this.pastorsassociations.get('term')?.value) {
+      this.pastorsassociations.patchValue({ term: true });
+    }
+
     if (this.pastorsassociations.invalid) {
       const invalidFields: string[] = [];
       const controls = this.pastorsassociations.controls;
@@ -848,7 +852,12 @@ export class PastorassociationregisterComponent {
             title: 'విజయం!',
             text: 'మీరు విజయవంతముగా నమోదు చేసినారు'
           });
-          this.pastorsassociations.reset();
+          this.pastorsassociations.reset({
+            term: true
+          });
+          this.constituency = [];
+          this.mandals = [];
+          this.panchayati = [];
           this.submitted = false;
         } else if (res.status == 451) {
           Swal.fire({

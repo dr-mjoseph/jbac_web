@@ -84,7 +84,7 @@ export class OrganisationregisterComponent {
       youtube: [''],
       lname: [''],
       god: [''],
-      term: [true, [Validators.required]],
+      term: [true],
       password: ['', [Validators.required, Validators.minLength(6)]],
       retypepassword: ['', [Validators.required, Validators.minLength(6)]],
     })
@@ -127,7 +127,7 @@ export class OrganisationregisterComponent {
       resconstituencyname: ['', [Validators.required]],
       resdistricts: ['', [Validators.required]],
       god: [''],
-      term: [true, [Validators.required]],
+      term: [true],
       mother: [''],
       orphon: [''],
       subcaste: [''],
@@ -154,7 +154,7 @@ export class OrganisationregisterComponent {
       // dob: ['', [Validators.required]],
       pastor: [''],
       description: [''],
-      term: [true, [Validators.required]],
+      term: [true],
 
     })
 
@@ -186,7 +186,7 @@ export class OrganisationregisterComponent {
       wingtype: ['',],
       facebook: [''],
       god: [''],
-      term: [true, [Validators.required]],
+      term: [true],
       lifegoal: [''],
       denomination_id: ['', [Validators.required]],
       villagename: ['', [Validators.required]],
@@ -218,7 +218,7 @@ export class OrganisationregisterComponent {
       youtube: [''],
       remarks: [''],
       village_name: ['', [Validators.required]],
-      term: [true, [Validators.required]],
+      term: [true],
 
     })
 
@@ -245,7 +245,7 @@ export class OrganisationregisterComponent {
       panchayati: ['', [Validators.required]],
       villagename: ['', [Validators.required]],
       ward: ['', [Validators.required]],
-      term: [true, [Validators.required]]
+      term: [true]
     })
 
     this.independentchurchform = this.formBuilder.group({
@@ -283,7 +283,7 @@ export class OrganisationregisterComponent {
       description: [''],
       password: ['', [Validators.required, Validators.minLength(6)]],
       retypepassword: ['', [Validators.required, Validators.minLength(6)]],
-      term: [true, [Validators.required]],
+      term: [true],
 
     })
   }
@@ -619,6 +619,10 @@ export class OrganisationregisterComponent {
       this.independentorgainsationform.patchValue({ villagename: vName });
     }
 
+    if (!this.independentorgainsationform.get('term')?.value) {
+      this.independentorgainsationform.patchValue({ term: true });
+    }
+
     if (this.independentorgainsationform.invalid) {
       const invalidFields: string[] = [];
       const controls = this.independentorgainsationform.controls;
@@ -670,7 +674,12 @@ export class OrganisationregisterComponent {
               title: 'విజయం!',
               text: 'విజయవంతముగా నమోదు చేయబడింది, మీ ఫోన్ నెంబర్ మరియు పాస్వర్డ్ తో లాగిన్ అవగలరు'
             });
-            this.independentorgainsationform.reset();
+            this.independentorgainsationform.reset({
+              term: true
+            });
+            this.constituency = [];
+            this.mandals = [];
+            this.panchayati = [];
             this.submitted = false;
           } else {
             Swal.fire({

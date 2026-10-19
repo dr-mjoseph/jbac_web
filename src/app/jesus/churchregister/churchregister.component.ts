@@ -84,7 +84,7 @@ export class ChurchregisterComponent {
       youtube: [''],
       lname: [''],
       god: [''],
-      term: [true, [Validators.required]],
+      term: [true],
       password: ['', [Validators.required, Validators.minLength(6)]],
       retypepassword: ['', [Validators.required, Validators.minLength(6)]],
     })
@@ -127,7 +127,7 @@ export class ChurchregisterComponent {
       resconstituencyname: ['', [Validators.required]],
       resdistricts: ['', [Validators.required]],
       god: [''],
-      term: [true, [Validators.required]],
+      term: [true],
       mother: [''],
       orphon: [''],
       subcaste: [''],
@@ -154,7 +154,7 @@ export class ChurchregisterComponent {
       // dob: ['', [Validators.required]],
       pastor: [''],
       description: [''],
-      term: [true, [Validators.required]],
+      term: [true],
 
     })
 
@@ -186,7 +186,7 @@ export class ChurchregisterComponent {
       wingtype: ['',],
       facebook: [''],
       god: [''],
-      term: [true, [Validators.required]],
+      term: [true],
       lifegoal: [''],
       denomination_id: ['', [Validators.required]],
       villagename: ['', [Validators.required]],
@@ -218,7 +218,7 @@ export class ChurchregisterComponent {
       youtube: [''],
       remarks: [''],
       village_name: [''],
-      term: [true, [Validators.required]],
+      term: [true],
 
     })
 
@@ -245,7 +245,7 @@ export class ChurchregisterComponent {
       panchayati: ['', [Validators.required]],
       villagename: ['', [Validators.required]],
       ward: ['', [Validators.required]],
-      term: [true, [Validators.required]]
+      term: [true]
     })
 
     this.independentchurchform = this.formBuilder.group({
@@ -283,7 +283,7 @@ export class ChurchregisterComponent {
       description: [''],
       password: ['', [Validators.required, Validators.minLength(6)]],
       retypepassword: ['', [Validators.required, Validators.minLength(6)]],
-      term: [true, [Validators.required]],
+      term: [true],
 
     })
   }
@@ -652,6 +652,10 @@ export class ChurchregisterComponent {
       this.churchregsiterform.patchValue({ village_name: vName });
     }
 
+    if (!this.churchregsiterform.get('term')?.value) {
+      this.churchregsiterform.patchValue({ term: true });
+    }
+
     if (this.churchregsiterform.invalid) {
       const invalidFields: string[] = [];
       const controls = this.churchregsiterform.controls;
@@ -710,7 +714,12 @@ export class ChurchregisterComponent {
                 this.router.navigate(['/login']);
               }
             });
-            this.churchregsiterform.reset();
+            this.churchregsiterform.reset({
+              term: true
+            });
+            this.constituency = [];
+            this.mandals = [];
+            this.panchayati = [];
             this.submitted = false;
           } else {
             Swal.fire({

@@ -86,7 +86,7 @@ export class StudentregisterComponent {
       resconstituencyname: ['', [Validators.required]],
       resdistricts: ['', [Validators.required]],
       god: [''],
-      term: [true, [Validators.required]],
+      term: [true],
       mother: [''],
       orphon: [''],
       subcaste: [''],
@@ -607,6 +607,9 @@ export class StudentregisterComponent {
     this.submitted = true;
     this.showSpinner = true;
 
+    if (!this.studentform.get('term')?.value) {
+      this.studentform.patchValue({ term: true });
+    }
     if (this.studentform.invalid) {
       this.showAlert(
         'warning',
@@ -627,7 +630,12 @@ export class StudentregisterComponent {
         (res: any) => {
           if (res?.status === 200) {
             this.showAlert('success', 'నమోదు విజయవంతం', 'మీ ఫోన్ నంబర్‌కు సమాచారం పంపిస్తాము.');
-            this.studentform.reset();
+            this.studentform.reset({
+              term: true
+            });
+            this.constituency = [];
+            this.mandals = [];
+            this.panchayati = [];
             this.submitted = false;
           } else {
             this.showAlert('error', 'లోపం!', 'సర్వర్‌లో సమస్య ఉంది. దయచేసి మరలా ప్రయత్నించండి.');

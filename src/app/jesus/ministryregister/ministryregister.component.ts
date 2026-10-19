@@ -53,7 +53,7 @@ export class MinistryregisterComponent {
       // dob: ['', [Validators.required]],
       pastor: [''],
       description: [''],
-      term: [true, [Validators.required]],
+      term: [true],
 
     })
   }
@@ -133,6 +133,9 @@ export class MinistryregisterComponent {
 
   postministrysignup() {
     this.submitted = true;
+    if (!this.ministryform.get('term')?.value) {
+      this.ministryform.patchValue({ term: true });
+    }
     if (this.ministryform.invalid) {
       Swal.fire('* ఉన్న తప్పనిసరి  ఫీల్డ్స్ ఎంటర్ చేయండి');
     } else if (this.ministryform.value.password != this.ministryform.value.retypepassword) {
@@ -143,7 +146,12 @@ export class MinistryregisterComponent {
           Swal.fire('ఇదే ఫోన్ నెంబర్ తో ఇంతకుముందే రిజిస్టర్ అయ్యారు');
         } else if (res.status == 200) {
           Swal.fire('విజయవంతముగా నమోదు చేయబడింది, మీ ఫోన్ నెంబర్ మరియు పాస్వర్డ్ తో లాగిన్ అవగలరు');
-          this.ministryform.reset();
+          this.ministryform.reset({
+            term: true
+          });
+          this.constituency = [];
+          this.mandals = [];
+          this.panchayati = [];
           this.submitted = false;
         } else {
           alert('సర్వర్ డౌన్ వుంది, దయచేసి తరువాత ప్రయత్నిచండి');

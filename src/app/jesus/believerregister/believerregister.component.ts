@@ -74,7 +74,7 @@ export class BelieverregisterComponent {
       youtube: [''],
       lname: [''],
       god: [''],
-      term: [true, [Validators.required]],
+      term: [true],
       password: ['', [Validators.required, Validators.minLength(6)]],
       retypepassword: ['', [Validators.required, Validators.minLength(6)]],
     })
@@ -183,6 +183,9 @@ export class BelieverregisterComponent {
   }
   postbeliversignup() {
     this.submitted = true;
+    if (!this.beliverform.get('term')?.value) {
+      this.beliverform.patchValue({ term: true });
+    }
     if (this.beliverform.invalid) {
       Swal.fire('please fill the details');
     } else if (this.beliverform.value.password != this.beliverform.value.retypepassword) {
@@ -201,7 +204,12 @@ export class BelieverregisterComponent {
           Swal.fire('ఇదే ఫోన్ నెంబర్ తో ఇంతకుముందే రిజిస్టర్ అయ్యారు');
         } else if (res.status == 200) {
           Swal.fire('విజయవంతముగా నమోదు చేయబడింది, మీ ఫోన్ నెంబర్ మరియు పాస్వర్డ్ తో లాగిన్ అవగలరు');
-          this.beliverform.reset();
+          this.beliverform.reset({
+            term: true
+          });
+          this.constituency = [];
+          this.mandals = [];
+          this.panchayati = [];
 
           this.submitted = false;
         } else {

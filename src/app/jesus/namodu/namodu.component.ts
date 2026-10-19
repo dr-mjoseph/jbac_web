@@ -89,7 +89,7 @@ export class NamoduComponent {
       village_id: ['', [Validators.required]],
       address: [''],
       description:[''],
-      term: [true, [Validators.required]],
+      term: [true],
 
     })
 
@@ -407,6 +407,9 @@ export class NamoduComponent {
     this.submitted = true;
     this.showSpinner = true;
 
+    if (!this.entryform.get('term')?.value) {
+      this.entryform.patchValue({ term: true });
+    }
     if (this.entryform.invalid) {
       this.showAlert(
         'warning',
@@ -463,7 +466,23 @@ export class NamoduComponent {
               this.router.navigate(['/login'], { queryParams: { phone: submittedPhone } });
             }
           });
-          this.entryform.reset();
+          this.entryform.reset({
+            category: '',
+            number: '',
+            whatsapp: '',
+            password: '',
+            name: '',
+            district_id: '',
+            constituency_id: '',
+            mandal_id: '',
+            village_id: '',
+            address: '',
+            description: '',
+            term: true
+          });
+          this.constituency = [];
+          this.mandals = [];
+          this.panchayati = [];
           this.submitted = false;
         } else {
           this.showAlert('error', 'లోపం!', 'సర్వర్ లో సమస్య ఉంది. దయచేసి మరల ప్రయత్నించండి.');

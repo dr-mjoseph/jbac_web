@@ -192,7 +192,7 @@ export class FamilyCouncellingComponent implements OnInit {
       members_count: [1, [Validators.required, Validators.min(1)]],
       counselling_type: ['General Family Counselling', [Validators.required]],
       notes: ['', [Validators.required]],
-      term: [true, [Validators.requiredTrue]]
+      term: [true]
     });
 
     // Doctor Profile Form

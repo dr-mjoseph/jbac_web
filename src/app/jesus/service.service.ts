@@ -739,6 +739,12 @@ postwishform(data: any) {
   editministry(data: any) {
     return this.http.post(this.testApi + 'editministry', data);
   }
+  editdoctor(data: any) {
+    return this.http.post(this.testApi + 'editdoctor', data);
+  }
+  editentry(data: any) {
+    return this.http.post(this.testApi + 'editentry', data);
+  }
   searchingmarriages(data: any) {
     return this.http.post(this.testApi + 'searchingmarriages', data);
   }
