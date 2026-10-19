@@ -451,7 +451,7 @@ getmandals(event: any) {
             confirmButtonText: 'లాగిన్ పేజీకి వెళ్లండి (Login Now)',
             confirmButtonColor: '#00548F',
             showCancelButton: true,
-            cancelButtonText: 'సరే (OK)',
+            cancelButtonText: 'Exit',
             cancelButtonColor: '#6c757d'
           }).then((result) => {
             if (result.isConfirmed) {

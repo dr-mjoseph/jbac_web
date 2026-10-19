@@ -56,10 +56,10 @@ export class EventsComponent {
       panchayati_id: [''],
     })
   }
-  now: any;
+  now: string = new DatePipe('en-US').transform(new Date(), 'yyyy-MM-dd') || '';
   ngOnInit(): void {
     const datePipe = new DatePipe('en-US');
-    this.now = datePipe.transform(new Date(), 'yyyy-MM-dd') || '';
+    this.now = datePipe.transform(new Date(), 'yyyy-MM-dd') || this.now;
     this.getpastors();
     this.getyouth();
     this.getrevival();
@@ -223,8 +223,8 @@ export class EventsComponent {
     this.service.getRibbonEvents().subscribe({
       next: (res: any) => {
         const raw = res && res.data ? res.data : (Array.isArray(res) ? res : []);
-        // Display if and only if there is 1 in d_in column in event table; if 0 don't display
-        this.ribbonEvents = (raw || []).filter((item: any) => item && (item.d_in == 1 || item.d_in === '1'));
+        // Display if and only if there is 1 in d_in column AND meeting dates have not passed
+        this.ribbonEvents = (raw || []).filter((item: any) => item && (item.d_in == 1 || item.d_in === '1') && !this.isOldMeeting(item));
       },
       error: (err: any) => {
         console.error('getRibbonEvents error:', err);
@@ -277,6 +277,16 @@ export class EventsComponent {
 
   formatDateString(dateVal: any): string {
     if (!dateVal) return '';
+    if (typeof dateVal === 'string') {
+      const match = dateVal.trim().match(/^(\d{4})-(\d{2})-(\d{2})/);
+      if (match) {
+        return `${match[1]}-${match[2]}-${match[3]}`;
+      }
+      const ddmmyyyy = dateVal.trim().match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})/);
+      if (ddmmyyyy) {
+        return `${ddmmyyyy[3]}-${ddmmyyyy[2].padStart(2, '0')}-${ddmmyyyy[1].padStart(2, '0')}`;
+      }
+    }
     try {
       const d = new Date(dateVal);
       if (isNaN(d.getTime())) return '';
@@ -290,9 +300,9 @@ export class EventsComponent {
   }
 
   isCurrentDateEvent(event: any): boolean {
-    const today = this.now;
-    if (!today) return true;
-    const start = this.formatDateString(event.startdate);
+    const today = this.now || this.formatDateString(new Date());
+    if (!today || !event) return true;
+    const start = this.formatDateString(event.startdate || event.event_date);
     const end = this.formatDateString(event.enddate);
     if (start && end) {
       return start <= today && end >= today;
@@ -307,10 +317,10 @@ export class EventsComponent {
   }
 
   isOldMeeting(event: any): boolean {
-    const today = this.now;
-    if (!today) return false;
+    const today = this.now || this.formatDateString(new Date());
+    if (!today || !event) return false;
     const end = this.formatDateString(event.enddate);
-    const start = this.formatDateString(event.startdate);
+    const start = this.formatDateString(event.startdate || event.event_date);
     if (end) {
       return end < today;
     }
@@ -355,7 +365,7 @@ export class EventsComponent {
           Swal.fire(res.message);
         } else if (res.status == 200) {
           const raw = res.data || [];
-          const dInItems = raw.filter((item: any) => item && (item.d_in == 1 || item.d_in === '1'));
+          const dInItems = raw.filter((item: any) => item && (item.d_in == 1 || item.d_in === '1') && !this.isOldMeeting(item));
           if (dInItems.length > 0 && this.ribbonEvents.length === 0) {
             this.ribbonEvents = dInItems;
           }

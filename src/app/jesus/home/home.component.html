@@ -6,12 +6,12 @@
             <img src="assets/images/Banner01.png" (error)="onBannerError($event, 0)" alt="JBAC Banner 1" loading="eager" fetchpriority="high">
         </picture>
     </div>
-    <div class="mySlides">
+    <!-- <div class="mySlides">
         <picture>
             <source srcset="assets/images/Banner02.webp" type="image/webp">
             <img src="assets/images/Banner02.png" (error)="onBannerError($event, 1)" alt="JBAC Banner 2" loading="eager">
         </picture>
-    </div>
+    </div> -->
     <div class="mySlides">
         <picture>
             <source srcset="assets/images/Banner03.webp" type="image/webp">
@@ -42,12 +42,12 @@
             <img src="assets/images/Banner07.png" (error)="onBannerError($event, 6)" alt="JBAC Banner 7" loading="eager">
         </picture>
     </div>
-    <div class="mySlides">
+    <!-- <div class="mySlides">
         <picture>
             <source srcset="assets/images/Banner08.webp" type="image/webp">
             <img src="assets/images/Banner08.png" (error)="onBannerError($event, 7)" alt="JBAC Banner 8" loading="eager">
         </picture>
-    </div>
+    </div> -->
     
     <a class="prev" (click)="plusSlides(-1)" aria-label="Previous banner">&#10094;</a>
     <a class="next" (click)="plusSlides(1)" aria-label="Next banner">&#10095;</a>
@@ -60,8 +60,6 @@
     <span class="dot" (click)="currentSlide(3)">4</span>
     <span class="dot" (click)="currentSlide(4)">5</span>
     <span class="dot" (click)="currentSlide(5)">6</span>
-    <span class="dot" (click)="currentSlide(6)">7</span>
-    <span class="dot" (click)="currentSlide(7)">8</span>
 </div>
 
 

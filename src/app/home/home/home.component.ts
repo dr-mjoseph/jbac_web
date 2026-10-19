@@ -25,13 +25,11 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
 
   banners: string[] = [
     'assets/images/Banner01.png',
-    'assets/images/Banner02.png',
     'assets/images/Banner03.png',
     'assets/images/Banner04.png',
     'assets/images/Banner05.png',
     'assets/images/Banner06.png',
-    'assets/images/Banner07.png',
-    'assets/images/Banner08.png'
+    'assets/images/Banner07.png'
   ];
 
   constructor(private service: ServiceService, private router: Router) { }
@@ -51,8 +49,8 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
 
   preloadBanners(): void {
     if (typeof window !== 'undefined') {
-      for (let i = 1; i <= 8; i++) {
-        const num = i.toString().padStart(2, '0');
+      const bannerNums = ['01', '03', '04', '05', '06', '07'];
+      for (const num of bannerNums) {
         const webpImg = new Image();
         webpImg.src = `assets/images/Banner${num}.webp`;
         const pngImg = new Image();
@@ -81,7 +79,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   plusSlides(step: number) {
-    const total = this.slides && this.slides.length > 0 ? this.slides.length : 8;
+    const total = this.slides && this.slides.length > 0 ? this.slides.length : 6;
     let nextIndex = (this.slideIndex + step) % total;
     if (nextIndex < 0) {
       nextIndex = total - 1;

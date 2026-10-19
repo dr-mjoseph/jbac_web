@@ -447,10 +447,10 @@ app.all(['/api/events', '/dashboardapi/getevents', '/dashboardapi/getupdateevent
     }
 });
 
-// Dedicated ribbon events endpoint (meetings with d_in = 1)
+// Dedicated ribbon events endpoint (meetings with d_in = 1 and unexpired dates)
 app.all(['/dashboardapi/getribbonevents', '/api/getribbonevents'], async (_req: any, res: any) => {
     try {
-        const sql = 'SELECT id, eventname as title, eventname, eventname as event_name, orgname, meetsize, description, startdate, startdate as event_date, enddate, starttime, starttime as event_time, endtime, location, address, facebook, youtube, phone, eventcontactnumber, image, speaker1, speaker2, speaker3, speaker4, district_id, constituency_id, mandal_id, panchayat_id, d_in, activestatus FROM events WHERE d_in = 1 ORDER BY id DESC';
+        const sql = 'SELECT id, eventname as title, eventname, eventname as event_name, orgname, meetsize, description, startdate, startdate as event_date, enddate, starttime, starttime as event_time, endtime, location, address, facebook, youtube, phone, eventcontactnumber, image, speaker1, speaker2, speaker3, speaker4, district_id, constituency_id, mandal_id, panchayat_id, d_in, activestatus FROM events WHERE d_in = 1 AND ((enddate IS NOT NULL AND enddate != "" AND enddate >= CURDATE()) OR ((enddate IS NULL OR enddate = "") AND (startdate IS NULL OR startdate >= CURDATE()))) ORDER BY id DESC';
         const [rows] = await db.query(sql);
         res.json({ status: 200, data: rows });
     } catch (err: any) {
