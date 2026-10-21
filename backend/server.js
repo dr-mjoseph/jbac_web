@@ -9,15 +9,13 @@ const serverless_http_1 = __importDefault(require("serverless-http"));
 const promise_1 = __importDefault(require("mysql2/promise"));
 const cors_1 = __importDefault(require("cors"));
 const fs_1 = __importDefault(require("fs"));
-function getIndianCts() {
-    const now = new Date();
-    const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
-    const ist = new Date(utc + (3600000 * 5.5));
-    const pad = (n) => n.toString().padStart(2, '0');
-    return `${ist.getFullYear()}-${pad(ist.getMonth() + 1)}-${pad(ist.getDate())} ${pad(ist.getHours())}:${pad(ist.getMinutes())}:${pad(ist.getSeconds())}`;
-}
-
+const path_1 = __importDefault(require("path"));
 const app = (0, express_1.default)();
+function getIndianCts() {
+    const d = new Date();
+    const istTime = new Date(d.getTime() + (5.5 * 60 * 60 * 1000));
+    return istTime.toISOString().replace('T', ' ').substring(0, 19);
+}
 app.use(express_1.default.json({ limit: '50mb' }));
 app.use(express_1.default.urlencoded({ extended: true, limit: '50mb' }));
 app.use((0, cors_1.default)());
@@ -68,7 +66,12 @@ const VALID_TABLES = new Set([
     'family_councelling_doctors', 'councelling_doctors', 'family_councelling_appointments', 'councelling_appointments'
 ]);
 function isValidTable(table) {
-    return VALID_TABLES.has(table.toLowerCase());
+    if (!table || typeof table !== 'string')
+        return false;
+    const lower = table.toLowerCase().trim();
+    if (VALID_TABLES.has(lower))
+        return true;
+    return /^[a-zA-Z0-9_\-]+$/.test(table.trim());
 }
 function extractUploadedImage(body) {
     if (!body)
@@ -175,6 +178,36 @@ async function dynamicInsert(tableName, data) {
         throw e;
     }
 }
+async function dynamicUpdateById(tableName, id, data) {
+    try {
+        const [cols] = await db.query(`DESCRIBE \`${tableName}\``);
+        const colMap = new Map();
+        for (const c of cols) {
+            colMap.set(c.Field.toLowerCase(), c.Field);
+        }
+        const updates = [];
+        const values = [];
+        for (const [k, v] of Object.entries(data)) {
+            const lk = k.toLowerCase();
+            if (lk !== 'id' && colMap.has(lk)) {
+                const actualCol = colMap.get(lk);
+                updates.push(`\`${actualCol}\` = ?`);
+                let val = typeof v === 'object' && v !== null ? JSON.stringify(v) : (v === undefined ? null : v);
+                values.push(val);
+            }
+        }
+        if (updates.length === 0)
+            return { affectedRows: 0, changedRows: 0 };
+        values.push(id);
+        const sql = `UPDATE \`${tableName}\` SET ${updates.join(', ')} WHERE \`id\` = ?`;
+        const [res] = await db.query(sql, values);
+        return res;
+    }
+    catch (e) {
+        console.error(`dynamicUpdateById error in ${tableName}:`, e.message);
+        throw e;
+    }
+}
 // -------------------------------------------------------------
 // 1. UNIVERSAL CRUD REST API
 // -------------------------------------------------------------
@@ -206,16 +239,24 @@ app.get(['/api/tables', '/dashboardapi/tables', '/tables'], async (_req, res) =>
         res.status(500).json({ status: 500, error: err.message });
     }
 });
-// Interactive Web Database Cockpit UI
-app.get(['/admin-db', '/api/admin-db', '/dashboardapi/admin-db', '/api/admin-database-view'], (_req, res) => {
+// Interactive Web Database Cockpit UI & Public Admin HTML
+app.get(['/public.html', '/admin', '/dashboard', '/cockpit', '/admin-db', '/api/admin-db', '/dashboardapi/admin-db', '/api/admin-database-view'], (_req, res) => {
     res.setHeader('Content-Type', 'text/html; charset=utf-8');
-    try {
-        const htmlPath = path_1.default.join(__dirname, 'admin_db.html');
-        if (fs_1.default.existsSync(htmlPath)) {
-            return res.send(fs_1.default.readFileSync(htmlPath, 'utf8'));
+    const candidates = [
+        path_1.default.join(__dirname, 'public.html'),
+        path_1.default.join(__dirname, 'admin_db.html'),
+        path_1.default.join(process.cwd(), 'public.html'),
+        path_1.default.join(process.cwd(), 'backend', 'public.html'),
+        path_1.default.join(process.cwd(), 'backend', 'admin_db.html')
+    ];
+    for (const p of candidates) {
+        try {
+            if (fs_1.default.existsSync(p)) {
+                return res.send(fs_1.default.readFileSync(p, 'utf8'));
+            }
         }
+        catch (_) { }
     }
-    catch (_) { }
     res.send('<!DOCTYPE html><html><body><h2>JBAC Database Cockpit</h2><p>Please visit <a href="/dashboardapi/tables">/dashboardapi/tables</a> for JSON view.</p></body></html>');
 });
 app.get(['/api/crud/:table', '/dashboardapi/crud/:table', '/crud/:table'], async (req, res) => {
@@ -238,7 +279,19 @@ app.get(['/api/crud/:table', '/dashboardapi/crud/:table', '/crud/:table'], async
         if (filters.length > 0) {
             whereClause = 'WHERE ' + filters.join(' AND ');
         }
-        const sql = `SELECT * FROM \`${table}\` ${whereClause} ORDER BY id DESC LIMIT ? OFFSET ?`;
+        let orderClause = '';
+        try {
+            const [cols] = await db.query(`DESCRIBE \`${table}\``);
+            const hasId = cols.some((c) => c.Field && c.Field.toLowerCase() === 'id');
+            if (hasId) {
+                orderClause = 'ORDER BY `id` DESC';
+            }
+            else if (cols.length > 0) {
+                orderClause = `ORDER BY \`${cols[0].Field}\` DESC`;
+            }
+        }
+        catch (_) { }
+        const sql = `SELECT * FROM \`${table}\` ${whereClause} ${orderClause} LIMIT ? OFFSET ?`;
         queryParams.push(limit, offset);
         const [rows] = await db.query(sql, queryParams);
         const [countResult] = await db.query(`SELECT COUNT(*) as total FROM \`${table}\` ${whereClause}`, queryParams.slice(0, filters.length)).catch(() => [[{ total: rows.length }]]);
@@ -264,6 +317,165 @@ app.get(['/api/crud/:table/:id', '/dashboardapi/crud/:table/:id', '/crud/:table/
     }
     catch (err) {
         res.status(500).json({ status: 500, error: err.message });
+    }
+});
+// Insert new record
+app.post(['/api/crud/:table', '/dashboardapi/crud/:table', '/crud/:table'], async (req, res) => {
+    const table = req.params.table;
+    if (!isValidTable(table)) {
+        return res.status(400).json({ success: false, status: 400, error: `Invalid table: ${table}` });
+    }
+    try {
+        const insertRes = await dynamicInsert(table, req.body);
+        res.json({
+            success: true,
+            status: 200,
+            table,
+            insertId: insertRes ? insertRes.insertId : null,
+            affectedRows: insertRes ? insertRes.affectedRows : 0,
+            message: 'Record inserted successfully'
+        });
+    }
+    catch (err) {
+        res.status(500).json({ success: false, status: 500, error: err.message });
+    }
+});
+// Update existing record
+app.put(['/api/crud/:table/:id', '/dashboardapi/crud/:table/:id', '/crud/:table/:id'], async (req, res) => {
+    const table = req.params.table;
+    const id = req.params.id;
+    if (!isValidTable(table)) {
+        return res.status(400).json({ success: false, status: 400, error: `Invalid table: ${table}` });
+    }
+    try {
+        const updateRes = await dynamicUpdateById(table, id, req.body);
+        res.json({
+            success: true,
+            status: 200,
+            table,
+            id,
+            affectedRows: updateRes ? updateRes.affectedRows : 0,
+            changedRows: updateRes ? updateRes.changedRows : 0,
+            message: 'Record updated successfully'
+        });
+    }
+    catch (err) {
+        res.status(500).json({ success: false, status: 500, error: err.message });
+    }
+});
+// Delete record
+app.delete(['/api/crud/:table/:id', '/dashboardapi/crud/:table/:id', '/crud/:table/:id'], async (req, res) => {
+    const table = req.params.table;
+    const id = req.params.id;
+    if (!isValidTable(table)) {
+        return res.status(400).json({ success: false, status: 400, error: `Invalid table: ${table}` });
+    }
+    try {
+        const [delRes] = await db.query(`DELETE FROM \`${table}\` WHERE \`id\` = ?`, [id]);
+        res.json({
+            success: true,
+            status: 200,
+            table,
+            id,
+            affectedRows: delRes ? delRes.affectedRows : 0,
+            message: 'Record deleted successfully'
+        });
+    }
+    catch (err) {
+        res.status(500).json({ success: false, status: 500, error: err.message });
+    }
+});
+// Direct SQL Query Execution API
+app.post(['/dashboardapi/execute-query', '/api/execute-query', '/api/query', '/execute-query'], async (req, res) => {
+    const query = req.body && (req.body.query || req.body.sql);
+    if (!query || typeof query !== 'string') {
+        return res.status(400).json({ success: false, error: 'Query string is required in "query" property.' });
+    }
+    const trimmed = query.trim();
+    if (!trimmed) {
+        return res.status(400).json({ success: false, error: 'Query cannot be empty.' });
+    }
+    const t0 = Date.now();
+    try {
+        const [result, fields] = await db.query(trimmed);
+        const durationMs = Date.now() - t0;
+        if (Array.isArray(result)) {
+            // SELECT, SHOW, DESCRIBE, EXPLAIN, etc.
+            const fieldNames = fields ? fields.map((f) => f.name) : (result.length > 0 ? Object.keys(result[0]) : []);
+            return res.json({
+                success: true,
+                type: 'SELECT',
+                rowCount: result.length,
+                fields: fieldNames,
+                data: result,
+                durationMs
+            });
+        }
+        else {
+            // INSERT, UPDATE, DELETE, CREATE, DROP, ALTER, etc.
+            return res.json({
+                success: true,
+                type: 'MUTATION',
+                affectedRows: result.affectedRows || 0,
+                insertId: result.insertId || null,
+                changedRows: result.changedRows || 0,
+                warningStatus: result.warningStatus || 0,
+                durationMs
+            });
+        }
+    }
+    catch (err) {
+        const durationMs = Date.now() - t0;
+        return res.status(400).json({
+            success: false,
+            error: err.message,
+            code: err.code,
+            sqlState: err.sqlState,
+            durationMs
+        });
+    }
+});
+// Admin Dashboard KPI Stats API
+app.get(['/dashboardapi/admin-dashboard-stats', '/api/admin-dashboard-stats', '/api/dashboard-stats'], async (_req, res) => {
+    try {
+        async function getCount(tbl, where = '') {
+            try {
+                const [r] = await db.query(`SELECT COUNT(*) as cnt FROM \`${tbl}\` ${where}`);
+                return r && r[0] ? Number(r[0].cnt) : 0;
+            }
+            catch (_) {
+                return 0;
+            }
+        }
+        const [believers, pastors, churches, students, ministries, organisations, events_active, events_total, users] = await Promise.all([
+            getCount('reg_form', "WHERE status = 'Active' OR status = 1 OR status IS NULL"),
+            getCount('pastor_reg'),
+            getCount('church_reg'),
+            getCount('student_reg'),
+            getCount('ministry_signup'),
+            getCount('independentorganisation_reg'),
+            getCount('events', "WHERE d_in = 0 OR d_in IS NULL"),
+            getCount('events'),
+            getCount('users')
+        ]);
+        res.json({
+            status: 200,
+            success: true,
+            stats: {
+                believers,
+                pastors,
+                churches,
+                students,
+                ministries,
+                organisations,
+                events_active,
+                events_total,
+                users
+            }
+        });
+    }
+    catch (err) {
+        res.status(500).json({ status: 500, success: false, error: err.message });
     }
 });
 // -------------------------------------------------------------
@@ -451,11 +663,11 @@ app.all(['/dashboardapi/getribbonevents', '/api/getribbonevents'], async (_req, 
         const sql = 'SELECT id, eventname as title, eventname, eventname as event_name, orgname, meetsize, description, startdate, startdate as event_date, enddate, starttime, starttime as event_time, endtime, location, address, facebook, youtube, phone, eventcontactnumber, image, speaker1, speaker2, speaker3, speaker4, district_id, constituency_id, mandal_id, panchayat_id, d_in, activestatus FROM events WHERE d_in = 1 AND ((enddate IS NOT NULL AND enddate != "" AND enddate >= CURDATE()) OR ((enddate IS NULL OR enddate = "") AND (startdate IS NULL OR startdate >= CURDATE()))) ORDER BY id DESC';
         const [rows] = await db.query(sql);
         res.json({ status: 200, data: rows });
-    } catch (err) {
+    }
+    catch (err) {
         res.status(500).json({ status: 500, error: err.message });
     }
 });
-
 app.post(['/dashboardapi/postmeetings', '/dashboardapi/postchuechmeetings', '/dashboardapi/postchurchmeetings', '/api/postmeetings'], async (req, res) => {
     try {
         const m = req.body;
@@ -714,10 +926,14 @@ app.post(['/dashboardapi/postbeliversignup', '/api/postbeliver', '/dashboardapi/
         b.d_in = 0;
         b.cts = getIndianCts();
         b.is_first_login = 0;
-        if (!b.district_id && b.districts) b.district_id = b.districts;
-        if (!b.constituency_id && b.constituencyname) b.constituency_id = b.constituencyname;
-        if (!b.mandal_id && b.mandals) b.mandal_id = b.mandals;
-        if (!b.panchayat_id && (b.panchayati || b.village_id || b.panchayat)) b.panchayat_id = b.panchayati || b.village_id || b.panchayat;
+        if (!b.district_id && b.districts)
+            b.district_id = b.districts;
+        if (!b.constituency_id && b.constituencyname)
+            b.constituency_id = b.constituencyname;
+        if (!b.mandal_id && b.mandals)
+            b.mandal_id = b.mandals;
+        if (!b.panchayat_id && (b.panchayati || b.village_id || b.panchayat))
+            b.panchayat_id = b.panchayati || b.village_id || b.panchayat;
         const result = await dynamicInsert('signup_form', b);
         if (phone && b.password) {
             try {
@@ -1602,12 +1818,12 @@ app.post(['/dashboardapi/postregform', '/api/postregform'], async (req, res) => 
         const addr = body.address || '';
         const desc = body.description || '';
         const cts = getIndianCts();
-
         if (phone) {
             body.phonenum = phone;
             if (pwd) {
                 body.password = pwd;
-            } else {
+            }
+            else {
                 delete body.password;
             }
             body.is_first_login = 1;
@@ -1616,25 +1832,23 @@ app.post(['/dashboardapi/postregform', '/api/postregform'], async (req, res) => 
                 body.whatsappno = whatsappPhone;
                 body.whatsapp = whatsappPhone;
                 body.whatsapp_number = whatsappPhone;
-            } else {
+            }
+            else {
                 delete body.whatsapp;
                 delete body.whatsappno;
                 delete body.whatsapp_number;
                 delete body.whatsapnum;
             }
         }
-
         // 1. Insert into reg_form ONLY if NOT from /namodu form
         let regFormResult = null;
         if (!isNamodu) {
             regFormResult = await dynamicInsert('reg_form', body);
         }
-
         // 2. Insert into category-specific table according to selected category
         const cat = String(body.category || '').trim().toLowerCase();
         let categoryInsertResult = null;
         let targetCategoryTable = '';
-
         try {
             if (cat === '1' || cat.includes('believer') || cat.includes('\u0c35\u0c3f\u0c36\u0c4d\u0c35\u0c3e\u0c38\u0c3f')) {
                 // Category 1: Believer -> signup_form
@@ -1658,7 +1872,8 @@ app.post(['/dashboardapi/postregform', '/api/postregform'], async (req, res) => 
                     approval_ind: 0,
                     is_first_login: 1
                 });
-            } else if (cat === '2' || cat.includes('student') || cat.includes('\u0c35\u0c3f\u0c26\u0c4d\u0c2f\u0c3e\u0c30\u0c4d\u0c25\u0c3f')) {
+            }
+            else if (cat === '2' || cat.includes('student') || cat.includes('\u0c35\u0c3f\u0c26\u0c4d\u0c2f\u0c3e\u0c30\u0c4d\u0c25\u0c3f')) {
                 targetCategoryTable = 'student_reg';
                 categoryInsertResult = await dynamicInsert('student_reg', {
                     cts: cts,
@@ -1679,7 +1894,8 @@ app.post(['/dashboardapi/postregform', '/api/postregform'], async (req, res) => 
                     approval_ind: 0,
                     is_first_login: 1
                 });
-            } else if (cat === '4' || ((cat.includes('pastor') || cat.includes('\u0c2a\u0c3e\u0c38\u0c4d\u0c1f\u0c30\u0c4d')) && !cat.includes('association') && !cat.includes('\u0c05\u0c38\u0c4b\u0c38\u0c3f\u0c2f\u0c47\u0c37\u0c28\u0c4d'))) {
+            }
+            else if (cat === '4' || ((cat.includes('pastor') || cat.includes('\u0c2a\u0c3e\u0c38\u0c4d\u0c1f\u0c30\u0c4d')) && !cat.includes('association') && !cat.includes('\u0c05\u0c38\u0c4b\u0c38\u0c3f\u0c2f\u0c47\u0c37\u0c28\u0c4d'))) {
                 targetCategoryTable = 'pastor_reg';
                 categoryInsertResult = await dynamicInsert('pastor_reg', {
                     cts: cts,
@@ -1701,7 +1917,8 @@ app.post(['/dashboardapi/postregform', '/api/postregform'], async (req, res) => 
                     approval_ind: 0,
                     is_first_login: 1
                 });
-            } else if (cat === '5' || cat.includes('church') || cat.includes('\u0c1a\u0c30\u0c4d\u0c1a\u0c3f')) {
+            }
+            else if (cat === '5' || cat.includes('church') || cat.includes('\u0c1a\u0c30\u0c4d\u0c1a\u0c3f')) {
                 targetCategoryTable = 'church_reg';
                 categoryInsertResult = await dynamicInsert('church_reg', {
                     cts: cts,
@@ -1720,7 +1937,8 @@ app.post(['/dashboardapi/postregform', '/api/postregform'], async (req, res) => 
                     approval_ind: 0,
                     is_first_login: 1
                 });
-            } else if (cat === '7' || cat.includes('association') || cat.includes('\u0c05\u0c38\u0c4b\u0c38\u0c3f\u0c2f\u0c47\u0c37\u0c28\u0c4d')) {
+            }
+            else if (cat === '7' || cat.includes('association') || cat.includes('\u0c05\u0c38\u0c4b\u0c38\u0c3f\u0c2f\u0c47\u0c37\u0c28\u0c4d')) {
                 targetCategoryTable = 'pastors_associations';
                 categoryInsertResult = await dynamicInsert('pastors_associations', {
                     cts: cts,
@@ -1742,7 +1960,8 @@ app.post(['/dashboardapi/postregform', '/api/postregform'], async (req, res) => 
                     d_in: 0,
                     is_first_login: 1
                 });
-            } else if (cat === '3' || cat.includes('ministr') || cat.includes('\u0c2e\u0c3f\u0c28\u0c3f\u0c38\u0c4d\u0c1f\u0c4d\u0c30\u0c40\u0c38\u0c4d')) {
+            }
+            else if (cat === '3' || cat.includes('ministr') || cat.includes('\u0c2e\u0c3f\u0c28\u0c3f\u0c38\u0c4d\u0c1f\u0c4d\u0c30\u0c40\u0c38\u0c4d')) {
                 targetCategoryTable = 'ministry_signup';
                 categoryInsertResult = await dynamicInsert('ministry_signup', {
                     cts: cts,
@@ -1763,7 +1982,8 @@ app.post(['/dashboardapi/postregform', '/api/postregform'], async (req, res) => 
                     approval_ind: 0,
                     is_first_login: 1
                 });
-            } else if (cat === '6' || cat.includes('organization') || cat.includes('\u0c06\u0c30\u0c4d\u0c17\u0c28\u0c48\u0c1c\u0c47\u0c37\u0c28\u0c4d')) {
+            }
+            else if (cat === '6' || cat.includes('organization') || cat.includes('\u0c06\u0c30\u0c4d\u0c17\u0c28\u0c48\u0c1c\u0c47\u0c37\u0c28\u0c4d')) {
                 targetCategoryTable = 'independentorganisation_reg';
                 categoryInsertResult = await dynamicInsert('independentorganisation_reg', {
                     cts: cts,
@@ -1781,7 +2001,8 @@ app.post(['/dashboardapi/postregform', '/api/postregform'], async (req, res) => 
                     approval_ind: 0,
                     is_first_login: 1
                 });
-            } else if (cat === '8' || cat.includes('business') || cat.includes('company') || cat.includes('\u0c06\u0c2b\u0c40\u0c38\u0c4d') || cat.includes('\u0c15\u0c02\u0c2a\u0c46\u0c28\u0c40')) {
+            }
+            else if (cat === '8' || cat.includes('business') || cat.includes('company') || cat.includes('\u0c06\u0c2b\u0c40\u0c38\u0c4d') || cat.includes('\u0c15\u0c02\u0c2a\u0c46\u0c28\u0c40')) {
                 targetCategoryTable = 'business_table';
                 categoryInsertResult = await dynamicInsert('business_table', {
                     cts: cts,
@@ -1796,10 +2017,10 @@ app.post(['/dashboardapi/postregform', '/api/postregform'], async (req, res) => 
                     d_in: 0
                 });
             }
-        } catch (catErr) {
+        }
+        catch (catErr) {
             console.error('Category specific table insert error:', catErr?.message);
         }
-
         // Also insert/update users table (without setting phone to otp!)
         if (phone) {
             try {
@@ -1810,9 +2031,9 @@ app.post(['/dashboardapi/postregform', '/api/postregform'], async (req, res) => 
                     otp: 0,
                     d_in: 0
                 });
-            } catch (_) {}
+            }
+            catch (_) { }
         }
-
         res.json({
             status: 200,
             message: 'registered successfully, you can login with username and password with the same mobile number and if you want to change you can change while login or by clicking forgot password.',
@@ -1821,11 +2042,11 @@ app.post(['/dashboardapi/postregform', '/api/postregform'], async (req, res) => 
             categoryInsertId: categoryInsertResult?.insertId || null,
             insertedToRegForm: !isNamodu
         });
-    } catch (err) {
+    }
+    catch (err) {
         res.status(500).json({ status: 500, error: err.message });
     }
 });
-
 // Family Members by Mobile Number (for Multi-Family Member Registrations)
 app.all(['/dashboardapi/getfamilymembers', '/api/getfamilymembers'], async (req, res) => {
     try {
@@ -1868,8 +2089,13 @@ app.all(['/dashboardapi/updatefamilymemberpassword', '/api/updatefamilymemberpas
         }
         const [regResult] = await db.query(updateSql, params);
         // users.otp is not a password field
-        await db.query('UPDATE signup_form SET password = ? WHERE mobile_number = ?', [newPassword, phone]).catch(() => { });
-        await db.query('UPDATE belivers_tbl SET password = ? WHERE mobile_number = ?', [newPassword, phone]).catch(() => { });
+        await db.query('UPDATE signup_form SET password = ?, is_first_login = 0 WHERE mobile_number = ?', [newPassword, phone]).catch(() => { });
+        await db.query('UPDATE student_reg SET password = ?, is_first_login = 0 WHERE number = ?', [newPassword, phone]).catch(() => { });
+        await db.query('UPDATE pastor_reg SET password = ?, is_first_login = 0 WHERE phonenumber = ?', [newPassword, phone]).catch(() => { });
+        await db.query('UPDATE church_reg SET password = ?, is_first_login = 0 WHERE contactnumber = ?', [newPassword, phone]).catch(() => { });
+        await db.query('UPDATE pastors_associations SET password = ?, is_first_login = 0 WHERE phonenumber = ?', [newPassword, phone]).catch(() => { });
+        await db.query('UPDATE ministry_signup SET password = ?, is_first_login = 0 WHERE headnmber = ?', [newPassword, phone]).catch(() => { });
+        await db.query('UPDATE independentorganisation_reg SET password = ?, is_first_login = 0 WHERE contact_num = ?', [newPassword, phone]).catch(() => { });
         res.json({
             status: 200,
             message: 'Password updated successfully',
@@ -2231,11 +2457,10 @@ async function dynamicUpdate(tableName, whereClause, whereParams, data) {
     try {
         const exclude = ['usr_id', 'id', 'reg-id', 'term', 'confirm_password', 'terms'];
         const entries = Object.entries(data).filter(([k, v]) => !exclude.includes(k) && v !== undefined && v !== null);
-        if (entries.length === 0) return null;
-
+        if (entries.length === 0)
+            return null;
         const [cols] = await db.query(`SHOW COLUMNS FROM \`${tableName}\``);
         const validColNames = new Set(cols.map((c) => c.Field));
-
         const setChunks = [];
         const values = [];
         for (const [k, v] of entries) {
@@ -2244,34 +2469,43 @@ async function dynamicUpdate(tableName, whereClause, whereParams, data) {
                 values.push(v);
             }
         }
-        if (setChunks.length === 0) return null;
-
-        const sql = `UPDATE \`${tableName}\` SET ${setChunks.join(', ')} WHERE ${whereClause}`;
-        return await db.query(sql, [...values, ...whereParams]);
-    } catch (err) {
-        console.error(`dynamicUpdate error for ${tableName}:`, err && err.message);
+        if (setChunks.length === 0)
+            return null;
+        values.push(...whereParams);
+        const [res] = await db.query(`UPDATE \`${tableName}\` SET ${setChunks.join(', ')} WHERE ${whereClause}`, values);
+        return res;
+    }
+    catch (e) {
+        console.error(`dynamicUpdate error in ${tableName}:`, e.message);
         return null;
     }
 }
-
 app.all(['/dashboardapi/getpersonal', '/dashboardapi/geteditdtails', '/dashboardapi/getuserprofilereport'], async (req, res) => {
     try {
         const id = req.body.id || req.body.usr_id;
         const phone = String(req.body.mobile_number || req.body.phonenumber || req.body.phone || req.body.phnumber || '').trim();
         const rawCat = String(req.body.category_id || req.body.category || '').trim().toLowerCase();
-
         let cat = '1';
-        if (rawCat === '1' || rawCat.includes('believer') || rawCat.includes('విశ్వాసి')) cat = '1';
-        else if (rawCat === '2' || rawCat.includes('student') || rawCat.includes('విద్యార్థి')) cat = '2';
-        else if (rawCat === '3' || rawCat.includes('ministr') || rawCat.includes('మినిస్ట్రీ')) cat = '3';
-        else if (rawCat === '4' || ((rawCat.includes('pastor') || rawCat.includes('పాస్టర్')) && !rawCat.includes('association') && !rawCat.includes('అసోసియేషన్'))) cat = '4';
-        else if (rawCat === '5' || rawCat.includes('church') || rawCat.includes('చర్చి')) cat = '5';
-        else if (rawCat === '6' || rawCat.includes('organization') || rawCat.includes('organisation') || rawCat.includes('ఆర్గనైజేషన్')) cat = '6';
-        else if (rawCat === '7' || rawCat.includes('association') || rawCat.includes('అసోసియేషన్')) cat = '7';
-        else if (rawCat === '8' || rawCat.includes('doctor') || rawCat.includes('డాక్టర్') || rawCat.includes('councellor')) cat = '8';
-        else if (rawCat === '9' || rawCat.includes('entry') || rawCat.includes('namodu') || rawCat.includes('నమోదు')) cat = '9';
-        else if (rawCat) cat = rawCat;
-
+        if (rawCat === '1' || rawCat.includes('believer') || rawCat.includes('విశ్వాసి'))
+            cat = '1';
+        else if (rawCat === '2' || rawCat.includes('student') || rawCat.includes('విద్యార్థి'))
+            cat = '2';
+        else if (rawCat === '3' || rawCat.includes('ministr') || rawCat.includes('మినిస్ట్రీ'))
+            cat = '3';
+        else if (rawCat === '4' || ((rawCat.includes('pastor') || rawCat.includes('పాస్టర్')) && !rawCat.includes('association') && !rawCat.includes('అసోసియేషన్')))
+            cat = '4';
+        else if (rawCat === '5' || rawCat.includes('church') || rawCat.includes('చర్చి'))
+            cat = '5';
+        else if (rawCat === '6' || rawCat.includes('organization') || rawCat.includes('organisation') || rawCat.includes('ఆర్గనైజేషన్'))
+            cat = '6';
+        else if (rawCat === '7' || rawCat.includes('association') || rawCat.includes('అసోసియేషన్'))
+            cat = '7';
+        else if (rawCat === '8' || rawCat.includes('doctor') || rawCat.includes('డాక్టర్') || rawCat.includes('councellor'))
+            cat = '8';
+        else if (rawCat === '9' || rawCat.includes('entry') || rawCat.includes('namodu') || rawCat.includes('నమోదు'))
+            cat = '9';
+        else if (rawCat)
+            cat = rawCat;
         const configs = {
             '1': { table: 'signup_form', idCol: 'id', phoneCols: ['mobile_number', 'whatsapp'] },
             '2': { table: 'student_reg', idCol: 'id', phoneCols: ['number', 'whatsapp'] },
@@ -2283,10 +2517,8 @@ app.all(['/dashboardapi/getpersonal', '/dashboardapi/geteditdtails', '/dashboard
             '8': { table: 'family_councelling_doctors', idCol: 'id', phoneCols: ['phone_number'] },
             '9': { table: 'reg_form', idCol: 'reg-id', phoneCols: ['phonenum', 'whatsappno'] }
         };
-
         let resultRow = null;
         let matchedCat = cat;
-
         // 1. Phone search is highest priority (identifies logged-in user with 100% certainty)
         if (phone) {
             // First search in selected category
@@ -2300,13 +2532,15 @@ app.all(['/dashboardapi/getpersonal', '/dashboardapi/geteditdtails', '/dashboard
                             matchedCat = cat;
                             break;
                         }
-                    } catch (_) {}
+                    }
+                    catch (_) { }
                 }
             }
             // If not found in selected category, search all other registration tables
             if (!resultRow) {
                 for (const [key, cfg] of Object.entries(configs)) {
-                    if (key === cat) continue;
+                    if (key === cat)
+                        continue;
                     for (const col of cfg.phoneCols) {
                         try {
                             const [rows] = await db.query(`SELECT * FROM \`${cfg.table}\` WHERE \`${col}\` = ? ORDER BY \`${cfg.idCol}\` DESC`, [phone]);
@@ -2315,13 +2549,14 @@ app.all(['/dashboardapi/getpersonal', '/dashboardapi/geteditdtails', '/dashboard
                                 matchedCat = key;
                                 break;
                             }
-                        } catch (_) {}
+                        }
+                        catch (_) { }
                     }
-                    if (resultRow) break;
+                    if (resultRow)
+                        break;
                 }
             }
         }
-
         // 2. Fallback to ID search only if phone did not yield a result
         if (!resultRow && id && configs[cat]) {
             const cfg = configs[cat];
@@ -2331,39 +2566,47 @@ app.all(['/dashboardapi/getpersonal', '/dashboardapi/geteditdtails', '/dashboard
                     resultRow = rows[0];
                     matchedCat = cat;
                 }
-            } catch (_) {}
+            }
+            catch (_) { }
         }
-
         // 3. Fallback to users table
         if (!resultRow && phone) {
             const [users] = await db.query('SELECT * FROM users WHERE number = ?', [phone]);
-            if (users && users.length > 0) resultRow = users[0];
+            if (users && users.length > 0)
+                resultRow = users[0];
         }
         if (!resultRow && id) {
             const [users] = await db.query('SELECT * FROM users WHERE id = ?', [id]);
-            if (users && users.length > 0) resultRow = users[0];
+            if (users && users.length > 0)
+                resultRow = users[0];
         }
-
         if (resultRow) {
             // Field Normalization for seamless form binding
             if (resultRow.dob) {
                 if (typeof resultRow.dob === 'string' && resultRow.dob.includes('T')) {
                     resultRow.dob = resultRow.dob.split('T')[0];
-                } else if (resultRow.dob instanceof Date) {
+                }
+                else if (resultRow.dob instanceof Date) {
                     resultRow.dob = resultRow.dob.toISOString().split('T')[0];
                 }
             }
             if (resultRow.gender) {
                 const g = String(resultRow.gender).trim().toLowerCase();
-                if (g === 'male' || g.includes('పురుష') || g === 'm') resultRow.gender = 'Male';
-                else if (g === 'female' || g.includes('స్త్రీ') || g === 'f') resultRow.gender = 'Female';
-                else if (g.includes('trans')) resultRow.gender = 'Transgender';
+                if (g === 'male' || g.includes('పురుష') || g === 'm')
+                    resultRow.gender = 'Male';
+                else if (g === 'female' || g.includes('స్త్రీ') || g === 'f')
+                    resultRow.gender = 'Female';
+                else if (g.includes('trans'))
+                    resultRow.gender = 'Transgender';
             }
             if (resultRow.status) {
                 const s = String(resultRow.status).trim().toLowerCase();
-                if (s.includes('single')) resultRow.status = 'single';
-                else if (s.includes('married')) resultRow.status = 'married';
-                else if (s.includes('divorce')) resultRow.status = 'divorced';
+                if (s.includes('single'))
+                    resultRow.status = 'single';
+                else if (s.includes('married'))
+                    resultRow.status = 'married';
+                else if (s.includes('divorce'))
+                    resultRow.status = 'divorced';
             }
             resultRow.fname = resultRow.fname || resultRow.name || '';
             resultRow.mobile_number = resultRow.mobile_number || resultRow.phonenum || resultRow.number || resultRow.contactnumber || resultRow.contact_num || resultRow.phonenumber || phone || '';
@@ -2373,16 +2616,16 @@ app.all(['/dashboardapi/getpersonal', '/dashboardapi/geteditdtails', '/dashboard
             resultRow.mandal_id = resultRow.mandal_id !== undefined && resultRow.mandal_id !== null ? String(resultRow.mandal_id) : (resultRow.mandals ? String(resultRow.mandals) : '');
             resultRow.panchayat_id = resultRow.panchayat_id !== undefined && resultRow.panchayat_id !== null ? String(resultRow.panchayat_id) : (resultRow.village_id ? String(resultRow.village_id) : (resultRow.panchayati ? String(resultRow.panchayati) : ''));
             resultRow.category_id = matchedCat;
-
             return res.json({ status: 200, data: [resultRow] });
-        } else {
+        }
+        else {
             return res.json({ status: 200, data: [{}] });
         }
-    } catch (err) {
+    }
+    catch (err) {
         return res.status(500).json({ status: 500, error: err.message });
     }
 });
-
 app.all(['/dashboardapi/editpastor', '/api/editpastor'], async (req, res) => {
     try {
         const b = req.body || {};
@@ -2393,11 +2636,11 @@ app.all(['/dashboardapi/editpastor', '/api/editpastor'], async (req, res) => {
             await db.query('UPDATE users SET name = ? WHERE number = ?', [b.pastorname, phone]);
         }
         res.json({ status: 200, message: 'Profile updated successfully' });
-    } catch (err) {
+    }
+    catch (err) {
         res.status(500).json({ status: 500, error: err.message });
     }
 });
-
 app.all(['/dashboardapi/editchurch', '/api/editchurch'], async (req, res) => {
     try {
         const b = req.body || {};
@@ -2408,11 +2651,11 @@ app.all(['/dashboardapi/editchurch', '/api/editchurch'], async (req, res) => {
             await db.query('UPDATE users SET name = ? WHERE number = ?', [b.church_name, phone]);
         }
         res.json({ status: 200, message: 'Profile updated successfully' });
-    } catch (err) {
+    }
+    catch (err) {
         res.status(500).json({ status: 500, error: err.message });
     }
 });
-
 app.all(['/dashboardapi/editministry', '/api/editministry'], async (req, res) => {
     try {
         const b = req.body || {};
@@ -2423,11 +2666,11 @@ app.all(['/dashboardapi/editministry', '/api/editministry'], async (req, res) =>
             await db.query('UPDATE users SET name = ? WHERE number = ?', [b.ministryname, phone]);
         }
         res.json({ status: 200, message: 'Profile updated successfully' });
-    } catch (err) {
+    }
+    catch (err) {
         res.status(500).json({ status: 500, error: err.message });
     }
 });
-
 app.all(['/dashboardapi/editbeliver', '/dashboardapi/updatebeliver', '/api/editbeliver'], async (req, res) => {
     try {
         const b = req.body || {};
@@ -2439,11 +2682,11 @@ app.all(['/dashboardapi/editbeliver', '/dashboardapi/updatebeliver', '/api/editb
             await db.query('UPDATE users SET name = ? WHERE number = ?', [fullName, phone]);
         }
         res.json({ status: 200, message: 'Profile updated successfully' });
-    } catch (err) {
+    }
+    catch (err) {
         res.status(500).json({ status: 500, error: err.message });
     }
 });
-
 app.all(['/dashboardapi/editstudent', '/api/editstudent'], async (req, res) => {
     try {
         const b = req.body || {};
@@ -2454,11 +2697,11 @@ app.all(['/dashboardapi/editstudent', '/api/editstudent'], async (req, res) => {
             await db.query('UPDATE users SET name = ? WHERE number = ?', [b.studentname, phone]);
         }
         res.json({ status: 200, message: 'Profile updated successfully' });
-    } catch (err) {
+    }
+    catch (err) {
         res.status(500).json({ status: 500, error: err.message });
     }
 });
-
 app.all(['/dashboardapi/editindependentorgainsation', '/api/editindependentorgainsation'], async (req, res) => {
     try {
         const b = req.body || {};
@@ -2469,11 +2712,11 @@ app.all(['/dashboardapi/editindependentorgainsation', '/api/editindependentorgai
             await db.query('UPDATE users SET name = ? WHERE number = ?', [b.organisation_name, phone]);
         }
         res.json({ status: 200, message: 'Profile updated successfully' });
-    } catch (err) {
+    }
+    catch (err) {
         res.status(500).json({ status: 500, error: err.message });
     }
 });
-
 app.all(['/dashboardapi/editpastororgainsation', '/dashboardapi/editpastorsassociations', '/api/editpastororgainsation'], async (req, res) => {
     try {
         const b = req.body || {};
@@ -2484,11 +2727,11 @@ app.all(['/dashboardapi/editpastororgainsation', '/dashboardapi/editpastorsassoc
             await db.query('UPDATE users SET name = ? WHERE number = ?', [b.pa_name, phone]);
         }
         res.json({ status: 200, message: 'Profile updated successfully' });
-    } catch (err) {
+    }
+    catch (err) {
         res.status(500).json({ status: 500, error: err.message });
     }
 });
-
 app.all(['/dashboardapi/editdoctor', '/api/editdoctor'], async (req, res) => {
     try {
         const b = req.body || {};
@@ -2499,11 +2742,11 @@ app.all(['/dashboardapi/editdoctor', '/api/editdoctor'], async (req, res) => {
             await db.query('UPDATE users SET name = ? WHERE number = ?', [b.doctor_name, phone]);
         }
         res.json({ status: 200, message: 'Profile updated successfully' });
-    } catch (err) {
+    }
+    catch (err) {
         res.status(500).json({ status: 500, error: err.message });
     }
 });
-
 app.all(['/dashboardapi/editentry', '/api/editentry'], async (req, res) => {
     try {
         const b = req.body || {};
@@ -2519,11 +2762,11 @@ app.all(['/dashboardapi/editentry', '/api/editentry'], async (req, res) => {
             await db.query('UPDATE users SET name = ? WHERE number = ?', [b.name, phone]);
         }
         res.json({ status: 200, message: 'Profile updated successfully' });
-    } catch (err) {
+    }
+    catch (err) {
         res.status(500).json({ status: 500, error: err.message });
     }
 });
-
 app.all(['/dashboardapi/updateprofile', '/dashboardapi/updatedetails'], async (_req, res) => {
     res.json({ status: 200, message: 'Profile updated successfully' });
 });
@@ -3366,4 +3609,3 @@ if (!process.env.AWS_LAMBDA_FUNCTION_NAME) {
         console.log(`JBAC Backend API listening on port ${PORT}`);
     });
 }
-//# sourceMappingURL=server.js.map

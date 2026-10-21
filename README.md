@@ -129,6 +129,40 @@ The mobile application is housed in `C:\Users\rajes\StudioProjects\jbac_app` (re
 
 ---
 
+## 🗄️ Database Cockpit & Query Console (`public.html`)
+
+A complete web-based SQL query editor and administrative data cockpit is available locally and on AWS Lambda:
+
+- **Live URL**: `https://1a8kqxawxd.execute-api.ap-southeast-2.amazonaws.com/public.html` (also at `/admin` and `/dashboard`)
+- **Local File**: [public.html](file:///c:/Users/rajes/Documents/jbac_web/public.html)
+- **Features**:
+  1. **Dashboard Tab**: Real-time KPI metric cards (Believers, Pastors, Churches, Students, Ministries, Organisations, Active Events, Users) and AWS RDS MySQL 8.4 engine health telemetry.
+  2. **SQL Query Console**: Full-featured code editor with `Ctrl+Enter` shortcut execution, 12+ preloaded SQL query presets, execution latency in milliseconds (`ms`), affected/returned row badges, and CSV / JSON export.
+  3. **Table Explorer & Schema Browser**: Filterable sidebar listing all 89 tables with live row count badges, schema inspector (`Field`, `Type`, `Null`, `Key`, `Default`, `Extra`), pagination (25 to 250 records), and real-time record manipulation.
+  4. **Record Manipulation Modals**: Add new records (INSERT), edit existing records (UPDATE), and soft/hard delete records (DELETE).
+  5. **Direct Query Execution API**:
+     - `POST /dashboardapi/execute-query` (or `/api/query`):
+       ```json
+       { "query": "SELECT * FROM users WHERE status = 'Active' LIMIT 10" }
+       ```
+     - Response:
+       ```json
+       { "success": true, "type": "SELECT", "rowCount": 10, "fields": ["id", "name", "number"], "data": [...], "durationMs": 28 }
+       ```
+
+---
+
+## 📦 Imported Backend Project (`Api/`)
+
+Downloaded directly from the user's Google Drive archive into [`Api/`](file:///c:/Users/rajes/Documents/jbac_web/Api):
+- **`Api/config/dbconnect.js`**: Database connection pool configured for AWS RDS MySQL 8.4 (`jbac-mysql-db-v3`).
+- **`Api/dashboard/`**: Full controllers, models, validators, and route handlers for admin operations.
+- **`Api/website/`**: Controllers and models for public portal operations.
+- **`Api/validators/` & `Api/utils/`**: Master validators and scheduled job helpers.
+- **`Api/public.html`**: Mirrored database cockpit.
+
+---
+
 ## 📚 Project Documentation Directory
 
 - [ROADMAP.md](ROADMAP.md): Detailed milestones, completed deliverables, and pending features.
@@ -136,3 +170,5 @@ The mobile application is housed in `C:\Users\rajes\StudioProjects\jbac_app` (re
 - [AWS_DEPLOYMENT_AND_SYNC_GUIDE.md](AWS_DEPLOYMENT_AND_SYNC_GUIDE.md): Complete AWS infrastructure provisioning and web-to-mobile sync guide.
 - [PROJECT_JOURNAL_AND_EXECUTION_LOG.md](PROJECT_JOURNAL_AND_EXECUTION_LOG.md): Exhaustive chronological project history and troubleshooting log.
 - [backend/README.md](backend/README.md): Express API server architecture, routes, and database schemas.
+- [public.html](public.html): Universal database administration & query interface.
+

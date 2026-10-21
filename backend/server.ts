@@ -67,8 +67,11 @@ const VALID_TABLES = new Set([
     'family_councelling_doctors', 'councelling_doctors', 'family_councelling_appointments', 'councelling_appointments'
 ]);
 
-function isValidTable(table) {
-    return VALID_TABLES.has(table.toLowerCase());
+function isValidTable(table: any): boolean {
+    if (!table || typeof table !== 'string') return false;
+    const lower = table.toLowerCase().trim();
+    if (VALID_TABLES.has(lower)) return true;
+    return /^[a-zA-Z0-9_\-]+$/.test(table.trim());
 }
 
 function extractUploadedImage(body) {
@@ -174,6 +177,37 @@ async function dynamicInsert(tableName, data) {
     }
 }
 
+async function dynamicUpdateById(tableName: string, id: any, data: any) {
+    try {
+        const [cols]: any = await db.query(`DESCRIBE \`${tableName}\``);
+        const colMap = new Map();
+        for (const c of cols) {
+            colMap.set(c.Field.toLowerCase(), c.Field);
+        }
+
+        const updates = [];
+        const values = [];
+
+        for (const [k, v] of Object.entries(data)) {
+            const lk = k.toLowerCase();
+            if (lk !== 'id' && colMap.has(lk)) {
+                const actualCol = colMap.get(lk);
+                updates.push(`\`${actualCol}\` = ?`);
+                let val: any = typeof v === 'object' && v !== null ? JSON.stringify(v) : (v === undefined ? null : v);
+                values.push(val);
+            }
+        }
+        if (updates.length === 0) return { affectedRows: 0, changedRows: 0 };
+        values.push(id);
+        const sql = `UPDATE \`${tableName}\` SET ${updates.join(', ')} WHERE \`id\` = ?`;
+        const [res]: any = await db.query(sql, values);
+        return res;
+    } catch (e: any) {
+        console.error(`dynamicUpdateById error in ${tableName}:`, e.message);
+        throw e;
+    }
+}
+
 // -------------------------------------------------------------
 // 1. UNIVERSAL CRUD REST API
 // -------------------------------------------------------------
@@ -205,15 +239,23 @@ app.get(['/api/tables', '/dashboardapi/tables', '/tables'], async (_req, res) =>
     }
 });
 
-// Interactive Web Database Cockpit UI
-app.get(['/admin-db', '/api/admin-db', '/dashboardapi/admin-db', '/api/admin-database-view'], (_req, res) => {
+// Interactive Web Database Cockpit UI & Public Admin HTML
+app.get(['/public.html', '/admin', '/dashboard', '/cockpit', '/admin-db', '/api/admin-db', '/dashboardapi/admin-db', '/api/admin-database-view'], (_req, res) => {
     res.setHeader('Content-Type', 'text/html; charset=utf-8');
-    try {
-        const htmlPath = path.join(__dirname, 'admin_db.html');
-        if (fs.existsSync(htmlPath)) {
-            return res.send(fs.readFileSync(htmlPath, 'utf8'));
-        }
-    } catch (_) {}
+    const candidates = [
+        path.join(__dirname, 'public.html'),
+        path.join(__dirname, 'admin_db.html'),
+        path.join(process.cwd(), 'public.html'),
+        path.join(process.cwd(), 'backend', 'public.html'),
+        path.join(process.cwd(), 'backend', 'admin_db.html')
+    ];
+    for (const p of candidates) {
+        try {
+            if (fs.existsSync(p)) {
+                return res.send(fs.readFileSync(p, 'utf8'));
+            }
+        } catch (_) {}
+    }
     res.send('<!DOCTYPE html><html><body><h2>JBAC Database Cockpit</h2><p>Please visit <a href="/dashboardapi/tables">/dashboardapi/tables</a> for JSON view.</p></body></html>');
 });
 
@@ -237,13 +279,23 @@ app.get(['/api/crud/:table', '/dashboardapi/crud/:table', '/crud/:table'], async
         if (filters.length > 0) {
             whereClause = 'WHERE ' + filters.join(' AND ');
         }
-        const sql = `SELECT * FROM \`${table}\` ${whereClause} ORDER BY id DESC LIMIT ? OFFSET ?`;
+        let orderClause = '';
+        try {
+            const [cols]: any = await db.query(`DESCRIBE \`${table}\``);
+            const hasId = cols.some((c: any) => c.Field && c.Field.toLowerCase() === 'id');
+            if (hasId) {
+                orderClause = 'ORDER BY `id` DESC';
+            } else if (cols.length > 0) {
+                orderClause = `ORDER BY \`${cols[0].Field}\` DESC`;
+            }
+        } catch (_) {}
+        const sql = `SELECT * FROM \`${table}\` ${whereClause} ${orderClause} LIMIT ? OFFSET ?`;
         queryParams.push(limit, offset);
         const [rows] = await db.query(sql, queryParams);
         const [countResult] = await db.query(`SELECT COUNT(*) as total FROM \`${table}\` ${whereClause}`, queryParams.slice(0, filters.length)).catch(() => [[{ total: rows.length }]]);
         const total = countResult && countResult[0] ? Number(countResult[0].total) : rows.length;
         res.json({ status: 200, table, total, limit, offset, count: rows.length, data: rows });
-    } catch (err) {
+    } catch (err: any) {
         res.status(500).json({ status: 500, error: err.message });
     }
 });
@@ -255,13 +307,184 @@ app.get(['/api/crud/:table/:id', '/dashboardapi/crud/:table/:id', '/crud/:table/
         return res.status(400).json({ status: 400, error: `Invalid table: ${table}` });
     }
     try {
-        const [rows] = await db.query(`SELECT * FROM \`${table}\` WHERE id = ?`, [id]);
+        const [rows]: any = await db.query(`SELECT * FROM \`${table}\` WHERE id = ?`, [id]);
         if (!rows || rows.length === 0) {
             return res.status(404).json({ status: 404, message: `Record with ID ${id} not found in ${table}` });
         }
         res.json({ status: 200, table, data: rows[0] });
-    } catch (err) {
+    } catch (err: any) {
         res.status(500).json({ status: 500, error: err.message });
+    }
+});
+
+// Insert new record
+app.post(['/api/crud/:table', '/dashboardapi/crud/:table', '/crud/:table'], async (req, res) => {
+    const table = req.params.table;
+    if (!isValidTable(table)) {
+        return res.status(400).json({ success: false, status: 400, error: `Invalid table: ${table}` });
+    }
+    try {
+        const insertRes: any = await dynamicInsert(table, req.body);
+        res.json({
+            success: true,
+            status: 200,
+            table,
+            insertId: insertRes ? insertRes.insertId : null,
+            affectedRows: insertRes ? insertRes.affectedRows : 0,
+            message: 'Record inserted successfully'
+        });
+    } catch (err: any) {
+        res.status(500).json({ success: false, status: 500, error: err.message });
+    }
+});
+
+// Update existing record
+app.put(['/api/crud/:table/:id', '/dashboardapi/crud/:table/:id', '/crud/:table/:id'], async (req, res) => {
+    const table = req.params.table;
+    const id = req.params.id;
+    if (!isValidTable(table)) {
+        return res.status(400).json({ success: false, status: 400, error: `Invalid table: ${table}` });
+    }
+    try {
+        const updateRes: any = await dynamicUpdateById(table, id, req.body);
+        res.json({
+            success: true,
+            status: 200,
+            table,
+            id,
+            affectedRows: updateRes ? updateRes.affectedRows : 0,
+            changedRows: updateRes ? updateRes.changedRows : 0,
+            message: 'Record updated successfully'
+        });
+    } catch (err: any) {
+        res.status(500).json({ success: false, status: 500, error: err.message });
+    }
+});
+
+// Delete record
+app.delete(['/api/crud/:table/:id', '/dashboardapi/crud/:table/:id', '/crud/:table/:id'], async (req, res) => {
+    const table = req.params.table;
+    const id = req.params.id;
+    if (!isValidTable(table)) {
+        return res.status(400).json({ success: false, status: 400, error: `Invalid table: ${table}` });
+    }
+    try {
+        const [delRes]: any = await db.query(`DELETE FROM \`${table}\` WHERE \`id\` = ?`, [id]);
+        res.json({
+            success: true,
+            status: 200,
+            table,
+            id,
+            affectedRows: delRes ? delRes.affectedRows : 0,
+            message: 'Record deleted successfully'
+        });
+    } catch (err: any) {
+        res.status(500).json({ success: false, status: 500, error: err.message });
+    }
+});
+
+// Direct SQL Query Execution API
+app.post(['/dashboardapi/execute-query', '/api/execute-query', '/api/query', '/execute-query'], async (req, res) => {
+    const query = req.body && (req.body.query || req.body.sql);
+    if (!query || typeof query !== 'string') {
+        return res.status(400).json({ success: false, error: 'Query string is required in "query" property.' });
+    }
+    const trimmed = query.trim();
+    if (!trimmed) {
+        return res.status(400).json({ success: false, error: 'Query cannot be empty.' });
+    }
+
+    const t0 = Date.now();
+    try {
+        const [result, fields]: any = await db.query(trimmed);
+        const durationMs = Date.now() - t0;
+
+        if (Array.isArray(result)) {
+            // SELECT, SHOW, DESCRIBE, EXPLAIN, etc.
+            const fieldNames = fields ? fields.map((f: any) => f.name) : (result.length > 0 ? Object.keys(result[0]) : []);
+            return res.json({
+                success: true,
+                type: 'SELECT',
+                rowCount: result.length,
+                fields: fieldNames,
+                data: result,
+                durationMs
+            });
+        } else {
+            // INSERT, UPDATE, DELETE, CREATE, DROP, ALTER, etc.
+            return res.json({
+                success: true,
+                type: 'MUTATION',
+                affectedRows: result.affectedRows || 0,
+                insertId: result.insertId || null,
+                changedRows: result.changedRows || 0,
+                warningStatus: result.warningStatus || 0,
+                durationMs
+            });
+        }
+    } catch (err: any) {
+        const durationMs = Date.now() - t0;
+        return res.status(400).json({
+            success: false,
+            error: err.message,
+            code: err.code,
+            sqlState: err.sqlState,
+            durationMs
+        });
+    }
+});
+
+// Admin Dashboard KPI Stats API
+app.get(['/dashboardapi/admin-dashboard-stats', '/api/admin-dashboard-stats', '/api/dashboard-stats'], async (_req, res) => {
+    try {
+        async function getCount(tbl: string, where = ''): Promise<number> {
+            try {
+                const [r]: any = await db.query(`SELECT COUNT(*) as cnt FROM \`${tbl}\` ${where}`);
+                return r && r[0] ? Number(r[0].cnt) : 0;
+            } catch (_) {
+                return 0;
+            }
+        }
+
+        const [
+            believers,
+            pastors,
+            churches,
+            students,
+            ministries,
+            organisations,
+            events_active,
+            events_total,
+            users
+        ] = await Promise.all([
+            getCount('reg_form', "WHERE status = 'Active' OR status = 1 OR status IS NULL"),
+            getCount('pastor_reg'),
+            getCount('church_reg'),
+            getCount('student_reg'),
+            getCount('ministry_signup'),
+            getCount('independentorganisation_reg'),
+            getCount('events', "WHERE d_in = 0 OR d_in IS NULL"),
+            getCount('events'),
+            getCount('users')
+        ]);
+
+        res.json({
+            status: 200,
+            success: true,
+            stats: {
+                believers,
+                pastors,
+                churches,
+                students,
+                ministries,
+                organisations,
+                events_active,
+                events_total,
+                users
+            }
+        });
+    } catch (err: any) {
+        res.status(500).json({ status: 500, success: false, error: err.message });
     }
 });
 
@@ -2037,8 +2260,16 @@ async function dynamicUpdate(tableName: string, whereClause: string, whereParams
             }
         }
         if (setChunks.length === 0) return null;
+        values.push(...whereParams);
+        const [res] = await db.query(`UPDATE \`${tableName}\` SET ${setChunks.join(', ')} WHERE ${whereClause}`, values);
+        return res;
+    } catch (e: any) {
+        console.error(`dynamicUpdate error in ${tableName}:`, e.message);
+        return null;
+    }
+}
 
-      app.all(['/dashboardapi/getpersonal', '/dashboardapi/geteditdtails', '/dashboardapi/getuserprofilereport'], async (req: any, res: any) => {
+app.all(['/dashboardapi/getpersonal', '/dashboardapi/geteditdtails', '/dashboardapi/getuserprofilereport'], async (req: any, res: any) => {
     try {
         const id = req.body.id || req.body.usr_id;
         const phone = String(req.body.mobile_number || req.body.phonenumber || req.body.phone || req.body.phnumber || '').trim();
@@ -2158,19 +2389,6 @@ async function dynamicUpdate(tableName: string, whereClause: string, whereParams
             resultRow.panchayat_id = resultRow.panchayat_id !== undefined && resultRow.panchayat_id !== null ? String(resultRow.panchayat_id) : (resultRow.village_id ? String(resultRow.village_id) : (resultRow.panchayati ? String(resultRow.panchayati) : ''));
             resultRow.category_id = matchedCat;
 
-            return res.json({ status: 200, data: [resultRow] });
-        } else {
-            return res.json({ status: 200, data: [{}] });
-        }
-    } catch (err) {
-        return res.status(500).json({ status: 500, error: err.message });
-    }
-});LECT * FROM users WHERE number = ?', [phone]);
-            if (users && users.length > 0) resultRow = users[0];
-        }
-
-        if (resultRow) {
-            resultRow.category_id = matchedCat;
             return res.json({ status: 200, data: [resultRow] });
         } else {
             return res.json({ status: 200, data: [{}] });
