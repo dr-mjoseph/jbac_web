@@ -226,6 +226,11 @@ GitHub Issue: [#1](https://github.com/dr-mjoseph/jbac_web/issues/1)
   - Resolved `foreign key constraint fails (events_ibfk_1 REFERENCES pastor_reg)` during modal record updates by converting empty strings `""` to `NULL` for all nullable columns and foreign key identifiers (`*_id`).
   - Added session-level `SET FOREIGN_KEY_CHECKS = 0` during admin CRUD mutations (`dynamicInsert`, `dynamicUpdateById`, `app.delete`), cleanly restoring `SET FOREIGN_KEY_CHECKS = 1` afterwards.
   - Enhanced Edit Modal UI in [`public.html`](public.html) to indicate `(Currently NULL)` fields and serialize blank inputs as `null`.
+- [x] **Remote Development & GitHub Codespaces Parity**:
+  - Added `"serve:codespace": "ng serve --host 0.0.0.0 --disable-host-check"` to [`package.json`](package.json) for seamless container port forwarding.
+  - Resolved out-of-sync Codespace UI issues by documenting upstream pull and Angular cache clearing procedures.
+- [x] **Database Query Execution & CRUD Architecture Blueprint**:
+  - Fully mapped and documented `INSERT`, `UPDATE`, `DELETE`, and `SELECT` workflows across the active AWS Lambda API ([`backend/server.ts`](backend/server.ts)) and the modular [`Api/`](Api/) architecture in [`PROJECT_JOURNAL_AND_EXECUTION_LOG.md`](PROJECT_JOURNAL_AND_EXECUTION_LOG.md).
 
 ---
 

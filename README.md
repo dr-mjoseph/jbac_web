@@ -99,6 +99,9 @@ npm install
 npm start
 # App available at: http://localhost:4200
 
+# Start development server in GitHub Codespaces (bound to 0.0.0.0)
+npm run serve:codespace
+
 # Build production bundle for web deployment
 npm run build:prod
 # Compiled output stored in dist/churchwebsite/
@@ -112,6 +115,16 @@ npm run sync:mobile
 # Import MySQL database dump to RDS
 npm run import:db
 ```
+
+### ☁️ GitHub Codespaces Remote Development
+When resuming a GitHub Codespace, environments are persistent containers and do not auto-pull git changes. To ensure your Codespace runs the latest version:
+```bash
+git fetch origin && git checkout main && git pull origin main
+rm -rf .angular/cache
+npm install
+npm run serve:codespace
+```
+After starting the server, perform a browser hard-refresh (`Ctrl + Shift + R` or `Ctrl + F5`) to bypass cached browser bundles.
 
 ---
 

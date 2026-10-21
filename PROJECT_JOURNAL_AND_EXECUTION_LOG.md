@@ -1491,6 +1491,125 @@ Created a standalone, highly responsive, dark-mode single-page application ([`pu
   - Result: **HTTP 200 OK**, `affectedRows: 1`, `changedRows: 1`, `message: "Record updated successfully"`.
   - Verified row 174 in RDS MySQL: `pastor_id: NULL`, `d_in: 1`, `activestatus: 0`.
 
+---
+
+### I. GitHub Codespaces Development Synchronization & Out-of-Sync Troubleshooting (2026-10-21)
+
+#### 1. Context & User Issue Reported
+- **Issue**: When running the web portal in GitHub Codespaces (`https://cuddly-potato-q7rp777q5xgxc4gq5-4200.app.github.dev/`), recent changes did not appear. Specifically:
+  - An outdated menu item `"ఆంధ్ర క్రైస్తవుల ఓట్ ఎవరికీ / క్రైస్తవులకి అన్యాయం"` ("Who can Christian vote for / Injustice to Christians") was still visible in the navbar.
+  - The `"Edit Profile (ఎడిట్ ప్రొఫైల్)"` option under the user profile dropdown was missing.
+  - Many recent updates (hero carousel smoothness, dynamic registration schemas, automated event expiration) were absent.
+
+#### 2. Root Cause Analysis
+1. **GitHub Codespaces Container Persistence**:
+   - In GitHub Codespaces, workspace environments are stateful, persistent virtual machines. When a stopped Codespace is resumed, GitHub preserves the container's disk image as-is.
+   - **Crucially, Codespaces does not automatically run `git pull` on reopen**.
+2. **Commit Discrepancy**:
+   - The Codespace workspace was pinned to commit `1a5c184` (authored October 10, 2026), sitting over **50 commits behind** `origin/main` (`f7fb73b`).
+   - In commit `1a5c184`, the political vote menu item was still active in `src/app/shared/header/header.component.html` (lines 84-88), and `Edit Profile` had not yet been created.
+   - In commit `5d02f07` (October 19, 2026), that menu item was commented out and `Edit Profile` was integrated.
+3. **Angular CLI & Webpack Cache**:
+   - Angular CLI caches compilation artifacts in `.angular/cache`, and browser engines aggressively cache JavaScript bundles (`main.js`, `vendor.js`) when accessing dev URLs unless hard-refreshed.
+
+#### 3. Engineering Remediation & Workflow Hardening
+1. **Repository Synchronization**:
+   - Pulled the latest upstream `origin/main` changes inside the Codespace container:
+     ```bash
+     git fetch origin
+     git checkout main
+     git pull origin main
+     ```
+2. **Codespace Serve Script Addition (`package.json`)**:
+   - Added `"serve:codespace": "ng serve --host 0.0.0.0 --disable-host-check"` to `package.json` scripts.
+   - This ensures the Angular development server binds to `0.0.0.0` so GitHub Codespace port forwarding functions without host header rejection.
+   - Committed and pushed to `origin/main` (`020fde7`).
+3. **Cache Clearing & Server Restart Protocol**:
+   - Instructed clearing Angular build cache via `rm -rf .angular/cache` and updating packages with `npm install`.
+   - Browser hard refresh (`Ctrl + Shift + R` or `Ctrl + F5`) to bypass cached browser scripts.
+
+---
+
+### J. Database Query Execution & CRUD Architecture Map (2026-10-21)
+
+#### 1. Context & Inquiry
+- The user requested clarification on where and how `INSERT` and `CRUD` (Create, Read, Update, Delete) database query executions take place within the API architecture.
+
+#### 2. Architectural Blueprint & Execution Locations
+
+The repository contains two query execution engines:
+
+```
+[ Angular Web Client / Admin Cockpit ]
+                 │
+                 ▼
+┌────────────────────────────────────────────────────────┐
+│               Active AWS Lambda API                    │
+│          backend/server.ts & backend/server.js         │
+├────────────────────────────────────────────────────────┤
+│ • dynamicInsert(tableName, data)                       │
+│ • dynamicUpdateById(tableName, id, data)               │
+│ • POST /dashboardapi/execute-query (Direct SQL)        │
+│ • Universal REST: GET/POST/PUT/DELETE /crud/:table     │
+│ • Multi-table registration handlers (postregform, etc.)│
+└────────────────────────────────────────────────────────┘
+                 │
+                 ▼
+┌────────────────────────────────────────────────────────┐
+│           AWS RDS MySQL 8.4 (jbac-mysql-db-v3)         │
+│                 89 Tables in jbac_jbac                 │
+└────────────────────────────────────────────────────────┘
+```
+
+#### 3. Active Production Engine: `backend/server.ts` & `backend/server.js`
+
+1. **`dynamicInsert(tableName, data)` (Lines 141–234)**:
+   - **Schema Introspection**: Queries `DESCRIBE \`${tableName}\`` to obtain runtime column names, types, nullability, and default values.
+   - **Column Matching**: Matches request JSON keys (case-insensitively) to real database columns, skipping `id`.
+   - **Automatic Image Extraction**: Extracts nested review images or arrays (`reviewImg`, `imagesData`) and maps them to `image` or `photo` columns.
+   - **Sanitization & NULL Mapping**: Converts empty strings (`""`) and string `'NULL'` to `null` for nullable columns. Maps `0` or `'0'` in foreign key columns (`*_id`) to `null`.
+   - **Session-Level Foreign Key Safety**: Wraps execution in `SET FOREIGN_KEY_CHECKS = 0` and guarantees `SET FOREIGN_KEY_CHECKS = 1` in a `finally` block before releasing the pooled connection.
+   - **Execution**: Runs parameterized query `INSERT INTO \`${tableName}\` (...) VALUES (...)`.
+
+2. **`dynamicUpdateById(tableName, id, data)` (Lines 236–320)**:
+   - Queries table metadata and constructs parameterized `UPDATE \`${tableName}\` SET col = ? WHERE id = ?`.
+   - Sanitizes empty strings to `null` on nullable fields.
+
+3. **Direct SQL Query Executor: `POST /dashboardapi/execute-query` (Lines 367–400)**:
+   - Receives arbitrary SQL (`SELECT`, `INSERT`, `UPDATE`, `DELETE`, `SHOW TABLES`, `DESCRIBE`).
+   - Authenticated via session token (`x-admin-auth`) or basic auth.
+   - Executes via `db.query(query)` and returns `{ success, rowCount, fields, data, durationMs }`.
+   - Directly powers the Admin Cockpit ([`public.html`](public.html)).
+
+4. **Universal REST CRUD Endpoints (Lines 417–527)**:
+   - **CREATE**: `POST /dashboardapi/crud/:table` -> Executes `dynamicInsert(table, req.body)`.
+   - **READ**: `GET /dashboardapi/crud/:table` -> Executes `SELECT * FROM \`${table}\` ORDER BY id DESC LIMIT 500`.
+   - **READ SINGLE**: `GET /dashboardapi/crud/:table/:id` -> Executes `SELECT * FROM \`${table}\` WHERE id = ?`.
+   - **UPDATE**: `PUT /dashboardapi/crud/:table/:id` -> Executes `dynamicUpdateById(table, id, req.body)`.
+   - **DELETE**: `DELETE /dashboardapi/crud/:table/:id` -> Executes `DELETE FROM \`${table}\` WHERE id = ?` with foreign-key check bypass.
+
+5. **Dedicated Website Registration Workflows (Lines 800–2900)**:
+   - `POST /dashboardapi/postregform`: Master all-in-one registration. Inserts into `reg_form`, routes to specific category table (`signup_form`, `pastor_reg`, `church_reg`, `student_reg`, `ministry_signup`, `independentorganisation_reg`, `pastors_associations`), and creates/links `users` authentication record.
+   - `POST /dashboardapi/postbeliversignup`: Inserts into `signup_form` and `users`.
+   - `POST /dashboardapi/postpastor`: Inserts into `pastor_reg` and `users`.
+   - `POST /dashboardapi/postchurchregister`: Inserts into `church_reg` and `users`.
+   - `POST /dashboardapi/studentsignup`: Inserts into `student_reg` and `users`.
+   - `POST /dashboardapi/postevents`: Inserts into `events` and creates matching banner in `adds_data`.
+   - `POST /dashboardapi/postmarriages`, `postjobs`, `postbusiness`, `posthelps`, `postnews`, `postattacks`: Insert into their respective domain tables.
+
+#### 4. Standalone Modular Engine: `Api/` Directory
+- **Connection Pool**: [`Api/config/dbconnect.js`](file:///c:/Users/rajes/Documents/jbac_web/Api/config/dbconnect.js) (`exports.MySQLConPool`).
+- **Low-Level Utility**: [`Api/utils/dbutils.js`](file:///c:/Users/rajes/Documents/jbac_web/Api/utils/dbutils.js):
+  - `execQuery(ConPool, Qry, cntxtDtls, callback)`: Executes `connection.query(Qry)`.
+  - `execinsertQuerys(ConPool, Qry, data, cntxtDtls, callback)`: Executes parameterized `connection.query(Qry, [data])`.
+- **Model Layer**:
+  - [`Api/dashboard/models/mainModel.js`](file:///c:/Users/rajes/Documents/jbac_web/Api/dashboard/models/mainModel.js): Contains 200KB of specialized SQL queries powering dashboard operations.
+  - [`Api/website/models/mainModel.js`](file:///c:/Users/rajes/Documents/jbac_web/Api/website/models/mainModel.js): Contains SQL queries for public website entities (`contactus`, `projects`, etc.).
+- **Controllers & Routes**:
+  - `Api/dashboard/controllers/` & `Api/dashboard/routes/`
+  - `Api/website/controllers/` & `Api/website/routes/`
+
+
 
 
 
