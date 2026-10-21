@@ -177,9 +177,35 @@ GitHub Issue: [#1](https://github.com/dr-mjoseph/jbac_web/issues/1)
 
 ---
 
-## 🎯 11. Pending Launch & Post-Release Tasks
+## 🗄️ 11. Milestone 11: Google Drive Backend Migration, Database Cockpit & SQL Query Console Deployment to www.jbac.in/admin & Direct Query Execution Engine
+- [x] **Google Drive Project Extraction**:
+  - Downloaded the complete project folder from the user's public Google Drive link into [`Api/`](Api/) via Google Drive API v3.
+  - Excluded redundant dependency folders (`node_modules`) while maintaining 100% codebase parity across `dashboard/`, `website/`, `config/`, `validators/`, `utils/`, and `app.js`.
+  - Configured [`Api/config/dbconnect.js`](Api/config/dbconnect.js) with connection pooling pointing to AWS RDS MySQL 8.4 (`jbac-mysql-db-v3`).
+- [x] **Admin Database Cockpit & Query Console Interface (`public.html`)**:
+  - Created [`public.html`](public.html) featuring a sleek dark-mode, responsive single-page application.
+  - Built **Executive Dashboard** with live metric counters across 8 sectors (Believers, Pastors, Churches, Students, Ministries, Organisations, Active Events, Users) and AWS RDS telemetry.
+  - Built **SQL Query Console** with monospace code editor, `Ctrl+Enter` shortcut execution, 12+ preloaded SQL query presets, execution timing (`ms`), formatted data grid with image thumbnails, CSV / JSON exports, and persistent query history.
+  - Built **Table Explorer & Schema Browser** listing all 89 tables with live row counts, field metadata inspector, in-table search, and pagination.
+  - Implemented dynamic modal dialogs for row insertions (INSERT), row edits (UPDATE), and deletions (DELETE).
+- [x] **Universal SQL Runner & CRUD API**:
+  - Implemented `POST /dashboardapi/execute-query` (and `/api/query`, `/execute-query`) on AWS Lambda supporting both SELECT queries and mutation queries (affected rows, insert IDs).
+  - Implemented `POST /dashboardapi/crud/:table`, `PUT /dashboardapi/crud/:table/:id`, and `DELETE /dashboardapi/crud/:table/:id`.
+  - Implemented `GET /dashboardapi/admin-dashboard-stats` for real-time sector metrics.
+  - Extended `isValidTable` to accept any safe SQL identifier (`/^[a-zA-Z0-9_\-]+$/`) for all 89 tables in the database.
+- [x] **AWS Deployment & Custom Domain Routing (`www.jbac.in/admin`)**:
+  - Deployed updated `server.js` and dependencies to AWS Lambda `jbac-backend-api` in `ap-southeast-2`.
+  - Uploaded `public.html` to AWS S3 bucket `jbac-web-production-298363284024` under `/public.html`, `/admin`, `/admin/index.html`, and `/dashboard/index.html`.
+  - Invalidated AWS CloudFront cache (`EOBBU8SU7H3BI`) for `/admin`, `/admin/*`, `/dashboard`, `/dashboard/*`, `/public.html`.
+  - Fixed client-side API base resolution so `https://www.jbac.in/admin` connects directly to the live AWS Lambda backend with CORS.
+  - Verified live in production: `https://www.jbac.in/admin` loads the Cockpit with `● AWS RDS MySQL Connected`.
+
+---
+
+## 🎯 12. Pending Launch & Post-Release Tasks
 - [ ] Complete Google Play Console Review & Rollout for Release 35 (`jbacApp-0.0.35.aab`).
 - [ ] Monitor crash telemetry and user feedback via Google Play Console dashboard.
 - [ ] Run automated end-to-end smoke testing across all live production forms on https://jbac.in.
+
 
 

@@ -97,18 +97,24 @@ To run without hitting network timeout errors, pass these identical key-value pa
 
 ---
 
-## 📋 Comprehensive CRUD REST Endpoints
+## 📋 Universal SQL Execution & CRUD REST Endpoints
 
 1. **Table Metadata & Schemas:**
-   - `GET /api/tables` - Returns all 37 tables, column definitions, and live row counts.
-2. **Universal CRUD Operations:**
-   - `GET /api/crud/:table` - Retrieve table rows (supports `?limit=100&offset=0&[column]=[value]`)
-   - `GET /api/crud/:table/:id` - Retrieve single record by primary key ID
-   - `POST /api/crud/:table` - Insert new record into specified table
-   - `PUT /api/crud/:table/:id` - Update existing record by ID
-   - `DELETE /api/crud/:table/:id` - Permanently delete record by ID
-3. **Admin Database Console (GUI):**
-   - Access `http://<your-host>/api/admin-database-view` in browser to visually browse, search, add, update, and delete records across all 37 tables in `jbac_db`!
+   - `GET /api/tables` (or `/dashboardapi/tables`) - Returns all 89 tables in `jbac_jbac`, column definitions, and live row counts.
+2. **Direct SQL Query Execution:**
+   - `POST /dashboardapi/execute-query` (or `/api/query`) - Executes arbitrary SQL queries (SELECT, INSERT, UPDATE, DELETE, SHOW, DESCRIBE).
+     - Payload: `{ "query": "SELECT * FROM users LIMIT 10" }`
+     - Response: Includes `rowCount`, `fields`, `data`, and execution `durationMs`.
+3. **Admin Dashboard Telemetry:**
+   - `GET /dashboardapi/admin-dashboard-stats` - Aggregates real-time counts across Believers, Pastors, Churches, Students, Ministries, Organisations, Active Events, and Registered Users.
+4. **Universal CRUD Operations:**
+   - `GET /dashboardapi/crud/:table` - Retrieve table rows with safe pagination (supports `?limit=50&offset=0&[column]=[value]`).
+   - `GET /dashboardapi/crud/:table/:id` - Retrieve single record by primary key ID.
+   - `POST /dashboardapi/crud/:table` - Insert new record into specified table.
+   - `PUT /dashboardapi/crud/:table/:id` - Update existing record by ID.
+   - `DELETE /dashboardapi/crud/:table/:id` - Permanently delete record by ID.
+5. **Admin Database Console & Cockpit (GUI):**
+   - Access `https://www.jbac.in/admin` (or `/public.html`, `/dashboard`) to visually browse schemas, search rows, execute arbitrary SQL queries, and manipulate records across all 89 tables in `jbac_jbac`.
 
 ---
 
@@ -123,17 +129,19 @@ export DB_PASSWORD="biUt2TrZ9EZAqn6GXhiA"
 export PORT="8081"
 
 # Compile and start
-npx tsc
+& "C:\Users\rajes\AppData\Local\OpenAI\Codex\runtimes\cua_node\cfb32733c877621e\bin\node.exe" node_modules/typescript/bin/tsc
 node server.js
 ```
 
-### 2. Package for AWS Deployment
-- **AWS Elastic Beanstalk Package:**
-  `backend-deploy.zip` contains `server.js`, `package.json`, and `tsconfig.json`.
-- **AWS Lambda Package:**
-  `lambda-deploy.zip` contains `server.js`, `package.json`, `tsconfig.json`, and bundled dependencies.
+### 2. Package & Deploy to AWS Lambda
+The active serverless deployment runs on AWS Lambda `jbac-backend-api` in `ap-southeast-2`:
 ```bash
-# Rebuild packages
-npx tsc
-zip -r backend-deploy.zip server.js package.json tsconfig.json
-```
+# 1. Compile TypeScript to JavaScript
+& "C:\Users\rajes\AppData\Local\OpenAI\Codex\runtimes\cua_node\cfb32733c877621e\bin\node.exe" node_modules/typescript/bin/tsc server.ts --target es2020 --module commonjs --skipLibCheck --esModuleInterop --ignoreConfig --noEmitOnError false
+
+# 2. Package backend-deploy.zip with server.js, public.html, admin_db.html, and package.json
+python scripts/package_backend.py
+
+# 3. Deploy to AWS Lambda
+aws lambda update-function-code --function-name jbac-backend-api --zip-file fileb://backend/backend-deploy.zip --region ap-southeast-2
+```

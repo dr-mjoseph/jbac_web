@@ -98,9 +98,42 @@ mysql://admin:biUt2TrZ9EZAqn6GXhiA@jbac-mysql-db-v3.cdeeuw0s2trf.ap-southeast-2.
 
 ---
 
+### 5. Web-Based Cockpit & SQL Query Console (`www.jbac.in/admin`)
+You can query, explore, and manipulate the AWS RDS database directly from any web browser without installing MySQL Workbench or DBeaver:
+
+- **Live URL**: **`https://www.jbac.in/admin`** *(or `https://www.jbac.in/public.html`)*
+- **Direct Lambda URL**: `https://1a8kqxawxd.execute-api.ap-southeast-2.amazonaws.com/admin`
+- **Local File**: [`public.html`](public.html) *(Double-click to open in browser)*
+
+#### Programmatic Query API:
+You can also execute custom SQL queries programmatically via HTTP REST:
+* **Method**: `POST`
+* **URL**: `https://1a8kqxawxd.execute-api.ap-southeast-2.amazonaws.com/dashboardapi/execute-query`
+* **Headers**: `Content-Type: application/json`
+* **Body**:
+  ```json
+  {
+    "query": "SELECT COUNT(*) as active_users FROM users WHERE status = 'Active'"
+  }
+  ```
+* **Sample Response**:
+  ```json
+  {
+    "success": true,
+    "type": "SELECT",
+    "rowCount": 1,
+    "fields": ["active_users"],
+    "data": [{ "active_users": 64 }],
+    "durationMs": 30
+  }
+  ```
+
+---
+
 ## 🔍 Network & Connectivity Test (PowerShell)
 To verify connectivity from any Windows computer:
 ```powershell
 Test-NetConnection -ComputerName jbac-mysql-db-v3.cdeeuw0s2trf.ap-southeast-2.rds.amazonaws.com -Port 3306
 ```
 Expected output: `TcpTestSucceeded : True`
+

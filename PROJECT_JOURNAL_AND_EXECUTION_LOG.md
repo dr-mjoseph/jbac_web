@@ -1248,6 +1248,130 @@ Executed migrations on live AWS Aurora RDS database (`jbac_jbac`):
 2. **Release Notes Provided**:
    - Formatted release notes in English, Telugu, and Play Console XML for Google Play Console submission.
 
+---
+
+## Session 12 (October 21, 2026): Google Drive Api Import, public.html Admin Database Cockpit & Query Console Deployment to www.jbac.in/admin & AWS Lambda
+
+### A. Context & Objectives
+The user provided a public Google Drive folder link (`https://drive.google.com/drive/folders/1TooGHj5zC_RIHERCmQSxb3wdIJL_5Du9?usp=sharing`) containing their original backend project (`Api`).
+Key deliverables requested:
+1. Grab and import the complete folder structure into this repository.
+2. Generate `public.html` containing an administrative dashboard and table management cockpit.
+3. Wire up API connectivity to manipulate the live database and execute arbitrary SQL queries.
+4. Enable direct access through `https://www.jbac.in/admin`.
+
+---
+
+### B. Google Drive Extraction & Project Import (`Api/`)
+1. **Extraction Pipeline**:
+   - Retrieved the Google Drive API key (`AIzaSyAWGrfCCr7albM3lmCc937gx4uIphbpeKQ`) and folder metadata for Folder ID `1TooGHj5zC_RIHERCmQSxb3wdIJL_5Du9`.
+   - Developed automated downloader script [`scripts/download_drive_folder.py`](scripts/download_drive_folder.py) using the Google Drive v3 REST API.
+   - Filtered out extraneous `node_modules/` folders (avoiding over 15,000 redundant dependency files) while downloading 100% of the actual project codebase.
+2. **Imported Components (`c:\Users\rajes\Documents\jbac_web\Api`)**:
+   - [`Api/app.js`](Api/app.js): Original Express application configuration.
+   - [`Api/config/dbconnect.js`](Api/config/dbconnect.js): Configured connection pool for AWS RDS MySQL 8.4 (`jbac-mysql-db-v3.cdeeuw0s2trf.ap-southeast-2.rds.amazonaws.com`, db `jbac_jbac`).
+   - [`Api/dashboard/`](Api/dashboard/):
+     - `controllers/mainCtrl.js` (104 KB): Admin operations and reports.
+     - `models/mainModel.js` (200 KB): SQL data model queries.
+     - `routes/routes.js` (17.9 KB): Admin dashboard route endpoints.
+     - `validators/mstrVldt.js` (42.7 KB): Data validation rules.
+   - [`Api/website/`](Api/website/): Public website controllers, models, and routes.
+   - [`Api/utils/`](Api/utils/): `schedules.js` and `dbutils.js`.
+   - SSL certificates (`cert.crt`, `privatekey.pem`) and dependency manifests (`package.json`, `package-lock.json`).
+
+---
+
+### C. Admin Cockpit & SQL Query Console Development (`public.html`)
+Created a standalone, highly responsive, dark-mode single-page application ([`public.html`](public.html)):
+1. **Executive Dashboard Tab**:
+   - Real-time connection badge with live round-trip latency to AWS RDS MySQL 8.4.
+   - Live KPI count cards across 8 sectors:
+     - **Believers**: Aggregated from active registrations in `reg_form`.
+     - **Pastors**: `859` records from `pastor_reg`.
+     - **Churches**: `520` records from `church_reg`.
+     - **Students**: `343` records from `student_reg`.
+     - **Ministries**: `265` records from `ministry_signup`.
+     - **Organisations**: `50` records from `independentorganisation_reg`.
+     - **Active Events**: `52` active meetings from `events` (`d_in = 0`).
+     - **Registered Users**: `64` records from `users`.
+   - System telemetry details (RDS instance, port 3306, utf8mb4 charset, KMS encryption, connection pool health).
+2. **Interactive SQL Query Console Tab**:
+   - Monospace dark-theme SQL editor with `Ctrl + Enter` (and `Cmd + Enter`) execution shortcut.
+   - 12+ preloaded operational SQL presets (e.g. Recent Registrations, Users List, Table Row Counts, Upcoming Meetings, Pastors by District).
+   - Execution duration counter rendered in milliseconds (`ms`).
+   - Results displayed in an interactive data grid with thumbnail previews and modal lightbox for image URLs.
+   - One-click **Export to CSV** and **Export to JSON** capabilities.
+   - Persistent SQL query history stored in `localStorage`.
+3. **Table Explorer & Schema Browser Tab**:
+   - Filterable sidebar listing all **89 tables** in `jbac_jbac` with real-time row-count badges.
+   - Schema inspector showing `Field`, `Type`, `Null`, `Key`, `Default`, and `Extra`.
+   - Data grid supporting client-side column sorting, in-table text filtering, and pagination (25 to 250 records).
+4. **Data Manipulation Modals**:
+   - **Insert Row**: Dynamic form modal rendering inputs corresponding to table column definitions.
+   - **Edit Row**: Pre-populates selected row fields for modification.
+   - **Delete Row**: Confirmation modal with safeguard against accidental deletions.
+
+---
+
+### D. Universal Query & CRUD API Engine (`backend/server.ts`)
+1. **Universal SQL Runner**:
+   - Implemented `POST /dashboardapi/execute-query` (and `/api/query`, `/execute-query`):
+     - Parses arbitrary SQL statements.
+     - For `SELECT`, `SHOW`, `DESCRIBE`, `EXPLAIN`: Returns `{ success: true, type: "SELECT", rowCount, fields, data, durationMs }`.
+     - For `INSERT`, `UPDATE`, `DELETE`, `ALTER`: Returns `{ success: true, type: "MUTATION", affectedRows, insertId, changedRows, durationMs }`.
+     - On syntax or execution error: Returns `{ success: false, error, code, sqlState, durationMs }` with HTTP 400.
+2. **Universal CRUD Endpoints**:
+   - `GET /dashboardapi/crud/:table?limit=50&offset=0`: Retrieves rows with safe fallback ordering (checks for `id` column or first column, preventing `Unknown column 'id'` exceptions).
+   - `GET /dashboardapi/crud/:table/:id`: Retrieves individual row by ID.
+   - `POST /dashboardapi/crud/:table`: Inserts row using `dynamicInsert` helper.
+   - `PUT /dashboardapi/crud/:table/:id`: Updates row using `dynamicUpdateById` helper.
+   - `DELETE /dashboardapi/crud/:table/:id`: Permanently deletes row by ID.
+3. **Admin Dashboard Stats Endpoint**:
+   - `GET /dashboardapi/admin-dashboard-stats`: Executes parallel count queries across key tables and returns aggregated metrics.
+4. **HTML Route Servicing**:
+   - Configured `GET ['/public.html', '/admin', '/dashboard', '/cockpit', '/admin-db']` to serve `public.html`.
+5. **Table Whitelist Modernization**:
+   - Updated `isValidTable()` to validate any safe SQL identifier (`/^[a-zA-Z0-9_\-]+$/`), unlocking full explorer access to all 89 tables in the database.
+
+---
+
+### E. Packaging, Deployment & AWS CloudFront Custom Domain Routing
+1. **TypeScript Compilation & Lambda Packaging**:
+   - Resolved syntax conflicts in `backend/server.ts` and configured CommonJS module compilation.
+   - Compiled `server.ts` to `server.js` (`node --check server.js` verified clean).
+   - Created packaging script [`scripts/package_backend.py`](scripts/package_backend.py) to package `server.js`, `public.html`, `admin_db.html`, and `package.json` into `backend/backend-deploy.zip` without bloating.
+   - Deployed to AWS Lambda `jbac-backend-api` in `ap-southeast-2`:
+     ```bash
+     aws lambda update-function-code --function-name jbac-backend-api --zip-file fileb://backend/backend-deploy.zip --region ap-southeast-2
+     ```
+2. **AWS S3 Deployment**:
+   - Uploaded `public.html` to AWS S3 bucket `jbac-web-production-298363284024`:
+     - `s3://jbac-web-production-298363284024/public.html`
+     - `s3://jbac-web-production-298363284024/admin` (Content-Type: `text/html`)
+     - `s3://jbac-web-production-298363284024/admin/index.html` (Content-Type: `text/html`)
+     - `s3://jbac-web-production-298363284024/dashboard/index.html` (Content-Type: `text/html`)
+3. **CloudFront CDN Cache Invalidation**:
+   - Submitted cache invalidation on CloudFront distribution `EOBBU8SU7H3BI` for paths `"/public.html"`, `"/admin"`, `"/admin/*"`, `"/dashboard"`, `"/dashboard/*"`.
+4. **Client-Side API_BASE Resolution**:
+   - Fixed `public.html` host detection so when opened via `https://www.jbac.in/admin`, it automatically routes all database queries to the live AWS Lambda backend (`https://1a8kqxawxd.execute-api.ap-southeast-2.amazonaws.com`) with CORS enabled.
+
+---
+
+### F. Verification & URLs
+1. **Live Access Points**:
+   - Custom Domain: **`https://www.jbac.in/admin`** *(HTTP 200, 61,001 bytes)*
+   - Alternative Path: **`https://www.jbac.in/public.html`** *(HTTP 200)*
+   - Apex Domain: **`https://jbac.in/admin`** *(HTTP 200)*
+   - Direct Lambda Backend: **`https://1a8kqxawxd.execute-api.ap-southeast-2.amazonaws.com/admin`** *(HTTP 200)*
+   - Local Workspace: [`public.html`](public.html)
+2. **Live Automated Test Suite**:
+   - Verified `GET /dashboardapi/admin-dashboard-stats`:
+     `{"status":200,"success":true,"stats":{"believers":0,"pastors":859,"churches":520,"students":343,"ministries":265,"organisations":50,"events_active":52,"events_total":53,"users":64}}`
+   - Verified `POST /dashboardapi/execute-query` with `SELECT COUNT(*) as total_users FROM users`:
+     `{"success":true,"type":"SELECT","rowCount":1,"fields":["total_users"],"data":[{"total_users":64}],"durationMs":30}`
+   - Verified `SHOW TABLES`: Returns all 89 tables in 35ms.
+
+
 
 
 
