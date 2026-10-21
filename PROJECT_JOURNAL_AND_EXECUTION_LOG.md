@@ -1371,6 +1371,90 @@ Created a standalone, highly responsive, dark-mode single-page application ([`pu
      `{"success":true,"type":"SELECT","rowCount":1,"fields":["total_users"],"data":[{"total_users":64}],"durationMs":30}`
    - Verified `SHOW TABLES`: Returns all 89 tables in 35ms.
 
+---
+
+### G. Admin Cockpit Authentication, Mobile Browser Support & S3 Deployment Deletion Resolution (2026-10-21)
+
+#### 1. Context & User Issues Reported
+- **Issue 1**: `jbac.in` and `jbac.in/admin` were reported as having issues loading on mobile browsers.
+- **Issue 2**: Required a unified unique ID (`admin`) and Password (`JbacAdmin@2026`) to secure all admin access points:
+  - Custom Domain: `https://www.jbac.in/admin` (and `https://jbac.in/admin`)
+  - Alternative Path: `https://www.jbac.in/public.html` (and `https://jbac.in/public.html`)
+  - Direct AWS Lambda: `https://1a8kqxawxd.execute-api.ap-southeast-2.amazonaws.com/admin`
+- **Issue 3**: Direct AWS Lambda was working with the credentials, but accessing via custom domain (`https://www.jbac.in/admin`) or alternative path (`https://www.jbac.in/public.html`) was redirecting users to the main church website home page instead of displaying the Cockpit.
+
+#### 2. Root Cause Analysis
+1. **GitHub Actions S3 Sync `--delete` Wiped Admin Files**:
+   - In `.github/workflows/deploy-web-aws.yml`, step 64 executed `aws s3 sync dist/churchwebsite s3://${TARGET_BUCKET} --delete`.
+   - Because `admin`, `public.html`, and `dashboard` were generated outside `dist/churchwebsite`, every GitHub Actions push wiped them from S3 bucket `jbac-web-production-298363284024`.
+2. **CloudFront 404 Custom Error Response Rewrite**:
+   - With `admin` and `public.html` missing from S3, the S3 website endpoint returned 404 Not Found.
+   - CloudFront distribution `EOBBU8SU7H3BI` had custom error responses mapping 404 to `/index.html` (the Angular Single-Page App).
+3. **Angular SPA Router Swallowed Admin Routes**:
+   - In `src/app/app-routing.module.ts`, lines 132-133 defined `{ path: 'admin', redirectTo: '' }` and `{ path: 'public.html', redirectTo: '' }`.
+   - Consequently, whenever Angular loaded with `/admin` or `/public.html` in the URL, it automatically navigated to the home page (`''`).
+
+#### 3. Engineering Fixes Implemented
+1. **Unified Authentication Lock**:
+   - Integrated `adminAuthOverlay` in `public.html` requiring Admin Unique ID: `admin` and Password: `JbacAdmin@2026`.
+   - Implemented `POST /dashboardapi/admin-login` and `GET /dashboardapi/admin-verify` in `backend/server.ts` & `backend/server.js`.
+   - Admin authentication returns a SHA-256 session token stored in browser `sessionStorage` (`jbac_admin_auth_token`), attaching `x-admin-auth` header to all subsequent API calls.
+2. **Angular Build Configuration (`angular.json`)**:
+   - Added `"src/public.html"` to `architect.build.options.assets` array. Any future `ng build` automatically outputs `public.html` into `dist/churchwebsite`.
+3. **CI/CD Pipeline Hardening (`.github/workflows/deploy-web-aws.yml`)**:
+   - Added `Stage Admin Cockpit Static Files` step after build:
+     ```bash
+     mkdir -p dist/churchwebsite/admin dist/churchwebsite/dashboard
+     cp public.html dist/churchwebsite/public.html
+     cp public.html dist/churchwebsite/admin/index.html
+     cp public.html dist/churchwebsite/admin/admin
+     cp public.html dist/churchwebsite/dashboard/index.html
+     cp public.html dist/churchwebsite/dashboard/dashboard
+     ```
+   - Updated `aws s3 sync` with `--exclude "index.html" --exclude "public.html" --exclude "admin*" --exclude "dashboard*"` so that sync operations never delete the admin cockpit files.
+   - Explicitly uploaded all admin files with `--content-type "text/html"` and `--cache-control "no-cache, no-store, must-revalidate"`.
+4. **Angular Router Interceptor (`src/app/app-routing.module.ts`)**:
+   - Replaced `{ path: 'admin', redirectTo: '' }` and `{ path: 'public.html', redirectTo: '' }` with `canActivate` hooks:
+     ```typescript
+     {
+       path: 'admin',
+       children: [],
+       canActivate: [() => {
+         window.location.href = '/admin';
+         return false;
+       }]
+     },
+     {
+       path: 'public.html',
+       children: [],
+       canActivate: [() => {
+         window.location.href = '/public.html';
+         return false;
+       }]
+     }
+     ```
+   - If the Angular client is ever initialized on an admin route, it immediately breaks out of the SPA router and executes a native browser reload to serve the static Cockpit.
+5. **Mobile Viewport & Touch Optimization**:
+   - Added responsive viewport `<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">`.
+   - Added mobile touch scrollbars and a floating toggle button for the 89-table sidebar on small screens.
+6. **CloudFront Cache Invalidation**:
+   - Invalidated distribution `EOBBU8SU7H3BI` for `"/public.html"`, `"/admin"`, `"/admin/*"`, `"/dashboard"`, `"/dashboard/*"`.
+
+#### 4. Automated Verification Suite (`scripts/test_domain_cockpit.py`)
+- Verified all endpoints live:
+  - `https://www.jbac.in/admin`: **HTTP 200 OK**, Cockpit: **True**, Overlay: **True**
+  - `https://www.jbac.in/admin/`: **HTTP 200 OK**, Cockpit: **True**, Overlay: **True**
+  - `https://jbac.in/admin`: **HTTP 200 OK**, Cockpit: **True**, Overlay: **True**
+  - `https://jbac.in/admin/`: **HTTP 200 OK**, Cockpit: **True**, Overlay: **True**
+  - `https://www.jbac.in/public.html`: **HTTP 200 OK**, Cockpit: **True**, Overlay: **True**
+  - `https://jbac.in/public.html`: **HTTP 200 OK**, Cockpit: **True**, Overlay: **True**
+  - `https://1a8kqxawxd.execute-api.ap-southeast-2.amazonaws.com/admin`: **HTTP 200 OK**, Cockpit: **True**, Overlay: **True**
+- Tested Admin Login API (`POST /dashboardapi/admin-login` with `admin` / `JbacAdmin@2026`):
+  - Result: `success=True | token_received=True`
+- Tested Website Home Page (`https://www.jbac.in` / `https://jbac.in`):
+  - Result: **HTTP 200 OK**, Title: `JBAC-Jesus Believers Association Council` (Main church website remains 100% active and unimpacted).
+
+
 
 
 

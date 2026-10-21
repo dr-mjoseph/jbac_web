@@ -202,7 +202,30 @@ GitHub Issue: [#1](https://github.com/dr-mjoseph/jbac_web/issues/1)
 
 ---
 
-## 🎯 12. Pending Launch & Post-Release Tasks
+## 🔐 12. Milestone 12: Admin Cockpit Authentication Hardening, Mobile Browser Optimization & CI/CD S3 Protection
+- [x] **Unified ID & Password Access Gate**:
+  - Enforced single unique ID (`admin`) and Password (`JbacAdmin@2026`) across all access paths:
+    - Custom Domain: `https://www.jbac.in/admin` & `https://jbac.in/admin`
+    - Alternative Path: `https://www.jbac.in/public.html` & `https://jbac.in/public.html`
+    - Direct AWS Lambda: `https://1a8kqxawxd.execute-api.ap-southeast-2.amazonaws.com/admin`
+  - Integrated modal login overlay and SHA-256 session token management (`POST /dashboardapi/admin-login` & `GET /dashboardapi/admin-verify`).
+- [x] **Mobile Browser Viewport & Navigation Remediation**:
+  - Implemented responsive touch-scroll data tables, adaptive sidebar toggle button, and viewport meta tag (`maximum-scale=5.0, user-scalable=yes`) ensuring smooth viewing on mobile Safari and Chrome.
+- [x] **CI/CD Pipeline S3 `--delete` Fix & Asset Staging**:
+  - Identified root cause of custom domain redirect: `aws s3 sync ... --delete` wiped `admin` and `public.html` from S3 bucket on GitHub pushes because they were not built inside `dist/churchwebsite`.
+  - Updated [`.github/workflows/deploy-web-aws.yml`](.github/workflows/deploy-web-aws.yml) to stage admin files into `dist/churchwebsite/admin/` and `dist/churchwebsite/public.html` prior to sync.
+  - Added `--exclude "public.html" --exclude "admin*" --exclude "dashboard*"` to `aws s3 sync` and deployed them with `--cache-control "no-cache, no-store, must-revalidate"`.
+  - Added `"src/public.html"` to `angular.json` assets array.
+- [x] **Angular SPA Router Bypass for Admin Routes**:
+  - Replaced `{ path: 'admin', redirectTo: '' }` and `{ path: 'public.html', redirectTo: '' }` in [`src/app/app-routing.module.ts`](src/app/app-routing.module.ts) with `canActivate` hooks executing `window.location.href`, guaranteeing users are never redirected to the website home page.
+- [x] **CloudFront Edge CDN Invalidation**:
+  - Invalidated CloudFront distribution `EOBBU8SU7H3BI` cache for `/admin*`, `/dashboard*`, and `/public.html`.
+- [x] **Automated Testing Suite**:
+  - Created [`scripts/test_domain_cockpit.py`](scripts/test_domain_cockpit.py) verifying 100% pass across all 5 live endpoints and JWT admin authentication.
+
+---
+
+## 🎯 13. Pending Launch & Post-Release Tasks
 - [ ] Complete Google Play Console Review & Rollout for Release 35 (`jbacApp-0.0.35.aab`).
 - [ ] Monitor crash telemetry and user feedback via Google Play Console dashboard.
 - [ ] Run automated end-to-end smoke testing across all live production forms on https://jbac.in.
