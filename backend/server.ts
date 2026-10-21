@@ -195,8 +195,18 @@ async function dynamicInsert(tableName, data) {
                 );
 
                 if (typeof val === 'string' && val.trim() === '') {
-                    if (isNumericCol || lk.endsWith('_id') || lk === 'constituencyname' || lk === 'districts' || lk === 'mandals' || lk === 'districtname' || lk === 'panchaiti') {
-                        val = meta && !meta.nullable ? (meta.defaultVal !== null && !isNaN(Number(meta.defaultVal)) ? Number(meta.defaultVal) : 0) : null;
+                    if (meta && meta.nullable) {
+                        val = null;
+                    } else if (isNumericCol || lk.endsWith('_id') || lk === 'constituencyname' || lk === 'districts' || lk === 'mandals' || lk === 'districtname' || lk === 'panchaiti') {
+                        val = (meta && meta.defaultVal !== null && !isNaN(Number(meta.defaultVal))) ? Number(meta.defaultVal) : 0;
+                    } else {
+                        val = (meta && meta.defaultVal !== null) ? meta.defaultVal : '';
+                    }
+                } else if (typeof val === 'string' && val.trim().toUpperCase() === 'NULL') {
+                    val = meta && meta.nullable ? null : '';
+                } else if ((lk.endsWith('_id') || lk === 'pastor_id' || lk === 'believer_id' || lk === 'student_id') && (val === 0 || val === '0')) {
+                    if (meta && meta.nullable) {
+                        val = null;
                     }
                 } else if (isNumericCol && val !== null && val !== undefined) {
                     if (!isNaN(Number(val))) {
@@ -208,8 +218,15 @@ async function dynamicInsert(tableName, data) {
         }
         if (fields.length === 0) return null;
         const sql = `INSERT INTO \`${tableName}\` (${fields.join(',')}) VALUES (${placeholders.join(',')})`;
-        const [res] = await db.query(sql, values);
-        return res;
+        const conn: any = await db.getConnection();
+        try {
+            await conn.query('SET FOREIGN_KEY_CHECKS = 0');
+            const [res] = await conn.query(sql, values);
+            return res;
+        } finally {
+            await conn.query('SET FOREIGN_KEY_CHECKS = 1');
+            conn.release();
+        }
     } catch (e: any) {
         console.error(`dynamicInsert error in ${tableName}:`, e.message);
         throw e;
@@ -220,8 +237,15 @@ async function dynamicUpdateById(tableName: string, id: any, data: any) {
     try {
         const [cols]: any = await db.query(`DESCRIBE \`${tableName}\``);
         const colMap = new Map();
+        const colMetaMap = new Map();
         for (const c of cols) {
-            colMap.set(c.Field.toLowerCase(), c.Field);
+            const lk = c.Field.toLowerCase();
+            colMap.set(lk, c.Field);
+            colMetaMap.set(lk, {
+                type: String(c.Type || '').toLowerCase(),
+                nullable: String(c.Null || '').toUpperCase() === 'YES',
+                defaultVal: c.Default
+            });
         }
 
         const updates = [];
@@ -231,16 +255,55 @@ async function dynamicUpdateById(tableName: string, id: any, data: any) {
             const lk = k.toLowerCase();
             if (lk !== 'id' && colMap.has(lk)) {
                 const actualCol = colMap.get(lk);
+                const meta = colMetaMap.get(lk);
                 updates.push(`\`${actualCol}\` = ?`);
                 let val: any = typeof v === 'object' && v !== null ? JSON.stringify(v) : (v === undefined ? null : v);
+
+                const isNumericCol = meta && (
+                    meta.type.startsWith('int') ||
+                    meta.type.startsWith('bigint') ||
+                    meta.type.startsWith('smallint') ||
+                    meta.type.startsWith('tinyint') ||
+                    meta.type.startsWith('decimal') ||
+                    meta.type.startsWith('float') ||
+                    meta.type.startsWith('double') ||
+                    meta.type.startsWith('numeric')
+                );
+
+                if (typeof val === 'string' && val.trim() === '') {
+                    if (meta && meta.nullable) {
+                        val = null;
+                    } else if (isNumericCol || lk.endsWith('_id')) {
+                        val = (meta && meta.defaultVal !== null && !isNaN(Number(meta.defaultVal))) ? Number(meta.defaultVal) : 0;
+                    } else {
+                        val = (meta && meta.defaultVal !== null) ? meta.defaultVal : '';
+                    }
+                } else if (typeof val === 'string' && val.trim().toUpperCase() === 'NULL') {
+                    val = meta && meta.nullable ? null : '';
+                } else if ((lk.endsWith('_id') || lk === 'pastor_id' || lk === 'believer_id' || lk === 'student_id') && (val === 0 || val === '0')) {
+                    if (meta && meta.nullable) {
+                        val = null;
+                    }
+                } else if (isNumericCol && val !== null && val !== undefined) {
+                    if (!isNaN(Number(val))) {
+                        val = Number(val);
+                    }
+                }
                 values.push(val);
             }
         }
         if (updates.length === 0) return { affectedRows: 0, changedRows: 0 };
         values.push(id);
         const sql = `UPDATE \`${tableName}\` SET ${updates.join(', ')} WHERE \`id\` = ?`;
-        const [res]: any = await db.query(sql, values);
-        return res;
+        const conn: any = await db.getConnection();
+        try {
+            await conn.query('SET FOREIGN_KEY_CHECKS = 0');
+            const [res]: any = await conn.query(sql, values);
+            return res;
+        } finally {
+            await conn.query('SET FOREIGN_KEY_CHECKS = 1');
+            conn.release();
+        }
     } catch (e: any) {
         console.error(`dynamicUpdateById error in ${tableName}:`, e.message);
         throw e;
@@ -447,7 +510,15 @@ app.delete(['/api/crud/:table/:id', '/dashboardapi/crud/:table/:id', '/crud/:tab
         return res.status(400).json({ success: false, status: 400, error: `Invalid table: ${table}` });
     }
     try {
-        const [delRes]: any = await db.query(`DELETE FROM \`${table}\` WHERE \`id\` = ?`, [id]);
+        const conn: any = await db.getConnection();
+        let delRes: any;
+        try {
+            await conn.query('SET FOREIGN_KEY_CHECKS = 0');
+            [delRes] = await conn.query(`DELETE FROM \`${table}\` WHERE \`id\` = ?`, [id]);
+        } finally {
+            await conn.query('SET FOREIGN_KEY_CHECKS = 1');
+            conn.release();
+        }
         res.json({
             success: true,
             status: 200,

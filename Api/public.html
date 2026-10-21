@@ -2039,12 +2039,14 @@
       const cols = currentTableCols.length > 0 ? currentTableCols : (record ? Object.keys(record) : ['name', 'status']);
       cols.forEach(c => {
         if (c.toLowerCase() === 'id' && editingRecordId) return; // ID is readonly
-        const val = record && record[c] !== undefined && record[c] !== null ? String(record[c]) : '';
+        const isNullOrUndefined = !record || record[c] === undefined || record[c] === null;
+        const val = isNullOrUndefined ? '' : String(record[c]);
+        const placeholder = isNullOrUndefined ? 'NULL (leave blank for NULL)' : `Enter ${escapeHtml(c)}`;
         const group = document.createElement('div');
         group.className = 'form-group';
         group.innerHTML = `
-          <label for="field_${c}">${escapeHtml(c)}</label>
-          <input type="text" id="field_${c}" name="${escapeHtml(c)}" class="input-field" value="${escapeHtml(val)}" placeholder="Enter ${escapeHtml(c)}">
+          <label for="field_${c}">${escapeHtml(c)} ${isNullOrUndefined ? '<span style="color:var(--text-dim); font-size:0.75rem; font-weight:normal;">(Currently NULL)</span>' : ''}</label>
+          <input type="text" id="field_${c}" name="${escapeHtml(c)}" class="input-field" value="${escapeHtml(val)}" placeholder="${placeholder}">
         `;
         form.appendChild(group);
       });
@@ -2062,10 +2064,14 @@
 
     async function saveRecord() {
       const form = document.getElementById('recordForm');
-      const inputs = form.querySelectorAll('input');
+      const inputs = form.querySelectorAll('input, textarea, select');
       const payload = {};
       inputs.forEach(inp => {
-        payload[inp.name] = inp.value;
+        if (!inp.name) return;
+        const raw = inp.value;
+        const trimmed = typeof raw === 'string' ? raw.trim() : '';
+        // If field is left empty or set to literal NULL, pass null so foreign key constraints and numeric columns succeed
+        payload[inp.name] = (trimmed === '' || trimmed.toUpperCase() === 'NULL') ? null : raw;
       });
 
       const btn = document.getElementById('saveRecordBtn');

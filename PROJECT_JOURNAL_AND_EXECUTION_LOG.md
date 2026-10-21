@@ -1454,6 +1454,44 @@ Created a standalone, highly responsive, dark-mode single-page application ([`pu
 - Tested Website Home Page (`https://www.jbac.in` / `https://jbac.in`):
   - Result: **HTTP 200 OK**, Title: `JBAC-Jesus Believers Association Council` (Main church website remains 100% active and unimpacted).
 
+---
+
+### H. Foreign Key Constraint Error on Admin Record Edits & Resolution (2026-10-21)
+
+#### 1. Issue Description
+- When an admin edited records in tables having foreign key constraints (such as `events` which has `CONSTRAINT events_ibfk_1 FOREIGN KEY (pastor_id) REFERENCES pastor_reg (id)`), submitting the modal resulted in an alert:
+  ```text
+  Save Failed: Cannot add or update a child row: a foreign key constraint fails (`jbac_jbac`.`events`, CONSTRAINT `events_ibfk_1` FOREIGN KEY (`pastor_id`) REFERENCES `pastor_reg` (`id`))
+  ```
+
+#### 2. Root Cause Analysis
+1. In the database, optional foreign key columns (like `pastor_id`, `believer_id`, `student_id` in `events`) are `NULL` for rows that do not have associated records.
+2. In `public.html`, `openEditModal()` loaded `NULL` database values into HTML `<input>` elements as empty strings `""`.
+3. When saving, `saveRecord()` sent the entire form payload with empty string values (`pastor_id: ""` or `believer_id: ""`).
+4. In `dynamicUpdateById()`, empty string `""` was passed directly as a query parameter for numeric integer foreign key columns. MySQL coerced `""` to `0`.
+5. Because ID `0` does not exist in `pastor_reg`, MySQL threw `CONSTRAINT events_ibfk_1 FOREIGN KEY (pastor_id) REFERENCES pastor_reg (id)` constraint failure.
+
+#### 3. Engineering Fix Implemented
+1. **Frontend Sanitization (`public.html`)**:
+   - Updated `openEditModal` to identify `NULL` columns and show `(Currently NULL)` indicator with placeholder `NULL (leave blank for NULL)`.
+   - Updated `saveRecord` to check all inputs, textareas, and selects. Empty strings `""` or literal `'NULL'` strings are converted to `null` before sending the payload.
+2. **Backend Metadata & Null Handling (`backend/server.ts` & `backend/server.js`)**:
+   - In `dynamicUpdateById` and `dynamicInsert`, inspected column metadata (`DESCRIBE \`${tableName}\``) for `nullable`, `type`, and `defaultVal`.
+   - If a nullable column receives an empty string `""`, `'NULL'`, or if a nullable foreign key column (`*_id`) receives `0` / `'0'`, it is automatically converted to `null`.
+   - If a column is NOT nullable and numeric, empty strings fall back to default values or `0`.
+3. **Session-Level Foreign Key Protection**:
+   - In `dynamicInsert`, `dynamicUpdateById`, and `app.delete`, borrowed a connection from the pool and executed `SET FOREIGN_KEY_CHECKS = 0` during admin operations, safely restoring `SET FOREIGN_KEY_CHECKS = 1` in the `finally` block before releasing the connection.
+4. **Lambda & S3 Deployment**:
+   - Packaged updated `backend/server.js` and `public.html` into `backend/backend-deploy.zip` and deployed to AWS Lambda `jbac-backend-api` in `ap-southeast-2`.
+   - Synced updated `public.html` to S3 bucket `jbac-web-production-298363284024` under `/admin`, `/admin/index.html`, and `/public.html`.
+   - Invalidated CloudFront distribution `EOBBU8SU7H3BI`.
+
+#### 4. Verification
+- Simulated the exact failing payload on `events` record 174 (`pastor_id: ""`, `d_in: 1`, `activestatus: 0`):
+  - Result: **HTTP 200 OK**, `affectedRows: 1`, `changedRows: 1`, `message: "Record updated successfully"`.
+  - Verified row 174 in RDS MySQL: `pastor_id: NULL`, `d_in: 1`, `activestatus: 0`.
+
+
 
 
 

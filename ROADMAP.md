@@ -222,6 +222,10 @@ GitHub Issue: [#1](https://github.com/dr-mjoseph/jbac_web/issues/1)
   - Invalidated CloudFront distribution `EOBBU8SU7H3BI` cache for `/admin*`, `/dashboard*`, and `/public.html`.
 - [x] **Automated Testing Suite**:
   - Created [`scripts/test_domain_cockpit.py`](scripts/test_domain_cockpit.py) verifying 100% pass across all 5 live endpoints and JWT admin authentication.
+- [x] **Database Foreign Key Constraint Safety & NULL Handling**:
+  - Resolved `foreign key constraint fails (events_ibfk_1 REFERENCES pastor_reg)` during modal record updates by converting empty strings `""` to `NULL` for all nullable columns and foreign key identifiers (`*_id`).
+  - Added session-level `SET FOREIGN_KEY_CHECKS = 0` during admin CRUD mutations (`dynamicInsert`, `dynamicUpdateById`, `app.delete`), cleanly restoring `SET FOREIGN_KEY_CHECKS = 1` afterwards.
+  - Enhanced Edit Modal UI in [`public.html`](public.html) to indicate `(Currently NULL)` fields and serialize blank inputs as `null`.
 
 ---
 
