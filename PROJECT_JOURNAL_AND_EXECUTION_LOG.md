@@ -1067,4 +1067,61 @@ Executed migrations on live AWS Aurora RDS database (`jbac_jbac`):
 | [`ROADMAP.md`](ROADMAP.md) | Added Milestone 8 documenting navigation tuning, carousel optimization, automated ribbon expiration, and modal buttons. |
 | [`README.md`](README.md) | Updated key capabilities (6-slide carousel, automated date-based event expiration, modal actions, and navigation updates). |
 
+---
+
+## 15. Milestone 9: AWS RDS Continuous Running, Edit Profile Pre-population, Telugu Wait Spinners, and Mobile Release v0.0.34
+
+### A. AWS RDS Continuous 24/7 Database Operation
+1. **Diagnosis of AWS 7-Day Stopping Behavior**:
+   - In AWS RDS, standard databases (`available` state) run continuously 24/7 indefinitely and do **not** stop after 7 days.
+   - The 7-day rule only applies when an instance is explicitly stopped by an administrator using "Stop temporarily" (AWS auto-starts it after 7 days for maintenance).
+   - Audited the user's AWS account (`ap-southeast-2`): verified RDS DB instance `jbac-mysql-db-v3` is in `available` state.
+   - Confirmed no AWS Lambda functions, EventBridge schedulers, or CloudWatch alarm stop actions exist that could shut down or pause the database.
+   - Enabled **Deletion Protection** on `jbac-mysql-db-v3` (`aws rds modify-db-instance --db-instance-identifier jbac-mysql-db-v3 --deletion-protection --apply-immediately`) to guard against accidental deletion or automated cleanup.
+
+### B. Edit Profile Field Pre-population & Cascading Dropdown Hydration
+1. **Root Cause Diagnosis**:
+   - The `/dashboardapi/geteditdtails` endpoint in the backend only queried based on `category_id` and `usr_id`. If `usr_id` was absent, zero, or if the user record lived in another category table, the query failed and returned empty rows.
+   - The profile forms in both web and mobile used differing field names (e.g. `pastorname`, `fname`, `studentname`, `church_name`, `paname` vs. generic `name`, and `phonenumber`, `contactnumber` vs. `mobile_number`).
+   - Cascading dropdowns (`constituency`, `mandals`, `panchayati`) were initialized to empty lists or `(0)`, causing Angular reactive form controls to render blank options because corresponding select options were not yet present in the DOM.
+2. **Backend Hardening (`backend/server.js` & `backend/server.ts`)**:
+   - Updated `/dashboardapi/geteditdtails` to perform phone-first and `usr_id` searches across all 9 user tables (`belivers_tbl`, `pastors_tbl`, `student_tbl`, `ministry_tbl`, `church_reg`, `organisation_tbl`, `pastorsassociations_tbl`, `tbl_councelling_doctor`, `users`).
+   - Standardized field aliases (`name`, `mobile_number`, `dob`, `gender`, `district_id`, `constituency_id`, `mandal_id`, `panchayat_id`).
+   - Built and deployed updated Lambda package (`backend/backend-deploy.zip`) to AWS Lambda `jbac-backend-api` in `ap-southeast-2`.
+3. **Web Frontend (`src/app/jesus/update/update.component.ts`)**:
+   - Falls back to `sessionStorage` and `localStorage` for `usr_id`, `mobile_number`, and `category_id`.
+   - Populates cascading dropdowns (`getconstency(distId)`, `getmandals(constId)`, `gepanchayati(mandalId)`) and re-patches form values after options load.
+   - Pre-populates all existing filled fields (e.g., 8 out of 10) and leaves remaining unfilled fields (e.g., 2 out of 10) editable and empty.
+4. **Mobile App (`src/pages/profile/profile.ts` & runtime bundle `15.js`)**:
+   - Passes `mobile_number: localStorage.getItem('mobile_number')` in the payload.
+   - Added cascading dropdown hydrations and field name fallbacks (`details.name`, `details.mobile_number`).
+
+### C. Telugu Processing Spinner (`దయచేసి వేచి ఉండండి, ప్రాసెస్ అవుతోంది...`)
+1. **Web Frontend (`jbac_web`)**:
+   - `src/app/jesus/login/login.component.html` & `.ts`: Disabled submit button with `[disabled]="showSpinner"` and added Telugu wait text.
+   - `src/app/jesus/namodu/namodu.component.html` & `.ts`: Button disabled with Telugu processing text and overlay.
+   - `src/app/jesus/signup/signup.component.html` & `.ts`: Handled `showSpinner` state across all 7 submit methods with disabled buttons and Telugu text.
+   - Standalone registration templates (`believerregister`, `pastorregister`, `churchregister`, `studentregister`, `ministryregister`, `organisationregister`, `pastorassociationregister`, `doctorregister`): Submit buttons disabled with Telugu spinner text.
+2. **Mobile App (`jbac_app`)**:
+   - `src/pages/login/` & runtime `0.js`: `isLoggingIn`, `[disabled]="isLoggingIn"`, `<ion-spinner>`, and Telugu text.
+   - `src/pages/entry-form/` & runtime `32.js`: `isSubmitting`, `[disabled]="isSubmitting"`, `<ion-spinner>`, and Telugu text.
+   - Registration chunks (`37.js`, `12.js`, `16.js`, `35.js`, `18.js`, `21.js`, `38.js`, `52.js`): `showSpinner`, `[disabled]="showSpinner"`, `<ion-spinner>`, and Telugu wait message.
+   - Verified JavaScript syntax across all runtime bundles with Node.js VM script parser.
+
+### D. Mobile Release v0.0.34 (.apk & .aab)
+1. **Version Configuration**:
+   - `config.xml`: Bumped to `version="0.0.34" android-versionCode="34"`.
+   - `package.json`: Bumped to `"version": "0.0.34"`.
+   - `platforms/android/app/src/main/AndroidManifest.xml`: Bumped to `versionCode="34"` and `versionName="0.0.34"`.
+2. **Build & Signing Execution (`scripts/build_and_sign_release_v34.ps1`)**:
+   - Executed Gradle `assembleRelease` and `bundleRelease` (`-PcdvBuildToolsVersion=30.0.3`).
+   - Zipaligned and signed release APK with `apksigner` and `Jbac.keystore` (v1 + v2 scheme).
+   - Signed release AAB with `jarsigner` and `Jbac.keystore`.
+   - Verified signatures and Android badging (`targetSdkVersion: 36`).
+3. **Artifacts Generated**:
+   - **Signed APK for Testing**: `C:\Users\rajes\StudioProjects\jbac_app\jbacApp-0.0.34.apk` (118.68 MB)
+   - **Signed AAB for Play Store**: `C:\Users\rajes\StudioProjects\jbac_app\jbacApp-0.0.34.aab` (115.81 MB)
+   - **Upload Bundle**: `C:\Users\rajes\StudioProjects\jbac_app\appreleasesigned.aab` (115.81 MB)
+
+
 

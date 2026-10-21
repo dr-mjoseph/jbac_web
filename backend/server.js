@@ -2247,7 +2247,7 @@ async function dynamicUpdate(tableName, whereClause, whereParams, data) {
 app.all(['/dashboardapi/getpersonal', '/dashboardapi/geteditdtails', '/dashboardapi/getuserprofilereport'], async (req, res) => {
     try {
         const id = req.body.id || req.body.usr_id;
-        const phone = req.body.mobile_number || req.body.phonenumber || req.body.phone || req.body.phnumber;
+        const phone = String(req.body.mobile_number || req.body.phonenumber || req.body.phone || req.body.phnumber || '').trim();
         const rawCat = String(req.body.category_id || req.body.category || '').trim().toLowerCase();
 
         let cat = '1';
@@ -2277,52 +2277,93 @@ app.all(['/dashboardapi/getpersonal', '/dashboardapi/geteditdtails', '/dashboard
         let resultRow = null;
         let matchedCat = cat;
 
-        if (configs[cat]) {
-            const cfg = configs[cat];
-            if (id) {
-                const [rows] = await db.query(`SELECT * FROM \`${cfg.table}\` WHERE \`${cfg.idCol}\` = ?`, [id]);
-                if (rows && rows.length > 0) resultRow = rows[0];
-            }
-            if (!resultRow && phone) {
-                for (const col of cfg.phoneCols) {
-                    const [rows] = await db.query(`SELECT * FROM \`${cfg.table}\` WHERE \`${col}\` = ? ORDER BY \`${cfg.idCol}\` DESC`, [phone]);
-                    if (rows && rows.length > 0) {
-                        resultRow = rows[0];
-                        break;
-                    }
-                }
-            }
-        }
-
-        if (!resultRow && phone) {
-            for (const [key, cfg] of Object.entries(configs)) {
-                if (key === cat) continue;
+        // 1. Phone search is highest priority (identifies logged-in user with 100% certainty)
+        if (phone) {
+            // First search in selected category
+            if (configs[cat]) {
+                const cfg = configs[cat];
                 for (const col of cfg.phoneCols) {
                     try {
                         const [rows] = await db.query(`SELECT * FROM \`${cfg.table}\` WHERE \`${col}\` = ? ORDER BY \`${cfg.idCol}\` DESC`, [phone]);
                         if (rows && rows.length > 0) {
                             resultRow = rows[0];
-                            matchedCat = key;
+                            matchedCat = cat;
                             break;
                         }
                     } catch (_) {}
                 }
-                if (resultRow) break;
+            }
+            // If not found in selected category, search all other registration tables
+            if (!resultRow) {
+                for (const [key, cfg] of Object.entries(configs)) {
+                    if (key === cat) continue;
+                    for (const col of cfg.phoneCols) {
+                        try {
+                            const [rows] = await db.query(`SELECT * FROM \`${cfg.table}\` WHERE \`${col}\` = ? ORDER BY \`${cfg.idCol}\` DESC`, [phone]);
+                            if (rows && rows.length > 0) {
+                                resultRow = rows[0];
+                                matchedCat = key;
+                                break;
+                            }
+                        } catch (_) {}
+                    }
+                    if (resultRow) break;
+                }
             }
         }
 
+        // 2. Fallback to ID search only if phone did not yield a result
+        if (!resultRow && id && configs[cat]) {
+            const cfg = configs[cat];
+            try {
+                const [rows] = await db.query(`SELECT * FROM \`${cfg.table}\` WHERE \`${cfg.idCol}\` = ?`, [id]);
+                if (rows && rows.length > 0) {
+                    resultRow = rows[0];
+                    matchedCat = cat;
+                }
+            } catch (_) {}
+        }
+
+        // 3. Fallback to users table
+        if (!resultRow && phone) {
+            const [users] = await db.query('SELECT * FROM users WHERE number = ?', [phone]);
+            if (users && users.length > 0) resultRow = users[0];
+        }
         if (!resultRow && id) {
             const [users] = await db.query('SELECT * FROM users WHERE id = ?', [id]);
             if (users && users.length > 0) resultRow = users[0];
         }
 
-        if (!resultRow && phone) {
-            const [users] = await db.query('SELECT * FROM users WHERE number = ?', [phone]);
-            if (users && users.length > 0) resultRow = users[0];
-        }
-
         if (resultRow) {
+            // Field Normalization for seamless form binding
+            if (resultRow.dob) {
+                if (typeof resultRow.dob === 'string' && resultRow.dob.includes('T')) {
+                    resultRow.dob = resultRow.dob.split('T')[0];
+                } else if (resultRow.dob instanceof Date) {
+                    resultRow.dob = resultRow.dob.toISOString().split('T')[0];
+                }
+            }
+            if (resultRow.gender) {
+                const g = String(resultRow.gender).trim().toLowerCase();
+                if (g === 'male' || g.includes('పురుష') || g === 'm') resultRow.gender = 'Male';
+                else if (g === 'female' || g.includes('స్త్రీ') || g === 'f') resultRow.gender = 'Female';
+                else if (g.includes('trans')) resultRow.gender = 'Transgender';
+            }
+            if (resultRow.status) {
+                const s = String(resultRow.status).trim().toLowerCase();
+                if (s.includes('single')) resultRow.status = 'single';
+                else if (s.includes('married')) resultRow.status = 'married';
+                else if (s.includes('divorce')) resultRow.status = 'divorced';
+            }
+            resultRow.fname = resultRow.fname || resultRow.name || '';
+            resultRow.mobile_number = resultRow.mobile_number || resultRow.phonenum || resultRow.number || resultRow.contactnumber || resultRow.contact_num || resultRow.phonenumber || phone || '';
+            resultRow.whatsapp = resultRow.whatsapp || resultRow.whatsappno || resultRow.whatsapp_number || '';
+            resultRow.district_id = resultRow.district_id !== undefined && resultRow.district_id !== null ? String(resultRow.district_id) : (resultRow.districts ? String(resultRow.districts) : '');
+            resultRow.constituency_id = resultRow.constituency_id !== undefined && resultRow.constituency_id !== null ? String(resultRow.constituency_id) : (resultRow.constituencyname ? String(resultRow.constituencyname) : '');
+            resultRow.mandal_id = resultRow.mandal_id !== undefined && resultRow.mandal_id !== null ? String(resultRow.mandal_id) : (resultRow.mandals ? String(resultRow.mandals) : '');
+            resultRow.panchayat_id = resultRow.panchayat_id !== undefined && resultRow.panchayat_id !== null ? String(resultRow.panchayat_id) : (resultRow.village_id ? String(resultRow.village_id) : (resultRow.panchayati ? String(resultRow.panchayati) : ''));
             resultRow.category_id = matchedCat;
+
             return res.json({ status: 200, data: [resultRow] });
         } else {
             return res.json({ status: 200, data: [{}] });

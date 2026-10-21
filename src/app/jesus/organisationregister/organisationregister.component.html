@@ -484,8 +484,9 @@
                                     <div class="col-md-2 mb-4 pb-2">
                                     </div>
                                     <div class="col-md-2 mb-4 pb-2">
-                                        <button type="submit" (click)="postindepedentorganisation()"
-                                            class="default-btn  user-all-btn">Register
+                                        <button type="submit" (click)="postindepedentorganisation()" [disabled]="showSpinner" class="default-btn user-all-btn">
+                                            <span *ngIf="showSpinner"><i class="fa fa-spinner fa-spin me-1"></i> దయచేసి వేచి ఉండండి, ప్రాసెస్ అవుతోంది...</span>
+                                            <span *ngIf="!showSpinner">Register</span>
                                         </button>
                                     </div>
                                 </div>

@@ -127,8 +127,8 @@
                                         <button type="button" class="default-btn user-all-btn"
                                             [disabled]="showSpinner"
                                             (click)="passlogin()">
-                                            <span *ngIf="showSpinner" style="display: inline-block; width: 14px; height: 14px; border: 2px solid #fff; border-right-color: transparent; border-radius: 50%; animation: spin 0.75s linear infinite; vertical-align: middle; margin-right: 6px;"></span>
-                                            {{ showSpinner ? 'లాగిన్ అవుతోంది...' : 'Login' }}
+                                            <span *ngIf="showSpinner"><i class="fa fa-spinner fa-spin me-1"></i> దయచేసి వేచి ఉండండి, ప్రాసెస్ అవుతోంది...</span>
+                                            <span *ngIf="!showSpinner">Login</span>
                                         </button>
                                     </div>
                                 </div>

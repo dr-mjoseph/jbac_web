@@ -555,8 +555,9 @@
                                         <!-- <div class="col-md-2 mb-4 pb-2">
                                         </div> -->
                                         <div class="d-flex justify-content-center align-items-center" style="height: 10vh; font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif ;">
-                                            <button type="submit" (click)="postregform()" class="default-btn user-all-btn">
-                                                సబ్మిట్ (SUBMIT)
+                                            <button type="submit" (click)="postregform()" [disabled]="showSpinner" class="default-btn user-all-btn">
+                                                <span *ngIf="showSpinner"><i class="fa fa-spinner fa-spin me-1"></i> దయచేసి వేచి ఉండండి, ప్రాసెస్ అవుతోంది...</span>
+                                                <span *ngIf="!showSpinner">సబ్మిట్ (SUBMIT)</span>
                                             </button>
                                         </div>
                                         
@@ -590,5 +591,5 @@
 </div>
 <div class="my-overlay" *ngIf="showSpinner">
     <div class="cusloader"></div>
-    <h5 style="color: white;">ప్రాసెస్ అవుతుంది, కొంచెం ఆగండి...</h5>
+    <h5 style="color: white;"><i class="fa fa-spinner fa-spin me-1"></i> దయచేసి వేచి ఉండండి, ప్రాసెస్ అవుతోంది...</h5>
 </div>

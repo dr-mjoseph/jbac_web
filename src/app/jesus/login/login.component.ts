@@ -117,6 +117,18 @@ export class LoginComponent implements OnInit, AfterContentInit {
     } else {
       sessionStorage.removeItem('is_doctor');
     }
+
+    localStorage.setItem('usr_id', String(userId));
+    localStorage.setItem('mobile_number', String(mobile));
+    localStorage.setItem('name', String(userName));
+    localStorage.setItem('category_id', String(catId));
+    localStorage.setItem('category', String(catName));
+    localStorage.setItem('auth_ind', '1');
+    if (isDoc) {
+      localStorage.setItem('is_doctor', '1');
+    } else {
+      localStorage.removeItem('is_doctor');
+    }
     localStorage.setItem('key_id', '1');
     this.service.getlgstatus('1');
 

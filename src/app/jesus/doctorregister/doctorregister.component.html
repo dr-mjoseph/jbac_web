@@ -376,9 +376,8 @@
                 class="btn btn-primary btn-lg px-5 py-3 fw-bold shadow rounded-pill"
                 [disabled]="showSpinner"
               >
-                <span *ngIf="showSpinner" class="spinner-border spinner-border-sm me-2" role="status"></span>
-                <i *ngIf="!showSpinner" class="fa fa-user-plus me-2"></i>
-                డాక్టర్ రిజిస్ట్రేషన్ పూర్తి చేయండి (Submit Registration)
+                <span *ngIf="showSpinner"><i class="fa fa-spinner fa-spin me-2"></i>దయచేసి వేచి ఉండండి, ప్రాసెస్ అవుతోంది...</span>
+                <span *ngIf="!showSpinner"><i class="fa fa-user-plus me-2"></i>డాక్టర్ రిజిస్ట్రేషన్ పూర్తి చేయండి (Submit Registration)</span>
               </button>
             </div>
 

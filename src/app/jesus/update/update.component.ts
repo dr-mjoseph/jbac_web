@@ -320,10 +320,13 @@ export class UpdateComponent {
       description: ['']
     });
 
-    this.categoryid = this.normalizeCategoryId(sessionStorage.getItem("category_id") || sessionStorage.getItem("category"));
-    this.category = sessionStorage.getItem("category") || 'Member';
-    this.name = sessionStorage.getItem("name");
-    this.mobile_number = sessionStorage.getItem("mobile_number");
+    this.categoryid = this.normalizeCategoryId(
+      sessionStorage.getItem("category_id") || localStorage.getItem("category_id") || 
+      sessionStorage.getItem("category") || localStorage.getItem("category")
+    );
+    this.category = sessionStorage.getItem("category") || localStorage.getItem("category") || 'Member';
+    this.name = sessionStorage.getItem("name") || localStorage.getItem("name");
+    this.mobile_number = sessionStorage.getItem("mobile_number") || localStorage.getItem("mobile_number");
   }
 
   normalizeCategoryId(cat: any): string {
@@ -351,7 +354,8 @@ export class UpdateComponent {
     // this.getpastor();
     const datePipe = new DatePipe('en-Us');
     this.now = datePipe.transform(new Date(), 'yyyy-MM-dd');
-    if (sessionStorage.getItem("auth_ind") == '' || sessionStorage.getItem("auth_ind") == null || sessionStorage.getItem("auth_ind") == undefined) {
+    const auth = sessionStorage.getItem("auth_ind") || localStorage.getItem("auth_ind");
+    if (!auth) {
       Swal.fire("Login Required");
       this.router.navigate(['/']);
     }
@@ -529,8 +533,8 @@ export class UpdateComponent {
   geteditdtails() {
     var data = {
       category_id: this.categoryid,
-      usr_id: sessionStorage.getItem('usr_id'),
-      mobile_number: sessionStorage.getItem('mobile_number')
+      usr_id: sessionStorage.getItem('usr_id') || localStorage.getItem('usr_id'),
+      mobile_number: sessionStorage.getItem('mobile_number') || localStorage.getItem('mobile_number')
     };
     this.service.geteditdtails(data).subscribe((res: any) => {
       this.details = (res.data && res.data.length > 0) ? res.data[0] : {};
@@ -782,24 +786,55 @@ export class UpdateComponent {
         description: this.details.description
       });
 
-      // Pre-populate cascading location dropdowns
+      // Pre-populate cascading location dropdowns and re-patch controls so <select> options display saved values
       const distId = this.details.district_id || this.details.districts || this.details.districtname || this.details.resdistricts;
       const constId = this.details.constituency_id || this.details.constituencyname || this.details.resconstituencyname;
       const mandalId = this.details.mandal_id || this.details.mandals || this.details.resmandals;
+      const panchId = this.details.panchayat_id || this.details.panchayati || this.details.village_id;
 
       if (distId) {
         this.service.getconsistencys().subscribe((cRes: any) => {
           this.constituency = cRes.data ? cRes.data.filter((d: any) => d.dstrct_id == distId) : [];
+          if (constId) {
+            this.beliverform.patchValue({ constituencyname: constId });
+            this.pastorform.patchValue({ constituency_id: constId });
+            this.churchregsiterform.patchValue({ constituency_id: constId });
+            this.updateprofileministry.patchValue({ constituency_id: constId });
+            this.studentform.patchValue({ constituency_id: constId });
+            this.independentorgainsationform.patchValue({ constituencyname: constId });
+            this.pastorsassociations.patchValue({ constituency_id: constId });
+            this.entryform.patchValue({ constituency_id: constId });
+          }
         });
       }
       if (constId) {
         this.service.getmandals().subscribe((mRes: any) => {
           this.mandals = mRes.data ? mRes.data.filter((d: any) => d.const_id == constId) : [];
+          if (mandalId) {
+            this.beliverform.patchValue({ mandals: mandalId });
+            this.pastorform.patchValue({ mandal_id: mandalId });
+            this.churchregsiterform.patchValue({ mandal_id: mandalId });
+            this.updateprofileministry.patchValue({ mandal_id: mandalId });
+            this.studentform.patchValue({ mandal_id: mandalId });
+            this.independentorgainsationform.patchValue({ mandals: mandalId });
+            this.pastorsassociations.patchValue({ mandal_id: mandalId });
+            this.entryform.patchValue({ mandal_id: mandalId });
+          }
         });
       }
       if (mandalId) {
         this.service.gepanchayatis(mandalId).subscribe((pRes: any) => {
           this.panchayati = pRes.data ? pRes.data.filter((d: any) => !mandalId || d.mndl_id == mandalId) : [];
+          if (panchId) {
+            this.beliverform.patchValue({ panchayati: panchId });
+            this.pastorform.patchValue({ panchayat_id: panchId });
+            this.churchregsiterform.patchValue({ village_id: panchId });
+            this.updateprofileministry.patchValue({ panchayat_id: panchId });
+            this.studentform.patchValue({ village_id: panchId });
+            this.independentorgainsationform.patchValue({ panchayati: panchId });
+            this.pastorsassociations.patchValue({ village_id: panchId });
+            this.entryform.patchValue({ village_id: panchId });
+          }
         });
       }
     });
@@ -833,8 +868,8 @@ export class UpdateComponent {
     });
   }
   editpastor() {
-    const usr_id = sessionStorage.getItem('usr_id');
-    const mobile_number = sessionStorage.getItem('mobile_number');
+    const usr_id = sessionStorage.getItem('usr_id') || localStorage.getItem('usr_id');
+    const mobile_number = sessionStorage.getItem('mobile_number') || localStorage.getItem('mobile_number');
     const data = Object.assign({}, this.pastorform.value, { usr_id, mobile_number, id: this.details?.id });
     this.service.editpastor(data).subscribe((res: any) => {
       if (res.status == 200) {
@@ -848,8 +883,8 @@ export class UpdateComponent {
   }
 
   editchurch() {
-    const usr_id = sessionStorage.getItem('usr_id');
-    const mobile_number = sessionStorage.getItem('mobile_number');
+    const usr_id = sessionStorage.getItem('usr_id') || localStorage.getItem('usr_id');
+    const mobile_number = sessionStorage.getItem('mobile_number') || localStorage.getItem('mobile_number');
     const data = Object.assign({}, this.churchregsiterform.value, { usr_id, mobile_number, id: this.details?.id });
     this.service.editchurch(data).subscribe((res: any) => {
       if (res.status == 200) {
@@ -863,8 +898,8 @@ export class UpdateComponent {
   }
 
   editindependentorgainsation() {
-    const usr_id = sessionStorage.getItem('usr_id');
-    const mobile_number = sessionStorage.getItem('mobile_number');
+    const usr_id = sessionStorage.getItem('usr_id') || localStorage.getItem('usr_id');
+    const mobile_number = sessionStorage.getItem('mobile_number') || localStorage.getItem('mobile_number');
     const data = Object.assign({}, this.independentorgainsationform.value, { usr_id, mobile_number, id: this.details?.id });
     this.service.editindependentorgainsation(data).subscribe((res: any) => {
       if (res.status == 200) {
@@ -878,8 +913,8 @@ export class UpdateComponent {
   }
 
   editindepastororgainsation() {
-    const usr_id = sessionStorage.getItem('usr_id');
-    const mobile_number = sessionStorage.getItem('mobile_number');
+    const usr_id = sessionStorage.getItem('usr_id') || localStorage.getItem('usr_id');
+    const mobile_number = sessionStorage.getItem('mobile_number') || localStorage.getItem('mobile_number');
     const data = Object.assign({}, this.pastorsassociations.value, { usr_id, mobile_number, id: this.details?.id });
     this.service.editpastororgainsation(data).subscribe((res: any) => {
       if (res.status == 200) {
@@ -893,8 +928,8 @@ export class UpdateComponent {
   }
 
   editbeliver() {
-    const usr_id = sessionStorage.getItem('usr_id');
-    const mobile_number = sessionStorage.getItem('mobile_number');
+    const usr_id = sessionStorage.getItem('usr_id') || localStorage.getItem('usr_id');
+    const mobile_number = sessionStorage.getItem('mobile_number') || localStorage.getItem('mobile_number');
     const data = Object.assign({}, this.beliverform.value, { usr_id, mobile_number, id: this.details?.id });
     this.service.editbeliver(data).subscribe((res: any) => {
       if (res.status == 200) {
@@ -908,8 +943,8 @@ export class UpdateComponent {
   }
 
   editstudent() {
-    const usr_id = sessionStorage.getItem('usr_id');
-    const mobile_number = sessionStorage.getItem('mobile_number');
+    const usr_id = sessionStorage.getItem('usr_id') || localStorage.getItem('usr_id');
+    const mobile_number = sessionStorage.getItem('mobile_number') || localStorage.getItem('mobile_number');
     const data = Object.assign({}, this.studentform.value, { usr_id, mobile_number, id: this.details?.id });
     this.service.editstudent(data).subscribe((res: any) => {
       if (res.status == 200) {
@@ -923,8 +958,8 @@ export class UpdateComponent {
   }
 
   postministryupdate() {
-    const usr_id = sessionStorage.getItem('usr_id');
-    const mobile_number = sessionStorage.getItem('mobile_number');
+    const usr_id = sessionStorage.getItem('usr_id') || localStorage.getItem('usr_id');
+    const mobile_number = sessionStorage.getItem('mobile_number') || localStorage.getItem('mobile_number');
     const sourceData = this.updateprofileministry ? this.updateprofileministry.value : this.ministryform.value;
     const data = Object.assign({}, this.ministryform ? this.ministryform.value : {}, sourceData, { usr_id, mobile_number, id: this.details?.id });
     this.service.editministry(data).subscribe((res: any) => {
@@ -939,8 +974,8 @@ export class UpdateComponent {
   }
 
   editdoctor() {
-    const usr_id = sessionStorage.getItem('usr_id');
-    const mobile_number = sessionStorage.getItem('mobile_number');
+    const usr_id = sessionStorage.getItem('usr_id') || localStorage.getItem('usr_id');
+    const mobile_number = sessionStorage.getItem('mobile_number') || localStorage.getItem('mobile_number');
     const data = Object.assign({}, this.doctorform.value, { usr_id, mobile_number, id: this.details?.id });
     this.service.editdoctor(data).subscribe((res: any) => {
       if (res.status == 200) {
@@ -954,8 +989,8 @@ export class UpdateComponent {
   }
 
   editentry() {
-    const usr_id = sessionStorage.getItem('usr_id');
-    const mobile_number = sessionStorage.getItem('mobile_number');
+    const usr_id = sessionStorage.getItem('usr_id') || localStorage.getItem('usr_id');
+    const mobile_number = sessionStorage.getItem('mobile_number') || localStorage.getItem('mobile_number');
     const data = Object.assign({}, this.entryform.value, { usr_id, mobile_number, id: this.details?.id || this.details?.['reg-id'] });
     this.service.editentry(data).subscribe((res: any) => {
       if (res.status == 200) {
@@ -1228,7 +1263,7 @@ export class UpdateComponent {
   }
 
   checklogin() {
-    if ((sessionStorage.getItem('usr_id')) == null) {
+    if ((sessionStorage.getItem('usr_id') || localStorage.getItem('usr_id')) == null) {
       this.login = true;
     } else {
       this.login = false;
