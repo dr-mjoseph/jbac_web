@@ -59,21 +59,29 @@ Consumes multi-form request bodies, dynamically flattening custom data fields in
 - **Payload Structure:** `{ registrationType, firstName, lastName, email, phone, ...customMetadata }`
 
 ### 3. `POST /dashboardapi/postregform` (Namodu & Entry Form Submissions)
-Processes unified entry and `/namodu` submissions, routing to role-specific tables:
-- **Category 1 (Believer):** Stores directly into `signup_form` with `cts` (IST timestamp), `whatsapp`, `district_id`, `constituency_id`, `mandal_id`, `panchayat_id`, `from_signup: 'believer'`, and sets initial `password = phone`, `is_first_login = 1`.
-- **Other Categories:** Student (`student_reg`), Pastor (`pastor_reg`), Church (`church_reg`), Pastors Association (`pastors_associations`), Ministry (`ministry_signup`), Independent Organization (`independentorganisation_reg`). All store `cts`, `whatsapp`, and `is_first_login = 1`.
+Processes unified entry and `/namodu` submissions, routing to role-specific tables with strict contact number isolation:
+- **Clean Phone Field Separation**: The registrant's primary phone number is mapped exclusively to the primary contact field (`student_reg.number`, `church_reg.contactnumber`, `pastor_reg.phonenumber`, `ministry_signup.headnmber`, `independentorganisation_reg.contact_num`, `pastors_associations.phonenumber`, `signup_form.mobile_number`). Secondary numbers (`parentnum`, `pastornum`, `phonenumber2`, `pa_phonenumber`, `president`) remain `NULL` unless explicitly provided by the registrant.
+- **`users.otp` Integer Overflow Protection**: `users.otp` (MySQL `INT` column) is sanitized and only accepts numeric values `<= 999999` or `NULL`. Phone numbers and passwords are never written into `users.otp`, preventing 32-bit integer out-of-range database exceptions.
+- **Category Routing**:
+  - **Category 1 (Believer):** Stores directly into `signup_form` with `cts` (IST timestamp), `district_id`, `constituency_id`, `mandal_id`, `panchayat_id`, `from_signup: 'believer'`, and `is_first_login = 1`.
+  - **Other Categories:** Student (`student_reg`), Pastor (`pastor_reg`), Church (`church_reg`), Pastors Association (`pastors_associations`), Ministry (`ministry_signup`), Independent Organization (`independentorganisation_reg`). All store `cts` and `is_first_login = 1`.
 
 ### 4. `POST /dashboardapi/postbeliversignup` (Regular Believer Registration)
 Stores regular believer registrations into `signup_form`:
 - Maps geographic fields: `district_id`, `constituency_id`, `mandal_id`, `panchayat_id`.
 - Stores `cts` (IST timestamp), dedicated user password, and sets `is_first_login = 0`.
+- Protects `users.otp` from non-OTP data.
 
 ### 5. `POST /dashboardapi/passwordwebsitelogin` (Authentication)
 Authenticates users across all category tables:
+- **Seamless Password / Phone Authentication**: Supports authenticating via phone number when the user's password record in the database is `NULL` or matches phone without mutating the password column.
 - **First Login (Namodu & Entry):** If `is_first_login == 1`, returns `{ status: 201, first_login: true }` which triggers the change password modal on the frontend.
 - **Regular Registrations:** If `is_first_login == 0`, returns `{ status: 200, message: 'Login successful' }` for direct, normal login without the modal.
 
-### 6. `GET /api/admin-database-view`
+### 6. `POST /dashboardapi/geteditdtails` (Profile Pre-population)
+Fetches user details across all 9 category tables (`belivers_tbl`, `pastors_tbl`, `student_tbl`, `ministry_tbl`, `church_reg`, `organisation_tbl`, `pastorsassociations_tbl`, `tbl_councelling_doctor`, `users`) by `usr_id` and/or `mobile_number`. Returns standardized aliases (`name`, `mobile_number`, `dob`, `gender`, `district_id`, `constituency_id`, `mandal_id`, `panchayat_id`) enabling full pre-population of previously entered fields while keeping unentered fields blank and editable.
+
+### 7. `GET /api/admin-database-view`
 A private, browser-based database cockpit GUI panel. It aggregates separate, interactive spreadsheet rows viewable natively inside your standard browser window pane to view incoming registrations cleanly by roles without looking at terminal blocks.
 
 ---

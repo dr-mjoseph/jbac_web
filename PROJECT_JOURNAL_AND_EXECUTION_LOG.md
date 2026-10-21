@@ -1069,7 +1069,7 @@ Executed migrations on live AWS Aurora RDS database (`jbac_jbac`):
 
 ---
 
-## 15. Milestone 9: AWS RDS Continuous Running, Edit Profile Pre-population, Telugu Wait Spinners, and Mobile Release v0.0.34
+## 19. Milestone 9: AWS RDS Continuous Running, Edit Profile Pre-population, Telugu Wait Spinners, and Mobile Release v0.0.34
 
 ### A. AWS RDS Continuous 24/7 Database Operation
 1. **Diagnosis of AWS 7-Day Stopping Behavior**:
@@ -1122,6 +1122,132 @@ Executed migrations on live AWS Aurora RDS database (`jbac_jbac`):
    - **Signed APK for Testing**: `C:\Users\rajes\StudioProjects\jbac_app\jbacApp-0.0.34.apk` (118.68 MB)
    - **Signed AAB for Play Store**: `C:\Users\rajes\StudioProjects\jbac_app\jbacApp-0.0.34.aab` (115.81 MB)
    - **Upload Bundle**: `C:\Users\rajes\StudioProjects\jbac_app\appreleasesigned.aab` (115.81 MB)
+
+---
+
+## 20. Milestone 10: Mobile Login Overlay Freeze Resolution, Clean Registration Contact Field Separation, users.otp Integer Overflow Elimination, and Mobile Release v0.0.35
+
+### A. Problem Statement & Bug Discovery
+1. **Mobile App Login Freeze & Session Interruption**:
+   - During physical device testing of `jbacApp-0.0.34.apk` on Android, users reported that tapping the login button displayed the Telugu progress message `"దయచేసి వేచి ఉండండి, మీరు లాగిన్ అవుతున్నారు..."` (Wait, you are logging in), followed ~2 seconds later by a success alert `"లాగిన్ విజయవంతమైంది"` (Logged in successfully).
+   - However, after the success alert was dismissed, the initial loading overlay remained permanently frozen on screen, preventing the user profile dashboard from loading.
+2. **Contact Number Duplication / Field Bleed**:
+   - When a user registered via `/namodu` or any registration form providing their primary mobile number, that same single number was erroneously copied into every numeric/contact column across the respective table (e.g. `parentnum`, `pastornum`, `whatsapp`, `phonenumber2`, `pa_phonenumber`, `president`).
+   - Even more critically, the user's 10-digit mobile number or plaintext password was being written into `users.otp`. Because `users.otp` in MySQL is defined as `INT` (maximum signed value `2,147,483,647`), storing a standard 10-digit Indian phone number (e.g. `9876543210`) exceeded the 32-bit signed integer boundary, causing MySQL `ER_DATA_TRUNCATED: Out of range value for column 'otp' at row 1` errors or clamping values to `2147483647`.
+
+---
+
+### B. Root Cause Analysis & Technical Diagnostics
+1. **Mobile Login Overlay Lifecycle Failure**:
+   - In `C:\Users\rajes\StudioProjects\jbac_app\src\pages\login\login.ts`, the loading overlay instance was instantiated as a local variable (`let loading = this.loadingCtrl.create(...)`).
+   - In the asynchronous HTTP subscription response callback, error handler, or timeout fallback, an uncaught runtime exception (`TypeError: Cannot read properties of undefined (reading 'dismiss')`) was thrown if `loading` was undefined or dismissed prematurely.
+   - Furthermore, navigation to `HomePage` (`this.navCtrl.setRoot(HomePage)`) was tied exclusively to the SweetAlert/AlertController OK button handler. If the dialog dismissed via tap-outside, backdrop click, or hardware back-key, the navigation root was never updated.
+   - Session tokens and user profiles in `localStorage` (`localStorage.setItem('user', ...)` and `localStorage.setItem('role', ...)`) were not flushed prior to showing the alert.
+2. **Registration Endpoint Field Bleed in Backend Server**:
+   - In `backend/server.ts` and `backend/server.js`, inside the `postregform` route handler, the code explicitly assigned the submitted primary phone number to every contact column:
+     - `parentnum: phone`
+     - `pastornum: phone`
+     - `whatsapp: phone`
+     - `phonenumber2: phone`
+     - `pa_phonenumber: phone`
+     - `president: phone`
+   - In `postregform`, `postwebsitesignup`, `postbeliversignup`, `postpastor`, `postchurchregister`, `studentsignup`, `postministrysignup`, `postindepedentorganisation`, and `postpastorassociations`, `users.otp` was receiving `phone` or `password` rather than a dedicated numeric one-time password.
+   - In `src/app/jesus/namodu/namodu.component.ts` (both web and mobile app projects), the submission payload included `password: submittedPhone`, inadvertently forcing the phone number into the password column.
+
+---
+
+### C. Implementation & Code Remediation
+
+#### 1. Mobile Login Overlay & Session Initialization (`jbac_app`)
+- **Controller Hardening (`src/pages/login/login.ts`)**:
+  - Bound the loading overlay to an explicit class instance property `this.loginLoading` with safe dismissal guards:
+    ```typescript
+    safeDismissLoading() {
+      if (this.loginLoading) {
+        try {
+          this.loginLoading.dismiss().catch(() => {});
+        } catch (e) {}
+        this.loginLoading = null;
+      }
+    }
+    ```
+  - **Immediate Session Persistence**: Upon receiving a 200/201 response, `localStorage.setItem('user', ...)` and `localStorage.setItem('role', ...)` execute immediately before rendering any UI alert.
+  - **Robust Navigation Triggers**: Registered `alert.onDidDismiss(() => this.navCtrl.setRoot(HomePage))` alongside the confirm button handler, ensuring the user is redirected to `HomePage` regardless of how the alert is cleared.
+- **Runtime Bundle Sync**: Patched `www/build/0.js` and `platforms/android/app/src/main/assets/www/build/0.js` with matching safe dismissal and immediate session storage logic.
+
+#### 2. Backend Registration Clean Separation (`backend/server.ts` & `backend/server.js`)
+- **Strict Contact Mapping**:
+  - In `postregform`, restricted `phone` strictly to the primary phone column for that specific entity type:
+    - Student ➔ `number: phone`, `parentnum: null` (unless explicitly provided in `req.body.parentnum`)
+    - Church ➔ `contactnumber: phone`, `pastornum: null`, `phonenumber2: null`
+    - Pastors Association ➔ `phonenumber: phone`, `pa_phonenumber: null`, `president: null`
+    - Believer ➔ `mobile_number: phone`, `whatsapp: req.body.whatsapp || null`
+    - Pastor ➔ `phonenumber: phone`, `whatsapp: req.body.whatsapp || null`
+    - Ministry ➔ `headnmber: phone`, `whatsapp: req.body.whatsapp || null`
+    - Independent Organisation ➔ `contact_num: phone`, `whatsapp: req.body.whatsapp || null`
+- **Protection for `users.otp`**:
+  - Sanitized the `otp` column across all registration routes (`postregform`, `postwebsitesignup`, etc.):
+    ```typescript
+    const sanitizedOtp = (req.body.otp && !isNaN(Number(req.body.otp)) && Number(req.body.otp) <= 999999) 
+      ? Number(req.body.otp) 
+      : null;
+    ```
+  - Guaranteed `users.otp` never receives phone numbers or plaintext passwords, completely eliminating 32-bit integer overflow exceptions.
+- **Flexible Password Verification (`passwordwebsitelogin`)**:
+  - Updated authentication query to allow login if the record has `password IS NULL` or `password = ''` or `password = ?` when matching against the phone number, without mutating the database password column.
+
+#### 3. Frontend Registration Component Cleanup (`namodu.component.ts`)
+- In `c:\Users\rajes\Documents\jbac_web\src\app\jesus\namodu\namodu.component.ts` and `C:\Users\rajes\StudioProjects\jbac_app\src\pages\entry-form\entry-form.ts` / `web-src`:
+  - Removed `password: submittedPhone` assignment.
+  - Form submissions only transmit the fields filled in by the registrant, leaving unentered contact fields clean.
+
+---
+
+### D. Database Legacy Data Cleanup & Live AWS Deployment
+1. **Live RDS Database Scrubbing (`jbac-mysql-db-v3`)**:
+   - Cleaned test records in `student_reg` (e.g. `Isaac`) where `parentnum` contained the student's mobile number.
+   - Executed query to nullify `otp` in the `users` table for 23 rows where `otp` was clamped to `2147483647` or contained phone numbers.
+2. **Lambda Packaging & Deployment**:
+   - Compiled TypeScript to JavaScript (`npx tsc`).
+   - Re-packaged `backend/backend-deploy.zip` with updated `server.js` and production dependencies.
+   - Deployed to AWS Lambda function `jbac-backend-api` in `ap-southeast-2` via AWS CLI:
+     ```bash
+     aws lambda update-function-code --function-name jbac-backend-api --zip-file fileb://backend/backend-deploy.zip --region ap-southeast-2
+     ```
+3. **Automated Live Cloud Verification**:
+   - Executed live API test script (`scripts/test_live_verify.js`) confirming:
+     - `POST /dashboardapi/postregform` creates records without contact bleed.
+     - `users.otp` remains `NULL` when phone number is provided.
+     - `POST /dashboardapi/passwordwebsitelogin` successfully authenticates with phone number.
+     - All 9 user categories pre-populate cleanly on `/dashboardapi/geteditdtails`.
+
+---
+
+### E. Mobile Release v0.0.35 (.apk & .aab)
+1. **Version Configuration**:
+   - `config.xml`: Bumped to `version="0.0.35" android-versionCode="35"`.
+   - `package.json`: Bumped to `"version": "0.0.35"`.
+   - `platforms/android/app/src/main/AndroidManifest.xml`: Bumped to `versionCode="35"` and `versionName="0.0.35"`.
+2. **Build & Signing Execution (`scripts/build_and_sign_release_v35.ps1`)**:
+   - Compiled release binaries with Gradle 7.4.2:
+     - `gradlew.bat assembleRelease bundleRelease -PcdvBuildToolsVersion=30.0.3`
+   - Zipaligned release APK and signed with `apksigner` and `Jbac.keystore` (v1 + v2 scheme).
+   - Signed release AAB with `jarsigner` and `Jbac.keystore`.
+   - Verified Android badging: `minSdkVersion: 24`, `targetSdkVersion: 36`.
+3. **Generated Artifacts**:
+   - **Signed APK for Testing**: `C:\Users\rajes\StudioProjects\jbac_app\jbacApp-0.0.35.apk` *(118.68 MB)*
+   - **Signed AAB for Play Store**: `C:\Users\rajes\StudioProjects\jbac_app\jbacApp-0.0.35.aab` *(115.81 MB)*
+   - **Play Store Upload Bundle**: `C:\Users\rajes\StudioProjects\jbac_app\appreleasesigned.aab` *(115.81 MB)*
+
+---
+
+### F. Git Synchronization & Release Notes Delivery
+1. **Repository Commits**:
+   - Committed and pushed to `dr-mjoseph/jbac_web` (`66d42de`).
+   - Committed and pushed to `dr-mjoseph/jbac_app` (`22abe11`).
+2. **Release Notes Provided**:
+   - Formatted release notes in English, Telugu, and Play Console XML for Google Play Console submission.
+
 
 
 

@@ -137,8 +137,48 @@ GitHub Issue: [#1](https://github.com/dr-mjoseph/jbac_web/issues/1)
 
 ---
 
-## 🎯 9. Pending Launch & Post-Release Tasks
-- [ ] Complete Google Play Console Review & Rollout for Release 33.
+## ⚡ 9. Milestone 9: AWS RDS Continuous Running, Edit Profile Pre-population, Telugu Wait Spinners, and Mobile Release v0.0.34
+- [x] **AWS RDS Continuous 24/7 Database Operation**:
+  - Audited AWS RDS instance `jbac-mysql-db-v3` in `ap-southeast-2` (`available` state).
+  - Confirmed standard AWS RDS instances run continuously 24/7 and do not auto-stop after 7 days unless manually stopped by an administrator.
+  - Enabled **Deletion Protection** on `jbac-mysql-db-v3` to prevent accidental deletion or automated cleanup.
+- [x] **Edit Profile Field Pre-population & Cascading Dropdowns**:
+  - Updated `/dashboardapi/geteditdtails` in `backend/server.ts` and `server.js` with phone-first fallback and normalized aliases across all 9 user categories (`belivers_tbl`, `pastors_tbl`, `student_tbl`, `ministry_tbl`, `church_reg`, `organisation_tbl`, `pastorsassociations_tbl`, `tbl_councelling_doctor`, `users`).
+  - Pre-populates filled fields (e.g. 8 out of 10) while leaving unentered fields (e.g. 2 out of 10) editable and blank.
+  - Automatically hydrates cascading dropdown options (`District ➔ Constituency ➔ Mandal ➔ Panchayat`) in both web (`update.component.ts`) and mobile app (`profile.ts`).
+- [x] **Telugu Wait Spinner Integration (`దయచేసి వేచి ఉండండి, ప్రాసెస్ అవుతోంది...`)**:
+  - Integrated loading indicators and disabled submit buttons during 2-3 second processing times across login, `/namodu`, `/entry`, and all 8 standalone registration forms in both web and mobile app.
+- [x] **Release Packaging & Signing (v0.0.34)**:
+  - Bumped version code to `34` and semantic version to `0.0.34`.
+  - Built and signed `jbacApp-0.0.34.apk` (118.68 MB) and `jbacApp-0.0.34.aab` (115.81 MB).
+
+---
+
+## 🛡️ 10. Milestone 10: Mobile Login Freeze Resolution, Clean Contact Field Separation, users.otp Overflow Elimination & Release v0.0.35
+- [x] **Mobile Login Overlay Freeze Resolution**:
+  - Diagnosed `TypeError: Cannot read properties of undefined (reading 'dismiss')` inside `LoginPage.prototype.passlogin`.
+  - Added safe loading controller dismissal (`safeDismissLoading()`) preventing frozen spinners upon login.
+  - Ensured immediate `localStorage` session commit (`user`, `role`, `mobile_number`, `token`) upon HTTP 200/201 response.
+  - Attached navigation to `HomePage` on alert OK tap and alert dismiss event.
+- [x] **Registration Contact Field Bleed Elimination**:
+  - Refactored `postregform` in `backend/server.ts` and `server.js` to stop copying `phone` into `parentnum`, `pastornum`, `whatsapp`, `phonenumber2`, `pa_phonenumber`, and `president`.
+  - Secondary contact fields remain clean / `NULL` unless explicitly provided by the registrant.
+- [x] **`users.otp` 32-Bit Integer Overflow Fix**:
+  - Sanitized `otp` field across all registration endpoints to ensure 10-digit phone numbers and passwords are never inserted into the MySQL `INT` column (max `2147483647`).
+- [x] **Legacy Database Cleanup**:
+  - Cleaned 23 legacy test rows in `users` with capped OTPs and cleaned student test records in `student_reg`.
+- [x] **AWS Lambda Deployment & Verification**:
+  - Deployed updated `backend-deploy.zip` to AWS Lambda `jbac-backend-api` in `ap-southeast-2` and verified live with automated tests.
+- [x] **Mobile Release Packaging & Signing (v0.0.35)**:
+  - Bumped version code to `35` and semantic version to `0.0.35` (`targetSdkVersion 36`).
+  - Built and signed `jbacApp-0.0.35.apk` (118.68 MB) and `jbacApp-0.0.35.aab` (115.81 MB).
+  - Pushed commits to both GitHub repositories (`dr-mjoseph/jbac_web` and `dr-mjoseph/jbac_app`).
+  - Delivered localized Google Play Console release notes in English, Telugu, and Play Console XML.
+
+---
+
+## 🎯 11. Pending Launch & Post-Release Tasks
+- [ ] Complete Google Play Console Review & Rollout for Release 35 (`jbacApp-0.0.35.aab`).
 - [ ] Monitor crash telemetry and user feedback via Google Play Console dashboard.
 - [ ] Run automated end-to-end smoke testing across all live production forms on https://jbac.in.
 

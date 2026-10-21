@@ -16,7 +16,7 @@ Welcome to the **Jesus Believers Association Council (JBAC)** unified ecosystem 
                                     v                                   v
                       +---------------------------+       +---------------------------+
                       |   AWS Route 53 (DNS)      |       |  Android Mobile App       |
-                      |   jbac.in / www.jbac.in   |       |  (jbacApp-0.0.33.apk/aab) |
+                      |   jbac.in / www.jbac.in   |       |  (jbacApp-0.0.35.apk/aab) |
                       +---------------------------+       +---------------------------+
                                     |                                   |
                                     v                                   |
@@ -66,8 +66,9 @@ Welcome to the **Jesus Believers Association Council (JBAC)** unified ecosystem 
    - Interactive 6-slide hero banner carousel (optimized with preloaded WebP assets), live announcements, job postings, and media galleries.
    - Dynamic **Events & Meetings Portal** with horizontal scrolling ribbon powered by the `events` table with automatic date-based expiration (displaying if and only if `d_in == 1` and meeting date is current or upcoming, automatically expiring upon completion without requiring manual database resets), date-based tabs ("నేటి మీటింగ్స్" vs "రాబోయే మీటింగ్స్"), cascading geographic filters, and responsive 3-column meeting cards with poster zoom previews.
 5. **Native Android Application (`jbac_app`)**:
-   - Android app compliant with Google Play Store standards (`targetSdkVersion 36`, `minSdkVersion 24`, release version `0.0.33` / `versionCode 33`).
+   - Android app compliant with Google Play Store standards (`targetSdkVersion 36`, `minSdkVersion 24`, release version `0.0.35` / `versionCode 35`).
    - Official production release signing via `Jbac.keystore`.
+   - Includes real-time Telugu wait spinner alerts, immediate session persistence, and seamless login navigation.
 
 ---
 
@@ -119,11 +120,11 @@ npm run import:db
 The mobile application is housed in `C:\Users\rajes\StudioProjects\jbac_app` (repository: `dr-mjoseph/jbac_app`).
 
 - **Release Scripts**:
-  - `powershell -ExecutionPolicy Bypass -File .\scripts\build_and_sign_release_v33.ps1`
+  - `powershell -ExecutionPolicy Bypass -File .\scripts\build_and_sign_release_v35.ps1`
   - Automated tasks compile Gradle release binaries, perform 4-byte `zipalign`, sign the APK with `apksigner`, and sign the AAB with `jarsigner` using `Jbac.keystore`.
-- **Active Release Artifacts (v0.0.33 / versionCode 33)**:
-  - **APK**: `C:\Users\rajes\StudioProjects\jbac_app\jbacApp-0.0.33.apk`
-  - **AAB**: `C:\Users\rajes\StudioProjects\jbac_app\appreleasesigned.aab` / `jbacApp-0.0.33.aab`
+- **Active Release Artifacts (v0.0.35 / versionCode 35)**:
+  - **APK**: `C:\Users\rajes\StudioProjects\jbac_app\jbacApp-0.0.35.apk`
+  - **AAB**: `C:\Users\rajes\StudioProjects\jbac_app\appreleasesigned.aab` / `jbacApp-0.0.35.aab`
   - **SDK Settings**: `minSdkVersion 24`, `targetSdkVersion 36`, `compileSdkVersion 34`.
 
 ---
