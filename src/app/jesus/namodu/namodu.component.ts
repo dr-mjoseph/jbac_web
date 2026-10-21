@@ -427,12 +427,11 @@ export class NamoduComponent {
     const whatsappVal = this.entryform.value?.whatsapp || '';
     const payload = {
       ...this.entryform.value,
-      password: submittedPhone,
       source: 'namodu',
       is_namodu: true,
-      whatsapp: whatsappVal,
-      whatsappno: whatsappVal,
-      whatsapp_number: whatsappVal
+      whatsapp: whatsappVal || null,
+      whatsappno: whatsappVal || null,
+      whatsapp_number: whatsappVal || null
     };
     this.service.postregform(payload).subscribe(
       (res: any) => {

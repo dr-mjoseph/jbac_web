@@ -725,7 +725,7 @@ app.post(['/dashboardapi/postbeliversignup', '/api/postbeliver', '/dashboardapi/
                     name: `${b.fname || ''} ${b.lname || ''}`.trim() || 'Believer',
                     number: phone,
                     email: b.email || null,
-                    otp: b.password,
+                    otp: 0,
                     d_in: 0
                 });
             }
@@ -767,7 +767,7 @@ app.post(['/dashboardapi/postpastor', '/api/postpastor', '/dashboardapi/postrpas
                     name: p.pastorname || p.name || 'Pastor',
                     number: phone,
                     email: p.email || null,
-                    otp: p.password,
+                    otp: 0,
                     d_in: 0
                 });
             }
@@ -870,7 +870,7 @@ app.post(['/dashboardapi/postchurchregister', '/api/postchurchregister'], async 
                     name: c.church_name || c.churchname || 'Church',
                     number: phone,
                     email: c.email || null,
-                    otp: c.password,
+                    otp: 0,
                     d_in: 0
                 });
             }
@@ -1033,7 +1033,7 @@ app.post(['/dashboardapi/studentsignup', '/api/studentsignup'], async (req, res)
                     name: s.studentname || 'Student',
                     number: phone,
                     email: s.email || null,
-                    otp: s.password,
+                    otp: 0,
                     d_in: 0
                 });
             }
@@ -1069,7 +1069,7 @@ app.post(['/dashboardapi/postministrysignup', '/api/postministrysignup'], async 
                     name: m.ministryname || 'Ministry',
                     number: phone,
                     email: m.ministryemail || m.email || null,
-                    otp: m.password,
+                    otp: 0,
                     d_in: 0
                 });
             }
@@ -1105,7 +1105,7 @@ app.post(['/dashboardapi/postindepedentorganisation', '/dashboardapi/postindepen
                     name: o.organisation_name || 'Organization',
                     number: phone,
                     email: o.email || null,
-                    otp: o.password,
+                    otp: 0,
                     d_in: 0
                 });
             }
@@ -1245,7 +1245,7 @@ app.post(['/dashboardapi/postpastorassociations', '/api/postpastorassociations']
                     name: a.paname || a.headname || 'Pastor Association',
                     number: phone,
                     email: a.email || null,
-                    otp: a.password,
+                    otp: 0,
                     d_in: 0
                 });
             }
@@ -1592,8 +1592,9 @@ app.post(['/dashboardapi/postregform', '/api/postregform'], async (req, res) => 
         const isNamodu = body.source === 'namodu' || body.is_namodu === true || body.form_name === 'namodu' || (body.number && !body.phnumber);
         const phone = String(body.phonenum || body.phnumber || body.mobile_number || body.phone || body.number || '').trim();
         const name = String(body.name || body.studentname || body.pastorname || body.church_name || body.paname || body.ministryname || body.organisation_name || '').trim();
-        const pwd = String(body.password || phone).trim();
-        const whatsappPhone = String(body.whatsapp || body.whatsappno || body.whatsapp_number || body.whatsapnum || '').trim();
+        const rawPwd = body.password ? String(body.password).trim() : null;
+        const pwd = (rawPwd && rawPwd !== phone) ? rawPwd : null;
+        const whatsappPhone = String(body.whatsapp || body.whatsappno || body.whatsapp_number || body.whatsapnum || '').trim() || null;
         const distId = body.district_id || body.districts || body.districtname || null;
         const constId = body.constituency_id || body.constituencyname || body.constituency || null;
         const mandalId = body.mandal_id || body.mandals || body.mandalname || null;
@@ -1604,8 +1605,10 @@ app.post(['/dashboardapi/postregform', '/api/postregform'], async (req, res) => 
 
         if (phone) {
             body.phonenum = phone;
-            if (!body.password) {
+            if (pwd) {
                 body.password = pwd;
+            } else {
+                delete body.password;
             }
             body.is_first_login = 1;
             body.cts = cts;
@@ -1613,6 +1616,11 @@ app.post(['/dashboardapi/postregform', '/api/postregform'], async (req, res) => 
                 body.whatsappno = whatsappPhone;
                 body.whatsapp = whatsappPhone;
                 body.whatsapp_number = whatsappPhone;
+            } else {
+                delete body.whatsapp;
+                delete body.whatsappno;
+                delete body.whatsapp_number;
+                delete body.whatsapnum;
             }
         }
 
@@ -1628,7 +1636,7 @@ app.post(['/dashboardapi/postregform', '/api/postregform'], async (req, res) => 
         let targetCategoryTable = '';
 
         try {
-            if (cat === '1' || cat.includes('believer') || cat.includes('విశ్వాసి')) {
+            if (cat === '1' || cat.includes('believer') || cat.includes('\u0c35\u0c3f\u0c36\u0c4d\u0c35\u0c3e\u0c38\u0c3f')) {
                 // Category 1: Believer -> signup_form
                 targetCategoryTable = 'signup_form';
                 categoryInsertResult = await dynamicInsert('signup_form', {
@@ -1650,15 +1658,15 @@ app.post(['/dashboardapi/postregform', '/api/postregform'], async (req, res) => 
                     approval_ind: 0,
                     is_first_login: 1
                 });
-            } else if (cat === '2' || cat.includes('student') || cat.includes('విద్యార్థి')) {
+            } else if (cat === '2' || cat.includes('student') || cat.includes('\u0c35\u0c3f\u0c26\u0c4d\u0c2f\u0c3e\u0c30\u0c4d\u0c25\u0c3f')) {
                 targetCategoryTable = 'student_reg';
                 categoryInsertResult = await dynamicInsert('student_reg', {
                     cts: cts,
                     studentname: name,
                     number: phone,
                     whatsapp: whatsappPhone,
-                    parentnum: phone,
-                    pastornum: phone,
+                    parentnum: body.parentnum || body.mother || body.fathernum || null,
+                    pastornum: body.pastornum || null,
                     district_id: distId,
                     constituency_id: constId,
                     mandal_id: mandalId,
@@ -1671,15 +1679,15 @@ app.post(['/dashboardapi/postregform', '/api/postregform'], async (req, res) => 
                     approval_ind: 0,
                     is_first_login: 1
                 });
-            } else if (cat === '4' || ((cat.includes('pastor') || cat.includes('పాస్టర్')) && !cat.includes('association') && !cat.includes('అసోసియేషన్'))) {
+            } else if (cat === '4' || ((cat.includes('pastor') || cat.includes('\u0c2a\u0c3e\u0c38\u0c4d\u0c1f\u0c30\u0c4d')) && !cat.includes('association') && !cat.includes('\u0c05\u0c38\u0c4b\u0c38\u0c3f\u0c2f\u0c47\u0c37\u0c28\u0c4d'))) {
                 targetCategoryTable = 'pastor_reg';
                 categoryInsertResult = await dynamicInsert('pastor_reg', {
                     cts: cts,
                     pastorname: name,
                     phonenumber: phone,
                     whatsapp: whatsappPhone,
-                    phonenumber2: phone,
-                    pa_phonenumber: phone,
+                    phonenumber2: body.phonenumber2 || null,
+                    pa_phonenumber: body.pa_phonenumber || null,
                     district_id: distId,
                     constituency_id: constId,
                     mandal_id: mandalId,
@@ -1693,7 +1701,7 @@ app.post(['/dashboardapi/postregform', '/api/postregform'], async (req, res) => 
                     approval_ind: 0,
                     is_first_login: 1
                 });
-            } else if (cat === '5' || cat.includes('church') || cat.includes('చర్చి')) {
+            } else if (cat === '5' || cat.includes('church') || cat.includes('\u0c1a\u0c30\u0c4d\u0c1a\u0c3f')) {
                 targetCategoryTable = 'church_reg';
                 categoryInsertResult = await dynamicInsert('church_reg', {
                     cts: cts,
@@ -1712,15 +1720,17 @@ app.post(['/dashboardapi/postregform', '/api/postregform'], async (req, res) => 
                     approval_ind: 0,
                     is_first_login: 1
                 });
-            } else if (cat === '7' || cat.includes('association') || cat.includes('అసోసియేషన్')) {
+            } else if (cat === '7' || cat.includes('association') || cat.includes('\u0c05\u0c38\u0c4b\u0c38\u0c3f\u0c2f\u0c47\u0c37\u0c28\u0c4d')) {
                 targetCategoryTable = 'pastors_associations';
                 categoryInsertResult = await dynamicInsert('pastors_associations', {
                     cts: cts,
                     paname: name,
                     headname: name,
                     phonenumber: phone,
-                    whatsapp_number: whatsappPhone || phone,
-                    president: phone,
+                    whatsapp_number: whatsappPhone,
+                    president: body.president || null,
+                    secretory: body.secretory || null,
+                    stdph: body.stdph || null,
                     districtname: distId,
                     constituencyname: constId,
                     mandals: mandalId,
@@ -1732,7 +1742,7 @@ app.post(['/dashboardapi/postregform', '/api/postregform'], async (req, res) => 
                     d_in: 0,
                     is_first_login: 1
                 });
-            } else if (cat === '3' || cat.includes('ministr') || cat.includes('మినిస్ట్రీస్')) {
+            } else if (cat === '3' || cat.includes('ministr') || cat.includes('\u0c2e\u0c3f\u0c28\u0c3f\u0c38\u0c4d\u0c1f\u0c4d\u0c30\u0c40\u0c38\u0c4d')) {
                 targetCategoryTable = 'ministry_signup';
                 categoryInsertResult = await dynamicInsert('ministry_signup', {
                     cts: cts,
@@ -1753,7 +1763,7 @@ app.post(['/dashboardapi/postregform', '/api/postregform'], async (req, res) => 
                     approval_ind: 0,
                     is_first_login: 1
                 });
-            } else if (cat === '6' || cat.includes('organization') || cat.includes('ఆర్గనైజేషన్')) {
+            } else if (cat === '6' || cat.includes('organization') || cat.includes('\u0c06\u0c30\u0c4d\u0c17\u0c28\u0c48\u0c1c\u0c47\u0c37\u0c28\u0c4d')) {
                 targetCategoryTable = 'independentorganisation_reg';
                 categoryInsertResult = await dynamicInsert('independentorganisation_reg', {
                     cts: cts,
@@ -1771,7 +1781,7 @@ app.post(['/dashboardapi/postregform', '/api/postregform'], async (req, res) => 
                     approval_ind: 0,
                     is_first_login: 1
                 });
-            } else if (cat === '8' || cat.includes('business') || cat.includes('company') || cat.includes('ఆఫీస్') || cat.includes('కంపెనీ')) {
+            } else if (cat === '8' || cat.includes('business') || cat.includes('company') || cat.includes('\u0c06\u0c2b\u0c40\u0c38\u0c4d') || cat.includes('\u0c15\u0c02\u0c2a\u0c46\u0c28\u0c40')) {
                 targetCategoryTable = 'business_table';
                 categoryInsertResult = await dynamicInsert('business_table', {
                     cts: cts,
@@ -1790,14 +1800,14 @@ app.post(['/dashboardapi/postregform', '/api/postregform'], async (req, res) => 
             console.error('Category specific table insert error:', catErr?.message);
         }
 
-        // Also insert/update users table
+        // Also insert/update users table (without setting phone to otp!)
         if (phone) {
             try {
                 await dynamicInsert('users', {
                     name: name || 'Member',
                     number: phone,
                     email: body.email || null,
-                    otp: pwd,
+                    otp: 0,
                     d_in: 0
                 });
             } catch (_) {}
@@ -1857,7 +1867,7 @@ app.all(['/dashboardapi/updatefamilymemberpassword', '/api/updatefamilymemberpas
             params.push(memberName);
         }
         const [regResult] = await db.query(updateSql, params);
-        await db.query('UPDATE users SET otp = ? WHERE number = ?', [newPassword, phone]).catch(() => { });
+        // users.otp is not a password field
         await db.query('UPDATE signup_form SET password = ? WHERE mobile_number = ?', [newPassword, phone]).catch(() => { });
         await db.query('UPDATE belivers_tbl SET password = ? WHERE mobile_number = ?', [newPassword, phone]).catch(() => { });
         res.json({
@@ -1990,49 +2000,49 @@ app.post(['/dashboardapi/passwordwebsitelogin', '/api/login'], async (req, res) 
                 name: 'signup_form',
                 category_id: '1',
                 category_name: 'Believer',
-                query: 'SELECT id, CONCAT(fname, " ", COALESCE(lname, "")) as name, mobile_number, email, password, is_first_login FROM signup_form WHERE mobile_number = ? AND password = ?',
+                query: 'SELECT id, CONCAT(fname, " ", COALESCE(lname, "")) as name, mobile_number, email, password, is_first_login FROM signup_form WHERE mobile_number = ? AND (password = ? OR ((password IS NULL OR password = "") AND ? = mobile_number))',
                 phoneQuery: 'SELECT id FROM signup_form WHERE mobile_number = ?'
             },
             '2': {
                 name: 'student_reg',
                 category_id: '2',
                 category_name: 'Student',
-                query: 'SELECT id, studentname as name, number as mobile_number, null as email, password, is_first_login FROM student_reg WHERE number = ? AND password = ?',
+                query: 'SELECT id, studentname as name, number as mobile_number, null as email, password, is_first_login FROM student_reg WHERE number = ? AND (password = ? OR ((password IS NULL OR password = "") AND ? = number))',
                 phoneQuery: 'SELECT id FROM student_reg WHERE number = ?'
             },
             '3': {
                 name: 'ministry_signup',
                 category_id: '3',
                 category_name: 'Ministry',
-                query: 'SELECT id, ministryname as name, headnmber as mobile_number, ministryemail as email, password, is_first_login FROM ministry_signup WHERE headnmber = ? AND password = ?',
+                query: 'SELECT id, ministryname as name, headnmber as mobile_number, ministryemail as email, password, is_first_login FROM ministry_signup WHERE headnmber = ? AND (password = ? OR ((password IS NULL OR password = "") AND ? = headnmber))',
                 phoneQuery: 'SELECT id FROM ministry_signup WHERE headnmber = ?'
             },
             '4': {
                 name: 'pastor_reg',
                 category_id: '4',
                 category_name: 'Pastor',
-                query: 'SELECT id, pastorname as name, phonenumber as mobile_number, null as email, password, is_first_login FROM pastor_reg WHERE phonenumber = ? AND password = ?',
+                query: 'SELECT id, pastorname as name, phonenumber as mobile_number, null as email, password, is_first_login FROM pastor_reg WHERE phonenumber = ? AND (password = ? OR ((password IS NULL OR password = "") AND ? = phonenumber))',
                 phoneQuery: 'SELECT id FROM pastor_reg WHERE phonenumber = ?'
             },
             '5': {
                 name: 'church_reg',
                 category_id: '5',
                 category_name: 'Church',
-                query: 'SELECT id, church_name as name, contactnumber as mobile_number, null as email, password, is_first_login FROM church_reg WHERE contactnumber = ? AND password = ?',
+                query: 'SELECT id, church_name as name, contactnumber as mobile_number, null as email, password, is_first_login FROM church_reg WHERE contactnumber = ? AND (password = ? OR ((password IS NULL OR password = "") AND ? = contactnumber))',
                 phoneQuery: 'SELECT id FROM church_reg WHERE contactnumber = ?'
             },
             '6': {
                 name: 'independentorganisation_reg',
                 category_id: '6',
                 category_name: 'Independent Organization',
-                query: 'SELECT id, organisation_name as name, contact_num as mobile_number, email, password, is_first_login FROM independentorganisation_reg WHERE contact_num = ? AND password = ?',
+                query: 'SELECT id, organisation_name as name, contact_num as mobile_number, email, password, is_first_login FROM independentorganisation_reg WHERE contact_num = ? AND (password = ? OR ((password IS NULL OR password = "") AND ? = contact_num))',
                 phoneQuery: 'SELECT id FROM independentorganisation_reg WHERE contact_num = ?'
             },
             '7': {
                 name: 'pastors_associations',
                 category_id: '7',
                 category_name: 'Pastors Association',
-                query: 'SELECT id, paname as name, phonenumber as mobile_number, null as email, password, is_first_login FROM pastors_associations WHERE phonenumber = ? AND password = ?',
+                query: 'SELECT id, paname as name, phonenumber as mobile_number, null as email, password, is_first_login FROM pastors_associations WHERE phonenumber = ? AND (password = ? OR ((password IS NULL OR password = "") AND ? = phonenumber))',
                 phoneQuery: 'SELECT id FROM pastors_associations WHERE phonenumber = ?'
             },
             '8': {
@@ -2046,7 +2056,7 @@ app.post(['/dashboardapi/passwordwebsitelogin', '/api/login'], async (req, res) 
         // 1. If category provided, check category table first
         if (cat && categoryTables[cat]) {
             const cfg = categoryTables[cat];
-            const [rows] = await db.query(cfg.query, [phone, pwd]);
+            const [rows] = await db.query(cfg.query, [phone, pwd, pwd]);
             if (rows && rows.length > 0) {
                 const user = rows[0];
                 const userObj = formatUser(user, cfg.category_id, cfg.category_name);
@@ -2065,7 +2075,7 @@ app.post(['/dashboardapi/passwordwebsitelogin', '/api/login'], async (req, res) 
         for (const [key, cfg] of Object.entries(categoryTables)) {
             if (cat && key === cat)
                 continue;
-            const [rows] = await db.query(cfg.query, [phone, pwd]);
+            const [rows] = await db.query(cfg.query, [phone, pwd, pwd]);
             if (rows && rows.length > 0) {
                 const user = rows[0];
                 const userObj = formatUser(user, cfg.category_id, cfg.category_name);
@@ -2172,7 +2182,7 @@ app.post(['/dashboardapi/postwebsitesignup', '/api/signup'], async (req, res) =>
         if (existing && existing.length > 0) {
             return res.json({ status: 300, message: 'Account with this phone number already exists!' });
         }
-        const [resHeader] = await db.query('INSERT INTO users (name, number, email, otp, d_in) VALUES (?, ?, ?, ?, 0)', [name, phone, userMail, password]);
+        const [resHeader] = await db.query('INSERT INTO users (name, number, email, otp, d_in) VALUES (?, ?, ?, NULL, 0)', [name, phone, userMail]);
         res.json({ status: 200, message: 'Signup completed successfully', insertId: resHeader.insertId });
     }
     catch (err) {
@@ -2207,7 +2217,7 @@ app.post(['/dashboardapi/createfrgetpassword', '/api/resetpassword'], async (req
         else {
             await db.query('UPDATE reg_form SET password = ?, is_first_login = 0 WHERE phonenum = ?', [pwd, phone]).catch(() => { });
         }
-        await db.query('UPDATE users SET otp = ? WHERE number = ?', [pwd, phone]).catch(() => { });
+        // users.otp is not a password field
         await db.query('UPDATE signup_form SET password = ? WHERE mobile_number = ?', [pwd, phone]).catch(() => { });
         await db.query('UPDATE belivers_tbl SET password = ? WHERE mobile_number = ?', [pwd, phone]).catch(() => { });
         res.json({ status: 200, message: 'Password updated successfully' });
@@ -2695,7 +2705,7 @@ app.all(['/dashboardapi/upadtedpassword', '/dashboardapi/updatedpassword', '/api
             phoneCol = 'headnmber';
         }
         await db.query(`UPDATE \`${table}\` SET password = ? WHERE \`${phoneCol}\` = ? AND d_in = 0`, [newPass, phone]).catch(() => { });
-        await db.query('UPDATE users SET otp = ? WHERE number = ?', [newPass, phone]).catch(() => { });
+        // users.otp is not a password field
         await db.query('UPDATE signup_form SET password = ? WHERE mobile_number = ?', [newPass, phone]).catch(() => { });
         res.json({ status: 200, message: 'Password updated successfully' });
     }
