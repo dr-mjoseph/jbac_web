@@ -1122,10 +1122,9 @@
     // Configuration & State
     const DEFAULT_API_BASE = 'https://1a8kqxawxd.execute-api.ap-southeast-2.amazonaws.com';
     let API_BASE = localStorage.getItem('jbac_admin_api_base') || DEFAULT_API_BASE;
-    if (window.location.hostname !== 'localhost' && !window.location.hostname.includes('127.0.0.1') && !window.location.protocol.startsWith('file')) {
-      if (window.location.origin.includes('execute-api') || window.location.origin.includes('jbac.in')) {
-        API_BASE = window.location.origin;
-      }
+    // If loaded directly on API Gateway Lambda stage, use current origin; on jbac.in, use the Lambda API backend
+    if (window.location.origin && window.location.origin.includes('execute-api')) {
+      API_BASE = window.location.origin;
     }
 
     let allTables = [];
