@@ -129,8 +129,22 @@ const routes: Routes = [
  { path: 'family-counseling', component: FamilyCouncellingComponent },
  { path: 'doctorregister', component: DoctorregisterComponent },
  { path: 'doctor-register', component: DoctorregisterComponent },
- { path: 'admin', redirectTo: '' },
- { path: 'public.html', redirectTo: '' },
+  {
+    path: 'admin',
+    children: [],
+    canActivate: [() => {
+      window.location.href = '/admin';
+      return false;
+    }]
+  },
+  {
+    path: 'public.html',
+    children: [],
+    canActivate: [() => {
+      window.location.href = '/public.html';
+      return false;
+    }]
+  },
  { path: '**', redirectTo: '' }
 ];
 
