@@ -2,7 +2,8 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+  <meta name="description" content="JBAC Cloud Database & Query Cockpit - AWS RDS MySQL 8.4 Administration Console">
   <title>JBAC Cloud Database & Query Cockpit - AWS RDS MySQL 8.4</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -130,19 +131,15 @@
     .endpoint-select-wrap {
       display: flex;
       align-items: center;
+      gap: 6px;
       background: var(--code-bg);
       border: 1px solid var(--border-subtle);
-      border-radius: 6px;
-      padding: 2px 6px;
-      font-size: 0.78rem;
+      border-radius: 8px;
+      padding: 4px 10px;
+      font-size: 0.8rem;
     }
 
-    .endpoint-select-wrap span {
-      color: var(--text-dim);
-      margin-right: 6px;
-      font-family: 'JetBrains Mono', monospace;
-    }
-
+    .endpoint-select-wrap span { color: var(--text-dim); }
     .endpoint-input {
       background: transparent;
       border: none;
@@ -153,78 +150,118 @@
       outline: none;
     }
 
-    .btn {
-      background: var(--bg-card);
-      color: var(--text-main);
-      border: 1px solid var(--border-subtle);
-      padding: 7px 14px;
-      border-radius: 6px;
-      font-size: 0.82rem;
-      font-weight: 500;
+    /* Admin Auth User Badge */
+    .admin-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 5px 12px;
+      border-radius: 8px;
+      background: rgba(139, 92, 246, 0.15);
+      border: 1px solid rgba(139, 92, 246, 0.35);
+      font-size: 0.78rem;
+      color: #c4b5fd;
+      font-weight: 600;
+    }
+
+    .btn-logout {
+      background: rgba(239, 68, 68, 0.2);
+      border: 1px solid rgba(239, 68, 68, 0.4);
+      color: #fca5a5;
+      padding: 3px 8px;
+      border-radius: 5px;
+      font-size: 0.72rem;
       cursor: pointer;
+      transition: all 0.15s;
+    }
+    .btn-logout:hover {
+      background: var(--danger);
+      color: #fff;
+    }
+
+    /* Buttons */
+    .btn {
       display: inline-flex;
       align-items: center;
       gap: 6px;
+      padding: 7px 14px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      border-radius: 7px;
+      border: 1px solid var(--border-subtle);
+      background: var(--bg-card);
+      color: var(--text-main);
+      cursor: pointer;
       transition: all 0.15s ease;
-      user-select: none;
+      text-decoration: none;
     }
 
-    .btn:hover { background: var(--bg-card-hover); border-color: #3b506d; }
-    .btn-primary { background: var(--primary); border-color: var(--primary); color: #fff; }
-    .btn-primary:hover { background: var(--primary-hover); }
+    .btn:hover {
+      background: var(--bg-card-hover);
+      border-color: #3b506d;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: #fff;
+    }
+    .btn-primary:hover {
+      background: var(--primary-hover);
+      border-color: var(--primary-hover);
+    }
+
     .btn-success { background: var(--success); border-color: var(--success); color: #fff; }
+    .btn-success:hover { background: #059669; }
+
     .btn-danger { background: var(--danger); border-color: var(--danger); color: #fff; }
-    .btn-sm { padding: 4px 8px; font-size: 0.74rem; }
+    .btn-danger:hover { background: #dc2626; }
+
+    .btn-sm { padding: 5px 10px; font-size: 0.75rem; }
 
     /* Navigation Tabs */
     .nav-tabs {
       display: flex;
-      gap: 4px;
-      background: #0d131f;
-      padding: 6px 14px 0;
+      background: var(--bg-surface);
       border-bottom: 1px solid var(--border-subtle);
+      padding: 0 20px;
+      gap: 8px;
       flex-shrink: 0;
     }
 
     .nav-tab {
-      padding: 9px 18px;
-      font-size: 0.85rem;
+      padding: 12px 18px;
+      font-size: 0.88rem;
       font-weight: 600;
       color: var(--text-muted);
-      border-top-left-radius: 8px;
-      border-top-right-radius: 8px;
       cursor: pointer;
+      border-bottom: 2px solid transparent;
       display: flex;
       align-items: center;
       gap: 8px;
-      border: 1px solid transparent;
-      border-bottom: none;
-      transition: all 0.15s;
+      transition: all 0.15s ease;
+      user-select: none;
     }
 
-    .nav-tab:hover { color: var(--text-main); background: rgba(255,255,255,0.03); }
+    .nav-tab:hover { color: var(--text-main); }
     .nav-tab.active {
-      color: #60a5fa;
-      background: var(--bg-surface);
-      border-color: var(--border-subtle);
-      border-bottom: 2px solid var(--primary);
+      color: var(--primary);
+      border-bottom-color: var(--primary);
+      background: linear-gradient(180deg, transparent, rgba(59, 130, 246, 0.05));
     }
 
-    /* Main View Container */
+    /* Main Workspace Views */
     .view-container {
       flex: 1;
-      overflow: hidden;
       display: none;
-      height: calc(100vh - 105px);
+      height: calc(100vh - 110px);
+      overflow: hidden;
+      position: relative;
     }
 
-    .view-container.active {
-      display: flex;
-    }
+    .view-container.active { display: flex; }
 
-    /* ==========================================================================
-       TAB 1: DASHBOARD OVERVIEW
-       ========================================================================== */
+    /* View 1: Dashboard */
     .dashboard-view {
       flex-direction: column;
       overflow-y: auto;
@@ -235,7 +272,7 @@
 
     .metrics-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
       gap: 16px;
     }
 
@@ -246,16 +283,14 @@
       padding: 18px 20px;
       display: flex;
       flex-direction: column;
-      justify-content: space-between;
-      position: relative;
-      overflow: hidden;
-      transition: transform 0.2s, border-color 0.2s;
+      gap: 8px;
+      transition: all 0.2s;
       cursor: pointer;
     }
 
     .metric-card:hover {
-      transform: translateY(-2px);
       border-color: var(--primary);
+      transform: translateY(-2px);
       box-shadow: 0 8px 24px rgba(0,0,0,0.3);
     }
 
@@ -264,7 +299,7 @@
       align-items: center;
       justify-content: space-between;
       color: var(--text-muted);
-      font-size: 0.85rem;
+      font-size: 0.82rem;
       font-weight: 500;
     }
 
@@ -280,20 +315,17 @@
     }
 
     .metric-card-value {
-      font-size: 1.9rem;
+      font-size: 1.85rem;
       font-weight: 800;
-      letter-spacing: -0.02em;
-      margin: 12px 0 4px;
       color: #fff;
-      font-family: 'JetBrains Mono', monospace;
+      letter-spacing: -0.02em;
+      font-family: 'Inter', sans-serif;
     }
 
     .metric-card-footer {
-      font-size: 0.74rem;
+      font-size: 0.72rem;
       color: var(--text-dim);
-      display: flex;
-      align-items: center;
-      gap: 4px;
+      font-family: 'JetBrains Mono', monospace;
     }
 
     .dash-sections {
@@ -343,31 +375,27 @@
       border: 1px solid var(--border-subtle);
       padding: 10px 14px;
       border-radius: 8px;
-      color: var(--text-main);
-      font-size: 0.82rem;
       display: flex;
       align-items: center;
       justify-content: space-between;
+      color: var(--text-main);
       cursor: pointer;
-      text-align: left;
       transition: all 0.15s;
+      text-align: left;
     }
 
     .quick-query-btn:hover {
       background: var(--bg-card-hover);
       border-color: var(--primary);
+    }
+
+    .quick-query-sql {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.76rem;
       color: #93c5fd;
     }
 
-    .quick-query-btn code {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.75rem;
-      color: var(--text-dim);
-    }
-
-    /* ==========================================================================
-       TAB 2: SQL QUERY CONSOLE
-       ========================================================================== */
+    /* View 2: Query Console */
     .query-view {
       flex-direction: column;
       width: 100%;
@@ -375,17 +403,17 @@
       overflow: hidden;
     }
 
-    .query-top-panel {
+    .query-editor-wrap {
       background: var(--bg-surface);
       border-bottom: 1px solid var(--border-subtle);
-      padding: 14px 20px;
+      padding: 16px 20px;
       display: flex;
       flex-direction: column;
       gap: 12px;
       flex-shrink: 0;
     }
 
-    .query-bar {
+    .query-toolbar {
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -404,12 +432,16 @@
       min-width: 280px;
     }
 
-    .editor-container {
+    .sql-editor-container {
       position: relative;
       border: 1px solid var(--border-subtle);
       border-radius: 8px;
-      overflow: hidden;
       background: var(--code-bg);
+    }
+
+    .sql-editor-container:focus-within {
+      border-color: var(--border-focus);
+      box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
     }
 
     .sql-editor {
@@ -426,47 +458,14 @@
       outline: none;
     }
 
-    .sql-editor:focus {
-      background: #090e17;
-    }
-
-    .query-status-bar {
+    .query-history-bar {
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      padding: 8px 20px;
-      background: #0d131f;
-      border-bottom: 1px solid var(--border-subtle);
-      font-size: 0.78rem;
-      color: var(--text-muted);
-      flex-shrink: 0;
-    }
-
-    .status-left {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-    }
-
-    .query-results-area {
-      flex: 1;
-      overflow: auto;
-      padding: 16px 20px;
-      background: var(--bg-dark);
-    }
-
-    /* History Drawer */
-    .history-drawer {
-      padding: 10px 20px;
-      background: var(--bg-surface);
-      border-top: 1px solid var(--border-subtle);
-      display: flex;
-      align-items: center;
-      gap: 10px;
+      gap: 8px;
       overflow-x: auto;
-      white-space: nowrap;
-      flex-shrink: 0;
       font-size: 0.75rem;
+      color: var(--text-dim);
+      padding-top: 4px;
     }
 
     .history-pill {
@@ -480,13 +479,39 @@
       max-width: 240px;
       overflow: hidden;
       text-overflow: ellipsis;
+      white-space: nowrap;
     }
 
-    .history-pill:hover { border-color: var(--primary); color: #93c5fd; }
+    .history-pill:hover { border-color: var(--primary); color: #fff; }
 
-    /* ==========================================================================
-       TAB 3: TABLE EXPLORER
-       ========================================================================== */
+    .query-results-wrap {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      background: var(--bg-dark);
+    }
+
+    .results-header {
+      background: var(--bg-surface);
+      border-bottom: 1px solid var(--border-subtle);
+      padding: 8px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      flex-shrink: 0;
+    }
+
+    .results-table-container {
+      flex: 1;
+      overflow: auto;
+      padding: 0;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    /* View 3: Explorer View */
     .explorer-view {
       width: 100%;
       height: 100%;
@@ -501,6 +526,7 @@
       display: flex;
       flex-direction: column;
       flex-shrink: 0;
+      transition: all 0.2s ease;
     }
 
     .sidebar-search-box {
@@ -570,173 +596,100 @@
       background: var(--bg-dark);
     }
 
-    .explorer-header {
-      padding: 12px 20px;
+    .explorer-toolbar {
       background: var(--bg-surface);
       border-bottom: 1px solid var(--border-subtle);
+      padding: 10px 20px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      flex-wrap: wrap;
       gap: 12px;
       flex-shrink: 0;
+      flex-wrap: wrap;
     }
 
-    .table-header-info h2 {
-      font-size: 1.15rem;
-      font-weight: 700;
+    .table-title-area {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 10px;
     }
 
-    .table-header-info span {
-      font-size: 0.78rem;
-      color: var(--text-muted);
+    .table-name-badge {
       font-family: 'JetBrains Mono', monospace;
-    }
-
-    .table-subtabs {
-      display: flex;
-      gap: 4px;
-      background: var(--code-bg);
-      padding: 3px;
-      border-radius: 6px;
-      border: 1px solid var(--border-subtle);
-    }
-
-    .table-subtab {
-      padding: 4px 12px;
-      font-size: 0.78rem;
-      font-weight: 500;
-      color: var(--text-muted);
-      border-radius: 4px;
-      cursor: pointer;
-    }
-
-    .table-subtab.active {
-      background: var(--primary);
+      font-size: 1rem;
+      font-weight: 700;
       color: #fff;
     }
 
-    .grid-container {
-      flex: 1;
-      overflow: auto;
-      padding: 16px 20px;
-    }
-
-    /* Table Component */
-    table.data-grid {
+    /* Data Tables & Grids */
+    .data-grid {
       width: 100%;
       border-collapse: collapse;
-      font-size: 0.8rem;
-      text-align: left;
-      background: var(--bg-surface);
-      border-radius: 8px;
-      overflow: hidden;
-      border: 1px solid var(--border-subtle);
+      font-size: 0.82rem;
+      font-family: 'JetBrains Mono', monospace;
+      white-space: nowrap;
     }
 
-    table.data-grid th {
-      background: #182234;
-      color: #e2e8f0;
-      font-weight: 600;
-      padding: 10px 12px;
-      border-bottom: 2px solid var(--border-subtle);
-      white-space: nowrap;
+    .data-grid th {
+      background: #151e2e;
       position: sticky;
       top: 0;
+      padding: 10px 14px;
+      text-align: left;
+      font-weight: 600;
+      color: var(--text-muted);
+      border-bottom: 1px solid var(--border-subtle);
+      border-right: 1px solid rgba(255,255,255,0.04);
       z-index: 10;
-      user-select: none;
     }
 
-    table.data-grid th:hover { background: #1f2e46; cursor: pointer; }
-
-    table.data-grid td {
-      padding: 8px 12px;
-      border-bottom: 1px solid rgba(51, 65, 85, 0.4);
-      color: #cbd5e1;
+    .data-grid td {
+      padding: 8px 14px;
+      border-bottom: 1px solid var(--border-subtle);
+      border-right: 1px solid rgba(255,255,255,0.03);
+      color: #e2e8f0;
       max-width: 320px;
       overflow: hidden;
       text-overflow: ellipsis;
-      white-space: nowrap;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.76rem;
     }
 
-    table.data-grid tr:hover td {
-      background: rgba(59, 130, 246, 0.08);
-    }
+    .data-grid tr:hover td { background: rgba(59, 130, 246, 0.06); }
 
-    .null-tag {
-      color: #64748b;
-      font-style: italic;
-    }
-
-    .img-preview-thumb {
+    .cell-null { color: var(--text-dim); font-style: italic; }
+    .cell-img {
       width: 36px;
       height: 36px;
-      border-radius: 4px;
       object-fit: cover;
+      border-radius: 4px;
       border: 1px solid var(--border-subtle);
       cursor: pointer;
-      vertical-align: middle;
-      transition: transform 0.15s;
     }
 
-    .img-preview-thumb:hover { transform: scale(1.15); border-color: var(--primary); }
-
-    .empty-state {
-      padding: 60px 20px;
-      text-align: center;
-      color: var(--text-muted);
-    }
-
-    .empty-state h3 { color: var(--text-main); margin-bottom: 8px; }
-
-    /* Pagination Bar */
-    .pagination-bar {
-      padding: 10px 20px;
-      background: var(--bg-surface);
-      border-top: 1px solid var(--border-subtle);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      flex-shrink: 0;
-      font-size: 0.8rem;
-    }
-
-    /* Modal Backdrop */
+    /* Modals & Dialogs */
     .modal-backdrop {
-      display: none;
       position: fixed;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.8);
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.75);
       backdrop-filter: blur(4px);
-      z-index: 9999;
-      justify-content: center;
+      display: none;
       align-items: center;
+      justify-content: center;
+      z-index: 999;
       padding: 20px;
     }
 
     .modal-backdrop.open { display: flex; }
 
-    .modal-box {
+    .modal-card {
       background: var(--bg-surface);
       border: 1px solid var(--border-subtle);
       border-radius: 12px;
       width: 100%;
       max-width: 650px;
-      max-height: 85vh;
+      max-height: 90vh;
       display: flex;
       flex-direction: column;
-      box-shadow: 0 20px 50px rgba(0,0,0,0.7);
-      animation: modal-enter 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-
-    @keyframes modal-enter {
-      from { opacity: 0; transform: scale(0.95); }
-      to { opacity: 1; transform: scale(1); }
+      box-shadow: 0 20px 50px rgba(0,0,0,0.5);
     }
 
     .modal-header {
@@ -790,16 +743,303 @@
       border: 1px solid var(--border-subtle);
       box-shadow: 0 10px 40px rgba(0,0,0,0.8);
     }
+
+    /* =========================================================================
+       AUTHENTICATION OVERLAY GATE
+       ========================================================================= */
+    .auth-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(7, 10, 19, 0.94);
+      backdrop-filter: blur(20px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 10000;
+      padding: 20px;
+    }
+
+    .auth-overlay.hidden { display: none !important; }
+
+    .auth-card {
+      background: linear-gradient(180deg, #162032 0%, #111827 100%);
+      border: 1px solid rgba(59, 130, 246, 0.35);
+      border-radius: 16px;
+      width: 100%;
+      max-width: 440px;
+      padding: 32px 28px;
+      box-shadow: 0 25px 60px rgba(0,0,0,0.7), 0 0 30px rgba(59, 130, 246, 0.15);
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      animation: modalFadeIn 0.25s ease-out;
+    }
+
+    @keyframes modalFadeIn {
+      from { opacity: 0; transform: scale(0.96) translateY(-10px); }
+      to { opacity: 1; transform: scale(1) translateY(0); }
+    }
+
+    .auth-brand {
+      text-align: center;
+    }
+
+    .auth-brand h2 {
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: #fff;
+      letter-spacing: -0.02em;
+      margin-bottom: 6px;
+    }
+
+    .auth-brand p {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .auth-alert {
+      background: var(--danger-light);
+      border: 1px solid rgba(239, 68, 68, 0.5);
+      color: #fca5a5;
+      padding: 10px 14px;
+      border-radius: 8px;
+      font-size: 0.82rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .auth-input {
+      width: 100%;
+      background: var(--code-bg);
+      border: 1px solid var(--border-subtle);
+      color: #fff;
+      padding: 11px 14px;
+      border-radius: 8px;
+      font-size: 0.92rem;
+      outline: none;
+      font-family: inherit;
+      transition: all 0.15s;
+    }
+
+    .auth-input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+    }
+
+    .btn-toggle-pwd {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 1rem;
+      padding: 4px;
+    }
+    .btn-toggle-pwd:hover { color: #fff; }
+
+    .auth-footer {
+      text-align: center;
+      font-size: 0.72rem;
+      color: var(--text-dim);
+      border-top: 1px solid var(--border-subtle);
+      padding-top: 14px;
+    }
+
+    /* =========================================================================
+       MOBILE RESPONSIVENESS & ADAPTIVE LAYOUT
+       ========================================================================= */
+    .mobile-only { display: none !important; }
+
+    @media (max-width: 768px) {
+      .mobile-only { display: inline-flex !important; }
+      .desktop-only { display: none !important; }
+
+      body {
+        height: auto !important;
+        min-height: 100vh !important;
+        overflow-y: auto !important;
+      }
+
+      header {
+        flex-direction: column !important;
+        align-items: stretch !important;
+        padding: 12px 14px !important;
+        gap: 10px !important;
+      }
+
+      .brand-wrap {
+        justify-content: space-between !important;
+        width: 100% !important;
+      }
+
+      .brand-title h1 {
+        font-size: 0.95rem !important;
+      }
+
+      .brand-title p {
+        font-size: 0.68rem !important;
+      }
+
+      .header-controls {
+        flex-wrap: wrap !important;
+        width: 100% !important;
+        justify-content: space-between !important;
+        gap: 8px !important;
+      }
+
+      .endpoint-select-wrap {
+        flex: 1 1 100% !important;
+      }
+
+      .endpoint-input {
+        width: 100% !important;
+      }
+
+      .nav-tabs {
+        overflow-x: auto !important;
+        white-space: nowrap !important;
+        padding: 0 10px !important;
+        -webkit-overflow-scrolling: touch !important;
+        gap: 4px !important;
+      }
+
+      .nav-tab {
+        padding: 10px 14px !important;
+        font-size: 0.82rem !important;
+      }
+
+      .view-container {
+        height: auto !important;
+        min-height: calc(100vh - 130px) !important;
+        overflow: visible !important;
+      }
+
+      .dashboard-view {
+        padding: 16px 12px !important;
+        gap: 16px !important;
+        overflow-y: visible !important;
+      }
+
+      .metrics-grid {
+        grid-template-columns: 1fr !important;
+        gap: 12px !important;
+      }
+
+      .dash-sections {
+        grid-template-columns: 1fr !important;
+        gap: 16px !important;
+      }
+
+      /* Explorer on Mobile */
+      .explorer-view {
+        flex-direction: column !important;
+        height: auto !important;
+        min-height: 85vh !important;
+      }
+
+      .explorer-sidebar {
+        width: 100% !important;
+        max-height: 280px !important;
+        border-right: none !important;
+        border-bottom: 1px solid var(--border-subtle) !important;
+      }
+
+      .explorer-sidebar.mobile-collapsed {
+        display: none !important;
+      }
+
+      .explorer-main {
+        width: 100% !important;
+        min-height: 60vh !important;
+      }
+
+      .explorer-toolbar {
+        flex-direction: column !important;
+        align-items: stretch !important;
+        padding: 10px 12px !important;
+        gap: 8px !important;
+      }
+
+      .query-view {
+        height: auto !important;
+        min-height: 85vh !important;
+      }
+
+      .query-editor-wrap {
+        padding: 12px 14px !important;
+      }
+
+      .query-toolbar {
+        flex-direction: column !important;
+        align-items: stretch !important;
+      }
+
+      .query-presets-select {
+        min-width: 100% !important;
+      }
+
+      .sql-editor {
+        height: 140px !important;
+        font-size: 0.82rem !important;
+      }
+
+      .auth-card {
+        padding: 24px 18px !important;
+        max-width: 100% !important;
+      }
+    }
   </style>
 </head>
 <body>
+
+  <!-- =========================================================================
+       AUTHENTICATION OVERLAY GATE (ID: admin)
+       ========================================================================= -->
+  <div id="adminAuthOverlay" class="auth-overlay">
+    <div class="auth-card">
+      <div class="auth-brand">
+        <div class="brand-logo" style="width: 50px; height: 50px; font-size: 1.7rem; margin: 0 auto 12px auto;">🔐</div>
+        <h2>JBAC Database & Query Cockpit</h2>
+        <p>AWS RDS MySQL 8.4 Secure Administration Console</p>
+      </div>
+
+      <div id="authAlert" class="auth-alert" style="display: none;"></div>
+
+      <form id="adminLoginForm" onsubmit="handleAdminLogin(event)">
+        <div class="form-group" style="margin-bottom: 16px;">
+          <label for="adminUsernameInput">Admin Unique ID</label>
+          <input type="text" id="adminUsernameInput" class="auth-input" value="admin" required placeholder="Enter Unique ID (e.g. admin)" autocomplete="username">
+        </div>
+
+        <div class="form-group" style="margin-bottom: 22px;">
+          <label for="adminPasswordInput">Admin Password</label>
+          <div style="position: relative;">
+            <input type="password" id="adminPasswordInput" class="auth-input" required placeholder="Enter Admin Password" autocomplete="current-password" autofocus>
+            <button type="button" class="btn-toggle-pwd" onclick="togglePasswordVisibility('adminPasswordInput', this)" title="Show/Hide Password">👁️</button>
+          </div>
+        </div>
+
+        <button type="submit" id="adminLoginBtn" class="btn btn-primary" style="width: 100%; padding: 12px; font-size: 0.95rem; justify-content: center;">
+          <span id="loginBtnText">⚡ Unlock & Sign In</span>
+        </button>
+      </form>
+
+      <div class="auth-footer">
+        <span>Protected by SHA-256 HMAC Authentication &bull; JBAC Production Cloud</span>
+      </div>
+    </div>
+  </div>
 
   <!-- HEADER -->
   <header>
     <div class="brand-wrap">
       <div class="brand-logo">⚡</div>
       <div class="brand-title">
-        <h1>JBAC Database & Query Cockpit</h1>
+        <h1>JBAC Database Cockpit</h1>
         <p>AWS RDS MySQL 8.4 (Sydney ap-southeast-2) &bull; jbac_jbac</p>
       </div>
       <div class="status-badge" id="cloudStatusBadge">
@@ -815,6 +1055,12 @@
       </div>
       <button class="btn btn-sm" onclick="saveAndTestApi()">⚡ Connect</button>
       <button class="btn btn-sm btn-primary" onclick="refreshCurrentTab()">🔄 Refresh</button>
+      
+      <!-- Authenticated Admin User Status -->
+      <div class="admin-badge" id="adminBadge">
+        <span>🛡️ Admin: <b id="adminUserDisplay">admin</b></span>
+        <button class="btn-logout" onclick="adminLogout()" title="Lock Console / Sign Out">🔒 Logout</button>
+      </div>
     </div>
   </header>
 
@@ -822,7 +1068,7 @@
   <nav class="nav-tabs">
     <div class="nav-tab active" onclick="switchTab('dashboard')">📊 Dashboard & Metrics</div>
     <div class="nav-tab" onclick="switchTab('query')">⚡ SQL Query Console</div>
-    <div class="nav-tab" onclick="switchTab('explorer')">🗄️ Tables & Schema Explorer</div>
+    <div class="nav-tab" onclick="switchTab('explorer')">🗄️ Tables & Schema Explorer (89)</div>
   </nav>
 
   <!-- =========================================================================
@@ -868,8 +1114,8 @@
 
       <div class="metric-card" onclick="openQueryPreset('SELECT * FROM ministry_signup ORDER BY id DESC LIMIT 50;')">
         <div class="metric-card-header">
-          <span>Ministries</span>
-          <div class="metric-card-icon">🏛️</div>
+          <span>Ministries Registered</span>
+          <div class="metric-card-icon">🕊️</div>
         </div>
         <div class="metric-card-value" id="stat-ministries">--</div>
         <div class="metric-card-footer">ministry_signup &bull; Click to query</div>
@@ -877,81 +1123,110 @@
 
       <div class="metric-card" onclick="openQueryPreset('SELECT * FROM independentorganisation_reg ORDER BY id DESC LIMIT 50;')">
         <div class="metric-card-header">
-          <span>Organisations</span>
-          <div class="metric-card-icon">🏢</div>
+          <span>Organizations Registered</span>
+          <div class="metric-card-icon">🏛️</div>
         </div>
         <div class="metric-card-value" id="stat-orgs">--</div>
-        <div class="metric-card-footer">independentorganisation_reg</div>
+        <div class="metric-card-footer">independentorganisation_reg &bull; Click to query</div>
       </div>
 
-      <div class="metric-card" onclick="openQueryPreset('SELECT * FROM events WHERE d_in = 1 ORDER BY id DESC LIMIT 50;')">
+      <div class="metric-card" onclick="openQueryPreset('SELECT * FROM events ORDER BY id DESC LIMIT 50;')">
         <div class="metric-card-header">
-          <span>Active Events (Ribbon)</span>
+          <span>Active Events</span>
           <div class="metric-card-icon">📅</div>
         </div>
         <div class="metric-card-value" id="stat-events">--</div>
-        <div class="metric-card-footer"><span id="stat-events-total">-- total events</span></div>
+        <div class="metric-card-footer" id="stat-events-total">Loading total...</div>
       </div>
 
       <div class="metric-card" onclick="openQueryPreset('SELECT * FROM users ORDER BY id DESC LIMIT 50;')">
         <div class="metric-card-header">
-          <span>User Accounts</span>
-          <div class="metric-card-icon">🔑</div>
+          <span>Total Portal Accounts</span>
+          <div class="metric-card-icon">🔐</div>
         </div>
         <div class="metric-card-value" id="stat-users">--</div>
-        <div class="metric-card-footer">users table &bull; Login credentials</div>
+        <div class="metric-card-footer">users table &bull; Click to query</div>
       </div>
     </div>
 
     <div class="dash-sections">
-      <!-- Quick SQL Query Launchers -->
       <div class="dash-box">
         <div class="dash-box-header">
-          <h3>⚡ Quick Operation Launchers</h3>
-          <span style="font-size:0.75rem; color:var(--text-dim);">One-click execution in Query Console</span>
+          <h3>⚡ Common Administrative SQL Queries</h3>
+          <span style="font-size:0.75rem; color:var(--text-dim);">One-click execution</span>
         </div>
         <div class="quick-queries-list">
-          <div class="quick-query-btn" onclick="openQueryPreset('SELECT id, fname, lname, mobile_number, district_id, cts FROM signup_form ORDER BY id DESC LIMIT 25;')">
-            <div><b>👤 Recent Believer Signups</b><br><code>SELECT id, fname, mobile_number, district_id FROM signup_form...</code></div>
-            <span>▶ Run</span>
+          <div class="quick-query-btn" onclick="openQueryPreset('SELECT id, fname, mobile_number, cts, is_first_login FROM signup_form ORDER BY id DESC LIMIT 25;')">
+            <div>
+              <div style="font-weight:600; font-size:0.85rem;">Recent Believer Registrations</div>
+              <div class="quick-query-sql">SELECT id, fname, mobile_number, cts, is_first_login FROM signup_form ORDER BY id DESC LIMIT 25;</div>
+            </div>
+            <span>▶</span>
           </div>
 
-          <div class="quick-query-btn" onclick="openQueryPreset('SELECT id, eventname, startdate, enddate, d_in, activestatus, photo FROM events WHERE d_in = 1 ORDER BY id DESC;')">
-            <div><b>📅 Active Meeting Ribbon Items (d_in = 1)</b><br><code>SELECT id, eventname, startdate, enddate, d_in FROM events...</code></div>
-            <span>▶ Run</span>
+          <div class="quick-query-btn" onclick="openQueryPreset('SELECT id, pastorname, phonenumber, churchname, dstrct FROM pastor_reg ORDER BY id DESC LIMIT 25;')">
+            <div>
+              <div style="font-weight:600; font-size:0.85rem;">Recent Pastor Registrations</div>
+              <div class="quick-query-sql">SELECT id, pastorname, phonenumber, churchname, dstrct FROM pastor_reg ORDER BY id DESC LIMIT 25;</div>
+            </div>
+            <span>▶</span>
           </div>
 
-          <div class="quick-query-btn" onclick="openQueryPreset('SELECT id, pastorname, phonenumber, district_id, church_name FROM pastor_reg ORDER BY id DESC LIMIT 25;')">
-            <div><b>✝️ Recent Pastor Registrations</b><br><code>SELECT id, pastorname, phonenumber FROM pastor_reg...</code></div>
-            <span>▶ Run</span>
+          <div class="quick-query-btn" onclick="openQueryPreset('SELECT id, church_name, pastor_name, contactnumber, district FROM church_reg ORDER BY id DESC LIMIT 25;')">
+            <div>
+              <div style="font-weight:600; font-size:0.85rem;">Recent Church Registrations</div>
+              <div class="quick-query-sql">SELECT id, church_name, pastor_name, contactnumber, district FROM church_reg ORDER BY id DESC LIMIT 25;</div>
+            </div>
+            <span>▶</span>
           </div>
 
-          <div class="quick-query-btn" onclick="openQueryPreset('SELECT id, studentname, number, parentnum, district_id, cts FROM student_reg ORDER BY id DESC LIMIT 25;')">
-            <div><b>🎓 Student Registrations & Contact Details</b><br><code>SELECT id, studentname, number, parentnum FROM student_reg...</code></div>
-            <span>▶ Run</span>
+          <div class="quick-query-btn" onclick="openQueryPreset('SELECT id, title, start_date, end_date, venue FROM events WHERE d_in = 0 ORDER BY id DESC LIMIT 20;')">
+            <div>
+              <div style="font-weight:600; font-size:0.85rem;">Upcoming & Active Events</div>
+              <div class="quick-query-sql">SELECT id, title, start_date, end_date, venue FROM events WHERE d_in = 0 ORDER BY id DESC LIMIT 20;</div>
+            </div>
+            <span>▶</span>
           </div>
 
-          <div class="quick-query-btn" onclick="openQueryPreset('SELECT id, name, mobile, email, category, otp FROM users ORDER BY id DESC LIMIT 25;')">
-            <div><b>🔑 User Accounts & Clean OTP Status</b><br><code>SELECT id, name, mobile, otp FROM users ORDER BY id DESC...</code></div>
-            <span>▶ Run</span>
+          <div class="quick-query-btn" onclick="openQueryPreset('SELECT id, number, name, email, is_first_login FROM users ORDER BY id DESC LIMIT 25;')">
+            <div>
+              <div style="font-weight:600; font-size:0.85rem;">Recent User Logins & Accounts</div>
+              <div class="quick-query-sql">SELECT id, number, name, email, is_first_login FROM users ORDER BY id DESC LIMIT 25;</div>
+            </div>
+            <span>▶</span>
           </div>
         </div>
       </div>
 
-      <!-- Infrastructure & Storage Specs -->
       <div class="dash-box">
         <div class="dash-box-header">
-          <h3>☁️ AWS Infrastructure</h3>
+          <h3>☁️ AWS Database Architecture</h3>
         </div>
-        <div style="font-size:0.82rem; line-height: 1.8; color: var(--text-muted); font-family: 'JetBrains Mono', monospace;">
-          <div><b style="color:#fff;">Database:</b> AWS RDS MySQL 8.4</div>
-          <div><b style="color:#fff;">Identifier:</b> jbac-mysql-db-v3</div>
-          <div><b style="color:#fff;">Region:</b> ap-southeast-2 (Sydney)</div>
-          <div><b style="color:#fff;">Schema:</b> jbac_jbac (utf8mb4)</div>
-          <div><b style="color:#fff;">Encryption:</b> AWS KMS at rest</div>
-          <div><b style="color:#fff;">Protection:</b> Deletion Protection Enabled</div>
-          <div><b style="color:#fff;">Serverless API:</b> AWS Lambda / API Gateway</div>
-          <div><b style="color:#fff;">CDN & DNS:</b> CloudFront + Route 53</div>
+        <div style="display:flex; flex-direction:column; gap:12px; font-size:0.82rem;">
+          <div style="display:flex; justify-content:space-between; border-bottom:1px solid var(--border-subtle); padding-bottom:8px;">
+            <span style="color:var(--text-muted);">Database Engine</span>
+            <span style="font-weight:600; color:#fff;">AWS RDS MySQL 8.4</span>
+          </div>
+          <div style="display:flex; justify-content:space-between; border-bottom:1px solid var(--border-subtle); padding-bottom:8px;">
+            <span style="color:var(--text-muted);">AWS Region</span>
+            <span style="font-weight:600; color:#93c5fd;">ap-southeast-2 (Sydney)</span>
+          </div>
+          <div style="display:flex; justify-content:space-between; border-bottom:1px solid var(--border-subtle); padding-bottom:8px;">
+            <span style="color:var(--text-muted);">Database Name</span>
+            <span style="font-family:'JetBrains Mono'; font-weight:600; color:#a7f3d0;">jbac_jbac</span>
+          </div>
+          <div style="display:flex; justify-content:space-between; border-bottom:1px solid var(--border-subtle); padding-bottom:8px;">
+            <span style="color:var(--text-muted);">Total Tables</span>
+            <span style="font-weight:600; color:#fff;" id="dashTotalTables">89 Tables</span>
+          </div>
+          <div style="display:flex; justify-content:space-between; border-bottom:1px solid var(--border-subtle); padding-bottom:8px;">
+            <span style="color:var(--text-muted);">Backend Server</span>
+            <span style="font-weight:600; color:#fde047;">AWS Lambda Serverless</span>
+          </div>
+          <div style="display:flex; justify-content:space-between; padding-bottom:4px;">
+            <span style="color:var(--text-muted);">Security Policy</span>
+            <span style="font-weight:600; color:var(--success);">VPC + TLS 1.3 + Admin Auth</span>
+          </div>
         </div>
       </div>
     </div>
@@ -961,142 +1236,141 @@
        TAB 2: SQL QUERY CONSOLE
        ========================================================================= -->
   <div class="view-container query-view" id="tab-query">
-    <div class="query-top-panel">
-      <div class="query-bar">
-        <div style="display:flex; align-items:center; gap:8px;">
+    <div class="query-editor-wrap">
+      <div class="query-toolbar">
+        <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
           <select class="query-presets-select" id="queryPresets" onchange="loadSelectedPreset()">
-            <option value="">⚡ Load Query Preset...</option>
-            <option value="SELECT * FROM events WHERE d_in = 1 ORDER BY id DESC LIMIT 50;">Active Events Ribbon (d_in = 1)</option>
-            <option value="SELECT * FROM signup_form ORDER BY id DESC LIMIT 50;">Believers (signup_form) - Latest 50</option>
-            <option value="SELECT * FROM pastor_reg ORDER BY id DESC LIMIT 50;">Pastors (pastor_reg) - Latest 50</option>
-            <option value="SELECT * FROM church_reg ORDER BY id DESC LIMIT 50;">Churches (church_reg) - Latest 50</option>
-            <option value="SELECT * FROM student_reg ORDER BY id DESC LIMIT 50;">Students (student_reg) - Latest 50</option>
-            <option value="SELECT * FROM ministry_signup ORDER BY id DESC LIMIT 50;">Ministries (ministry_signup)</option>
-            <option value="SELECT * FROM independentorganisation_reg ORDER BY id DESC LIMIT 50;">Independent Organisations</option>
-            <option value="SELECT id, name, mobile, email, category, otp FROM users ORDER BY id DESC LIMIT 50;">Users Table (Auth & OTP)</option>
-            <option value="SHOW TABLES;">Show All Tables</option>
-            <option value="SELECT table_name, table_rows FROM information_schema.tables WHERE table_schema='jbac_jbac' ORDER BY table_rows DESC;">Table Row Counts Summary</option>
-            <option value="DESCRIBE events;">Inspect Schema: events</option>
-            <option value="DESCRIBE signup_form;">Inspect Schema: signup_form</option>
+            <option value="">-- Choose SQL Query Preset --</option>
+            <option value="SHOW TABLES;">SHOW TABLES (All 89 Database Tables)</option>
+            <option value="SELECT COUNT(*) as total_users FROM users;">Count total users</option>
+            <option value="SELECT COUNT(*) as total_believers FROM signup_form;">Count total believers (signup_form)</option>
+            <option value="SELECT COUNT(*) as total_pastors FROM pastor_reg;">Count total pastors</option>
+            <option value="SELECT COUNT(*) as total_churches FROM church_reg;">Count total churches</option>
+            <option value="SELECT id, fname, mobile_number, cts, is_first_login FROM signup_form ORDER BY id DESC LIMIT 50;">Recent 50 Believers with Details</option>
+            <option value="SELECT id, pastorname, phonenumber, churchname, dstrct FROM pastor_reg ORDER BY id DESC LIMIT 50;">Recent 50 Pastors</option>
+            <option value="SELECT id, church_name, pastor_name, contactnumber FROM church_reg ORDER BY id DESC LIMIT 50;">Recent 50 Churches</option>
+            <option value="SELECT id, title, start_date, venue FROM events WHERE d_in = 0 ORDER BY id DESC LIMIT 50;">Recent 50 Active Events</option>
+            <option value="SELECT id, doctor_name, specialization, phone_number, consultation_fee FROM family_councelling_doctors WHERE d_in = 0;">Active Counselling Doctors</option>
           </select>
-          <button class="btn btn-sm" onclick="clearQueryEditor()">🧹 Clear</button>
+          <button class="btn btn-sm" onclick="clearQueryEditor()">🗑️ Clear</button>
         </div>
 
         <div style="display:flex; align-items:center; gap:8px;">
-          <button class="btn btn-primary" onclick="executeQuery()">▶ Execute Query <span style="font-size:0.7rem; opacity:0.8;">(Ctrl+Enter)</span></button>
+          <span style="font-size:0.75rem; color:var(--text-dim);" class="desktop-only">Press Ctrl + Enter to run</span>
+          <button class="btn btn-primary" onclick="executeQuery()">⚡ Run Query</button>
         </div>
       </div>
 
-      <div class="editor-container">
-        <textarea class="sql-editor" id="sqlEditor" placeholder="Enter your SQL query here (e.g. SELECT * FROM events WHERE d_in = 1;)..." spellcheck="false"></textarea>
+      <div class="sql-editor-container">
+        <textarea id="sqlEditor" class="sql-editor" placeholder="Write any SQL query here (e.g. SELECT * FROM signup_form ORDER BY id DESC LIMIT 25;)..."></textarea>
+      </div>
+
+      <div class="query-history-bar" id="queryHistoryBar">
+        <span>History:</span>
+        <!-- Query pills injected here -->
       </div>
     </div>
 
-    <div class="query-status-bar">
-      <div class="status-left">
-        <span id="queryStatusMsg">Ready. Enter a query or select a preset.</span>
-        <span id="queryDuration" style="font-family:'JetBrains Mono'; color:#60a5fa;"></span>
-        <span id="queryRowCount" style="font-family:'JetBrains Mono'; color:#34d399;"></span>
+    <div class="query-results-wrap">
+      <div class="results-header">
+        <span id="queryStatusMsg">Ready to execute query.</span>
+        <div style="display:flex; align-items:center; gap:12px;">
+          <span id="queryDuration" style="font-family:'JetBrains Mono'; color:#93c5fd;"></span>
+          <span id="queryRowCount" style="font-weight:600; color:#fff;"></span>
+          <button class="btn btn-sm" onclick="exportResults('csv')">📥 CSV</button>
+          <button class="btn btn-sm" onclick="exportResults('json')">📥 JSON</button>
+        </div>
       </div>
-      <div style="display:flex; gap:8px;">
-        <button class="btn btn-sm" onclick="exportResults('csv')">📥 Export CSV</button>
-        <button class="btn btn-sm" onclick="exportResults('json')">📥 Export JSON</button>
-      </div>
-    </div>
 
-    <div class="query-results-area" id="queryResultsArea">
-      <div class="empty-state">
-        <h3>No Query Executed Yet</h3>
-        <p>Type an SQL query above and click <b>Execute Query</b>, or choose a pre-built template from the dropdown.</p>
+      <div class="results-table-container" id="queryResultsArea">
+        <div class="empty-state" style="padding: 40px; text-align:center; color:var(--text-dim);">
+          <h3>⚡ No query executed yet</h3>
+          <p>Type a SQL query above or select a preset and click "Run Query" (or Ctrl + Enter).</p>
+        </div>
       </div>
-    </div>
-
-    <div class="history-drawer" id="historyDrawer">
-      <span style="color:var(--text-dim); font-size:0.72rem; text-transform:uppercase; letter-spacing:0.04em;">Recent Queries:</span>
-      <div id="historyPills" style="display:flex; gap:6px;"></div>
     </div>
   </div>
 
   <!-- =========================================================================
-       TAB 3: TABLE EXPLORER
+       TAB 3: SCHEMA & TABLE EXPLORER (89 TABLES)
        ========================================================================= -->
   <div class="view-container explorer-view" id="tab-explorer">
-    <aside class="explorer-sidebar">
+    <div class="explorer-sidebar" id="explorerSidebar">
       <div class="sidebar-search-box">
-        <input type="text" class="input-field" id="tableFilterInput" placeholder="🔍 Filter 89 tables..." oninput="filterTablesList()">
+        <input type="text" id="tableSearchInput" class="input-field" placeholder="🔍 Search 89 tables..." oninput="filterTablesList()">
       </div>
-      <div class="tables-list" id="tablesListContainer">
-        <div style="padding:15px; text-align:center; color:var(--text-dim);">Loading tables from AWS RDS...</div>
+      <div class="tables-list" id="tablesList">
+        <div style="padding:16px; color:var(--text-dim); text-align:center;">Loading database schema...</div>
       </div>
-    </aside>
+    </div>
 
-    <main class="explorer-main">
-      <div class="explorer-header">
-        <div class="table-header-info">
-          <h2 id="activeTableTitle">Select a Table</h2>
-          <span id="activeTableStats">Pick a table from the sidebar to inspect records and schema</span>
+    <div class="explorer-main">
+      <div class="explorer-toolbar">
+        <div class="table-title-area">
+          <button class="btn btn-sm mobile-only" onclick="toggleMobileSidebar()" style="margin-right:4px;">📂 Tables</button>
+          <span style="color:var(--text-muted); font-size:0.85rem;">Table:</span>
+          <span class="table-name-badge" id="currentTableName">-- Select a Table --</span>
+          <span class="row-count-badge" id="currentTableRowCount">0 rows</span>
         </div>
 
-        <div style="display:flex; align-items:center; gap:10px;">
-          <div class="table-subtabs">
-            <div class="table-subtab active" id="subtab-data" onclick="switchTableSubtab('data')">📄 Data</div>
-            <div class="table-subtab" id="subtab-schema" onclick="switchTableSubtab('schema')">📐 Schema</div>
-          </div>
-          <input type="text" class="input-field" id="tableSearchRowInput" style="width:180px;" placeholder="Search rows..." oninput="filterActiveTableRows()">
-          <button class="btn btn-sm" onclick="fetchActiveTableData()">🔄</button>
-          <button class="btn btn-sm btn-primary" onclick="openInsertModal()">➕ Add Row</button>
-        </div>
-      </div>
-
-      <div class="grid-container" id="explorerGridContainer">
-        <div class="empty-state">
-          <h3>Welcome to Table Explorer</h3>
-          <p>Select any table on the left (e.g. <b>events</b>, <b>signup_form</b>, <b>pastor_reg</b>) to browse records and structure.</p>
-        </div>
-      </div>
-
-      <div class="pagination-bar" id="explorerPaginationBar" style="display:none;">
-        <div>
-          <span>Rows per page:</span>
-          <select id="pageSizeSelect" style="background:var(--code-bg); color:var(--text-main); border:1px solid var(--border-subtle); border-radius:4px; padding:2px 6px;" onchange="changePageSize()">
-            <option value="25">25</option>
-            <option value="50" selected>50</option>
-            <option value="100">100</option>
-            <option value="250">250</option>
+        <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+          <input type="text" id="recordFilterInput" class="input-field" style="width:160px;" placeholder="Filter rows..." oninput="filterTableRows()">
+          <button class="btn btn-sm btn-success" onclick="openAddRecordModal()">➕ New Record</button>
+          <select id="pageSizeSelect" class="input-field" style="width:90px;" onchange="changePageSize()">
+            <option value="50">50 rows</option>
+            <option value="100" selected>100 rows</option>
+            <option value="250">250 rows</option>
           </select>
-          <span id="pageRangeLabel" style="margin-left: 12px; color: var(--text-dim);"></span>
-        </div>
-        <div style="display:flex; gap:6px;">
-          <button class="btn btn-sm" id="prevPageBtn" onclick="prevPage()">◀ Previous</button>
+          <button class="btn btn-sm" id="prevPageBtn" onclick="prevPage()" disabled>◀ Prev</button>
           <button class="btn btn-sm" id="nextPageBtn" onclick="nextPage()">Next ▶</button>
         </div>
       </div>
-    </main>
+
+      <div class="results-table-container" id="explorerTableContainer">
+        <div class="empty-state" style="padding: 40px; text-align:center; color:var(--text-dim);">
+          <h3>Select a table from the sidebar to inspect records and schema</h3>
+        </div>
+      </div>
+    </div>
   </div>
 
   <!-- =========================================================================
-       MODALS: INSERT / EDIT / DELETE / IMAGE LIGHTBOX
+       MODALS: VIEW, EDIT, ADD, DELETE, LIGHTBOX
        ========================================================================= -->
-  <!-- Insert / Edit Modal -->
-  <div class="modal-backdrop" id="recordModal">
-    <div class="modal-box">
+  <!-- Record View Modal -->
+  <div class="modal-backdrop" id="viewModal">
+    <div class="modal-card">
       <div class="modal-header">
-        <h3 id="recordModalTitle">Add New Record</h3>
-        <button class="modal-close-btn" onclick="closeRecordModal()">&times;</button>
+        <h3 id="viewModalTitle">Record Details</h3>
+        <button class="modal-close-btn" onclick="closeViewModal()">&times;</button>
       </div>
-      <div class="modal-body" id="recordModalBody">
-        <!-- Dynamic Form Fields will be inserted here -->
+      <div class="modal-body" id="viewModalBody"></div>
+      <div class="modal-footer">
+        <button class="btn" onclick="closeViewModal()">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Record Add / Edit Modal -->
+  <div class="modal-backdrop" id="editModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 id="editModalTitle">Edit Record</h3>
+        <button class="modal-close-btn" onclick="closeEditModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="recordForm" style="display:flex; flex-direction:column; gap:12px;"></form>
       </div>
       <div class="modal-footer">
-        <button class="btn" onclick="closeRecordModal()">Cancel</button>
+        <button class="btn" onclick="closeEditModal()">Cancel</button>
         <button class="btn btn-primary" id="saveRecordBtn" onclick="saveRecord()">Save Record</button>
       </div>
     </div>
   </div>
 
-  <!-- Delete Confirm Modal -->
+  <!-- Delete Confirmation Modal -->
   <div class="modal-backdrop" id="deleteModal">
-    <div class="modal-box" style="max-width: 450px;">
+    <div class="modal-card" style="max-width:440px;">
       <div class="modal-header">
         <h3 style="color:var(--danger);">⚠️ Confirm Delete Record</h3>
         <button class="modal-close-btn" onclick="closeDeleteModal()">&times;</button>
@@ -1113,42 +1387,186 @@
 
   <!-- Image Lightbox Modal -->
   <div class="modal-backdrop" id="imgModal" onclick="closeImgModal()">
-    <span style="position:absolute; top:20px; right:30px; font-size:2rem; color:#fff; cursor:pointer;">&times;</span>
-    <img src="" class="lightbox-img" id="lightboxImg" onclick="event.stopPropagation()">
+    <img id="lightboxImg" class="lightbox-img" src="" alt="Enlarged Preview">
   </div>
 
-  <!-- SCRIPT ENGINE -->
+  <!-- =========================================================================
+       JAVASCRIPT APPLICATION LOGIC & SECURE AUTHENTICATION
+       ========================================================================= -->
   <script>
-    // Configuration & State
-    const DEFAULT_API_BASE = 'https://1a8kqxawxd.execute-api.ap-southeast-2.amazonaws.com';
-    let API_BASE = localStorage.getItem('jbac_admin_api_base') || DEFAULT_API_BASE;
-    // If loaded directly on API Gateway Lambda stage, use current origin; on jbac.in, use the Lambda API backend
-    if (window.location.origin && window.location.origin.includes('execute-api')) {
-      API_BASE = window.location.origin;
+    // Compute default API base based on origin
+    function resolveDefaultApiBase() {
+      const h = window.location.hostname;
+      if (h.includes('amazonaws.com')) {
+        return window.location.origin;
+      }
+      return 'https://1a8kqxawxd.execute-api.ap-southeast-2.amazonaws.com';
     }
 
+    let API_BASE = localStorage.getItem('jbac_api_base') || resolveDefaultApiBase();
+    let currentTable = 'signup_form';
+    let currentOffset = 0;
+    let currentLimit = 100;
+    let currentTableTotal = 0;
     let allTables = [];
-    let currentTable = 'events';
-    let currentTableData = [];
-    let currentTableColumns = [];
-    let currentSubtab = 'data'; // 'data' or 'schema'
-    let currentPage = 1;
-    let pageSize = 50;
-    let totalTableRows = 0;
-    let lastQueryResults = null;
-    let queryHistory = JSON.parse(localStorage.getItem('jbac_query_history') || '[]');
+    let currentTableRows = [];
+    let currentTableCols = [];
     let editingRecordId = null;
     let deletingRecordId = null;
+    let lastQueryResults = null;
 
-    // Initialize
-    document.addEventListener('DOMContentLoaded', () => {
+    // --- Authentication Storage & Headers ---
+    function getAdminToken() {
+      return sessionStorage.getItem('jbac_admin_token') || localStorage.getItem('jbac_admin_token') || '';
+    }
+
+    function setAdminToken(token, username = 'admin') {
+      sessionStorage.setItem('jbac_admin_token', token);
+      localStorage.setItem('jbac_admin_token', token);
+      sessionStorage.setItem('jbac_admin_user', username);
+      localStorage.setItem('jbac_admin_user', username);
+    }
+
+    function clearAdminToken() {
+      sessionStorage.removeItem('jbac_admin_token');
+      localStorage.removeItem('jbac_admin_token');
+      sessionStorage.removeItem('jbac_admin_user');
+      localStorage.removeItem('jbac_admin_user');
+    }
+
+    function getAuthHeaders(extra = {}) {
+      const token = getAdminToken();
+      const headers = {
+        'Content-Type': 'application/json',
+        ...extra
+      };
+      if (token) {
+        headers['x-admin-auth'] = token;
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+      return headers;
+    }
+
+    function showAuthOverlay(alertMsg = '') {
+      const overlay = document.getElementById('adminAuthOverlay');
+      overlay.classList.remove('hidden');
+      const alertBox = document.getElementById('authAlert');
+      if (alertMsg) {
+        alertBox.textContent = alertMsg;
+        alertBox.style.display = 'flex';
+      } else {
+        alertBox.style.display = 'none';
+      }
+      document.getElementById('adminPasswordInput').value = '';
+      document.getElementById('adminPasswordInput').focus();
+    }
+
+    function hideAuthOverlay() {
+      const overlay = document.getElementById('adminAuthOverlay');
+      overlay.classList.add('hidden');
+      const u = sessionStorage.getItem('jbac_admin_user') || 'admin';
+      document.getElementById('adminUserDisplay').textContent = u;
+    }
+
+    function togglePasswordVisibility(inputId, btn) {
+      const input = document.getElementById(inputId);
+      if (input.type === 'password') {
+        input.type = 'text';
+        btn.textContent = '🔒';
+      } else {
+        input.type = 'password';
+        btn.textContent = '👁️';
+      }
+    }
+
+    async function handleAdminLogin(e) {
+      e.preventDefault();
+      const user = document.getElementById('adminUsernameInput').value.trim();
+      const pwd = document.getElementById('adminPasswordInput').value.trim();
+      const btnText = document.getElementById('loginBtnText');
+      const alertBox = document.getElementById('authAlert');
+
+      if (!user || !pwd) {
+        alertBox.textContent = 'Please enter both Admin Unique ID and Password.';
+        alertBox.style.display = 'flex';
+        return;
+      }
+
+      btnText.textContent = 'Verifying credentials...';
+      alertBox.style.display = 'none';
+
+      try {
+        const res = await fetch(`${API_BASE}/dashboardapi/admin-login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username: user, password: pwd })
+        });
+        const json = await res.json();
+        if (json.success && json.token) {
+          setAdminToken(json.token, json.username || user);
+          hideAuthOverlay();
+          initApp();
+        } else {
+          alertBox.textContent = json.error || 'Invalid Admin ID or Password. Please try again.';
+          alertBox.style.display = 'flex';
+        }
+      } catch (err) {
+        alertBox.textContent = `Server connection error: ${err.message}. Please verify backend status.`;
+        alertBox.style.display = 'flex';
+      } finally {
+        btnText.textContent = '⚡ Unlock & Sign In';
+      }
+    }
+
+    function adminLogout() {
+      if (confirm('Lock database console and sign out?')) {
+        clearAdminToken();
+        showAuthOverlay('You have safely logged out of the JBAC Database Console.');
+      }
+    }
+
+    async function verifyExistingAuth() {
+      const token = getAdminToken();
+      if (!token) {
+        showAuthOverlay();
+        return false;
+      }
+
+      try {
+        const res = await fetch(`${API_BASE}/dashboardapi/admin-verify`, {
+          method: 'GET',
+          headers: getAuthHeaders()
+        });
+        if (res.ok) {
+          hideAuthOverlay();
+          return true;
+        } else {
+          clearAdminToken();
+          showAuthOverlay('Session expired. Please sign in again.');
+          return false;
+        }
+      } catch (_) {
+        // Network issue, if token exists allow offline check
+        hideAuthOverlay();
+        return true;
+      }
+    }
+
+    // --- Mobile Sidebar Toggle ---
+    function toggleMobileSidebar() {
+      const sb = document.getElementById('explorerSidebar');
+      sb.classList.toggle('mobile-collapsed');
+    }
+
+    // --- App Initialization ---
+    document.addEventListener('DOMContentLoaded', async () => {
       document.getElementById('apiBaseInput').value = API_BASE;
-      renderQueryHistory();
-      testApiConnection();
-      loadDashboardMetrics();
-      loadTables();
+      const isAuthed = await verifyExistingAuth();
+      if (isAuthed) {
+        initApp();
+      }
 
-      // Keyboard shortcut for query execution (Ctrl+Enter or Cmd+Enter)
+      // Keyboard shortcut for query console
       document.getElementById('sqlEditor').addEventListener('keydown', (e) => {
         if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
           e.preventDefault();
@@ -1157,30 +1575,40 @@
       });
     });
 
-    function saveAndTestApi() {
-      const input = document.getElementById('apiBaseInput').value.trim();
-      if (input) {
-        API_BASE = input.replace(/\/+$/, '');
-        localStorage.setItem('jbac_admin_api_base', API_BASE);
-      }
-      testApiConnection();
+    async function initApp() {
+      await testConnection();
       loadDashboardMetrics();
       loadTables();
     }
 
-    async function testApiConnection() {
+    function saveAndTestApi() {
+      const input = document.getElementById('apiBaseInput').value.trim();
+      if (input) {
+        API_BASE = input.replace(/\/+$/, '');
+        localStorage.setItem('jbac_api_base', API_BASE);
+      }
+      testConnection();
+      refreshCurrentTab();
+    }
+
+    async function testConnection() {
       const badge = document.getElementById('cloudStatusBadge');
       const text = document.getElementById('cloudStatusText');
-      text.textContent = 'Pinging API...';
+      text.textContent = 'Pinging RDS...';
+
       const t0 = performance.now();
       try {
-        const res = await fetch(`${API_BASE}/tables`, { timeout: 8000 });
+        const res = await fetch(`${API_BASE}/dashboardapi/admin-dashboard-stats`, {
+          headers: getAuthHeaders()
+        });
         const ms = Math.round(performance.now() - t0);
         if (res.ok) {
           text.textContent = `AWS RDS MySQL Connected (${ms}ms)`;
           badge.style.background = 'var(--success-light)';
           badge.style.borderColor = 'rgba(16, 185, 129, 0.4)';
           badge.style.color = 'var(--success)';
+        } else if (res.status === 401) {
+          showAuthOverlay('Session expired. Please enter Admin ID and Password.');
         } else {
           throw new Error(`HTTP ${res.status}`);
         }
@@ -1221,7 +1649,13 @@
     // Dashboard Metrics
     async function loadDashboardMetrics() {
       try {
-        const res = await fetch(`${API_BASE}/dashboardapi/admin-dashboard-stats`);
+        const res = await fetch(`${API_BASE}/dashboardapi/admin-dashboard-stats`, {
+          headers: getAuthHeaders()
+        });
+        if (res.status === 401) {
+          showAuthOverlay('Admin Authentication Required.');
+          return;
+        }
         if (res.ok) {
           const json = await res.json();
           const s = json.stats || {};
@@ -1273,7 +1707,7 @@
       statusMsg.textContent = 'Executing query on AWS RDS MySQL...';
       durationSpan.textContent = '';
       rowCountSpan.textContent = '';
-      resultsArea.innerHTML = '<div class="empty-state"><h3>⚡ Executing Query...</h3></div>';
+      resultsArea.innerHTML = '<div class="empty-state" style="padding:40px; text-align:center;"><h3>⚡ Executing Query...</h3></div>';
 
       addQueryToHistory(query);
 
@@ -1281,9 +1715,16 @@
       try {
         const res = await fetch(`${API_BASE}/dashboardapi/execute-query`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: getAuthHeaders(),
           body: JSON.stringify({ query })
         });
+
+        if (res.status === 401) {
+          showAuthOverlay('Admin Authentication Required to Execute SQL Queries.');
+          statusMsg.textContent = 'Unauthorized: Admin login required.';
+          return;
+        }
+
         const json = await res.json();
         const duration = json.durationMs || Math.round(performance.now() - t0);
 
@@ -1299,7 +1740,7 @@
             lastQueryResults = null;
             rowCountSpan.textContent = `⚡ ${json.affectedRows || 0} rows affected`;
             resultsArea.innerHTML = `
-              <div style="background:var(--bg-surface); border:1px solid var(--border-subtle); border-radius:8px; padding:24px; text-align:center;">
+              <div style="background:var(--bg-surface); border:1px solid var(--border-subtle); border-radius:8px; padding:24px; text-align:center; margin:20px;">
                 <h3 style="color:var(--success); margin-bottom:8px;">✅ Query Executed</h3>
                 <p style="color:var(--text-muted); font-family:'JetBrains Mono';">Affected Rows: <b>${json.affectedRows || 0}</b> | Insert ID: <b>${json.insertId || 'N/A'}</b> | Changed Rows: <b>${json.changedRows || 0}</b></p>
               </div>`;
@@ -1308,7 +1749,7 @@
           statusMsg.textContent = `Error: ${json.error || 'Query failed'}`;
           durationSpan.textContent = `⏱️ ${duration} ms`;
           resultsArea.innerHTML = `
-            <div style="background:var(--danger-light); border:1px solid rgba(239, 68, 68, 0.4); border-radius:8px; padding:20px;">
+            <div style="background:var(--danger-light); border:1px solid rgba(239, 68, 68, 0.4); border-radius:8px; padding:20px; margin:20px;">
               <h4 style="color:var(--danger); margin-bottom:6px;">SQL Execution Error:</h4>
               <pre style="color:#fca5a5; font-family:'JetBrains Mono'; font-size:0.85rem; white-space:pre-wrap;">${json.error}</pre>
             </div>`;
@@ -1322,20 +1763,26 @@
     function renderQueryGrid(rows, fields) {
       const area = document.getElementById('queryResultsArea');
       if (!rows || rows.length === 0) {
-        area.innerHTML = '<div class="empty-state"><h3>0 Records Returned</h3><p>The query executed cleanly but returned 0 rows.</p></div>';
+        area.innerHTML = '<div class="empty-state" style="padding:40px; text-align:center; color:var(--text-dim);"><h3>0 Records Returned</h3><p>The query executed cleanly but returned 0 rows.</p></div>';
         return;
       }
 
       const cols = fields && fields.length > 0 ? fields : Object.keys(rows[0]);
       let html = '<table class="data-grid"><thead><tr>';
-      cols.forEach(c => { html += `<th>${c}</th>`; });
+      cols.forEach(c => { html += `<th>${escapeHtml(c)}</th>`; });
       html += '</tr></thead><tbody>';
 
       rows.forEach(r => {
         html += '<tr>';
         cols.forEach(c => {
           const val = r[c];
-          html += formatCell(val);
+          if (val === null || val === undefined) {
+            html += '<td class="cell-null">NULL</td>';
+          } else if (typeof val === 'string' && (val.startsWith('http') && (val.endsWith('.jpg') || val.endsWith('.png') || val.endsWith('.webp') || val.includes('/images/')))) {
+            html += `<td><img src="${escapeHtml(val)}" class="cell-img" onclick="openLightbox('${escapeHtml(val)}')"></td>`;
+          } else {
+            html += `<td>${escapeHtml(String(val))}</td>`;
+          }
         });
         html += '</tr>';
       });
@@ -1344,153 +1791,178 @@
       area.innerHTML = html;
     }
 
-    function formatCell(val) {
-      if (val === null || val === undefined) {
-        return '<td><span class="null-tag">NULL</span></td>';
-      }
-      const str = String(val);
-      if (str.startsWith('data:image/') || (str.startsWith('http') && (str.includes('.jpg') || str.includes('.png') || str.includes('.jpeg') || str.includes('.webp') || str.includes('websiteimages')))) {
-        return `<td><img src="${str}" class="img-preview-thumb" onclick="openLightbox('${str}')" title="Click to enlarge" alt="img"></td>`;
-      }
-      if (typeof val === 'object') {
-        const jsonStr = JSON.stringify(val);
-        return `<td title="${escapeHtml(jsonStr)}">${escapeHtml(jsonStr.length > 60 ? jsonStr.slice(0, 60) + '...' : jsonStr)}</td>`;
-      }
-      return `<td title="${escapeHtml(str)}">${escapeHtml(str.length > 80 ? str.slice(0, 80) + '...' : str)}</td>`;
-    }
-
-    function escapeHtml(str) {
-      return String(str)
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;');
-    }
-
-    // Query History
     function addQueryToHistory(q) {
-      queryHistory = queryHistory.filter(item => item !== q);
-      queryHistory.unshift(q);
-      if (queryHistory.length > 20) queryHistory.pop();
-      localStorage.setItem('jbac_query_history', JSON.stringify(queryHistory));
-      renderQueryHistory();
+      let history = JSON.parse(localStorage.getItem('jbac_sql_history') || '[]');
+      history = history.filter(item => item !== q);
+      history.unshift(q);
+      if (history.length > 15) history.pop();
+      localStorage.setItem('jbac_sql_history', JSON.stringify(history));
+      renderHistoryBar();
     }
 
-    function renderQueryHistory() {
-      const container = document.getElementById('historyPills');
-      if (!container) return;
-      container.innerHTML = queryHistory.map(q => {
-        return `<div class="history-pill" onclick="openQueryPreset('${escapeHtml(q).replace(/'/g, "\\'")}')" title="${escapeHtml(q)}">${escapeHtml(q)}</div>`;
-      }).join('');
+    function renderHistoryBar() {
+      const bar = document.getElementById('queryHistoryBar');
+      const history = JSON.parse(localStorage.getItem('jbac_sql_history') || '[]');
+      if (history.length === 0) {
+        bar.style.display = 'none';
+        return;
+      }
+      bar.style.display = 'flex';
+      bar.innerHTML = '<span>History:</span>';
+      history.slice(0, 6).forEach(q => {
+        const pill = document.createElement('div');
+        pill.className = 'history-pill';
+        pill.title = q;
+        pill.textContent = q;
+        pill.onclick = () => {
+          document.getElementById('sqlEditor').value = q;
+          executeQuery();
+        };
+        bar.appendChild(pill);
+      });
     }
 
-    // Table Explorer
+    // --- Schema Explorer ---
     async function loadTables() {
+      const container = document.getElementById('tablesList');
+      container.innerHTML = '<div style="padding:16px; color:var(--text-dim); text-align:center;">Loading tables...</div>';
+
       try {
-        const res = await fetch(`${API_BASE}/dashboardapi/tables`);
-        const json = await res.json();
-        allTables = json.tables || json.data || [];
-        renderTablesList(allTables);
-        if (allTables.length > 0 && !currentTable) {
-          selectTable(allTables[0].name);
-        } else if (currentTable) {
-          selectTable(currentTable);
+        const res = await fetch(`${API_BASE}/dashboardapi/tables`, {
+          headers: getAuthHeaders()
+        });
+        if (res.status === 401) {
+          showAuthOverlay('Admin Authentication Required.');
+          return;
+        }
+        if (res.ok) {
+          const json = await res.json();
+          allTables = json.tables || [];
+          document.getElementById('dashTotalTables').textContent = `${allTables.length} Tables`;
+          renderTablesList(allTables);
+
+          if (allTables.length > 0 && !currentTable) {
+            selectTable(allTables[0].name || allTables[0]);
+          } else if (currentTable) {
+            selectTable(currentTable);
+          }
         }
       } catch (err) {
-        document.getElementById('tablesListContainer').innerHTML = `<div style="color:var(--danger); padding:12px;">Failed to load tables: ${err.message}</div>`;
+        container.innerHTML = `<div style="padding:16px; color:var(--danger);">Error loading tables: ${err.message}</div>`;
       }
     }
 
     function renderTablesList(tables) {
-      const container = document.getElementById('tablesListContainer');
-      if (tables.length === 0) {
-        container.innerHTML = '<div style="padding:15px; color:var(--text-dim);">No tables match.</div>';
+      const container = document.getElementById('tablesList');
+      if (!tables || tables.length === 0) {
+        container.innerHTML = '<div style="padding:16px; color:var(--text-dim);">No tables found.</div>';
         return;
       }
-      container.innerHTML = tables.map(t => {
-        return `<div class="table-list-item ${t.name === currentTable ? 'active' : ''}" onclick="selectTable('${t.name}')">
-          <span>📄 ${t.name}</span>
-          <span class="row-count-badge">${Number(t.rows || 0).toLocaleString()}</span>
-        </div>`;
-      }).join('');
+
+      let html = '';
+      tables.forEach(t => {
+        const name = typeof t === 'object' ? t.name : t;
+        const count = typeof t === 'object' && t.rowCount !== undefined ? t.rowCount : '';
+        const activeClass = name === currentTable ? 'active' : '';
+        html += `
+          <div class="table-list-item ${activeClass}" onclick="selectTable('${escapeHtml(name)}')">
+            <span>🗄️ ${escapeHtml(name)}</span>
+            ${count !== '' ? `<span class="row-count-badge">${count}</span>` : ''}
+          </div>`;
+      });
+      container.innerHTML = html;
     }
 
     function filterTablesList() {
-      const q = document.getElementById('tableFilterInput').value.toLowerCase().trim();
-      const filtered = allTables.filter(t => t.name.toLowerCase().includes(q));
+      const q = document.getElementById('tableSearchInput').value.trim().toLowerCase();
+      if (!q) {
+        renderTablesList(allTables);
+        return;
+      }
+      const filtered = allTables.filter(t => {
+        const name = typeof t === 'object' ? t.name : t;
+        return name.toLowerCase().includes(q);
+      });
       renderTablesList(filtered);
     }
 
-    async function selectTable(tableName) {
-      currentTable = tableName;
-      currentPage = 1;
-      renderTablesList(allTables);
-      document.getElementById('activeTableTitle').textContent = `📄 ${tableName}`;
-      document.getElementById('activeTableStats').textContent = 'Fetching rows from AWS RDS...';
-      document.getElementById('explorerGridContainer').innerHTML = '<div class="empty-state"><h3>Loading data...</h3></div>';
-      await fetchActiveTableData();
-    }
+    function selectTable(name) {
+      currentTable = name;
+      currentOffset = 0;
+      document.getElementById('currentTableName').textContent = name;
 
-    function switchTableSubtab(subtab) {
-      currentSubtab = subtab;
-      document.getElementById('subtab-data').classList.toggle('active', subtab === 'data');
-      document.getElementById('subtab-schema').classList.toggle('active', subtab === 'schema');
-      if (subtab === 'data') {
-        renderExplorerGrid(currentTableData);
-      } else {
-        renderSchemaView();
+      // On mobile, automatically collapse sidebar when a table is picked
+      if (window.innerWidth <= 768) {
+        document.getElementById('explorerSidebar').classList.add('mobile-collapsed');
       }
+
+      document.querySelectorAll('.table-list-item').forEach(el => {
+        if (el.textContent.includes(name)) el.classList.add('active');
+        else el.classList.remove('active');
+      });
+
+      fetchActiveTableData();
     }
 
     async function fetchActiveTableData() {
-      if (!currentTable) return;
+      const container = document.getElementById('explorerTableContainer');
+      container.innerHTML = '<div class="empty-state" style="padding:40px; text-align:center;"><h3>Loading table records...</h3></div>';
+
       try {
-        const offset = (currentPage - 1) * pageSize;
-        const res = await fetch(`${API_BASE}/dashboardapi/crud/${currentTable}?limit=${pageSize}&offset=${offset}`);
-        const json = await res.json();
-        currentTableData = json.data || [];
-        totalTableRows = json.total || currentTableData.length;
+        const res = await fetch(`${API_BASE}/dashboardapi/crud/${currentTable}?limit=${currentLimit}&offset=${currentOffset}`, {
+          headers: getAuthHeaders()
+        });
 
-        // Fetch schema
-        const found = allTables.find(t => t.name === currentTable);
-        currentTableColumns = found ? found.columns : [];
+        if (res.status === 401) {
+          showAuthOverlay('Admin Authentication Required.');
+          return;
+        }
 
-        document.getElementById('activeTableStats').textContent = `Showing ${(offset + 1).toLocaleString()} - ${Math.min(offset + currentTableData.length, totalTableRows).toLocaleString()} of ${totalTableRows.toLocaleString()} rows`;
+        if (res.ok) {
+          const json = await res.json();
+          currentTableRows = json.data || [];
+          currentTableTotal = json.total || currentTableRows.length;
+          document.getElementById('currentTableRowCount').textContent = `${currentTableTotal.toLocaleString()} rows`;
 
-        document.getElementById('explorerPaginationBar').style.display = totalTableRows > pageSize ? 'flex' : 'none';
-        document.getElementById('pageRangeLabel').textContent = `Page ${currentPage} of ${Math.ceil(totalTableRows / pageSize)}`;
-
-        if (currentSubtab === 'data') {
-          renderExplorerGrid(currentTableData);
+          updatePaginationControls();
+          renderExplorerGrid(currentTableRows);
         } else {
-          renderSchemaView();
+          container.innerHTML = `<div style="padding:20px; color:var(--danger);">Error loading table: HTTP ${res.status}</div>`;
         }
       } catch (err) {
-        document.getElementById('explorerGridContainer').innerHTML = `<div style="color:var(--danger); padding:20px;">Error: ${err.message}</div>`;
+        container.innerHTML = `<div style="padding:20px; color:var(--danger);">Network error: ${err.message}</div>`;
       }
     }
 
     function renderExplorerGrid(rows) {
-      const container = document.getElementById('explorerGridContainer');
+      const container = document.getElementById('explorerTableContainer');
       if (!rows || rows.length === 0) {
-        container.innerHTML = `<div class="empty-state"><h3>0 Records in ${currentTable}</h3><p>Click "Add Row" to insert the first record.</p></div>`;
+        container.innerHTML = '<div class="empty-state" style="padding:40px; text-align:center; color:var(--text-dim);"><h3>0 records found in this table</h3></div>';
         return;
       }
 
-      const cols = Object.keys(rows[0]);
-      let html = '<table class="data-grid"><thead><tr><th style="width:75px;">Actions</th>';
-      cols.forEach(c => { html += `<th>${c}</th>`; });
+      currentTableCols = Object.keys(rows[0]);
+      let html = '<table class="data-grid"><thead><tr><th style="width:90px; text-align:center;">Actions</th>';
+      currentTableCols.forEach(c => { html += `<th>${escapeHtml(c)}</th>`; });
       html += '</tr></thead><tbody>';
 
       rows.forEach(r => {
-        html += '<tr>';
-        const idVal = r.id !== undefined ? r.id : r[cols[0]];
-        html += `<td style="white-space:nowrap;">
-          <button class="btn btn-sm" onclick="openEditModal(${idVal})" title="Edit Row">✏️</button>
-          <button class="btn btn-sm btn-danger" onclick="openDeleteModal(${idVal})" title="Delete Row">🗑️</button>
+        const id = r.id || r.ID || '';
+        html += `<tr><td style="text-align:center;">
+          <button class="btn btn-sm" onclick='openViewModal(${JSON.stringify(r).replace(/'/g, "&#39;")})' title="View">👁️</button>
+          <button class="btn btn-sm btn-primary" onclick='openEditModal(${JSON.stringify(r).replace(/'/g, "&#39;")})' title="Edit">✏️</button>
+          ${id ? `<button class="btn btn-sm btn-danger" onclick="openDeleteModal(${id})" title="Delete">🗑️</button>` : ''}
         </td>`;
-        cols.forEach(c => {
-          html += formatCell(r[c]);
+
+        currentTableCols.forEach(c => {
+          const val = r[c];
+          if (val === null || val === undefined) {
+            html += '<td class="cell-null">NULL</td>';
+          } else if (typeof val === 'string' && (val.startsWith('http') && (val.endsWith('.jpg') || val.endsWith('.png') || val.endsWith('.webp') || val.includes('/images/')))) {
+            html += `<td><img src="${escapeHtml(val)}" class="cell-img" onclick="openLightbox('${escapeHtml(val)}')"></td>`;
+          } else {
+            html += `<td>${escapeHtml(String(val))}</td>`;
+          }
         });
         html += '</tr>';
       });
@@ -1499,127 +1971,101 @@
       container.innerHTML = html;
     }
 
-    function renderSchemaView() {
-      const container = document.getElementById('explorerGridContainer');
-      if (!currentTableColumns || currentTableColumns.length === 0) {
-        container.innerHTML = '<div class="empty-state"><h3>Schema Not Available</h3></div>';
-        return;
-      }
-
-      let html = `<table class="data-grid">
-        <thead>
-          <tr>
-            <th>Field</th>
-            <th>Type</th>
-            <th>Null</th>
-            <th>Key</th>
-            <th>Default</th>
-            <th>Extra</th>
-          </tr>
-        </thead>
-        <tbody>`;
-
-      currentTableColumns.forEach(col => {
-        html += `<tr>
-          <td><b style="color:#60a5fa;">${col.Field}</b></td>
-          <td>${col.Type}</td>
-          <td>${col.Null === 'YES' ? '<span class="null-tag">YES</span>' : '<span style="color:var(--warning)">NO</span>'}</td>
-          <td>${col.Key ? `<span style="background:rgba(59,130,246,0.2); padding:2px 6px; border-radius:4px; color:#93c5fd;">${col.Key}</span>` : '-'}</td>
-          <td>${col.Default !== null ? col.Default : '<span class="null-tag">NULL</span>'}</td>
-          <td>${col.Extra || '-'}</td>
-        </tr>`;
-      });
-
-      html += '</tbody></table>';
-      container.innerHTML = html;
-    }
-
-    function filterActiveTableRows() {
-      const q = document.getElementById('tableSearchRowInput').value.toLowerCase().trim();
+    function filterTableRows() {
+      const q = document.getElementById('recordFilterInput').value.trim().toLowerCase();
       if (!q) {
-        renderExplorerGrid(currentTableData);
+        renderExplorerGrid(currentTableRows);
         return;
       }
-      const filtered = currentTableData.filter(row => {
-        return Object.values(row).some(v => v !== null && v !== undefined && String(v).toLowerCase().includes(q));
+      const filtered = currentTableRows.filter(r => {
+        return Object.values(r).some(v => v !== null && v !== undefined && String(v).toLowerCase().includes(q));
       });
       renderExplorerGrid(filtered);
     }
 
-    function changePageSize() {
-      pageSize = Number(document.getElementById('pageSizeSelect').value);
-      currentPage = 1;
-      fetchActiveTableData();
+    function updatePaginationControls() {
+      document.getElementById('prevPageBtn').disabled = currentOffset === 0;
+      document.getElementById('nextPageBtn').disabled = (currentOffset + currentLimit) >= currentTableTotal;
     }
 
     function prevPage() {
-      if (currentPage > 1) {
-        currentPage--;
+      if (currentOffset >= currentLimit) {
+        currentOffset -= currentLimit;
         fetchActiveTableData();
       }
     }
 
     function nextPage() {
-      if (currentPage * pageSize < totalTableRows) {
-        currentPage++;
+      if ((currentOffset + currentLimit) < currentTableTotal) {
+        currentOffset += currentLimit;
         fetchActiveTableData();
       }
     }
 
-    // Modal Actions: Insert / Edit / Delete
-    function openInsertModal() {
-      editingRecordId = null;
-      document.getElementById('recordModalTitle').textContent = `➕ Insert Record into ${currentTable}`;
-      buildRecordForm({});
-      document.getElementById('recordModal').classList.add('open');
+    function changePageSize() {
+      currentLimit = Number(document.getElementById('pageSizeSelect').value) || 100;
+      currentOffset = 0;
+      fetchActiveTableData();
     }
 
-    function openEditModal(id) {
-      editingRecordId = id;
-      const row = currentTableData.find(r => r.id === id || Object.values(r)[0] === id);
-      document.getElementById('recordModalTitle').textContent = `✏️ Edit Record in ${currentTable} (ID: ${id})`;
-      buildRecordForm(row || {});
-      document.getElementById('recordModal').classList.add('open');
+    // Modal Operations
+    function openViewModal(record) {
+      document.getElementById('viewModalTitle').textContent = `Record View [${currentTable}]`;
+      const body = document.getElementById('viewModalBody');
+      let html = '<div style="display:flex; flex-direction:column; gap:8px;">';
+      for (const [k, v] of Object.entries(record)) {
+        html += `
+          <div style="display:flex; justify-content:space-between; border-bottom:1px solid var(--border-subtle); padding:6px 0; font-size:0.82rem;">
+            <span style="color:var(--text-muted); font-weight:600;">${escapeHtml(k)}:</span>
+            <span style="font-family:'JetBrains Mono'; max-width:400px; word-break:break-all; text-align:right;">${v !== null && v !== undefined ? escapeHtml(String(v)) : '<i style="color:var(--text-dim)">NULL</i>'}</span>
+          </div>`;
+      }
+      html += '</div>';
+      body.innerHTML = html;
+      document.getElementById('viewModal').classList.add('open');
     }
 
-    function buildRecordForm(data) {
-      const body = document.getElementById('recordModalBody');
-      const cols = currentTableColumns.length > 0 ? currentTableColumns : Object.keys(data).map(k => ({ Field: k, Type: 'text' }));
+    function closeViewModal() {
+      document.getElementById('viewModal').classList.remove('open');
+    }
 
-      let formHtml = '';
-      cols.forEach(col => {
-        const fieldName = col.Field;
-        const isAutoInc = (col.Extra || '').toLowerCase().includes('auto_increment');
-        const val = data[fieldName] !== undefined && data[fieldName] !== null ? data[fieldName] : '';
+    function openEditModal(record) {
+      editingRecordId = record ? (record.id || record.ID || null) : null;
+      document.getElementById('editModalTitle').textContent = editingRecordId ? `Edit Record ID ${editingRecordId} [${currentTable}]` : `New Record in [${currentTable}]`;
 
-        if (isAutoInc && !editingRecordId) return; // Skip primary auto-inc on insert
+      const form = document.getElementById('recordForm');
+      form.innerHTML = '';
 
-        formHtml += `<div class="form-group">
-          <label>${fieldName} ${col.Type ? `<span style="color:var(--text-dim); font-size:0.7rem;">(${col.Type})</span>` : ''}</label>`;
-
-        if (String(col.Type).includes('text') || String(col.Type).includes('json')) {
-          formHtml += `<textarea class="input-field" data-field="${fieldName}" rows="3">${escapeHtml(val)}</textarea>`;
-        } else {
-          formHtml += `<input type="text" class="input-field" data-field="${fieldName}" value="${escapeHtml(val)}" ${isAutoInc ? 'disabled style="opacity:0.5;"' : ''}>`;
-        }
-        formHtml += `</div>`;
+      const cols = currentTableCols.length > 0 ? currentTableCols : (record ? Object.keys(record) : ['name', 'status']);
+      cols.forEach(c => {
+        if (c.toLowerCase() === 'id' && editingRecordId) return; // ID is readonly
+        const val = record && record[c] !== undefined && record[c] !== null ? String(record[c]) : '';
+        const group = document.createElement('div');
+        group.className = 'form-group';
+        group.innerHTML = `
+          <label for="field_${c}">${escapeHtml(c)}</label>
+          <input type="text" id="field_${c}" name="${escapeHtml(c)}" class="input-field" value="${escapeHtml(val)}" placeholder="Enter ${escapeHtml(c)}">
+        `;
+        form.appendChild(group);
       });
 
-      body.innerHTML = formHtml || '<p>No editable columns found.</p>';
+      document.getElementById('editModal').classList.add('open');
     }
 
-    function closeRecordModal() {
-      document.getElementById('recordModal').classList.remove('open');
+    function openAddRecordModal() {
+      openEditModal(null);
+    }
+
+    function closeEditModal() {
+      document.getElementById('editModal').classList.remove('open');
     }
 
     async function saveRecord() {
-      const inputs = document.querySelectorAll('#recordModalBody [data-field]');
+      const form = document.getElementById('recordForm');
+      const inputs = form.querySelectorAll('input');
       const payload = {};
-      inputs.forEach(input => {
-        if (!input.disabled) {
-          const val = input.value.trim();
-          payload[input.getAttribute('data-field')] = val === '' ? null : val;
-        }
+      inputs.forEach(inp => {
+        payload[inp.name] = inp.value;
       });
 
       const btn = document.getElementById('saveRecordBtn');
@@ -1627,23 +2073,27 @@
       btn.disabled = true;
 
       try {
-        let res;
+        let url = `${API_BASE}/dashboardapi/crud/${currentTable}`;
+        let method = 'POST';
         if (editingRecordId) {
-          res = await fetch(`${API_BASE}/dashboardapi/crud/${currentTable}/${editingRecordId}`, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
-          });
-        } else {
-          res = await fetch(`${API_BASE}/dashboardapi/crud/${currentTable}`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
-          });
+          url += `/${editingRecordId}`;
+          method = 'PUT';
         }
+
+        const res = await fetch(url, {
+          method,
+          headers: getAuthHeaders(),
+          body: JSON.stringify(payload)
+        });
+
+        if (res.status === 401) {
+          showAuthOverlay('Admin Authentication Required.');
+          return;
+        }
+
         const json = await res.json();
         if (json.success || res.ok) {
-          closeRecordModal();
+          closeEditModal();
           fetchActiveTableData();
         } else {
           alert(`Save Failed: ${json.error || 'Server error'}`);
@@ -1674,8 +2124,15 @@
 
       try {
         const res = await fetch(`${API_BASE}/dashboardapi/crud/${currentTable}/${deletingRecordId}`, {
-          method: 'DELETE'
+          method: 'DELETE',
+          headers: getAuthHeaders()
         });
+
+        if (res.status === 401) {
+          showAuthOverlay('Admin Authentication Required.');
+          return;
+        }
+
         const json = await res.json();
         if (json.success || res.ok) {
           closeDeleteModal();
@@ -1734,6 +2191,16 @@
 
     function closeImgModal() {
       document.getElementById('imgModal').classList.remove('open');
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
     }
   </script>
 </body>

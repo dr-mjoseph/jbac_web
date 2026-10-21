@@ -98,22 +98,31 @@ mysql://admin:biUt2TrZ9EZAqn6GXhiA@jbac-mysql-db-v3.cdeeuw0s2trf.ap-southeast-2.
 
 ---
 
-### 5. Web-Based Cockpit & SQL Query Console (`www.jbac.in/admin`)
-You can query, explore, and manipulate the AWS RDS database directly from any web browser without installing MySQL Workbench or DBeaver:
+### 5. Web-Based Cockpit & SQL Query Console (`jbac.in/admin`)
+You can query, explore, and manipulate the AWS RDS database directly from any desktop or mobile web browser without installing MySQL Workbench or DBeaver:
 
-- **Live URL**: **`https://www.jbac.in/admin`** *(or `https://www.jbac.in/public.html`)*
-- **Direct Lambda URL**: `https://1a8kqxawxd.execute-api.ap-southeast-2.amazonaws.com/admin`
+- **Primary Custom Domain**: [https://www.jbac.in/admin](https://www.jbac.in/admin) *(or [https://jbac.in/admin](https://jbac.in/admin))*
+- **Alternative Path**: [https://www.jbac.in/public.html](https://www.jbac.in/public.html) *(or [https://jbac.in/public.html](https://jbac.in/public.html))*
+- **Direct AWS Lambda Endpoint**: [https://1a8kqxawxd.execute-api.ap-southeast-2.amazonaws.com/admin](https://1a8kqxawxd.execute-api.ap-southeast-2.amazonaws.com/admin)
 - **Local File**: [`public.html`](public.html) *(Double-click to open in browser)*
 
+#### 🔐 Security & Access Credentials:
+Access to the Cockpit and all query execution APIs is guarded by a unified authentication gate:
+* **Admin Unique ID**: `admin`
+* **Admin Password**: `JbacAdmin@2026`
+* **Session Security**: Authenticated via SHA-256 session token stored in browser session and verified on each request.
+
 #### Programmatic Query API:
-You can also execute custom SQL queries programmatically via HTTP REST:
+You can also execute custom SQL queries programmatically via HTTP REST with your admin credentials or token:
 * **Method**: `POST`
 * **URL**: `https://1a8kqxawxd.execute-api.ap-southeast-2.amazonaws.com/dashboardapi/execute-query`
-* **Headers**: `Content-Type: application/json`
+* **Headers**:
+  - `Content-Type: application/json`
+  - `x-admin-auth: <token>` *(obtained from `POST /dashboardapi/admin-login`)* or HTTP Basic Auth (`admin:JbacAdmin@2026`)
 * **Body**:
   ```json
   {
-    "query": "SELECT COUNT(*) as active_users FROM users WHERE status = 'Active'"
+    "query": "SELECT COUNT(*) as active_users FROM users"
   }
   ```
 * **Sample Response**:
@@ -123,7 +132,7 @@ You can also execute custom SQL queries programmatically via HTTP REST:
     "type": "SELECT",
     "rowCount": 1,
     "fields": ["active_users"],
-    "data": [{ "active_users": 64 }],
+    "data": [{ "active_users": 66 }],
     "durationMs": 30
   }
   ```

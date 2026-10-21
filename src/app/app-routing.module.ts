@@ -129,6 +129,9 @@ const routes: Routes = [
  { path: 'family-counseling', component: FamilyCouncellingComponent },
  { path: 'doctorregister', component: DoctorregisterComponent },
  { path: 'doctor-register', component: DoctorregisterComponent },
+ { path: 'admin', redirectTo: '' },
+ { path: 'public.html', redirectTo: '' },
+ { path: '**', redirectTo: '' }
 ];
 
 @NgModule({

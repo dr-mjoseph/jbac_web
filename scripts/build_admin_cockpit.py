@@ -1,0 +1,2228 @@
+import os
+import shutil
+
+html_content = r'''<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+  <meta name="description" content="JBAC Cloud Database & Query Cockpit - AWS RDS MySQL 8.4 Administration Console">
+  <title>JBAC Cloud Database & Query Cockpit - AWS RDS MySQL 8.4</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-dark: #0a0e17;
+      --bg-surface: #111827;
+      --bg-card: #182234;
+      --bg-card-hover: #1f2d42;
+      --border-subtle: #243247;
+      --border-focus: #3b82f6;
+      --text-main: #f9fafb;
+      --text-muted: #94a3b8;
+      --text-dim: #64748b;
+      --primary: #3b82f6;
+      --primary-hover: #2563eb;
+      --primary-light: rgba(59, 130, 246, 0.15);
+      --success: #10b981;
+      --success-light: rgba(16, 185, 129, 0.15);
+      --warning: #f59e0b;
+      --warning-light: rgba(245, 158, 11, 0.15);
+      --danger: #ef4444;
+      --danger-light: rgba(239, 68, 68, 0.15);
+      --accent: #8b5cf6;
+      --code-bg: #0d131f;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background: var(--bg-dark);
+      color: var(--text-main);
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* Scrollbars */
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: var(--bg-dark); }
+    ::-webkit-scrollbar-thumb { background: #2a3b53; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #3b506d; }
+
+    /* Header */
+    header {
+      background: var(--bg-surface);
+      border-bottom: 1px solid var(--border-subtle);
+      padding: 10px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-shrink: 0;
+      z-index: 50;
+    }
+
+    .brand-wrap {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-logo {
+      width: 38px;
+      height: 38px;
+      background: linear-gradient(135deg, #2563eb, #8b5cf6);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.3rem;
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.35);
+    }
+
+    .brand-title h1 {
+      font-size: 1.05rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .brand-title p {
+      font-size: 0.73rem;
+      color: var(--text-muted);
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 9999px;
+      font-size: 0.72rem;
+      font-weight: 600;
+      background: var(--success-light);
+      color: var(--success);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+
+    .status-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--success);
+      box-shadow: 0 0 8px var(--success);
+      animation: pulse-dot 2s infinite;
+    }
+
+    @keyframes pulse-dot {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.85); }
+    }
+
+    .header-controls {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .endpoint-select-wrap {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--code-bg);
+      border: 1px solid var(--border-subtle);
+      border-radius: 8px;
+      padding: 4px 10px;
+      font-size: 0.8rem;
+    }
+
+    .endpoint-select-wrap span { color: var(--text-dim); }
+    .endpoint-input {
+      background: transparent;
+      border: none;
+      color: #93c5fd;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.78rem;
+      width: 250px;
+      outline: none;
+    }
+
+    /* Admin Auth User Badge */
+    .admin-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 5px 12px;
+      border-radius: 8px;
+      background: rgba(139, 92, 246, 0.15);
+      border: 1px solid rgba(139, 92, 246, 0.35);
+      font-size: 0.78rem;
+      color: #c4b5fd;
+      font-weight: 600;
+    }
+
+    .btn-logout {
+      background: rgba(239, 68, 68, 0.2);
+      border: 1px solid rgba(239, 68, 68, 0.4);
+      color: #fca5a5;
+      padding: 3px 8px;
+      border-radius: 5px;
+      font-size: 0.72rem;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .btn-logout:hover {
+      background: var(--danger);
+      color: #fff;
+    }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 14px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      border-radius: 7px;
+      border: 1px solid var(--border-subtle);
+      background: var(--bg-card);
+      color: var(--text-main);
+      cursor: pointer;
+      transition: all 0.15s ease;
+      text-decoration: none;
+    }
+
+    .btn:hover {
+      background: var(--bg-card-hover);
+      border-color: #3b506d;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: #fff;
+    }
+    .btn-primary:hover {
+      background: var(--primary-hover);
+      border-color: var(--primary-hover);
+    }
+
+    .btn-success { background: var(--success); border-color: var(--success); color: #fff; }
+    .btn-success:hover { background: #059669; }
+
+    .btn-danger { background: var(--danger); border-color: var(--danger); color: #fff; }
+    .btn-danger:hover { background: #dc2626; }
+
+    .btn-sm { padding: 5px 10px; font-size: 0.75rem; }
+
+    /* Navigation Tabs */
+    .nav-tabs {
+      display: flex;
+      background: var(--bg-surface);
+      border-bottom: 1px solid var(--border-subtle);
+      padding: 0 20px;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+
+    .nav-tab {
+      padding: 12px 18px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.15s ease;
+      user-select: none;
+    }
+
+    .nav-tab:hover { color: var(--text-main); }
+    .nav-tab.active {
+      color: var(--primary);
+      border-bottom-color: var(--primary);
+      background: linear-gradient(180deg, transparent, rgba(59, 130, 246, 0.05));
+    }
+
+    /* Main Workspace Views */
+    .view-container {
+      flex: 1;
+      display: none;
+      height: calc(100vh - 110px);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .view-container.active { display: flex; }
+
+    /* View 1: Dashboard */
+    .dashboard-view {
+      flex-direction: column;
+      overflow-y: auto;
+      padding: 24px;
+      gap: 24px;
+      width: 100%;
+    }
+
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 16px;
+    }
+
+    .metric-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      padding: 18px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      transition: all 0.2s;
+      cursor: pointer;
+    }
+
+    .metric-card:hover {
+      border-color: var(--primary);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+    }
+
+    .metric-card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      color: var(--text-muted);
+      font-size: 0.82rem;
+      font-weight: 500;
+    }
+
+    .metric-card-icon {
+      font-size: 1.5rem;
+      width: 40px;
+      height: 40px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255,255,255,0.05);
+    }
+
+    .metric-card-value {
+      font-size: 1.85rem;
+      font-weight: 800;
+      color: #fff;
+      letter-spacing: -0.02em;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .metric-card-footer {
+      font-size: 0.72rem;
+      color: var(--text-dim);
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .dash-sections {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 20px;
+    }
+
+    @media (max-width: 1024px) {
+      .dash-sections { grid-template-columns: 1fr; }
+    }
+
+    .dash-box {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .dash-box-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border-subtle);
+      padding-bottom: 12px;
+    }
+
+    .dash-box-header h3 {
+      font-size: 1rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .quick-queries-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .quick-query-btn {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      padding: 10px 14px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      color: var(--text-main);
+      cursor: pointer;
+      transition: all 0.15s;
+      text-align: left;
+    }
+
+    .quick-query-btn:hover {
+      background: var(--bg-card-hover);
+      border-color: var(--primary);
+    }
+
+    .quick-query-sql {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.76rem;
+      color: #93c5fd;
+    }
+
+    /* View 2: Query Console */
+    .query-view {
+      flex-direction: column;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+    }
+
+    .query-editor-wrap {
+      background: var(--bg-surface);
+      border-bottom: 1px solid var(--border-subtle);
+      padding: 16px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      flex-shrink: 0;
+    }
+
+    .query-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .query-presets-select {
+      background: var(--code-bg);
+      color: var(--text-main);
+      border: 1px solid var(--border-subtle);
+      padding: 7px 12px;
+      border-radius: 6px;
+      font-size: 0.82rem;
+      outline: none;
+      min-width: 280px;
+    }
+
+    .sql-editor-container {
+      position: relative;
+      border: 1px solid var(--border-subtle);
+      border-radius: 8px;
+      background: var(--code-bg);
+    }
+
+    .sql-editor-container:focus-within {
+      border-color: var(--border-focus);
+      box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+    }
+
+    .sql-editor {
+      width: 100%;
+      height: 120px;
+      background: transparent;
+      color: #f1f5f9;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.88rem;
+      line-height: 1.5;
+      padding: 12px 14px;
+      border: none;
+      resize: vertical;
+      outline: none;
+    }
+
+    .query-history-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      overflow-x: auto;
+      font-size: 0.75rem;
+      color: var(--text-dim);
+      padding-top: 4px;
+    }
+
+    .history-pill {
+      background: var(--code-bg);
+      border: 1px solid var(--border-subtle);
+      padding: 4px 10px;
+      border-radius: 999px;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-family: 'JetBrains Mono', monospace;
+      max-width: 240px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .history-pill:hover { border-color: var(--primary); color: #fff; }
+
+    .query-results-wrap {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      background: var(--bg-dark);
+    }
+
+    .results-header {
+      background: var(--bg-surface);
+      border-bottom: 1px solid var(--border-subtle);
+      padding: 8px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      flex-shrink: 0;
+    }
+
+    .results-table-container {
+      flex: 1;
+      overflow: auto;
+      padding: 0;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    /* View 3: Explorer View */
+    .explorer-view {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      overflow: hidden;
+    }
+
+    .explorer-sidebar {
+      width: 300px;
+      background: var(--bg-surface);
+      border-right: 1px solid var(--border-subtle);
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+      transition: all 0.2s ease;
+    }
+
+    .sidebar-search-box {
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .input-field {
+      width: 100%;
+      background: var(--code-bg);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-main);
+      padding: 7px 12px;
+      border-radius: 6px;
+      font-size: 0.82rem;
+      outline: none;
+    }
+
+    .input-field:focus { border-color: var(--primary); }
+
+    .tables-list {
+      flex: 1;
+      overflow-y: auto;
+      padding: 8px;
+    }
+
+    .table-list-item {
+      padding: 8px 12px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+      color: var(--text-muted);
+      font-size: 0.84rem;
+      margin-bottom: 2px;
+      transition: all 0.15s;
+    }
+
+    .table-list-item:hover { background: var(--bg-card); color: var(--text-main); }
+    .table-list-item.active {
+      background: var(--primary-light);
+      color: #93c5fd;
+      font-weight: 600;
+      border-left: 3px solid var(--primary);
+    }
+
+    .row-count-badge {
+      font-size: 0.72rem;
+      background: rgba(255,255,255,0.06);
+      padding: 2px 7px;
+      border-radius: 999px;
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--text-dim);
+    }
+
+    .table-list-item.active .row-count-badge {
+      background: rgba(59, 130, 246, 0.3);
+      color: #bfdbfe;
+    }
+
+    .explorer-main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      background: var(--bg-dark);
+    }
+
+    .explorer-toolbar {
+      background: var(--bg-surface);
+      border-bottom: 1px solid var(--border-subtle);
+      padding: 10px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-shrink: 0;
+      flex-wrap: wrap;
+    }
+
+    .table-title-area {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .table-name-badge {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 1rem;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    /* Data Tables & Grids */
+    .data-grid {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82rem;
+      font-family: 'JetBrains Mono', monospace;
+      white-space: nowrap;
+    }
+
+    .data-grid th {
+      background: #151e2e;
+      position: sticky;
+      top: 0;
+      padding: 10px 14px;
+      text-align: left;
+      font-weight: 600;
+      color: var(--text-muted);
+      border-bottom: 1px solid var(--border-subtle);
+      border-right: 1px solid rgba(255,255,255,0.04);
+      z-index: 10;
+    }
+
+    .data-grid td {
+      padding: 8px 14px;
+      border-bottom: 1px solid var(--border-subtle);
+      border-right: 1px solid rgba(255,255,255,0.03);
+      color: #e2e8f0;
+      max-width: 320px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .data-grid tr:hover td { background: rgba(59, 130, 246, 0.06); }
+
+    .cell-null { color: var(--text-dim); font-style: italic; }
+    .cell-img {
+      width: 36px;
+      height: 36px;
+      object-fit: cover;
+      border-radius: 4px;
+      border: 1px solid var(--border-subtle);
+      cursor: pointer;
+    }
+
+    /* Modals & Dialogs */
+    .modal-backdrop {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.75);
+      backdrop-filter: blur(4px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 999;
+      padding: 20px;
+    }
+
+    .modal-backdrop.open { display: flex; }
+
+    .modal-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      width: 100%;
+      max-width: 650px;
+      max-height: 90vh;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+    }
+
+    .modal-header {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .modal-header h3 { font-size: 1.1rem; font-weight: 700; color: #fff; }
+    .modal-close-btn { background: none; border: none; color: var(--text-muted); font-size: 1.4rem; cursor: pointer; }
+    .modal-close-btn:hover { color: #fff; }
+
+    .modal-body {
+      padding: 20px;
+      overflow-y: auto;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .modal-footer {
+      padding: 14px 20px;
+      border-top: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 10px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .form-group label {
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+
+    .lightbox-img {
+      max-width: 90vw;
+      max-height: 85vh;
+      border-radius: 8px;
+      border: 1px solid var(--border-subtle);
+      box-shadow: 0 10px 40px rgba(0,0,0,0.8);
+    }
+
+    /* =========================================================================
+       AUTHENTICATION OVERLAY GATE
+       ========================================================================= */
+    .auth-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(7, 10, 19, 0.94);
+      backdrop-filter: blur(20px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 10000;
+      padding: 20px;
+    }
+
+    .auth-overlay.hidden { display: none !important; }
+
+    .auth-card {
+      background: linear-gradient(180deg, #162032 0%, #111827 100%);
+      border: 1px solid rgba(59, 130, 246, 0.35);
+      border-radius: 16px;
+      width: 100%;
+      max-width: 440px;
+      padding: 32px 28px;
+      box-shadow: 0 25px 60px rgba(0,0,0,0.7), 0 0 30px rgba(59, 130, 246, 0.15);
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      animation: modalFadeIn 0.25s ease-out;
+    }
+
+    @keyframes modalFadeIn {
+      from { opacity: 0; transform: scale(0.96) translateY(-10px); }
+      to { opacity: 1; transform: scale(1) translateY(0); }
+    }
+
+    .auth-brand {
+      text-align: center;
+    }
+
+    .auth-brand h2 {
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: #fff;
+      letter-spacing: -0.02em;
+      margin-bottom: 6px;
+    }
+
+    .auth-brand p {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .auth-alert {
+      background: var(--danger-light);
+      border: 1px solid rgba(239, 68, 68, 0.5);
+      color: #fca5a5;
+      padding: 10px 14px;
+      border-radius: 8px;
+      font-size: 0.82rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .auth-input {
+      width: 100%;
+      background: var(--code-bg);
+      border: 1px solid var(--border-subtle);
+      color: #fff;
+      padding: 11px 14px;
+      border-radius: 8px;
+      font-size: 0.92rem;
+      outline: none;
+      font-family: inherit;
+      transition: all 0.15s;
+    }
+
+    .auth-input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+    }
+
+    .btn-toggle-pwd {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 1rem;
+      padding: 4px;
+    }
+    .btn-toggle-pwd:hover { color: #fff; }
+
+    .auth-footer {
+      text-align: center;
+      font-size: 0.72rem;
+      color: var(--text-dim);
+      border-top: 1px solid var(--border-subtle);
+      padding-top: 14px;
+    }
+
+    /* =========================================================================
+       MOBILE RESPONSIVENESS & ADAPTIVE LAYOUT
+       ========================================================================= */
+    .mobile-only { display: none !important; }
+
+    @media (max-width: 768px) {
+      .mobile-only { display: inline-flex !important; }
+      .desktop-only { display: none !important; }
+
+      body {
+        height: auto !important;
+        min-height: 100vh !important;
+        overflow-y: auto !important;
+      }
+
+      header {
+        flex-direction: column !important;
+        align-items: stretch !important;
+        padding: 12px 14px !important;
+        gap: 10px !important;
+      }
+
+      .brand-wrap {
+        justify-content: space-between !important;
+        width: 100% !important;
+      }
+
+      .brand-title h1 {
+        font-size: 0.95rem !important;
+      }
+
+      .brand-title p {
+        font-size: 0.68rem !important;
+      }
+
+      .header-controls {
+        flex-wrap: wrap !important;
+        width: 100% !important;
+        justify-content: space-between !important;
+        gap: 8px !important;
+      }
+
+      .endpoint-select-wrap {
+        flex: 1 1 100% !important;
+      }
+
+      .endpoint-input {
+        width: 100% !important;
+      }
+
+      .nav-tabs {
+        overflow-x: auto !important;
+        white-space: nowrap !important;
+        padding: 0 10px !important;
+        -webkit-overflow-scrolling: touch !important;
+        gap: 4px !important;
+      }
+
+      .nav-tab {
+        padding: 10px 14px !important;
+        font-size: 0.82rem !important;
+      }
+
+      .view-container {
+        height: auto !important;
+        min-height: calc(100vh - 130px) !important;
+        overflow: visible !important;
+      }
+
+      .dashboard-view {
+        padding: 16px 12px !important;
+        gap: 16px !important;
+        overflow-y: visible !important;
+      }
+
+      .metrics-grid {
+        grid-template-columns: 1fr !important;
+        gap: 12px !important;
+      }
+
+      .dash-sections {
+        grid-template-columns: 1fr !important;
+        gap: 16px !important;
+      }
+
+      /* Explorer on Mobile */
+      .explorer-view {
+        flex-direction: column !important;
+        height: auto !important;
+        min-height: 85vh !important;
+      }
+
+      .explorer-sidebar {
+        width: 100% !important;
+        max-height: 280px !important;
+        border-right: none !important;
+        border-bottom: 1px solid var(--border-subtle) !important;
+      }
+
+      .explorer-sidebar.mobile-collapsed {
+        display: none !important;
+      }
+
+      .explorer-main {
+        width: 100% !important;
+        min-height: 60vh !important;
+      }
+
+      .explorer-toolbar {
+        flex-direction: column !important;
+        align-items: stretch !important;
+        padding: 10px 12px !important;
+        gap: 8px !important;
+      }
+
+      .query-view {
+        height: auto !important;
+        min-height: 85vh !important;
+      }
+
+      .query-editor-wrap {
+        padding: 12px 14px !important;
+      }
+
+      .query-toolbar {
+        flex-direction: column !important;
+        align-items: stretch !important;
+      }
+
+      .query-presets-select {
+        min-width: 100% !important;
+      }
+
+      .sql-editor {
+        height: 140px !important;
+        font-size: 0.82rem !important;
+      }
+
+      .auth-card {
+        padding: 24px 18px !important;
+        max-width: 100% !important;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- =========================================================================
+       AUTHENTICATION OVERLAY GATE (ID: admin)
+       ========================================================================= -->
+  <div id="adminAuthOverlay" class="auth-overlay">
+    <div class="auth-card">
+      <div class="auth-brand">
+        <div class="brand-logo" style="width: 50px; height: 50px; font-size: 1.7rem; margin: 0 auto 12px auto;">🔐</div>
+        <h2>JBAC Database & Query Cockpit</h2>
+        <p>AWS RDS MySQL 8.4 Secure Administration Console</p>
+      </div>
+
+      <div id="authAlert" class="auth-alert" style="display: none;"></div>
+
+      <form id="adminLoginForm" onsubmit="handleAdminLogin(event)">
+        <div class="form-group" style="margin-bottom: 16px;">
+          <label for="adminUsernameInput">Admin Unique ID</label>
+          <input type="text" id="adminUsernameInput" class="auth-input" value="admin" required placeholder="Enter Unique ID (e.g. admin)" autocomplete="username">
+        </div>
+
+        <div class="form-group" style="margin-bottom: 22px;">
+          <label for="adminPasswordInput">Admin Password</label>
+          <div style="position: relative;">
+            <input type="password" id="adminPasswordInput" class="auth-input" required placeholder="Enter Admin Password" autocomplete="current-password" autofocus>
+            <button type="button" class="btn-toggle-pwd" onclick="togglePasswordVisibility('adminPasswordInput', this)" title="Show/Hide Password">👁️</button>
+          </div>
+        </div>
+
+        <button type="submit" id="adminLoginBtn" class="btn btn-primary" style="width: 100%; padding: 12px; font-size: 0.95rem; justify-content: center;">
+          <span id="loginBtnText">⚡ Unlock & Sign In</span>
+        </button>
+      </form>
+
+      <div class="auth-footer">
+        <span>Protected by SHA-256 HMAC Authentication &bull; JBAC Production Cloud</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- HEADER -->
+  <header>
+    <div class="brand-wrap">
+      <div class="brand-logo">⚡</div>
+      <div class="brand-title">
+        <h1>JBAC Database Cockpit</h1>
+        <p>AWS RDS MySQL 8.4 (Sydney ap-southeast-2) &bull; jbac_jbac</p>
+      </div>
+      <div class="status-badge" id="cloudStatusBadge">
+        <span class="status-dot"></span>
+        <span id="cloudStatusText">Connecting...</span>
+      </div>
+    </div>
+
+    <div class="header-controls">
+      <div class="endpoint-select-wrap">
+        <span>API:</span>
+        <input type="text" class="endpoint-input" id="apiBaseInput" value="" placeholder="https://1a8kqxawxd.execute-api.ap-southeast-2.amazonaws.com">
+      </div>
+      <button class="btn btn-sm" onclick="saveAndTestApi()">⚡ Connect</button>
+      <button class="btn btn-sm btn-primary" onclick="refreshCurrentTab()">🔄 Refresh</button>
+      
+      <!-- Authenticated Admin User Status -->
+      <div class="admin-badge" id="adminBadge">
+        <span>🛡️ Admin: <b id="adminUserDisplay">admin</b></span>
+        <button class="btn-logout" onclick="adminLogout()" title="Lock Console / Sign Out">🔒 Logout</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- NAVIGATION TABS -->
+  <nav class="nav-tabs">
+    <div class="nav-tab active" onclick="switchTab('dashboard')">📊 Dashboard & Metrics</div>
+    <div class="nav-tab" onclick="switchTab('query')">⚡ SQL Query Console</div>
+    <div class="nav-tab" onclick="switchTab('explorer')">🗄️ Tables & Schema Explorer (89)</div>
+  </nav>
+
+  <!-- =========================================================================
+       TAB 1: DASHBOARD OVERVIEW
+       ========================================================================= -->
+  <div class="view-container dashboard-view active" id="tab-dashboard">
+    <div class="metrics-grid" id="metricsGrid">
+      <div class="metric-card" onclick="openQueryPreset('SELECT * FROM signup_form ORDER BY id DESC LIMIT 50;')">
+        <div class="metric-card-header">
+          <span>Believers Registered</span>
+          <div class="metric-card-icon">👥</div>
+        </div>
+        <div class="metric-card-value" id="stat-believers">--</div>
+        <div class="metric-card-footer">signup_form &bull; Click to query</div>
+      </div>
+
+      <div class="metric-card" onclick="openQueryPreset('SELECT * FROM pastor_reg ORDER BY id DESC LIMIT 50;')">
+        <div class="metric-card-header">
+          <span>Pastors Registered</span>
+          <div class="metric-card-icon">✝️</div>
+        </div>
+        <div class="metric-card-value" id="stat-pastors">--</div>
+        <div class="metric-card-footer">pastor_reg &bull; Click to query</div>
+      </div>
+
+      <div class="metric-card" onclick="openQueryPreset('SELECT * FROM church_reg ORDER BY id DESC LIMIT 50;')">
+        <div class="metric-card-header">
+          <span>Churches Registered</span>
+          <div class="metric-card-icon">⛪</div>
+        </div>
+        <div class="metric-card-value" id="stat-churches">--</div>
+        <div class="metric-card-footer">church_reg &bull; Click to query</div>
+      </div>
+
+      <div class="metric-card" onclick="openQueryPreset('SELECT * FROM student_reg ORDER BY id DESC LIMIT 50;')">
+        <div class="metric-card-header">
+          <span>Students Registered</span>
+          <div class="metric-card-icon">🎓</div>
+        </div>
+        <div class="metric-card-value" id="stat-students">--</div>
+        <div class="metric-card-footer">student_reg &bull; Click to query</div>
+      </div>
+
+      <div class="metric-card" onclick="openQueryPreset('SELECT * FROM ministry_signup ORDER BY id DESC LIMIT 50;')">
+        <div class="metric-card-header">
+          <span>Ministries Registered</span>
+          <div class="metric-card-icon">🕊️</div>
+        </div>
+        <div class="metric-card-value" id="stat-ministries">--</div>
+        <div class="metric-card-footer">ministry_signup &bull; Click to query</div>
+      </div>
+
+      <div class="metric-card" onclick="openQueryPreset('SELECT * FROM independentorganisation_reg ORDER BY id DESC LIMIT 50;')">
+        <div class="metric-card-header">
+          <span>Organizations Registered</span>
+          <div class="metric-card-icon">🏛️</div>
+        </div>
+        <div class="metric-card-value" id="stat-orgs">--</div>
+        <div class="metric-card-footer">independentorganisation_reg &bull; Click to query</div>
+      </div>
+
+      <div class="metric-card" onclick="openQueryPreset('SELECT * FROM events ORDER BY id DESC LIMIT 50;')">
+        <div class="metric-card-header">
+          <span>Active Events</span>
+          <div class="metric-card-icon">📅</div>
+        </div>
+        <div class="metric-card-value" id="stat-events">--</div>
+        <div class="metric-card-footer" id="stat-events-total">Loading total...</div>
+      </div>
+
+      <div class="metric-card" onclick="openQueryPreset('SELECT * FROM users ORDER BY id DESC LIMIT 50;')">
+        <div class="metric-card-header">
+          <span>Total Portal Accounts</span>
+          <div class="metric-card-icon">🔐</div>
+        </div>
+        <div class="metric-card-value" id="stat-users">--</div>
+        <div class="metric-card-footer">users table &bull; Click to query</div>
+      </div>
+    </div>
+
+    <div class="dash-sections">
+      <div class="dash-box">
+        <div class="dash-box-header">
+          <h3>⚡ Common Administrative SQL Queries</h3>
+          <span style="font-size:0.75rem; color:var(--text-dim);">One-click execution</span>
+        </div>
+        <div class="quick-queries-list">
+          <div class="quick-query-btn" onclick="openQueryPreset('SELECT id, fname, mobile_number, cts, is_first_login FROM signup_form ORDER BY id DESC LIMIT 25;')">
+            <div>
+              <div style="font-weight:600; font-size:0.85rem;">Recent Believer Registrations</div>
+              <div class="quick-query-sql">SELECT id, fname, mobile_number, cts, is_first_login FROM signup_form ORDER BY id DESC LIMIT 25;</div>
+            </div>
+            <span>▶</span>
+          </div>
+
+          <div class="quick-query-btn" onclick="openQueryPreset('SELECT id, pastorname, phonenumber, churchname, dstrct FROM pastor_reg ORDER BY id DESC LIMIT 25;')">
+            <div>
+              <div style="font-weight:600; font-size:0.85rem;">Recent Pastor Registrations</div>
+              <div class="quick-query-sql">SELECT id, pastorname, phonenumber, churchname, dstrct FROM pastor_reg ORDER BY id DESC LIMIT 25;</div>
+            </div>
+            <span>▶</span>
+          </div>
+
+          <div class="quick-query-btn" onclick="openQueryPreset('SELECT id, church_name, pastor_name, contactnumber, district FROM church_reg ORDER BY id DESC LIMIT 25;')">
+            <div>
+              <div style="font-weight:600; font-size:0.85rem;">Recent Church Registrations</div>
+              <div class="quick-query-sql">SELECT id, church_name, pastor_name, contactnumber, district FROM church_reg ORDER BY id DESC LIMIT 25;</div>
+            </div>
+            <span>▶</span>
+          </div>
+
+          <div class="quick-query-btn" onclick="openQueryPreset('SELECT id, title, start_date, end_date, venue FROM events WHERE d_in = 0 ORDER BY id DESC LIMIT 20;')">
+            <div>
+              <div style="font-weight:600; font-size:0.85rem;">Upcoming & Active Events</div>
+              <div class="quick-query-sql">SELECT id, title, start_date, end_date, venue FROM events WHERE d_in = 0 ORDER BY id DESC LIMIT 20;</div>
+            </div>
+            <span>▶</span>
+          </div>
+
+          <div class="quick-query-btn" onclick="openQueryPreset('SELECT id, number, name, email, is_first_login FROM users ORDER BY id DESC LIMIT 25;')">
+            <div>
+              <div style="font-weight:600; font-size:0.85rem;">Recent User Logins & Accounts</div>
+              <div class="quick-query-sql">SELECT id, number, name, email, is_first_login FROM users ORDER BY id DESC LIMIT 25;</div>
+            </div>
+            <span>▶</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="dash-box">
+        <div class="dash-box-header">
+          <h3>☁️ AWS Database Architecture</h3>
+        </div>
+        <div style="display:flex; flex-direction:column; gap:12px; font-size:0.82rem;">
+          <div style="display:flex; justify-content:space-between; border-bottom:1px solid var(--border-subtle); padding-bottom:8px;">
+            <span style="color:var(--text-muted);">Database Engine</span>
+            <span style="font-weight:600; color:#fff;">AWS RDS MySQL 8.4</span>
+          </div>
+          <div style="display:flex; justify-content:space-between; border-bottom:1px solid var(--border-subtle); padding-bottom:8px;">
+            <span style="color:var(--text-muted);">AWS Region</span>
+            <span style="font-weight:600; color:#93c5fd;">ap-southeast-2 (Sydney)</span>
+          </div>
+          <div style="display:flex; justify-content:space-between; border-bottom:1px solid var(--border-subtle); padding-bottom:8px;">
+            <span style="color:var(--text-muted);">Database Name</span>
+            <span style="font-family:'JetBrains Mono'; font-weight:600; color:#a7f3d0;">jbac_jbac</span>
+          </div>
+          <div style="display:flex; justify-content:space-between; border-bottom:1px solid var(--border-subtle); padding-bottom:8px;">
+            <span style="color:var(--text-muted);">Total Tables</span>
+            <span style="font-weight:600; color:#fff;" id="dashTotalTables">89 Tables</span>
+          </div>
+          <div style="display:flex; justify-content:space-between; border-bottom:1px solid var(--border-subtle); padding-bottom:8px;">
+            <span style="color:var(--text-muted);">Backend Server</span>
+            <span style="font-weight:600; color:#fde047;">AWS Lambda Serverless</span>
+          </div>
+          <div style="display:flex; justify-content:space-between; padding-bottom:4px;">
+            <span style="color:var(--text-muted);">Security Policy</span>
+            <span style="font-weight:600; color:var(--success);">VPC + TLS 1.3 + Admin Auth</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       TAB 2: SQL QUERY CONSOLE
+       ========================================================================= -->
+  <div class="view-container query-view" id="tab-query">
+    <div class="query-editor-wrap">
+      <div class="query-toolbar">
+        <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+          <select class="query-presets-select" id="queryPresets" onchange="loadSelectedPreset()">
+            <option value="">-- Choose SQL Query Preset --</option>
+            <option value="SHOW TABLES;">SHOW TABLES (All 89 Database Tables)</option>
+            <option value="SELECT COUNT(*) as total_users FROM users;">Count total users</option>
+            <option value="SELECT COUNT(*) as total_believers FROM signup_form;">Count total believers (signup_form)</option>
+            <option value="SELECT COUNT(*) as total_pastors FROM pastor_reg;">Count total pastors</option>
+            <option value="SELECT COUNT(*) as total_churches FROM church_reg;">Count total churches</option>
+            <option value="SELECT id, fname, mobile_number, cts, is_first_login FROM signup_form ORDER BY id DESC LIMIT 50;">Recent 50 Believers with Details</option>
+            <option value="SELECT id, pastorname, phonenumber, churchname, dstrct FROM pastor_reg ORDER BY id DESC LIMIT 50;">Recent 50 Pastors</option>
+            <option value="SELECT id, church_name, pastor_name, contactnumber FROM church_reg ORDER BY id DESC LIMIT 50;">Recent 50 Churches</option>
+            <option value="SELECT id, title, start_date, venue FROM events WHERE d_in = 0 ORDER BY id DESC LIMIT 50;">Recent 50 Active Events</option>
+            <option value="SELECT id, doctor_name, specialization, phone_number, consultation_fee FROM family_councelling_doctors WHERE d_in = 0;">Active Counselling Doctors</option>
+          </select>
+          <button class="btn btn-sm" onclick="clearQueryEditor()">🗑️ Clear</button>
+        </div>
+
+        <div style="display:flex; align-items:center; gap:8px;">
+          <span style="font-size:0.75rem; color:var(--text-dim);" class="desktop-only">Press Ctrl + Enter to run</span>
+          <button class="btn btn-primary" onclick="executeQuery()">⚡ Run Query</button>
+        </div>
+      </div>
+
+      <div class="sql-editor-container">
+        <textarea id="sqlEditor" class="sql-editor" placeholder="Write any SQL query here (e.g. SELECT * FROM signup_form ORDER BY id DESC LIMIT 25;)..."></textarea>
+      </div>
+
+      <div class="query-history-bar" id="queryHistoryBar">
+        <span>History:</span>
+        <!-- Query pills injected here -->
+      </div>
+    </div>
+
+    <div class="query-results-wrap">
+      <div class="results-header">
+        <span id="queryStatusMsg">Ready to execute query.</span>
+        <div style="display:flex; align-items:center; gap:12px;">
+          <span id="queryDuration" style="font-family:'JetBrains Mono'; color:#93c5fd;"></span>
+          <span id="queryRowCount" style="font-weight:600; color:#fff;"></span>
+          <button class="btn btn-sm" onclick="exportResults('csv')">📥 CSV</button>
+          <button class="btn btn-sm" onclick="exportResults('json')">📥 JSON</button>
+        </div>
+      </div>
+
+      <div class="results-table-container" id="queryResultsArea">
+        <div class="empty-state" style="padding: 40px; text-align:center; color:var(--text-dim);">
+          <h3>⚡ No query executed yet</h3>
+          <p>Type a SQL query above or select a preset and click "Run Query" (or Ctrl + Enter).</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       TAB 3: SCHEMA & TABLE EXPLORER (89 TABLES)
+       ========================================================================= -->
+  <div class="view-container explorer-view" id="tab-explorer">
+    <div class="explorer-sidebar" id="explorerSidebar">
+      <div class="sidebar-search-box">
+        <input type="text" id="tableSearchInput" class="input-field" placeholder="🔍 Search 89 tables..." oninput="filterTablesList()">
+      </div>
+      <div class="tables-list" id="tablesList">
+        <div style="padding:16px; color:var(--text-dim); text-align:center;">Loading database schema...</div>
+      </div>
+    </div>
+
+    <div class="explorer-main">
+      <div class="explorer-toolbar">
+        <div class="table-title-area">
+          <button class="btn btn-sm mobile-only" onclick="toggleMobileSidebar()" style="margin-right:4px;">📂 Tables</button>
+          <span style="color:var(--text-muted); font-size:0.85rem;">Table:</span>
+          <span class="table-name-badge" id="currentTableName">-- Select a Table --</span>
+          <span class="row-count-badge" id="currentTableRowCount">0 rows</span>
+        </div>
+
+        <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+          <input type="text" id="recordFilterInput" class="input-field" style="width:160px;" placeholder="Filter rows..." oninput="filterTableRows()">
+          <button class="btn btn-sm btn-success" onclick="openAddRecordModal()">➕ New Record</button>
+          <select id="pageSizeSelect" class="input-field" style="width:90px;" onchange="changePageSize()">
+            <option value="50">50 rows</option>
+            <option value="100" selected>100 rows</option>
+            <option value="250">250 rows</option>
+          </select>
+          <button class="btn btn-sm" id="prevPageBtn" onclick="prevPage()" disabled>◀ Prev</button>
+          <button class="btn btn-sm" id="nextPageBtn" onclick="nextPage()">Next ▶</button>
+        </div>
+      </div>
+
+      <div class="results-table-container" id="explorerTableContainer">
+        <div class="empty-state" style="padding: 40px; text-align:center; color:var(--text-dim);">
+          <h3>Select a table from the sidebar to inspect records and schema</h3>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       MODALS: VIEW, EDIT, ADD, DELETE, LIGHTBOX
+       ========================================================================= -->
+  <!-- Record View Modal -->
+  <div class="modal-backdrop" id="viewModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 id="viewModalTitle">Record Details</h3>
+        <button class="modal-close-btn" onclick="closeViewModal()">&times;</button>
+      </div>
+      <div class="modal-body" id="viewModalBody"></div>
+      <div class="modal-footer">
+        <button class="btn" onclick="closeViewModal()">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Record Add / Edit Modal -->
+  <div class="modal-backdrop" id="editModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 id="editModalTitle">Edit Record</h3>
+        <button class="modal-close-btn" onclick="closeEditModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="recordForm" style="display:flex; flex-direction:column; gap:12px;"></form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn" onclick="closeEditModal()">Cancel</button>
+        <button class="btn btn-primary" id="saveRecordBtn" onclick="saveRecord()">Save Record</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Delete Confirmation Modal -->
+  <div class="modal-backdrop" id="deleteModal">
+    <div class="modal-card" style="max-width:440px;">
+      <div class="modal-header">
+        <h3 style="color:var(--danger);">⚠️ Confirm Delete Record</h3>
+        <button class="modal-close-btn" onclick="closeDeleteModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p id="deleteModalMsg">Are you sure you want to permanently delete this record?</p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn" onclick="closeDeleteModal()">Cancel</button>
+        <button class="btn btn-danger" id="confirmDeleteBtn" onclick="executeDeleteRecord()">Delete Record</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Image Lightbox Modal -->
+  <div class="modal-backdrop" id="imgModal" onclick="closeImgModal()">
+    <img id="lightboxImg" class="lightbox-img" src="" alt="Enlarged Preview">
+  </div>
+
+  <!-- =========================================================================
+       JAVASCRIPT APPLICATION LOGIC & SECURE AUTHENTICATION
+       ========================================================================= -->
+  <script>
+    // Compute default API base based on origin
+    function resolveDefaultApiBase() {
+      const h = window.location.hostname;
+      if (h.includes('amazonaws.com')) {
+        return window.location.origin;
+      }
+      return 'https://1a8kqxawxd.execute-api.ap-southeast-2.amazonaws.com';
+    }
+
+    let API_BASE = localStorage.getItem('jbac_api_base') || resolveDefaultApiBase();
+    let currentTable = 'signup_form';
+    let currentOffset = 0;
+    let currentLimit = 100;
+    let currentTableTotal = 0;
+    let allTables = [];
+    let currentTableRows = [];
+    let currentTableCols = [];
+    let editingRecordId = null;
+    let deletingRecordId = null;
+    let lastQueryResults = null;
+
+    // --- Authentication Storage & Headers ---
+    function getAdminToken() {
+      return sessionStorage.getItem('jbac_admin_token') || localStorage.getItem('jbac_admin_token') || '';
+    }
+
+    function setAdminToken(token, username = 'admin') {
+      sessionStorage.setItem('jbac_admin_token', token);
+      localStorage.setItem('jbac_admin_token', token);
+      sessionStorage.setItem('jbac_admin_user', username);
+      localStorage.setItem('jbac_admin_user', username);
+    }
+
+    function clearAdminToken() {
+      sessionStorage.removeItem('jbac_admin_token');
+      localStorage.removeItem('jbac_admin_token');
+      sessionStorage.removeItem('jbac_admin_user');
+      localStorage.removeItem('jbac_admin_user');
+    }
+
+    function getAuthHeaders(extra = {}) {
+      const token = getAdminToken();
+      const headers = {
+        'Content-Type': 'application/json',
+        ...extra
+      };
+      if (token) {
+        headers['x-admin-auth'] = token;
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+      return headers;
+    }
+
+    function showAuthOverlay(alertMsg = '') {
+      const overlay = document.getElementById('adminAuthOverlay');
+      overlay.classList.remove('hidden');
+      const alertBox = document.getElementById('authAlert');
+      if (alertMsg) {
+        alertBox.textContent = alertMsg;
+        alertBox.style.display = 'flex';
+      } else {
+        alertBox.style.display = 'none';
+      }
+      document.getElementById('adminPasswordInput').value = '';
+      document.getElementById('adminPasswordInput').focus();
+    }
+
+    function hideAuthOverlay() {
+      const overlay = document.getElementById('adminAuthOverlay');
+      overlay.classList.add('hidden');
+      const u = sessionStorage.getItem('jbac_admin_user') || 'admin';
+      document.getElementById('adminUserDisplay').textContent = u;
+    }
+
+    function togglePasswordVisibility(inputId, btn) {
+      const input = document.getElementById(inputId);
+      if (input.type === 'password') {
+        input.type = 'text';
+        btn.textContent = '🔒';
+      } else {
+        input.type = 'password';
+        btn.textContent = '👁️';
+      }
+    }
+
+    async function handleAdminLogin(e) {
+      e.preventDefault();
+      const user = document.getElementById('adminUsernameInput').value.trim();
+      const pwd = document.getElementById('adminPasswordInput').value.trim();
+      const btnText = document.getElementById('loginBtnText');
+      const alertBox = document.getElementById('authAlert');
+
+      if (!user || !pwd) {
+        alertBox.textContent = 'Please enter both Admin Unique ID and Password.';
+        alertBox.style.display = 'flex';
+        return;
+      }
+
+      btnText.textContent = 'Verifying credentials...';
+      alertBox.style.display = 'none';
+
+      try {
+        const res = await fetch(`${API_BASE}/dashboardapi/admin-login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username: user, password: pwd })
+        });
+        const json = await res.json();
+        if (json.success && json.token) {
+          setAdminToken(json.token, json.username || user);
+          hideAuthOverlay();
+          initApp();
+        } else {
+          alertBox.textContent = json.error || 'Invalid Admin ID or Password. Please try again.';
+          alertBox.style.display = 'flex';
+        }
+      } catch (err) {
+        alertBox.textContent = `Server connection error: ${err.message}. Please verify backend status.`;
+        alertBox.style.display = 'flex';
+      } finally {
+        btnText.textContent = '⚡ Unlock & Sign In';
+      }
+    }
+
+    function adminLogout() {
+      if (confirm('Lock database console and sign out?')) {
+        clearAdminToken();
+        showAuthOverlay('You have safely logged out of the JBAC Database Console.');
+      }
+    }
+
+    async function verifyExistingAuth() {
+      const token = getAdminToken();
+      if (!token) {
+        showAuthOverlay();
+        return false;
+      }
+
+      try {
+        const res = await fetch(`${API_BASE}/dashboardapi/admin-verify`, {
+          method: 'GET',
+          headers: getAuthHeaders()
+        });
+        if (res.ok) {
+          hideAuthOverlay();
+          return true;
+        } else {
+          clearAdminToken();
+          showAuthOverlay('Session expired. Please sign in again.');
+          return false;
+        }
+      } catch (_) {
+        // Network issue, if token exists allow offline check
+        hideAuthOverlay();
+        return true;
+      }
+    }
+
+    // --- Mobile Sidebar Toggle ---
+    function toggleMobileSidebar() {
+      const sb = document.getElementById('explorerSidebar');
+      sb.classList.toggle('mobile-collapsed');
+    }
+
+    // --- App Initialization ---
+    document.addEventListener('DOMContentLoaded', async () => {
+      document.getElementById('apiBaseInput').value = API_BASE;
+      const isAuthed = await verifyExistingAuth();
+      if (isAuthed) {
+        initApp();
+      }
+
+      // Keyboard shortcut for query console
+      document.getElementById('sqlEditor').addEventListener('keydown', (e) => {
+        if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+          e.preventDefault();
+          executeQuery();
+        }
+      });
+    });
+
+    async function initApp() {
+      await testConnection();
+      loadDashboardMetrics();
+      loadTables();
+    }
+
+    function saveAndTestApi() {
+      const input = document.getElementById('apiBaseInput').value.trim();
+      if (input) {
+        API_BASE = input.replace(/\/+$/, '');
+        localStorage.setItem('jbac_api_base', API_BASE);
+      }
+      testConnection();
+      refreshCurrentTab();
+    }
+
+    async function testConnection() {
+      const badge = document.getElementById('cloudStatusBadge');
+      const text = document.getElementById('cloudStatusText');
+      text.textContent = 'Pinging RDS...';
+
+      const t0 = performance.now();
+      try {
+        const res = await fetch(`${API_BASE}/dashboardapi/admin-dashboard-stats`, {
+          headers: getAuthHeaders()
+        });
+        const ms = Math.round(performance.now() - t0);
+        if (res.ok) {
+          text.textContent = `AWS RDS MySQL Connected (${ms}ms)`;
+          badge.style.background = 'var(--success-light)';
+          badge.style.borderColor = 'rgba(16, 185, 129, 0.4)';
+          badge.style.color = 'var(--success)';
+        } else if (res.status === 401) {
+          showAuthOverlay('Session expired. Please enter Admin ID and Password.');
+        } else {
+          throw new Error(`HTTP ${res.status}`);
+        }
+      } catch (err) {
+        text.textContent = `Connection Failed (${err.message})`;
+        badge.style.background = 'var(--danger-light)';
+        badge.style.borderColor = 'rgba(239, 68, 68, 0.4)';
+        badge.style.color = 'var(--danger)';
+      }
+    }
+
+    // Tab Switching
+    function switchTab(tabId) {
+      document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.view-container').forEach(c => c.classList.remove('active'));
+
+      if (tabId === 'dashboard') {
+        document.querySelectorAll('.nav-tab')[0].classList.add('active');
+        document.getElementById('tab-dashboard').classList.add('active');
+        loadDashboardMetrics();
+      } else if (tabId === 'query') {
+        document.querySelectorAll('.nav-tab')[1].classList.add('active');
+        document.getElementById('tab-query').classList.add('active');
+      } else if (tabId === 'explorer') {
+        document.querySelectorAll('.nav-tab')[2].classList.add('active');
+        document.getElementById('tab-explorer').classList.add('active');
+        if (allTables.length === 0) loadTables();
+      }
+    }
+
+    function refreshCurrentTab() {
+      const activeTab = document.querySelector('.view-container.active');
+      if (activeTab.id === 'tab-dashboard') loadDashboardMetrics();
+      else if (activeTab.id === 'tab-query') executeQuery();
+      else if (activeTab.id === 'tab-explorer') fetchActiveTableData();
+    }
+
+    // Dashboard Metrics
+    async function loadDashboardMetrics() {
+      try {
+        const res = await fetch(`${API_BASE}/dashboardapi/admin-dashboard-stats`, {
+          headers: getAuthHeaders()
+        });
+        if (res.status === 401) {
+          showAuthOverlay('Admin Authentication Required.');
+          return;
+        }
+        if (res.ok) {
+          const json = await res.json();
+          const s = json.stats || {};
+          document.getElementById('stat-believers').textContent = Number(s.believers || 0).toLocaleString();
+          document.getElementById('stat-pastors').textContent = Number(s.pastors || 0).toLocaleString();
+          document.getElementById('stat-churches').textContent = Number(s.churches || 0).toLocaleString();
+          document.getElementById('stat-students').textContent = Number(s.students || 0).toLocaleString();
+          document.getElementById('stat-ministries').textContent = Number(s.ministries || 0).toLocaleString();
+          document.getElementById('stat-orgs').textContent = Number(s.organisations || 0).toLocaleString();
+          document.getElementById('stat-events').textContent = Number(s.events_active || 0).toLocaleString();
+          document.getElementById('stat-events-total').textContent = `${Number(s.events_total || 0).toLocaleString()} total meetings`;
+          document.getElementById('stat-users').textContent = Number(s.users || 0).toLocaleString();
+        }
+      } catch (err) {
+        console.warn('Dashboard stats fallback:', err);
+      }
+    }
+
+    // SQL Query Console
+    function loadSelectedPreset() {
+      const select = document.getElementById('queryPresets');
+      if (select.value) {
+        document.getElementById('sqlEditor').value = select.value;
+        executeQuery();
+      }
+    }
+
+    function openQueryPreset(query) {
+      switchTab('query');
+      document.getElementById('sqlEditor').value = query;
+      executeQuery();
+    }
+
+    function clearQueryEditor() {
+      document.getElementById('sqlEditor').value = '';
+      document.getElementById('sqlEditor').focus();
+    }
+
+    async function executeQuery() {
+      const editor = document.getElementById('sqlEditor');
+      const query = editor.value.trim();
+      if (!query) return;
+
+      const statusMsg = document.getElementById('queryStatusMsg');
+      const durationSpan = document.getElementById('queryDuration');
+      const rowCountSpan = document.getElementById('queryRowCount');
+      const resultsArea = document.getElementById('queryResultsArea');
+
+      statusMsg.textContent = 'Executing query on AWS RDS MySQL...';
+      durationSpan.textContent = '';
+      rowCountSpan.textContent = '';
+      resultsArea.innerHTML = '<div class="empty-state" style="padding:40px; text-align:center;"><h3>⚡ Executing Query...</h3></div>';
+
+      addQueryToHistory(query);
+
+      const t0 = performance.now();
+      try {
+        const res = await fetch(`${API_BASE}/dashboardapi/execute-query`, {
+          method: 'POST',
+          headers: getAuthHeaders(),
+          body: JSON.stringify({ query })
+        });
+
+        if (res.status === 401) {
+          showAuthOverlay('Admin Authentication Required to Execute SQL Queries.');
+          statusMsg.textContent = 'Unauthorized: Admin login required.';
+          return;
+        }
+
+        const json = await res.json();
+        const duration = json.durationMs || Math.round(performance.now() - t0);
+
+        if (json.success) {
+          statusMsg.textContent = 'Query executed successfully.';
+          durationSpan.textContent = `⏱️ ${duration} ms`;
+
+          if (json.type === 'SELECT') {
+            lastQueryResults = json.data || [];
+            rowCountSpan.textContent = `📋 ${lastQueryResults.length} rows returned`;
+            renderQueryGrid(lastQueryResults, json.fields);
+          } else {
+            lastQueryResults = null;
+            rowCountSpan.textContent = `⚡ ${json.affectedRows || 0} rows affected`;
+            resultsArea.innerHTML = `
+              <div style="background:var(--bg-surface); border:1px solid var(--border-subtle); border-radius:8px; padding:24px; text-align:center; margin:20px;">
+                <h3 style="color:var(--success); margin-bottom:8px;">✅ Query Executed</h3>
+                <p style="color:var(--text-muted); font-family:'JetBrains Mono';">Affected Rows: <b>${json.affectedRows || 0}</b> | Insert ID: <b>${json.insertId || 'N/A'}</b> | Changed Rows: <b>${json.changedRows || 0}</b></p>
+              </div>`;
+          }
+        } else {
+          statusMsg.textContent = `Error: ${json.error || 'Query failed'}`;
+          durationSpan.textContent = `⏱️ ${duration} ms`;
+          resultsArea.innerHTML = `
+            <div style="background:var(--danger-light); border:1px solid rgba(239, 68, 68, 0.4); border-radius:8px; padding:20px; margin:20px;">
+              <h4 style="color:var(--danger); margin-bottom:6px;">SQL Execution Error:</h4>
+              <pre style="color:#fca5a5; font-family:'JetBrains Mono'; font-size:0.85rem; white-space:pre-wrap;">${json.error}</pre>
+            </div>`;
+        }
+      } catch (err) {
+        statusMsg.textContent = `Network / Server Error: ${err.message}`;
+        resultsArea.innerHTML = `<div style="color:var(--danger); padding:20px;">Failed to send query: ${err.message}</div>`;
+      }
+    }
+
+    function renderQueryGrid(rows, fields) {
+      const area = document.getElementById('queryResultsArea');
+      if (!rows || rows.length === 0) {
+        area.innerHTML = '<div class="empty-state" style="padding:40px; text-align:center; color:var(--text-dim);"><h3>0 Records Returned</h3><p>The query executed cleanly but returned 0 rows.</p></div>';
+        return;
+      }
+
+      const cols = fields && fields.length > 0 ? fields : Object.keys(rows[0]);
+      let html = '<table class="data-grid"><thead><tr>';
+      cols.forEach(c => { html += `<th>${escapeHtml(c)}</th>`; });
+      html += '</tr></thead><tbody>';
+
+      rows.forEach(r => {
+        html += '<tr>';
+        cols.forEach(c => {
+          const val = r[c];
+          if (val === null || val === undefined) {
+            html += '<td class="cell-null">NULL</td>';
+          } else if (typeof val === 'string' && (val.startsWith('http') && (val.endsWith('.jpg') || val.endsWith('.png') || val.endsWith('.webp') || val.includes('/images/')))) {
+            html += `<td><img src="${escapeHtml(val)}" class="cell-img" onclick="openLightbox('${escapeHtml(val)}')"></td>`;
+          } else {
+            html += `<td>${escapeHtml(String(val))}</td>`;
+          }
+        });
+        html += '</tr>';
+      });
+
+      html += '</tbody></table>';
+      area.innerHTML = html;
+    }
+
+    function addQueryToHistory(q) {
+      let history = JSON.parse(localStorage.getItem('jbac_sql_history') || '[]');
+      history = history.filter(item => item !== q);
+      history.unshift(q);
+      if (history.length > 15) history.pop();
+      localStorage.setItem('jbac_sql_history', JSON.stringify(history));
+      renderHistoryBar();
+    }
+
+    function renderHistoryBar() {
+      const bar = document.getElementById('queryHistoryBar');
+      const history = JSON.parse(localStorage.getItem('jbac_sql_history') || '[]');
+      if (history.length === 0) {
+        bar.style.display = 'none';
+        return;
+      }
+      bar.style.display = 'flex';
+      bar.innerHTML = '<span>History:</span>';
+      history.slice(0, 6).forEach(q => {
+        const pill = document.createElement('div');
+        pill.className = 'history-pill';
+        pill.title = q;
+        pill.textContent = q;
+        pill.onclick = () => {
+          document.getElementById('sqlEditor').value = q;
+          executeQuery();
+        };
+        bar.appendChild(pill);
+      });
+    }
+
+    // --- Schema Explorer ---
+    async function loadTables() {
+      const container = document.getElementById('tablesList');
+      container.innerHTML = '<div style="padding:16px; color:var(--text-dim); text-align:center;">Loading tables...</div>';
+
+      try {
+        const res = await fetch(`${API_BASE}/dashboardapi/tables`, {
+          headers: getAuthHeaders()
+        });
+        if (res.status === 401) {
+          showAuthOverlay('Admin Authentication Required.');
+          return;
+        }
+        if (res.ok) {
+          const json = await res.json();
+          allTables = json.tables || [];
+          document.getElementById('dashTotalTables').textContent = `${allTables.length} Tables`;
+          renderTablesList(allTables);
+
+          if (allTables.length > 0 && !currentTable) {
+            selectTable(allTables[0].name || allTables[0]);
+          } else if (currentTable) {
+            selectTable(currentTable);
+          }
+        }
+      } catch (err) {
+        container.innerHTML = `<div style="padding:16px; color:var(--danger);">Error loading tables: ${err.message}</div>`;
+      }
+    }
+
+    function renderTablesList(tables) {
+      const container = document.getElementById('tablesList');
+      if (!tables || tables.length === 0) {
+        container.innerHTML = '<div style="padding:16px; color:var(--text-dim);">No tables found.</div>';
+        return;
+      }
+
+      let html = '';
+      tables.forEach(t => {
+        const name = typeof t === 'object' ? t.name : t;
+        const count = typeof t === 'object' && t.rowCount !== undefined ? t.rowCount : '';
+        const activeClass = name === currentTable ? 'active' : '';
+        html += `
+          <div class="table-list-item ${activeClass}" onclick="selectTable('${escapeHtml(name)}')">
+            <span>🗄️ ${escapeHtml(name)}</span>
+            ${count !== '' ? `<span class="row-count-badge">${count}</span>` : ''}
+          </div>`;
+      });
+      container.innerHTML = html;
+    }
+
+    function filterTablesList() {
+      const q = document.getElementById('tableSearchInput').value.trim().toLowerCase();
+      if (!q) {
+        renderTablesList(allTables);
+        return;
+      }
+      const filtered = allTables.filter(t => {
+        const name = typeof t === 'object' ? t.name : t;
+        return name.toLowerCase().includes(q);
+      });
+      renderTablesList(filtered);
+    }
+
+    function selectTable(name) {
+      currentTable = name;
+      currentOffset = 0;
+      document.getElementById('currentTableName').textContent = name;
+
+      // On mobile, automatically collapse sidebar when a table is picked
+      if (window.innerWidth <= 768) {
+        document.getElementById('explorerSidebar').classList.add('mobile-collapsed');
+      }
+
+      document.querySelectorAll('.table-list-item').forEach(el => {
+        if (el.textContent.includes(name)) el.classList.add('active');
+        else el.classList.remove('active');
+      });
+
+      fetchActiveTableData();
+    }
+
+    async function fetchActiveTableData() {
+      const container = document.getElementById('explorerTableContainer');
+      container.innerHTML = '<div class="empty-state" style="padding:40px; text-align:center;"><h3>Loading table records...</h3></div>';
+
+      try {
+        const res = await fetch(`${API_BASE}/dashboardapi/crud/${currentTable}?limit=${currentLimit}&offset=${currentOffset}`, {
+          headers: getAuthHeaders()
+        });
+
+        if (res.status === 401) {
+          showAuthOverlay('Admin Authentication Required.');
+          return;
+        }
+
+        if (res.ok) {
+          const json = await res.json();
+          currentTableRows = json.data || [];
+          currentTableTotal = json.total || currentTableRows.length;
+          document.getElementById('currentTableRowCount').textContent = `${currentTableTotal.toLocaleString()} rows`;
+
+          updatePaginationControls();
+          renderExplorerGrid(currentTableRows);
+        } else {
+          container.innerHTML = `<div style="padding:20px; color:var(--danger);">Error loading table: HTTP ${res.status}</div>`;
+        }
+      } catch (err) {
+        container.innerHTML = `<div style="padding:20px; color:var(--danger);">Network error: ${err.message}</div>`;
+      }
+    }
+
+    function renderExplorerGrid(rows) {
+      const container = document.getElementById('explorerTableContainer');
+      if (!rows || rows.length === 0) {
+        container.innerHTML = '<div class="empty-state" style="padding:40px; text-align:center; color:var(--text-dim);"><h3>0 records found in this table</h3></div>';
+        return;
+      }
+
+      currentTableCols = Object.keys(rows[0]);
+      let html = '<table class="data-grid"><thead><tr><th style="width:90px; text-align:center;">Actions</th>';
+      currentTableCols.forEach(c => { html += `<th>${escapeHtml(c)}</th>`; });
+      html += '</tr></thead><tbody>';
+
+      rows.forEach(r => {
+        const id = r.id || r.ID || '';
+        html += `<tr><td style="text-align:center;">
+          <button class="btn btn-sm" onclick='openViewModal(${JSON.stringify(r).replace(/'/g, "&#39;")})' title="View">👁️</button>
+          <button class="btn btn-sm btn-primary" onclick='openEditModal(${JSON.stringify(r).replace(/'/g, "&#39;")})' title="Edit">✏️</button>
+          ${id ? `<button class="btn btn-sm btn-danger" onclick="openDeleteModal(${id})" title="Delete">🗑️</button>` : ''}
+        </td>`;
+
+        currentTableCols.forEach(c => {
+          const val = r[c];
+          if (val === null || val === undefined) {
+            html += '<td class="cell-null">NULL</td>';
+          } else if (typeof val === 'string' && (val.startsWith('http') && (val.endsWith('.jpg') || val.endsWith('.png') || val.endsWith('.webp') || val.includes('/images/')))) {
+            html += `<td><img src="${escapeHtml(val)}" class="cell-img" onclick="openLightbox('${escapeHtml(val)}')"></td>`;
+          } else {
+            html += `<td>${escapeHtml(String(val))}</td>`;
+          }
+        });
+        html += '</tr>';
+      });
+
+      html += '</tbody></table>';
+      container.innerHTML = html;
+    }
+
+    function filterTableRows() {
+      const q = document.getElementById('recordFilterInput').value.trim().toLowerCase();
+      if (!q) {
+        renderExplorerGrid(currentTableRows);
+        return;
+      }
+      const filtered = currentTableRows.filter(r => {
+        return Object.values(r).some(v => v !== null && v !== undefined && String(v).toLowerCase().includes(q));
+      });
+      renderExplorerGrid(filtered);
+    }
+
+    function updatePaginationControls() {
+      document.getElementById('prevPageBtn').disabled = currentOffset === 0;
+      document.getElementById('nextPageBtn').disabled = (currentOffset + currentLimit) >= currentTableTotal;
+    }
+
+    function prevPage() {
+      if (currentOffset >= currentLimit) {
+        currentOffset -= currentLimit;
+        fetchActiveTableData();
+      }
+    }
+
+    function nextPage() {
+      if ((currentOffset + currentLimit) < currentTableTotal) {
+        currentOffset += currentLimit;
+        fetchActiveTableData();
+      }
+    }
+
+    function changePageSize() {
+      currentLimit = Number(document.getElementById('pageSizeSelect').value) || 100;
+      currentOffset = 0;
+      fetchActiveTableData();
+    }
+
+    // Modal Operations
+    function openViewModal(record) {
+      document.getElementById('viewModalTitle').textContent = `Record View [${currentTable}]`;
+      const body = document.getElementById('viewModalBody');
+      let html = '<div style="display:flex; flex-direction:column; gap:8px;">';
+      for (const [k, v] of Object.entries(record)) {
+        html += `
+          <div style="display:flex; justify-content:space-between; border-bottom:1px solid var(--border-subtle); padding:6px 0; font-size:0.82rem;">
+            <span style="color:var(--text-muted); font-weight:600;">${escapeHtml(k)}:</span>
+            <span style="font-family:'JetBrains Mono'; max-width:400px; word-break:break-all; text-align:right;">${v !== null && v !== undefined ? escapeHtml(String(v)) : '<i style="color:var(--text-dim)">NULL</i>'}</span>
+          </div>`;
+      }
+      html += '</div>';
+      body.innerHTML = html;
+      document.getElementById('viewModal').classList.add('open');
+    }
+
+    function closeViewModal() {
+      document.getElementById('viewModal').classList.remove('open');
+    }
+
+    function openEditModal(record) {
+      editingRecordId = record ? (record.id || record.ID || null) : null;
+      document.getElementById('editModalTitle').textContent = editingRecordId ? `Edit Record ID ${editingRecordId} [${currentTable}]` : `New Record in [${currentTable}]`;
+
+      const form = document.getElementById('recordForm');
+      form.innerHTML = '';
+
+      const cols = currentTableCols.length > 0 ? currentTableCols : (record ? Object.keys(record) : ['name', 'status']);
+      cols.forEach(c => {
+        if (c.toLowerCase() === 'id' && editingRecordId) return; // ID is readonly
+        const val = record && record[c] !== undefined && record[c] !== null ? String(record[c]) : '';
+        const group = document.createElement('div');
+        group.className = 'form-group';
+        group.innerHTML = `
+          <label for="field_${c}">${escapeHtml(c)}</label>
+          <input type="text" id="field_${c}" name="${escapeHtml(c)}" class="input-field" value="${escapeHtml(val)}" placeholder="Enter ${escapeHtml(c)}">
+        `;
+        form.appendChild(group);
+      });
+
+      document.getElementById('editModal').classList.add('open');
+    }
+
+    function openAddRecordModal() {
+      openEditModal(null);
+    }
+
+    function closeEditModal() {
+      document.getElementById('editModal').classList.remove('open');
+    }
+
+    async function saveRecord() {
+      const form = document.getElementById('recordForm');
+      const inputs = form.querySelectorAll('input');
+      const payload = {};
+      inputs.forEach(inp => {
+        payload[inp.name] = inp.value;
+      });
+
+      const btn = document.getElementById('saveRecordBtn');
+      btn.textContent = 'Saving...';
+      btn.disabled = true;
+
+      try {
+        let url = `${API_BASE}/dashboardapi/crud/${currentTable}`;
+        let method = 'POST';
+        if (editingRecordId) {
+          url += `/${editingRecordId}`;
+          method = 'PUT';
+        }
+
+        const res = await fetch(url, {
+          method,
+          headers: getAuthHeaders(),
+          body: JSON.stringify(payload)
+        });
+
+        if (res.status === 401) {
+          showAuthOverlay('Admin Authentication Required.');
+          return;
+        }
+
+        const json = await res.json();
+        if (json.success || res.ok) {
+          closeEditModal();
+          fetchActiveTableData();
+        } else {
+          alert(`Save Failed: ${json.error || 'Server error'}`);
+        }
+      } catch (err) {
+        alert(`Error: ${err.message}`);
+      } finally {
+        btn.textContent = 'Save Record';
+        btn.disabled = false;
+      }
+    }
+
+    function openDeleteModal(id) {
+      deletingRecordId = id;
+      document.getElementById('deleteModalMsg').textContent = `Are you sure you want to permanently delete record ID ${id} from table "${currentTable}"?`;
+      document.getElementById('deleteModal').classList.add('open');
+    }
+
+    function closeDeleteModal() {
+      document.getElementById('deleteModal').classList.remove('open');
+    }
+
+    async function executeDeleteRecord() {
+      if (!deletingRecordId) return;
+      const btn = document.getElementById('confirmDeleteBtn');
+      btn.textContent = 'Deleting...';
+      btn.disabled = true;
+
+      try {
+        const res = await fetch(`${API_BASE}/dashboardapi/crud/${currentTable}/${deletingRecordId}`, {
+          method: 'DELETE',
+          headers: getAuthHeaders()
+        });
+
+        if (res.status === 401) {
+          showAuthOverlay('Admin Authentication Required.');
+          return;
+        }
+
+        const json = await res.json();
+        if (json.success || res.ok) {
+          closeDeleteModal();
+          fetchActiveTableData();
+        } else {
+          alert(`Delete Failed: ${json.error || 'Server error'}`);
+        }
+      } catch (err) {
+        alert(`Error: ${err.message}`);
+      } finally {
+        btn.textContent = 'Delete Record';
+        btn.disabled = false;
+      }
+    }
+
+    // Export Utilities
+    function exportResults(format) {
+      if (!lastQueryResults || lastQueryResults.length === 0) {
+        alert('No query results available to export.');
+        return;
+      }
+
+      if (format === 'json') {
+        const blob = new Blob([JSON.stringify(lastQueryResults, null, 2)], { type: 'application/json' });
+        downloadBlob(blob, `jbac_query_export_${Date.now()}.json`);
+      } else if (format === 'csv') {
+        const cols = Object.keys(lastQueryResults[0]);
+        let csv = cols.map(c => `"${c.replace(/"/g, '""')}"`).join(',') + '\n';
+        lastQueryResults.forEach(r => {
+          csv += cols.map(c => {
+            const v = r[c] !== null && r[c] !== undefined ? String(r[c]) : '';
+            return `"${v.replace(/"/g, '""')}"`;
+          }).join(',') + '\n';
+        });
+        const blob = new Blob([csv], { type: 'text/csv' });
+        downloadBlob(blob, `jbac_query_export_${Date.now()}.csv`);
+      }
+    }
+
+    function downloadBlob(blob, filename) {
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+
+    // Lightbox Modal
+    function openLightbox(src) {
+      document.getElementById('lightboxImg').src = src;
+      document.getElementById('imgModal').classList.add('open');
+    }
+
+    function closeImgModal() {
+      document.getElementById('imgModal').classList.remove('open');
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+  </script>
+</body>
+</html>
+'''
+
+targets = [
+    'public.html',
+    'backend/public.html',
+    'Api/public.html',
+    'src/assets/public.html'
+]
+
+for t in targets:
+    d = os.path.dirname(t)
+    if d and not os.path.exists(d):
+        os.makedirs(d, exist_ok=True)
+    with open(t, 'w', encoding='utf-8') as f:
+        f.write(html_content)
+    print(f"Updated {t} ({len(html_content):,} bytes)")
+
+print("Successfully written all public.html copies!")

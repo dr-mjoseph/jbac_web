@@ -10,6 +10,7 @@ const promise_1 = __importDefault(require("mysql2/promise"));
 const cors_1 = __importDefault(require("cors"));
 const fs_1 = __importDefault(require("fs"));
 const path_1 = __importDefault(require("path"));
+const crypto_1 = __importDefault(require("crypto"));
 const app = (0, express_1.default)();
 function getIndianCts() {
     const d = new Date();
@@ -46,6 +47,44 @@ const db = promise_1.default.createPool({
     keepAliveInitialDelay: 10000,
     connectTimeout: 20000
 });
+// Admin Cockpit & Query Console Security Configuration
+const ADMIN_USERNAME = process.env.ADMIN_USERNAME || 'admin';
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'JbacAdmin@2026';
+const ADMIN_AUTH_SECRET = process.env.ADMIN_AUTH_SECRET || 'jbac_cockpit_auth_secret_token_2026';
+function getExpectedAdminToken() {
+    return crypto_1.default.createHash('sha256').update(`${ADMIN_USERNAME}:${ADMIN_PASSWORD}:${ADMIN_AUTH_SECRET}`).digest('hex');
+}
+function verifyAdminAuth(req) {
+    const token = req.headers['x-admin-auth'] || req.headers['x-admin-token'] || (req.query && req.query.token);
+    if (token && token === getExpectedAdminToken()) {
+        return true;
+    }
+    const authHeader = req.headers['authorization'];
+    if (authHeader && typeof authHeader === 'string') {
+        const parts = authHeader.trim().split(/\s+/);
+        if (parts.length === 2 && parts[0].toLowerCase() === 'bearer') {
+            if (parts[1] === getExpectedAdminToken())
+                return true;
+        }
+        if (parts.length === 2 && parts[0].toLowerCase() === 'basic') {
+            try {
+                const creds = Buffer.from(parts[1], 'base64').toString('utf8').split(':');
+                if (creds[0] === ADMIN_USERNAME && creds[1] === ADMIN_PASSWORD)
+                    return true;
+            }
+            catch (_) { }
+        }
+    }
+    if (req.body && typeof req.body === 'object') {
+        if (req.body.adminUsername === ADMIN_USERNAME && req.body.adminPassword === ADMIN_PASSWORD) {
+            return true;
+        }
+        if (req.body.adminToken === getExpectedAdminToken()) {
+            return true;
+        }
+    }
+    return false;
+}
 // Whitelist of valid database tables
 const VALID_TABLES = new Set([
     'indian-states', 'sheet1', 'about_tbl', 'adds_data', 'attacks', 'banner_dlt_t',
@@ -259,6 +298,43 @@ app.get(['/public.html', '/admin', '/dashboard', '/cockpit', '/admin-db', '/api/
     }
     res.send('<!DOCTYPE html><html><body><h2>JBAC Database Cockpit</h2><p>Please visit <a href="/dashboardapi/tables">/dashboardapi/tables</a> for JSON view.</p></body></html>');
 });
+// Admin Authentication Endpoints
+app.post(['/dashboardapi/admin-login', '/api/admin-login'], (req, res) => {
+    const b = req.body || {};
+    const username = String(b.username || b.user || b.id || '').trim();
+    const password = String(b.password || b.pwd || '').trim();
+    if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
+        const token = getExpectedAdminToken();
+        return res.json({
+            success: true,
+            status: 200,
+            token,
+            username: ADMIN_USERNAME,
+            message: 'Admin authenticated successfully'
+        });
+    }
+    return res.status(401).json({
+        success: false,
+        status: 401,
+        error: 'Invalid Admin ID or Password. Please check your credentials.'
+    });
+});
+app.get(['/dashboardapi/admin-verify', '/api/admin-verify'], (req, res) => {
+    if (verifyAdminAuth(req)) {
+        return res.json({
+            success: true,
+            status: 200,
+            authenticated: true,
+            username: ADMIN_USERNAME
+        });
+    }
+    return res.status(401).json({
+        success: false,
+        status: 401,
+        authenticated: false,
+        error: 'Session expired or invalid credentials.'
+    });
+});
 app.get(['/api/crud/:table', '/dashboardapi/crud/:table', '/crud/:table'], async (req, res) => {
     const table = req.params.table;
     if (!isValidTable(table)) {
@@ -387,6 +463,13 @@ app.delete(['/api/crud/:table/:id', '/dashboardapi/crud/:table/:id', '/crud/:tab
 });
 // Direct SQL Query Execution API
 app.post(['/dashboardapi/execute-query', '/api/execute-query', '/api/query', '/execute-query'], async (req, res) => {
+    if (!verifyAdminAuth(req)) {
+        return res.status(401).json({
+            success: false,
+            status: 401,
+            error: 'Unauthorized: Admin authentication required to execute database queries.'
+        });
+    }
     const query = req.body && (req.body.query || req.body.sql);
     if (!query || typeof query !== 'string') {
         return res.status(400).json({ success: false, error: 'Query string is required in "query" property.' });
