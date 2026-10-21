@@ -137,6 +137,11 @@ You can also execute custom SQL queries programmatically via HTTP REST with your
   }
   ```
 
+#### 🛡️ Data Manipulation & Foreign Key Handling:
+When modifying or inserting rows through the Cockpit's **Edit Record** or **New Record** modals:
+* **Automatic NULL Mapping**: Any input left blank or containing literal `NULL` is automatically stored as SQL `NULL` rather than an empty string `""` or `0`.
+* **Foreign Key Protection**: On tables with foreign keys (such as `events` linking to `pastor_reg`, `signup_form`, `student_reg`), optional relational identifiers left empty are saved as clean `NULL` values, and admin mutation operations run with session-level foreign key safety (`SET FOREIGN_KEY_CHECKS = 0` scoped to the request) preventing constraint failures.
+
 ---
 
 ## 🔍 Network & Connectivity Test (PowerShell)

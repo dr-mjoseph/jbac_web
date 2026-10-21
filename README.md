@@ -147,7 +147,7 @@ A complete web-based SQL query editor and administrative data cockpit is availab
 2. **Dashboard Tab**: Real-time KPI metric cards (Believers, Pastors, Churches, Students, Ministries, Organisations, Active Events, Users) and AWS RDS MySQL 8.4 engine health telemetry.
 3. **SQL Query Console**: Full-featured code editor with `Ctrl+Enter` shortcut execution, preloaded SQL query presets, execution latency in milliseconds (`ms`), affected/returned row badges, and CSV / JSON export.
 4. **Table Explorer & Schema Browser**: Filterable drawer listing all 89 tables with live row count badges, schema inspector (`Field`, `Type`, `Null`, `Key`, `Default`, `Extra`), pagination, and real-time record manipulation.
-5. **Record Manipulation Modals**: Add new records (INSERT), edit existing records (UPDATE), and soft/hard delete records (DELETE).
+5. **Record Manipulation Modals**: Add new records (INSERT), edit existing records (UPDATE), and soft/hard delete records (DELETE) with intelligent NULL sanitization (blank inputs automatically convert to SQL `NULL`) and session-level Foreign Key safety (preventing constraint violations on relational fields like `pastor_id`, `believer_id`, etc.).
 6. **Secured Query Execution API**:
    - `POST /dashboardapi/execute-query` (with `x-admin-auth` header or Basic Auth):
      ```json
