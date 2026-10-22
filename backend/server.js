@@ -530,6 +530,159 @@ app.delete(['/api/crud/:table/:id', '/dashboardapi/crud/:table/:id', '/crud/:tab
         res.status(500).json({ success: false, status: 500, error: err.message });
     }
 });
+// Batch Import Table Data (CSV / JSON with Upsert, Update, or Insert)
+app.post(['/dashboardapi/import/:table', '/api/import/:table', '/crud/import/:table'], async (req, res) => {
+    if (!verifyAdminAuth(req)) {
+        return res.status(401).json({ success: false, error: 'Unauthorized: Admin authentication required.' });
+    }
+    const table = req.params.table;
+    if (!isValidTable(table)) {
+        return res.status(400).json({ success: false, error: `Invalid or restricted table: ${table}` });
+    }
+    const { records, mode = 'upsert' } = req.body || {};
+    if (!Array.isArray(records) || records.length === 0) {
+        return res.status(400).json({ success: false, error: 'Request body must include a non-empty "records" array.' });
+    }
+    const t0 = Date.now();
+    const conn = await db.getConnection();
+    try {
+        await conn.query('SET FOREIGN_KEY_CHECKS = 0');
+        const [cols] = await conn.query(`DESCRIBE \`${table}\``);
+        const colMap = new Map();
+        const colMetaMap = new Map();
+        let primaryKeyCol = 'id';
+        for (const c of cols) {
+            const lk = c.Field.toLowerCase();
+            colMap.set(lk, c.Field);
+            colMetaMap.set(lk, {
+                field: c.Field,
+                type: String(c.Type || '').toLowerCase(),
+                nullable: String(c.Null || '').toUpperCase() === 'YES',
+                isPri: String(c.Key || '').toUpperCase() === 'PRI',
+                defaultVal: c.Default
+            });
+            if (String(c.Key || '').toUpperCase() === 'PRI') {
+                primaryKeyCol = c.Field;
+            }
+        }
+        let insertedCount = 0;
+        let updatedCount = 0;
+        let skippedCount = 0;
+        const errors = [];
+        for (let idx = 0; idx < records.length; idx++) {
+            const row = records[idx];
+            if (!row || typeof row !== 'object') {
+                skippedCount++;
+                continue;
+            }
+            try {
+                const sanitizedData = {};
+                for (const [k, v] of Object.entries(row)) {
+                    const lk = String(k).trim().toLowerCase();
+                    if (colMap.has(lk)) {
+                        const actualCol = colMap.get(lk);
+                        const meta = colMetaMap.get(lk);
+                        let val = v;
+                        const isNumericCol = meta && (
+                            meta.type.startsWith('int') ||
+                            meta.type.startsWith('bigint') ||
+                            meta.type.startsWith('smallint') ||
+                            meta.type.startsWith('tinyint') ||
+                            meta.type.startsWith('decimal') ||
+                            meta.type.startsWith('float') ||
+                            meta.type.startsWith('double') ||
+                            meta.type.startsWith('numeric')
+                        );
+                        if (val === undefined || val === null || (typeof val === 'string' && val.trim().toUpperCase() === 'NULL')) {
+                            val = meta && meta.nullable ? null : (isNumericCol ? 0 : '');
+                        }
+                        else if (typeof val === 'string' && val.trim() === '') {
+                            val = meta && meta.nullable ? null : (isNumericCol ? 0 : '');
+                        }
+                        else if (isNumericCol && !isNaN(Number(val))) {
+                            val = Number(val);
+                        }
+                        sanitizedData[actualCol] = val;
+                    }
+                }
+                const pkVal = sanitizedData[primaryKeyCol];
+                const hasValidPk = pkVal !== undefined && pkVal !== null && pkVal !== '' && !isNaN(Number(pkVal)) && Number(pkVal) > 0;
+                if (mode === 'update' && !hasValidPk) {
+                    skippedCount++;
+                    continue;
+                }
+                if (hasValidPk && (mode === 'upsert' || mode === 'update')) {
+                    const [existing] = await conn.query(`SELECT \`${primaryKeyCol}\` FROM \`${table}\` WHERE \`${primaryKeyCol}\` = ? LIMIT 1`, [pkVal]);
+                    if (existing && existing.length > 0) {
+                        const updateFields = [];
+                        const updateVals = [];
+                        for (const [cName, cVal] of Object.entries(sanitizedData)) {
+                            if (cName !== primaryKeyCol) {
+                                updateFields.push(`\`${cName}\` = ?`);
+                                updateVals.push(cVal);
+                            }
+                        }
+                        if (updateFields.length > 0) {
+                            updateVals.push(pkVal);
+                            await conn.query(`UPDATE \`${table}\` SET ${updateFields.join(', ')} WHERE \`${primaryKeyCol}\` = ?`, updateVals);
+                            updatedCount++;
+                        }
+                        else {
+                            skippedCount++;
+                        }
+                        continue;
+                    }
+                    else if (mode === 'update') {
+                        skippedCount++;
+                        continue;
+                    }
+                }
+                if (mode === 'insert' || mode === 'upsert') {
+                    const insertFields = [];
+                    const insertPlaceholders = [];
+                    const insertVals = [];
+                    for (const [cName, cVal] of Object.entries(sanitizedData)) {
+                        if (cName === primaryKeyCol && (!cVal || cVal === 0))
+                            continue;
+                        insertFields.push(`\`${cName}\``);
+                        insertPlaceholders.push('?');
+                        insertVals.push(cVal);
+                    }
+                    if (insertFields.length > 0) {
+                        const insertSql = `INSERT INTO \`${table}\` (${insertFields.join(', ')}) VALUES (${insertPlaceholders.join(', ')})`;
+                        await conn.query(insertSql, insertVals);
+                        insertedCount++;
+                    }
+                    else {
+                        skippedCount++;
+                    }
+                }
+            }
+            catch (err) {
+                errors.push({ index: idx, error: err.message });
+            }
+        }
+        res.json({
+            success: true,
+            table,
+            totalRows: records.length,
+            inserted: insertedCount,
+            updated: updatedCount,
+            skipped: skippedCount,
+            errorsCount: errors.length,
+            errors: errors.slice(0, 10),
+            durationMs: Date.now() - t0,
+            message: `Import completed: ${updatedCount} updated, ${insertedCount} inserted, ${skippedCount} skipped.`
+        });
+    }
+    catch (err) {
+        res.status(500).json({ success: false, error: err.message });
+    }
+    finally {
+        await conn.query('SET FOREIGN_KEY_CHECKS = 1');
+        conn.release();
+    }
+});
 // Direct SQL Query Execution API
 app.post(['/dashboardapi/execute-query', '/api/execute-query', '/api/query', '/execute-query'], async (req, res) => {
     if (!verifyAdminAuth(req)) {

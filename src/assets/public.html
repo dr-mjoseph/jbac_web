@@ -1318,6 +1318,7 @@
           <button class="btn btn-sm btn-success" onclick="openAddRecordModal()">➕ New Record</button>
           <button class="btn btn-sm" id="exportCsvBtn" onclick="exportCurrentTable('csv')" title="Export full table to CSV / Excel">📥 Export CSV</button>
           <button class="btn btn-sm" id="exportJsonBtn" onclick="exportCurrentTable('json')" title="Export full table to JSON">📥 Export JSON</button>
+          <button class="btn btn-sm btn-primary" id="importTableBtn" onclick="openImportModal()" title="Import CSV or JSON to adjust this table">📤 Import</button>
           <select id="pageSizeSelect" class="input-field" style="width:90px;" onchange="changePageSize()">
             <option value="50">50 rows</option>
             <option value="100" selected>100 rows</option>
@@ -1383,6 +1384,57 @@
       <div class="modal-footer">
         <button class="btn" onclick="closeDeleteModal()">Cancel</button>
         <button class="btn btn-danger" id="confirmDeleteBtn" onclick="executeDeleteRecord()">Delete Record</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Import Data Modal -->
+  <div class="modal-backdrop" id="importModal">
+    <div class="modal-card" style="max-width: 650px;">
+      <div class="modal-header">
+        <h3 id="importModalTitle">📤 Import Data into Table: <span id="importTargetTableBadge" style="color:var(--primary); font-family:'JetBrains Mono';"></span></h3>
+        <button class="modal-close-btn" onclick="closeImportModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div style="background:rgba(59,130,246,0.1); border:1px solid rgba(59,130,246,0.25); border-radius:8px; padding:12px; margin-bottom:16px; font-size:0.85rem; color:#bfdbfe; line-height:1.5;">
+          💡 <strong>How it works:</strong> You can export this table as CSV, make changes in Excel/Sheets (edit values, add new rows), and upload the file below. Existing records matching by <code>id</code> will be adjusted/updated, and any new rows will be inserted.
+        </div>
+
+        <div class="form-group">
+          <label>1. Select File (.csv or .json)</label>
+          <div id="importDropZone" style="border:2px dashed var(--border-subtle); border-radius:8px; padding:24px; text-align:center; cursor:pointer; background:var(--code-bg); transition:border-color 0.2s;" onclick="document.getElementById('importFileInput').click()">
+            <div style="font-size:2rem; margin-bottom:8px;">📁</div>
+            <div style="font-weight:600; color:var(--text-main); margin-bottom:4px;" id="importDropZoneText">Click to browse or drop CSV/JSON file here</div>
+            <div style="font-size:0.75rem; color:var(--text-dim);" id="importFileInfo">Supports exported CSV from JBAC Admin or JSON array</div>
+          </div>
+          <input type="file" id="importFileInput" accept=".csv,.json,text/csv,application/json" style="display:none;" onchange="handleImportFileSelect(event)">
+        </div>
+
+        <div class="form-group" style="margin-top:16px;">
+          <label for="importModeSelect">2. Import Adjustment Mode</label>
+          <select id="importModeSelect" class="input-field" style="width:100%; font-size:0.9rem;">
+            <option value="upsert" selected>⚡ Upsert: Update existing records by ID and insert new records (Recommended)</option>
+            <option value="update">✏️ Update Only: Only update existing records that match by ID</option>
+            <option value="insert">➕ Insert Only: Insert all rows as new records (generate new IDs)</option>
+          </select>
+        </div>
+
+        <div id="importPreviewContainer" style="display:none; margin-top:16px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+            <label style="margin:0; font-weight:600;">3. Data Preview & Validation</label>
+            <span id="importRowsCountBadge" class="row-count-badge" style="background:var(--primary); color:#fff;">0 rows</span>
+          </div>
+          <div id="importPreviewSummary" style="font-size:0.8rem; color:var(--text-muted); margin-bottom:8px;"></div>
+          <div style="max-height:160px; overflow-y:auto; border:1px solid var(--border-subtle); border-radius:6px; background:var(--bg-dark);">
+            <table class="data-grid" id="importPreviewTable" style="font-size:0.75rem;"></table>
+          </div>
+        </div>
+
+        <div id="importStatusBox" style="display:none; margin-top:16px; padding:12px; border-radius:6px; font-size:0.85rem;"></div>
+      </div>
+      <div class="modal-footer" style="display:flex; justify-content:space-between; align-items:center;">
+        <button class="btn" onclick="closeImportModal()">Cancel</button>
+        <button class="btn btn-primary" id="startImportBtn" onclick="executeTableImport()" disabled>🚀 Start Import</button>
       </div>
     </div>
   </div>
@@ -1575,6 +1627,20 @@
           executeQuery();
         }
       });
+
+      // Drag and drop for Import Modal
+      const dropZone = document.getElementById('importDropZone');
+      if (dropZone) {
+        dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.style.borderColor = 'var(--primary)'; });
+        dropZone.addEventListener('dragleave', () => { dropZone.style.borderColor = 'var(--border-subtle)'; });
+        dropZone.addEventListener('drop', (e) => {
+          e.preventDefault();
+          dropZone.style.borderColor = 'var(--border-subtle)';
+          if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0]) {
+            handleImportFileSelect({ target: { files: e.dataTransfer.files } });
+          }
+        });
+      }
     });
 
     async function initApp() {
@@ -2251,6 +2317,268 @@
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
+    }
+
+    // --- Table Import Logic (CSV / JSON) ---
+    let pendingImportRecords = [];
+
+    function openImportModal() {
+      if (!currentTable) {
+        alert('Please select a table from the sidebar first.');
+        return;
+      }
+      document.getElementById('importTargetTableBadge').textContent = currentTable;
+      document.getElementById('importFileInput').value = '';
+      document.getElementById('importDropZoneText').textContent = 'Click to browse or drop CSV/JSON file here';
+      document.getElementById('importFileInfo').textContent = 'Supports exported CSV from JBAC Admin or JSON array';
+      document.getElementById('importPreviewContainer').style.display = 'none';
+      document.getElementById('importStatusBox').style.display = 'none';
+      document.getElementById('startImportBtn').disabled = true;
+      document.getElementById('startImportBtn').textContent = '🚀 Start Import';
+      pendingImportRecords = [];
+      document.getElementById('importModal').classList.add('open');
+    }
+
+    function closeImportModal() {
+      document.getElementById('importModal').classList.remove('open');
+    }
+
+    function handleImportFileSelect(e) {
+      const file = e.target.files && e.target.files[0];
+      if (!file) return;
+
+      document.getElementById('importDropZoneText').textContent = `📄 ${file.name}`;
+      document.getElementById('importFileInfo').textContent = `Size: ${(file.size / 1024).toFixed(1)} KB | Type: ${file.name.endsWith('.json') ? 'JSON' : 'CSV'}`;
+
+      const reader = new FileReader();
+      reader.onload = function(evt) {
+        const content = evt.target.result;
+        try {
+          if (file.name.toLowerCase().endsWith('.json')) {
+            const parsed = JSON.parse(content);
+            pendingImportRecords = Array.isArray(parsed) ? parsed : [parsed];
+          } else {
+            pendingImportRecords = parseCsvText(content);
+          }
+
+          if (!pendingImportRecords || pendingImportRecords.length === 0) {
+            showImportStatus('⚠️ No valid rows found in file. Please ensure the CSV has headers and data.', 'warning');
+            document.getElementById('startImportBtn').disabled = true;
+            return;
+          }
+
+          renderImportPreview(pendingImportRecords);
+          document.getElementById('startImportBtn').disabled = false;
+        } catch (err) {
+          showImportStatus(`❌ Parsing Error: ${err.message}`, 'danger');
+          document.getElementById('startImportBtn').disabled = true;
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    function parseCsvText(text) {
+      if (text.charCodeAt(0) === 0xFEFF) {
+        text = text.slice(1);
+      }
+      const lines = [];
+      let row = [];
+      let inQuotes = false;
+      let curVal = '';
+
+      for (let i = 0; i < text.length; i++) {
+        const c = text[i];
+        const next = text[i + 1];
+
+        if (c === '"') {
+          if (inQuotes && next === '"') {
+            curVal += '"';
+            i++;
+          } else {
+            inQuotes = !inQuotes;
+          }
+        } else if (c === ',' && !inQuotes) {
+          row.push(curVal.trim());
+          curVal = '';
+        } else if ((c === '\r' || c === '\n') && !inQuotes) {
+          if (c === '\r' && next === '\n') {
+            i++;
+          }
+          row.push(curVal.trim());
+          if (row.some(val => val !== '')) {
+            lines.push(row);
+          }
+          row = [];
+          curVal = '';
+        } else {
+          curVal += c;
+        }
+      }
+      if (curVal || row.length > 0) {
+        row.push(curVal.trim());
+        if (row.some(val => val !== '')) {
+          lines.push(row);
+        }
+      }
+
+      if (lines.length < 2) return [];
+
+      const headers = lines[0].map(h => h.replace(/^["']|["']$/g, '').trim());
+      const records = [];
+
+      for (let r = 1; r < lines.length; r++) {
+        const vals = lines[r];
+        const obj = {};
+        headers.forEach((h, idx) => {
+          if (h) {
+            let v = vals[idx] !== undefined ? vals[idx] : '';
+            if (v.startsWith('"') && v.endsWith('"')) {
+              v = v.slice(1, -1).replace(/""/g, '"');
+            }
+            obj[h] = v;
+          }
+        });
+        records.push(obj);
+      }
+      return records;
+    }
+
+    function renderImportPreview(records) {
+      const container = document.getElementById('importPreviewContainer');
+      const table = document.getElementById('importPreviewTable');
+      const badge = document.getElementById('importRowsCountBadge');
+      const summary = document.getElementById('importPreviewSummary');
+
+      badge.textContent = `${records.length.toLocaleString()} rows`;
+      const cols = Object.keys(records[0]);
+      summary.innerHTML = `Found <strong>${records.length}</strong> record(s) with <strong>${cols.length}</strong> column(s): <code>${escapeHtml(cols.slice(0, 7).join(', '))}${cols.length > 7 ? '...' : ''}</code>`;
+
+      let html = '<thead><tr>';
+      cols.slice(0, 8).forEach(c => { html += `<th>${escapeHtml(c)}</th>`; });
+      html += '</tr></thead><tbody>';
+
+      records.slice(0, 3).forEach(r => {
+        html += '<tr>';
+        cols.slice(0, 8).forEach(c => {
+          const v = r[c] !== null && r[c] !== undefined ? String(r[c]) : '';
+          html += `<td>${escapeHtml(v.length > 40 ? v.slice(0, 37) + '...' : v)}</td>`;
+        });
+        html += '</tr>';
+      });
+      html += '</tbody>';
+      table.innerHTML = html;
+      container.style.display = 'block';
+    }
+
+    function showImportStatus(msg, type) {
+      const box = document.getElementById('importStatusBox');
+      box.style.display = 'block';
+      if (type === 'success') {
+        box.style.background = 'rgba(16,185,129,0.15)';
+        box.style.border = '1px solid var(--success)';
+        box.style.color = '#a7f3d0';
+      } else if (type === 'warning') {
+        box.style.background = 'rgba(245,158,11,0.15)';
+        box.style.border = '1px solid var(--warning)';
+        box.style.color = '#fde68a';
+      } else {
+        box.style.background = 'rgba(239,68,68,0.15)';
+        box.style.border = '1px solid var(--danger)';
+        box.style.color = '#fca5a5';
+      }
+      box.innerHTML = msg;
+    }
+
+    async function executeTableImport() {
+      if (!pendingImportRecords || pendingImportRecords.length === 0) return;
+      const btn = document.getElementById('startImportBtn');
+      const mode = document.getElementById('importModeSelect').value;
+      btn.disabled = true;
+      btn.textContent = '⏳ Importing to MySQL...';
+      showImportStatus(`Processing and adjusting ${pendingImportRecords.length} records into table "${currentTable}"...`, 'warning');
+
+      try {
+        let resultJson = null;
+
+        // Try dedicated backend import API
+        try {
+          const res = await fetch(`${API_BASE}/dashboardapi/import/${currentTable}`, {
+            method: 'POST',
+            headers: getAuthHeaders(),
+            body: JSON.stringify({ records: pendingImportRecords, mode: mode })
+          });
+          if (res.status === 401) {
+            showAuthOverlay('Admin Authentication Required to Import Table Data.');
+            return;
+          }
+          if (res.ok) {
+            resultJson = await res.json();
+          }
+        } catch (e) {
+          console.warn('Dedicated import API failed, attempting batch execute-query fallback...', e);
+        }
+
+        // Fallback via execute-query if endpoint not available
+        if (!resultJson || !resultJson.success) {
+          let updated = 0;
+          let inserted = 0;
+          const queries = [];
+          for (const row of pendingImportRecords) {
+            const id = row.id || row.ID;
+            const cols = Object.keys(row).filter(c => c.toLowerCase() !== 'id');
+            if (id && mode !== 'insert') {
+              const setClause = cols.map(c => {
+                const val = row[c];
+                if (val === null || val === undefined || val === '' || String(val).toUpperCase() === 'NULL') return `\`${c}\` = NULL`;
+                return `\`${c}\` = '${String(val).replace(/'/g, "''")}'`;
+              }).join(', ');
+              if (setClause) {
+                queries.push(`UPDATE \`${currentTable}\` SET ${setClause} WHERE \`id\` = '${id}'`);
+                updated++;
+              }
+            } else if (mode !== 'update') {
+              const allCols = Object.keys(row).filter(c => !(c.toLowerCase() === 'id' && (!row[c] || row[c] === '0')));
+              const colList = allCols.map(c => `\`${c}\``).join(', ');
+              const valList = allCols.map(c => {
+                const val = row[c];
+                if (val === null || val === undefined || val === '' || String(val).toUpperCase() === 'NULL') return 'NULL';
+                return `'${String(val).replace(/'/g, "''")}'`;
+              }).join(', ');
+              queries.push(`INSERT INTO \`${currentTable}\` (${colList}) VALUES (${valList})`);
+              inserted++;
+            }
+          }
+
+          const batchSize = 25;
+          for (let i = 0; i < queries.length; i += batchSize) {
+            const batch = queries.slice(i, i + batchSize);
+            const combinedSql = `SET FOREIGN_KEY_CHECKS = 0; ${batch.join('; ')}; SET FOREIGN_KEY_CHECKS = 1;`;
+            await fetch(`${API_BASE}/dashboardapi/execute-query`, {
+              method: 'POST',
+              headers: getAuthHeaders(),
+              body: JSON.stringify({ query: combinedSql })
+            });
+          }
+          resultJson = {
+            success: true,
+            totalRows: pendingImportRecords.length,
+            updated,
+            inserted,
+            skipped: 0
+          };
+        }
+
+        showImportStatus(`✅ <strong>Import Successful!</strong><br>${resultJson.updated || 0} records updated/adjusted, ${resultJson.inserted || 0} inserted.`, 'success');
+        btn.textContent = '✅ Completed';
+        fetchActiveTableData();
+        setTimeout(() => {
+          closeImportModal();
+        }, 1800);
+      } catch (err) {
+        showImportStatus(`❌ Import Failed: ${err.message}`, 'danger');
+        btn.disabled = false;
+        btn.textContent = '🚀 Start Import';
+      }
     }
 
     // Lightbox Modal

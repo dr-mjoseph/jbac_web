@@ -1705,28 +1705,41 @@ The repository contains two query execution engines:
 
 ---
 
-## 27. Cloud Database Cockpit Table Export Feature & Admin Documentation (`jbac.in/admin`)
+## 27. Cloud Database Cockpit Table Export & Import Feature Suite & AWS Deployment (`jbac.in/admin`)
 
 ### 1. Requirements & Overview
-- Implemented convenient table export mechanisms for administrators accessing the cloud database at `https://jbac.in/admin` (and `https://www.jbac.in/admin`).
-- Provided two distinct export workflows:
-  1. **1-Click Direct Table Export** from the **Tables & Schema Explorer** tab.
-  2. **Custom SQL Query Export** from the **SQL Query Console** tab.
+- Implemented convenient table export and import mechanisms for administrators accessing the cloud database at `https://jbac.in/admin` (and `https://www.jbac.in/admin`).
+- Allows administrators to:
+  1. **Export Table Data**: Export any of the 89 database tables to `.csv` or `.json`.
+  2. **Edit Locally**: Open the CSV in Microsoft Excel or Google Sheets to edit records, correct details, or add new rows.
+  3. **Import & Adjust**: Upload the modified file back to the table in the admin cockpit to adjust records directly in AWS RDS MySQL.
 
 ### 2. Implementation Details
 - **Tables & Schema Explorer Toolbar**:
-  - Added `📥 Export CSV` (`#exportCsvBtn`) and `📥 Export JSON` (`#exportJsonBtn`) directly to the explorer toolbar adjacent to `➕ New Record`.
-  - Created `exportCurrentTable(format)` function in `public.html`:
-    - Checks selected active table (`currentTable`).
-    - Dispatches a background query `SELECT * FROM \`${currentTable}\`;` to `/dashboardapi/execute-query` with authenticated headers (`x-admin-auth`) to fetch the full dataset.
-    - Gracefully falls back to loaded page rows if full query fails.
-    - Prepends UTF-8 Byte Order Mark (`\uFEFF`) to CSV output so Microsoft Excel, LibreOffice Calc, and Google Sheets correctly render Telugu script and special unicode characters without mojibake.
-    - Generates client-side Blob download named `jbac_${currentTable}_export_${Date.now()}.csv` (or `.json`).
-- **SQL Query Console Enhancement**:
-  - Enhanced `exportResults(format)` with UTF-8 BOM encoding and `text/csv;charset=utf-8;` MIME type.
-- **Synchronized Across All Cockpit Mirrors**:
-  - Updated `scripts/build_admin_cockpit.py` to compile and distribute updates to `public.html`, `backend/public.html`, `Api/public.html`, `src/assets/public.html`, and `src/public.html`.
-  - Documented complete user guide and admin credentials in `DATABASE_CONNECTION.md` and `README.md`.
+  - Added `📥 Export CSV` (`#exportCsvBtn`), `📥 Export JSON` (`#exportJsonBtn`), and `📤 Import` (`#importTableBtn`) on the explorer toolbar adjacent to `➕ New Record`.
+- **Client-Side Export Engine (`exportCurrentTable`)**:
+  - Pulls complete active table records via background SQL query `SELECT * FROM \`${currentTable}\`;` with session authentication (`x-admin-auth`).
+  - Prepends UTF-8 Byte Order Mark (`\uFEFF`) to CSV output so Microsoft Excel, LibreOffice Calc, and Google Sheets render Telugu script and special unicode characters without mojibake.
+  - Automatically triggers client-side file download.
+- **Client-Side Import Engine (`openImportModal`, `executeTableImport`)**:
+  - Modal with drag-and-drop file upload zone supporting `.csv` and `.json`.
+  - Built-in RFC-compliant CSV parser handling quoted multiline strings, escaped quotes, and commas.
+  - Interactive table preview displaying matched columns and row count.
+  - Selectable import adjustment modes:
+    - **Upsert (Recommended)**: Matches records by primary key `id`, updates existing rows, and inserts new rows.
+    - **Update Only**: Only adjusts existing rows matching by `id`.
+    - **Insert Only**: Inserts all rows as new records.
+- **Backend Batch Import API (`POST /dashboardapi/import/:table`)**:
+  - Implemented in `backend/server.ts` and `backend/server.js`.
+  - Intelligently queries `DESCRIBE \`${table}\`` to discover primary keys and column types.
+  - Sanitizes blank and literal `NULL` values to SQL `NULL` and casts numeric types.
+  - Scopes transaction execution within `SET FOREIGN_KEY_CHECKS = 0` / `SET FOREIGN_KEY_CHECKS = 1`.
+  - Returns detailed operation telemetry: `{ success: true, totalRows, updated, inserted, skipped, errorsCount, durationMs }`.
+- **Packaging & Production Deployment**:
+  - Compiled and packaged updated `backend/server.js` and `public.html` into `backend/backend-deploy.zip` (13.03 MB).
+  - Deployed to AWS Lambda `jbac-backend-api` in `ap-southeast-2` via AWS CLI.
+  - Uploaded `public.html` to AWS S3 bucket `jbac-web-production-298363284024` under `/public.html`, `/admin`, `/admin/index.html`, and `/dashboard/index.html`.
+  - Invalidated AWS CloudFront cache (`EOBBU8SU7H3BI`) for paths `"/public.html"`, `"/admin"`, `"/admin/*"`, `"/dashboard"`, `"/dashboard/*"`.
 
 
 

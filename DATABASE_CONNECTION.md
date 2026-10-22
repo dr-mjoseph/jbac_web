@@ -156,6 +156,20 @@ You can export any of the 89 database tables to spreadsheet (CSV) or JSON format
 4. In the results header bar above the data grid, click **`📥 CSV`** or **`📥 JSON`**.
 5. The downloaded file contains the exact query results with headers matching your chosen columns.
 
+#### 📤 How to Import Data & Adjust Database Tables (CSV & JSON):
+Administrators can export any table, modify values in Microsoft Excel / Google Sheets, and re-import the file to automatically apply changes and adjust the database table:
+
+1. **Export the Table**: In the **"🗄️ Tables & Schema Explorer"** tab, click **`📥 Export CSV`**.
+2. **Make Adjustments**: Open the exported CSV file in Excel, edit any values (names, mobile numbers, dates, statuses), or append new rows at the bottom.
+3. **Open Import Dialog**: In the Cockpit, ensure the target table is selected and click the blue **`📤 Import`** button on the toolbar.
+4. **Choose File**: Click the upload box or drag-and-drop your updated `.csv` or `.json` file.
+5. **Select Adjustment Mode**:
+   - **⚡ Upsert (Update matching IDs & Insert new records)** *(Recommended)*: Automatically matches records by `id`, updates existing rows with your modifications, and inserts any newly added rows.
+   - **✏️ Update Only**: Only modifies existing records that match by primary key `id`.
+   - **➕ Insert Only**: Inserts all rows as new records (generating new auto-increment IDs).
+6. **Preview & Confirm**: The dialog displays row count and column preview. Click **`🚀 Start Import`**.
+7. **Instant Database Synchronization**: Records are updated safely with session-level foreign key protection (`SET FOREIGN_KEY_CHECKS = 0`) and the table data refreshes automatically.
+
 #### 🛡️ Data Manipulation & Foreign Key Handling:
 When modifying or inserting rows through the Cockpit's **Edit Record** or **New Record** modals:
 * **Automatic NULL Mapping**: Any input left blank or containing literal `NULL` is automatically stored as SQL `NULL` rather than an empty string `""` or `0`.

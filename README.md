@@ -159,9 +159,14 @@ A complete web-based SQL query editor and administrative data cockpit is availab
 1. **Universal Mobile & Desktop Support**: Fully responsive with collapsible 89-table sidebar, touch-scrolling data grids, and adaptive layouts for iPhone and Android browsers.
 2. **Dashboard Tab**: Real-time KPI metric cards (Believers, Pastors, Churches, Students, Ministries, Organisations, Active Events, Users) and AWS RDS MySQL 8.4 engine health telemetry.
 3. **SQL Query Console**: Full-featured code editor with `Ctrl+Enter` shortcut execution, preloaded SQL query presets, execution latency in milliseconds (`ms`), affected/returned row badges, and CSV / JSON export with UTF-8 BOM encoding.
-4. **Table Explorer & Schema Browser**: Filterable drawer listing all 89 tables with live row count badges, schema inspector (`Field`, `Type`, `Null`, `Key`, `Default`, `Extra`), pagination, real-time record manipulation, and 1-click **`📥 Export CSV`** and **`📥 Export JSON`** buttons on the toolbar for instant full-table exports.
-5. **Record Manipulation Modals**: Add new records (INSERT), edit existing records (UPDATE), and soft/hard delete records (DELETE) with intelligent NULL sanitization (blank inputs automatically convert to SQL `NULL`) and session-level Foreign Key safety (preventing constraint violations on relational fields like `pastor_id`, `believer_id`, etc.).
-6. **Secured Query Execution API**:
+4. **Table Explorer & Schema Browser**: Filterable drawer listing all 89 tables with live row count badges, schema inspector (`Field`, `Type`, `Null`, `Key`, `Default`, `Extra`), pagination, real-time record manipulation, 1-click **`📥 Export CSV`** and **`📥 Export JSON`** buttons, and **`📤 Import`** table modal for batch spreadsheet adjustments.
+5. **Table Data Import & Batch Adjustment Engine**: Dedicated import modal with drag-and-drop file upload (`.csv`, `.json`), column preview, and flexible adjustment modes:
+   - **Upsert (Recommended)**: Matches by `id`, updates existing records with changes made in Excel/Sheets, and inserts any new records.
+   - **Update Only**: Strictly adjusts records matching existing IDs.
+   - **Insert Only**: Inserts all parsed rows as new records.
+6. **Record Manipulation Modals**: Add new records (INSERT), edit existing records (UPDATE), and soft/hard delete records (DELETE) with intelligent NULL sanitization (blank inputs automatically convert to SQL `NULL`) and session-level Foreign Key safety (preventing constraint violations on relational fields like `pastor_id`, `believer_id`, etc.).
+7. **Secured Query Execution & Import APIs**:
+   - `POST /dashboardapi/import/:table` (batch CSV/JSON upsert & update engine).
    - `POST /dashboardapi/execute-query` (with `x-admin-auth` header or Basic Auth):
      ```json
      { "query": "SELECT * FROM users WHERE status = 'Active' LIMIT 10" }
