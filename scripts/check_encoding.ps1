@@ -1,0 +1,5 @@
+$bytes = [System.IO.File]::ReadAllBytes("C:\Users\rajes\StudioProjects\jbac_app\www\build\23.js")
+$strUtf8 = [System.Text.Encoding]::UTF8.GetString($bytes)
+$strAscii = [System.Text.Encoding]::ASCII.GetString($bytes)
+Write-Host "UTF8 contains telugu జిల్లాలను:" ($strUtf8.Contains([System.Text.Encoding]::UTF8.GetString([System.Text.Encoding]::UTF8.GetBytes("జిల్లాలను"))))
+Write-Host "Question marks count in raw:" ([regex]::Matches($strUtf8, '\?{3,}').Count)
