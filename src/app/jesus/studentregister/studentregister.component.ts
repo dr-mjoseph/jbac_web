@@ -46,30 +46,23 @@ export class StudentregisterComponent {
       number: ['', [Validators.required, Validators.maxLength(10)]],
       pastornum: [''],
       study: ['', [Validators.required]],
-//      schname: ['', [Validators.required]],
-      //fathername: ['', [Validators.required]],
+      schname: [''],
       aboutyourself: [''],
       sstatus: [''],
       finanstat: [''],
-      //nativeplace: [''],
       caste: [''],
       talent: [''],
       passexam: [''],
       tmarks: ['', [Validators.required]],
       mmarks: ['', [Validators.required]],
-      // district_id: ['', [Validators.required]],
-      // constituency_id: ['', [Validators.required]],
-      // mandal_id: ['', [Validators.required]],
-      // village_id: ['', [Validators.required]],
-      password: ['', [Validators.required, Validators.minLength(4)]],
-      retypepassword: ['', [Validators.required, Validators.minLength(4)]],
-      //church: [''],
-      //pastor: [''],
+      district_id: [''],
+      constituency_id: [''],
+      mandal_id: [''],
+      village_id: [''],
+      password: ['', [Validators.minLength(4)]],
+      retypepassword: ['', [Validators.minLength(4)]],
       leadership: [''],
-      // leadertype: [''],
       generaltype: [''],
-      // wingtype: [''],
-      // wingtypes: [''],
       dob: [''],
       denomination_id: ['', [Validators.required]],
       hobbies: [''],
@@ -610,7 +603,30 @@ export class StudentregisterComponent {
     if (!this.studentform.get('term')?.value) {
       this.studentform.patchValue({ term: true });
     }
+
+    const pw = this.studentform.get('password')?.value;
+    const rpw = this.studentform.get('retypepassword')?.value;
+    if (pw && rpw && pw !== rpw) {
+      this.showAlert('warning', 'గమనిక!', 'పాస్‌వర్డ్‌లు సరిపోలడం లేదు (Passwords do not match)');
+      this.showSpinner = false;
+      return;
+    }
+
+    // Default password to mobile number if left empty
+    if (!pw) {
+      const phone = this.studentform.get('number')?.value || '';
+      this.studentform.patchValue({ password: phone, retypepassword: phone });
+    }
+
     if (this.studentform.invalid) {
+      const invalidControls: string[] = [];
+      const controls = this.studentform.controls;
+      for (const name in controls) {
+        if (controls[name].invalid) {
+          invalidControls.push(name);
+        }
+      }
+      console.warn('Student form validation failed for controls:', invalidControls);
       this.showAlert(
         'warning',
         'గమనిక!',
@@ -619,13 +635,21 @@ export class StudentregisterComponent {
               <b>మార్క్ వున్నా ఫీల్డ్స్ తప్పనిసరిగా ఎంటర్ చేయండి</b>
             </p>`
       );
-      this.showSpinner = false; // Stop spinner on validation failure
+      this.showSpinner = false;
       return;
     }
 
-  
-    this.service.poststudentsignup(this.studentform.value)
-      .pipe(finalize(() => this.showSpinner = false)) // Ensures spinner is hidden no matter what
+    // Sync alias fields so both old and new schema columns are populated
+    const payload = {
+      ...this.studentform.value,
+      group_branch: this.studentform.value.study || '',
+      totmarks: this.studentform.value.tmarks || '',
+      maxmarks: this.studentform.value.mmarks || '',
+      exampass: this.studentform.value.passexam || ''
+    };
+
+    this.service.poststudentsignup(payload)
+      .pipe(finalize(() => this.showSpinner = false))
       .subscribe(
         (res: any) => {
           if (res?.status === 200) {
@@ -638,7 +662,7 @@ export class StudentregisterComponent {
             this.panchayati = [];
             this.submitted = false;
           } else {
-            this.showAlert('error', 'లోపం!', 'సర్వర్‌లో సమస్య ఉంది. దయచేసి మరలా ప్రయత్నించండి.');
+            this.showAlert('error', 'లోపం!', res?.message || 'సర్వర్‌లో సమస్య ఉంది. దయచేసి మరలా ప్రయత్నించండి.');
           }
         },
         (error) => {
@@ -646,7 +670,6 @@ export class StudentregisterComponent {
           this.showAlert('error', 'లోపం!', 'Something went wrong, please try again later');
         }
       );
-    
   }
   
   // poststudentsignup() {

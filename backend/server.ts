@@ -1494,8 +1494,25 @@ app.post(['/dashboardapi/studentsignup', '/api/studentsignup'], async (req: any,
         s.d_in = 0;
         s.cts = getIndianCts();
         s.is_first_login = 0;
-        const result = await dynamicInsert('student_reg', s);
+
+        // Sync alias fields between frontend form and database columns
+        if (s.study && !s.group_branch) s.group_branch = s.study;
+        if (s.group_branch && !s.study) s.study = s.group_branch;
+        if (s.tmarks !== undefined && s.totmarks === undefined) s.totmarks = s.tmarks;
+        if (s.totmarks !== undefined && s.tmarks === undefined) s.tmarks = s.totmarks;
+        if (s.mmarks !== undefined && s.maxmarks === undefined) s.maxmarks = s.mmarks;
+        if (s.maxmarks !== undefined && s.mmarks === undefined) s.mmarks = s.maxmarks;
+        if (s.passexam && !s.exampass) s.exampass = s.passexam;
+        if (s.exampass && !s.passexam) s.passexam = s.exampass;
+        if (s.whatsappnumber && !s.whatsapp) s.whatsapp = s.whatsappnumber;
+        if (s.whatsapp && !s.whatsappnumber) s.whatsappnumber = s.whatsapp;
+
         const phone = s.number || s.phonenumber || s.mobile_number;
+        if (!s.password && phone) {
+            s.password = phone;
+        }
+
+        const result = await dynamicInsert('student_reg', s);
         if (phone && s.password) {
             try {
                 await dynamicInsert('users', {
