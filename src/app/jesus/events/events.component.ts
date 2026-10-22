@@ -337,18 +337,38 @@ export class EventsComponent {
     return Boolean(start && start > today);
   }
 
+  sortEventsAscending(list: any[]): any[] {
+    const today = this.now || this.formatDateString(new Date());
+    return list.sort((a, b) => {
+      const startA = this.formatDateString(a.startdate || a.event_date);
+      const startB = this.formatDateString(b.startdate || b.event_date);
+      // Meetings happening today or ongoing with enddate >= today appear first
+      const effA = (startA && startA < today) ? today : (startA || '9999-99-99');
+      const effB = (startB && startB < today) ? today : (startB || '9999-99-99');
+      if (effA !== effB) {
+        return effA.localeCompare(effB);
+      }
+      if (startA !== startB) {
+        return (startA || '').localeCompare(startB || '');
+      }
+      return Number(a.id || 0) - Number(b.id || 0);
+    });
+  }
+
+  displayEvents(sourceList?: any[]) {
+    const list = sourceList ? [...sourceList] : [...this.allEvents];
+    this.sortEventsAscending(list);
+    this.searchevents = list;
+  }
+
+  // Backward compatibility aliases
   setMeetingTab(tab: 'today' | 'upcoming') {
     this.activeTab = tab;
-    this.displayEventsForCurrentTab();
+    this.displayEvents();
   }
 
   displayEventsForCurrentTab(sourceList?: any[]) {
-    const list = sourceList || this.allEvents;
-    if (this.activeTab === 'today') {
-      this.searchevents = list.filter(item => this.isCurrentDateEvent(item));
-    } else {
-      this.searchevents = list.filter(item => this.isUpcomingMeeting(item));
-    }
+    this.displayEvents(sourceList);
   }
 
   updateCounts() {
@@ -369,12 +389,12 @@ export class EventsComponent {
           if (dInItems.length > 0 && this.ribbonEvents.length === 0) {
             this.ribbonEvents = dInItems;
           }
-          // Exclude old meetings completely
+          // Exclude old meetings completely and display active/future in ascending date order
           this.allEvents = raw
             .filter((item: any) => !this.isOldMeeting(item))
             .map((item: any) => ({ ...item, showMore: false }));
           this.updateCounts();
-          this.displayEventsForCurrentTab();
+          this.displayEvents();
         }
       },
       error: (err: any) => {
@@ -504,7 +524,7 @@ export class EventsComponent {
 
     const hasFilter = Object.keys(queryPayload).some(k => queryPayload[k] !== '' && queryPayload[k] != null);
     if (!hasFilter) {
-      this.displayEventsForCurrentTab();
+      this.displayEvents();
       return;
     }
 
@@ -514,11 +534,7 @@ export class EventsComponent {
           const results = res.data
             .filter((item: any) => !this.isOldMeeting(item))
             .map((item: any) => ({ ...item, showMore: false }));
-          if (queryPayload.startdate) {
-            this.searchevents = results;
-          } else {
-            this.displayEventsForCurrentTab(results);
-          }
+          this.displayEvents(results);
         } else {
           this.applyClientSideFilter(queryPayload);
         }
@@ -553,7 +569,7 @@ export class EventsComponent {
         }
         return itemStart === payload.startdate;
       });
-      this.searchevents = filtered;
+      this.displayEvents(filtered);
       return;
     }
     if (payload.mettingtype) {
@@ -569,7 +585,7 @@ export class EventsComponent {
     if (payload.ministry_id) {
       filtered = filtered.filter(item => item.ministry_id == payload.ministry_id);
     }
-    this.displayEventsForCurrentTab(filtered);
+    this.displayEvents(filtered);
   }
 
   search(event?: any) {

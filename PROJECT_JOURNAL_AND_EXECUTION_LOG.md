@@ -1609,6 +1609,75 @@ The repository contains two query execution engines:
   - `Api/dashboard/controllers/` & `Api/dashboard/routes/`
   - `Api/website/controllers/` & `Api/website/routes/`
 
+---
+
+## 25. Database 24/7 Reliability, Events Simplification & Mobile Release v0.0.36
+
+### 1. Database Automatic Stopping: Root Cause & Permanent Fix
+- **Issue**: The production AWS RDS database (`jbac-mysql-db-v3` in `ap-southeast-2`) was repeatedly stopping automatically on weekdays, requiring manual intervention.
+- **Root Cause Discovered**:
+  - Investigated AWS CloudTrail and GitHub Actions workflows.
+  - Located [`.github/workflows/aws-resource-scheduler.yml`](.github/workflows/aws-resource-scheduler.yml), which was configured with an active cron trigger:
+    ```yaml
+    schedule:
+      - cron: '0 14 * * 1-5'  # 14:00 UTC = 7:30 PM IST Mon-Fri
+    ```
+  - At 14:00 UTC every weekday, this workflow executed:
+    `aws rds stop-db-instance --db-instance-identifier jbac-mysql-db-v3`
+  - AWS CloudTrail confirmed that `StopDBInstance` was initiated by the GitHub Actions runner identity (`20.168.136.133`) from Microsoft Azure.
+- **Permanent Fix Implemented**:
+  - Removed the `schedule:` block completely from [`.github/workflows/aws-resource-scheduler.yml`](.github/workflows/aws-resource-scheduler.yml).
+  - Added an explicit safeguard rule to prevent stopping `jbac-mysql-db-v3` even if the workflow is ever dispatched manually:
+    ```yaml
+    # Safeguard: Never allow production DB to be stopped
+    if [ "$DB_INSTANCE" = "jbac-mysql-db-v3" ]; then
+      echo "SKIPPING: jbac-mysql-db-v3 is production 24/7 database and must NEVER be stopped."
+      exit 0
+    fi
+    ```
+  - Confirmed DB status is active and `available` in `ap-southeast-2`.
+
+---
+
+### 2. Events Page Tab Removal & Ascending Chronological Order (`jbac_web`)
+- **Requirement**: Remove the tab buttons ("Today's meetings" / "రాబోయే మీటింగ్స్") and the tab condition, but retain the filter search completely and display all upcoming/active meetings in ascending order (today ➔ tomorrow ➔ day after tomorrow ➔ future).
+- **Implementation**:
+  - In [`src/app/jesus/events/events.component.html`](src/app/jesus/events/events.component.html): Removed `<div class="meeting-tabs-group">` button row and cleaned empty-state text.
+  - In [`src/app/jesus/events/events.component.ts`](src/app/jesus/events/events.component.ts):
+    - Added `sortEventsAscending(list)` which compares effective event start dates against today's date (`today <= tomorrow <= future`).
+    - Unified all search and filtering methods (`applyCombinedFilter`, `applyClientSideFilter`, `reset`) to route through `displayEvents()`.
+    - Preserved full filter search functionality (districts, denominations, dates, categories).
+  - **Verification**: Verified with Angular production build (`npm run build -- --configuration production`), passing with zero compile errors.
+
+---
+
+### 3. Student Registration Parity & Meeting Expiration in Mobile App (`jbac_app`)
+- **Collaborator Commit Parity (`ed77502` - "student")**:
+  - In [`src/pages/student/student.ts`](../../StudioProjects/jbac_app/src/pages/student/student.ts) & [`student.html`](../../StudioProjects/jbac_app/src/pages/student/student.html):
+    - Added 14 new talent options (Video Editing, Photography, Social Media, Organiser, Sound Management, Drummer, Keyboard Player, Giving Gospel, Singer, Song Writer, Social Service, Good in Studies, Multi Talent, Speaker, Writer, Others).
+    - Added fields for `Group / Branch` (`branch`), `Total Marks Secured` (`tmarks`), and `Maximum Marks Conducted` (`mmarks`).
+    - Extended `generaltype` leadership levels to 11 options (State Level down to Section/Class Level).
+- **Events Poster Expiry & Ascending Sort**:
+  - In [`src/pages/meeting/meeting.ts`](../../StudioProjects/jbac_app/src/pages/meeting/meeting.ts):
+    - Added `isOldMeeting()` ensuring that as soon as `enddate < today`, the poster automatically disappears.
+    - Added `sortEventsAscending()` for chronological ordering.
+    - Routed all search handlers (`searchdistric`, `searchconstenct`, `ministry`, `searchdenomationdata`, `searchchange`, `searchmandals`, `onDateChange`, `search`, `searechevents`) through `setFilteredEvents()`.
+  - Recompiled and synchronized runtime bundles `5.js` and `12.js` in both `www/build/` and `platforms/android/app/src/main/assets/www/build/`.
+
+---
+
+### 4. Release v0.0.36 Android Build & Artifact Generation
+- Bumped application version:
+  - `config.xml`: `version="0.0.36"` and `android-versionCode="36"`
+  - `package.json`: `"version": "0.0.36"`
+  - `AndroidManifest.xml`: `android:versionCode="36"` and `android:versionName="0.0.36"`
+- Executed automated build script [`scripts/build_and_sign_release_v36.ps1`](scripts/build_and_sign_release_v36.ps1):
+  - **Signed APK**: `C:\Users\rajes\StudioProjects\jbac_app\jbacApp-0.0.36.apk` *(118.68 MB)*
+  - **Signed AAB**: `C:\Users\rajes\StudioProjects\jbac_app\jbacApp-0.0.36.aab` *(115.81 MB)*
+  - **Standard Bundle**: `C:\Users\rajes\StudioProjects\jbac_app\appreleasesigned.aab`
+  - Verified APK badging with `aapt`: `targetSdkVersion='36'`, `versionCode='36'`, `versionName='0.0.36'`.
+
+
 
 
 

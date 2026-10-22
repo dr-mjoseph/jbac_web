@@ -1,11 +1,7 @@
 name: AWS Resource Cost Scheduler (Auto Stop & Start)
 
 on:
-  schedule:
-    # Auto-stop every weekday evening at 14:00 UTC (7:30 PM IST / 12:00 AM Sydney)
-    - cron: '0 14 * * 1-5'
-    # Auto-start every weekday morning at 03:00 UTC (8:30 AM IST / 1:00 PM Sydney)
-    - cron: '0 3 * * 1-5'
+  # Cron schedules removed: Website is live, production RDS database must run 24/7 continuously.
   workflow_dispatch:
     inputs:
       action:
@@ -13,9 +9,9 @@ on:
         required: true
         type: choice
         options:
-          - 'stop'
-          - 'start'
           - 'status'
+          - 'start'
+          - 'stop'
         default: 'status'
       target:
         description: 'Target resources to schedule'
@@ -25,7 +21,7 @@ on:
           - 'all'
           - 'rds'
           - 'ec2'
-        default: 'all'
+        default: 'status'
 
 permissions:
   contents: read
@@ -42,26 +38,16 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION || 'ap-southeast-2' }}
 
-      - name: Determine Action (Cron vs Manual)
+      - name: Determine Action (Manual Dispatch Only)
         id: determine_action
         run: |
-          if [ "${{ github.event_name }}" = "schedule" ]; then
-            HOUR=$(date -u +%H)
-            if [ "$HOUR" -ge 12 ]; then
-              ACTION="stop"
-            else
-              ACTION="start"
-            fi
-            TARGET="all"
-          else
-            ACTION="${{ inputs.action }}"
-            TARGET="${{ inputs.target }}"
-          fi
+          ACTION="${{ inputs.action }}"
+          TARGET="${{ inputs.target }}"
           echo "ACTION=${ACTION}" >> $GITHUB_ENV
           echo "TARGET=${TARGET}" >> $GITHUB_ENV
           echo "Executing ${ACTION} on target: ${TARGET}"
 
-      - name: Manage RDS Instances (Stop / Start / Status)
+      - name: Manage RDS Instances (Status / Start / Protected 24/7 Live Database)
         if: env.TARGET == 'all' || env.TARGET == 'rds'
         run: |
           REGION="${{ secrets.AWS_REGION || 'ap-southeast-2' }}"
@@ -82,23 +68,17 @@ jobs:
               echo "Processing RDS '${DB_ID}' (Current Status: ${DB_STATUS})..."
 
               if [ "${ACTION}" = "stop" ]; then
-                if [ "${DB_STATUS}" = "available" ]; then
-                  echo "Stopping RDS DB: ${DB_ID} to eliminate hourly compute charges..."
-                  aws rds stop-db-instance --db-instance-identifier "${DB_ID}" --region "${REGION}" 2>&1 || true
-                  echo "[SUCCESS] Stop command sent to ${DB_ID}. (Saving ~65-70% on monthly compute!)"
-                else
-                  echo "RDS DB '${DB_ID}' is already in status: ${DB_STATUS}. No action needed."
-                fi
+                echo "[PROTECTION ENFORCED] RDS DB '${DB_ID}' powers live website and mobile app (jbac.in). Automatic and manual stopping is disabled to maintain 100% 24/7 uptime."
               elif [ "${ACTION}" = "start" ]; then
                 if [ "${DB_STATUS}" = "stopped" ]; then
                   echo "Starting RDS DB: ${DB_ID}..."
                   aws rds start-db-instance --db-instance-identifier "${DB_ID}" --region "${REGION}" 2>&1 || true
                   echo "[SUCCESS] Start command sent to ${DB_ID}."
                 else
-                  echo "RDS DB '${DB_ID}' is already in status: ${DB_STATUS}. No action needed."
+                  echo "RDS DB '${DB_ID}' is already in status: ${DB_STATUS}."
                 fi
               else
-                echo "Status Check: RDS DB '${DB_ID}' is ${DB_STATUS}."
+                echo "Status Check: RDS DB '${DB_ID}' is ${DB_STATUS} (Continuous 24/7 Operation)."
               fi
             done <<< "${DB_INSTANCES}"
           fi

@@ -140,22 +140,6 @@
             </marquee>
         </div>
 
-        <!-- Meeting Tabs: Current Date Only vs Upcoming Meetings -->
-        <div class="row mb-4">
-            <div class="col-12 text-center">
-                <div class="btn-group meeting-tabs-group" role="group" aria-label="Meeting View Tabs">
-                    <button type="button" class="btn meeting-tab-btn" [ngClass]="activeTab === 'today' ? 'btn-danger font-weight-bold active' : 'btn-outline-danger'"
-                        (click)="setMeetingTab('today')">
-                        📅 నేటి మీటింగ్స్ ({{todayEventsCount}})
-                    </button>
-                    <button type="button" class="btn meeting-tab-btn" [ngClass]="activeTab === 'upcoming' ? 'btn-danger font-weight-bold active' : 'btn-outline-danger'"
-                        (click)="setMeetingTab('upcoming')">
-                        🔜 రాబోయే మీటింగ్స్ ({{upcomingEventsCount}})
-                    </button>
-                </div>
-            </div>
-        </div>
-
         <!-- Meetings Grid -->
         <div class="row">
             <div class="col-12">
@@ -164,8 +148,7 @@
                     <div class="col-12 text-center py-5" *ngIf="searchevents.length === 0">
                         <div class="alert alert-info d-inline-block shadow-sm" style="padding: 20px 40px; border-radius: 12px; font-size: 16px;">
                             <i class="fa fa-info-circle me-2"></i>
-                            <b *ngIf="activeTab === 'today'">ఈ రోజుకు ఎటువంటి మీటింగ్స్ లేవు లేదా ఎంచుకున్న ఫిల్టర్‌కు ఫలితాలు లేవు.</b>
-                            <b *ngIf="activeTab === 'upcoming'">రాబోయే మీటింగ్స్ ఏవీ లేవు లేదా ఎంచుకున్న ఫిల్టర్‌కు ఫలితాలు లేవు.</b>
+                            <b>మీటింగ్స్ ఏవీ లేవు లేదా ఎంచుకున్న ఫిల్టర్‌కు ఫలితాలు లేవు.</b>
                         </div>
                     </div>
 
