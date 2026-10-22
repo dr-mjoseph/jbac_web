@@ -35,7 +35,7 @@ CREATE TABLE IF NOT EXISTS jbac_db.registrations (
 
 3. **Role-Specific Registration Tables:**
    - **`signup_form` (Believers):** Stores believer registrations from both standard forms and `/namodu`. Key columns: `id`, `cts` (IST timestamp, positioned before name), `fname`, `lname`, `mobile_number`, `whatsapp`, `district_id`, `constituency_id`, `mandal_id`, `panchayat_id`, `password`, `is_first_login`, `from_signup`.
-   - **`student_reg` (Students):** Key columns: `id`, `cts`, `studentname`, `number`, `whatsapp`, `district_id`, `constituency_id`, `mandal_id`, `village_id`, `password`, `is_first_login`.
+   - **`student_reg` (Students):** Key columns: `id`, `cts`, `studentname`, `number`, `whatsapp`, `whatsappnumber`, `study`, `group_branch`, `tmarks`, `totmarks`, `mmarks`, `maxmarks`, `talent`, `schname`, `fathername`, `mother`, `orphon`, `branch`, `passexam`, `exampass`, `district_id`, `constituency_id`, `mandal_id`, `village_id`, `resdistricts`, `resconstituencyname`, `resmandals`, `respanchayati`, `villagename`, `password`, `is_first_login`.
    - **`pastor_reg` (Pastors):** Key columns: `id`, `cts`, `pastorname`, `phonenumber`, `whatsapp`, `district_id`, `constituency_id`, `mandal_id`, `village_id`, `password`, `is_first_login`.
    - **`church_reg` (Churches):** Key columns: `id`, `cts`, `church_name`, `contactnumber`, `whatsapp`, `district_id`, `constituency_id`, `mandal_id`, `village_id`, `password`, `is_first_login`.
    - **`pastors_associations` (Pastors Associations):** Key columns: `id`, `cts`, `paname`, `phonenumber`, `whatsapp`, `district_id`, `constituency_id`, `mandal_id`, `village_id`, `password`, `is_first_login`.
@@ -71,6 +71,19 @@ Stores regular believer registrations into `signup_form`:
 - Maps geographic fields: `district_id`, `constituency_id`, `mandal_id`, `panchayat_id`.
 - Stores `cts` (IST timestamp), dedicated user password, and sets `is_first_login = 0`.
 - Protects `users.otp` from non-OTP data.
+
+### 4a. `POST /dashboardapi/studentsignup` (Student Registration)
+Dedicated endpoint processing student registrations from both web (`/studentregister`) and mobile (`StudentPage`):
+- **Bidirectional Alias Synchronization**:
+  - `study` ⟷ `group_branch`
+  - `tmarks` ⟷ `totmarks`
+  - `mmarks` ⟷ `maxmarks`
+  - `passexam` ⟷ `exampass`
+  - `whatsappnumber` ⟷ `whatsapp`
+- **Automatic Password Fallback**:
+  - Automatically defaults empty/omitted password submissions to the registrant's mobile number, enabling immediate login.
+- **Master User Sync**:
+  - Synchronizes phone and password into `users` table.
 
 ### 5. `POST /dashboardapi/passwordwebsitelogin` (Authentication)
 Authenticates users across all category tables:

@@ -234,7 +234,27 @@ GitHub Issue: [#1](https://github.com/dr-mjoseph/jbac_web/issues/1)
 
 ---
 
-## 🎯 13. Pending Launch & Post-Release Tasks
+## 🎓 13. Milestone 13: Student Registration Form Remediation & RDS MySQL Database Parity
+- [x] **RDS MySQL `student_reg` Schema Alteration**:
+  - Altered live AWS RDS MySQL table `student_reg` adding 9 missing columns: `study`, `tmarks`, `mmarks`, `passexam`, `whatsappnumber`, `fathername`, `mother`, `orphon`, `branch`.
+  - Confirmed column `talent` active across `student_reg`, `students`, and `signup_form`.
+- [x] **Form Validation Lock Resolution**:
+  - Removed hidden mandatory requirements for `password` and `retypepassword` (now optional with minlength 4 and auto-defaulting to mobile phone number).
+  - Uncommented and registered College/School address form controls (`schname`, `district_id`, `constituency_id`, `mandal_id`, `village_id`) in `studentregister.component.ts`.
+  - Resolved copy-paste validation bug in `tmarks` and `mmarks`.
+- [x] **Backend Alias Synchronization**:
+  - Synchronized alias columns `study` ⟷ `group_branch`, `tmarks` ⟷ `totmarks`, `mmarks` ⟷ `maxmarks`, `passexam` ⟷ `exampass`, `whatsappnumber` ⟷ `whatsapp` in `POST /dashboardapi/studentsignup`.
+  - Added automatic password fallback defaulting empty password submissions to the registrant's mobile number.
+- [x] **Strict Template Type Checking & AOT Build Fixes**:
+  - Fixed strict null indexing errors (`e['field'].errors?.['required']`) in `studentregister.component.html`, ensuring clean production compilation (`ng build --configuration production`).
+- [x] **End-to-End Live Automated Verification**:
+  - Dispatched live HTTPS registration POST request, receiving HTTP 200 with `insertId: 405`, verifying all new fields directly in AWS RDS MySQL, and safely cleaning up test data.
+- [x] **Automated Cross-Repository Sync to Android Mobile App**:
+  - Pushed to `main`, triggering automated CI/CD pipeline syncing all web updates to [`dr-mjoseph/jbac_app`](https://github.com/dr-mjoseph/jbac_app).
+
+---
+
+## 🎯 14. Pending Launch & Post-Release Tasks
 - [ ] Complete Google Play Console Review & Rollout for Release 35 (`jbacApp-0.0.35.aab`).
 - [ ] Monitor crash telemetry and user feedback via Google Play Console dashboard.
 - [ ] Run automated end-to-end smoke testing across all live production forms on https://jbac.in.

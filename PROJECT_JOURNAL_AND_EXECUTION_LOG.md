@@ -1740,14 +1740,78 @@ The repository contains two query execution engines:
   - Deployed to AWS Lambda `jbac-backend-api` in `ap-southeast-2` via AWS CLI.
   - Uploaded `public.html` to AWS S3 bucket `jbac-web-production-298363284024` under `/public.html`, `/admin`, `/admin/index.html`, and `/dashboard/index.html`.
   - Invalidated AWS CloudFront cache (`EOBBU8SU7H3BI`) for paths `"/public.html"`, `"/admin"`, `"/admin/*"`, `"/dashboard"`, `"/dashboard/*"`.
+---
 
+## 28. Student Registration Form Mandatory Fields Resolution, RDS MySQL Schema Alteration & Cross-Platform Parity
 
+### 1. Problem Statement & User Bug Report
+- **User Issue**:
+  - In the student registration form (`/studentregister`), users were unable to register. Upon filling all visible inputs and submitting, the form displayed the Telugu warning:
+    `"మార్క్ వున్నా ఫీల్డ్స్ తప్పనిసరిగా ఎంటర్ చేయండి" (All mandatory fields must be entered)`.
+  - The recent collaborator commit named `"student"` (`ed77502`) introduced new fields (`talent`, `study`, `schname`, `fathername`, marks, etc.), but these changes had not fully reflected into the database schema and caused the form validation to fail.
 
+### 2. Root Cause Analysis
+1. **Hidden Required Password Fields**:
+   - In `studentregister.component.ts`, `password` and `retypepassword` were declared with `[Validators.required]`.
+   - In `studentregister.component.html`, the password inputs were commented out (`<!-- ... -->`).
+   - Consequently, `studentform.get('password').value` was always empty `""`, causing `this.studentform.invalid` to evaluate to `true` on every submission attempt regardless of what the user entered.
+2. **Missing Form Controls in Component Class**:
+   - Commit `ed77502` uncommented the "Studied / Studying College / School Address" inputs in HTML (`schname`, `district_id`, `constituency_id`, `mandal_id`, `village_id`).
+   - However, they remained commented out in the TypeScript `FormBuilder` group. On form submission, accessing `e['schname'].errors` threw a runtime error or blocked Angular form lifecycle processing.
+3. **Template Validation Copy-Paste Bug**:
+   - The inputs for `tmarks` and `mmarks` had `*ngIf="e['number'].errors"` instead of checking their own control errors.
+4. **Database Table Column Mismatch**:
+   - The live RDS MySQL database table `student_reg` historically had columns named `group_branch`, `totmarks`, `maxmarks`, `exampass`, and `whatsapp`, whereas the frontend submitted `study`, `tmarks`, `mmarks`, `passexam`, and `whatsappnumber`.
+   - While `talent` was present in `student_reg`, `students`, and `signup_form`, columns `study`, `tmarks`, `mmarks`, `passexam`, `whatsappnumber`, `fathername`, `mother`, `orphon`, and `branch` were absent in `student_reg`. Because the backend uses a whitelist-based `dynamicInsert` reflecting table columns from `information_schema.columns`, these unmapped fields were silently dropped.
 
+### 3. Comprehensive Fixes Applied
 
+#### A. Database Schema Migration (Live AWS RDS MySQL)
+- Created and executed [`scripts/alter_student_tables.js`](scripts/alter_student_tables.js) against the live AWS RDS MySQL cluster:
+  ```sql
+  ALTER TABLE student_reg 
+    ADD COLUMN `study` VARCHAR(255) DEFAULT NULL,
+    ADD COLUMN `tmarks` VARCHAR(255) DEFAULT NULL,
+    ADD COLUMN `mmarks` VARCHAR(255) DEFAULT NULL,
+    ADD COLUMN `passexam` VARCHAR(255) DEFAULT NULL,
+    ADD COLUMN `whatsappnumber` VARCHAR(25) DEFAULT NULL,
+    ADD COLUMN `fathername` VARCHAR(255) DEFAULT NULL,
+    ADD COLUMN `mother` VARCHAR(255) DEFAULT NULL,
+    ADD COLUMN `orphon` VARCHAR(255) DEFAULT NULL,
+    ADD COLUMN `branch` VARCHAR(255) DEFAULT NULL;
+  ```
+- Confirmed that `talent` (VARCHAR(255)) is active across `student_reg`, `students`, and `signup_form`.
 
+#### B. Backend API Column Synchronization & Default Password Fallback
+- Updated `studentsignup` route handler in [`backend/server.ts`](backend/server.ts) and [`backend/server.js`](backend/server.js):
+  - Added bidirectional synchronization between alias columns:
+    - `study` ⟷ `group_branch`
+    - `tmarks` ⟷ `totmarks`
+    - `mmarks` ⟷ `maxmarks`
+    - `passexam` ⟷ `exampass`
+    - `whatsappnumber` ⟷ `whatsapp`
+  - Added auto-default password fallback: if the user omits or leaves the password blank, it automatically defaults to their mobile number (`s.password = phone`), enabling instant login capability.
+- Packaged and deployed `backend/backend-deploy.zip` to AWS Lambda `jbac-backend-api` in `ap-southeast-2`.
 
+#### C. Web Frontend Component & Template Modernization
+- In [`src/app/jesus/studentregister/studentregister.component.ts`](src/app/jesus/studentregister/studentregister.component.ts):
+  - Uncommented and declared `schname`, `district_id`, `constituency_id`, `mandal_id`, and `village_id` in `this.studentform`.
+  - Changed `password` and `retypepassword` to optional validators (`[Validators.minLength(4)]`), with auto-defaulting to the student's phone number if left empty.
+  - Added password mismatch validation.
+  - Added payload mapping ensuring both alias fields and standard fields are transmitted.
+- In [`src/app/jesus/studentregister/studentregister.component.html`](src/app/jesus/studentregister/studentregister.component.html):
+  - Uncommented modern password and retype-password input controls with minlength 4 validation.
+  - Fixed `tmarks` and `mmarks` error expressions.
+  - Updated all control error bindings to use strict-null safe expressions (`e['field'].errors?.['required']`), eliminating Angular AOT template compiler errors.
 
-
-
-
+#### D. End-to-End Live Verification & CI/CD Deployment
+- Executed [`scripts/test_live_student_reg.js`](scripts/test_live_student_reg.js):
+  - Successfully dispatched live HTTPS POST request to `/dashboardapi/studentsignup`.
+  - Received `HTTP 200 {"status":200,"message":"Student registration successful"}` with `insertId: 405`.
+  - Inspected MySQL RDS `student_reg` table directly: verified `talent`, `study`, `group_branch`, `tmarks`, `totmarks`, `mmarks`, `maxmarks`, `schname`, `villagename`, and auto-default `password` were saved accurately.
+  - Cleaned up test record.
+- Pushed commits `62f2d5c` and `bc01b21` to `main`.
+- Monitored GitHub Actions:
+  - **Deploy Web App to AWS (S3 + CloudFront + Lambda Backend)**: `completed (success)`
+  - **Auto-Sync Web App to Android Mobile App**: `completed (success)`
+- Pulled sync commits into mobile app repository [`dr-mjoseph/jbac_app`](https://github.com/dr-mjoseph/jbac_app) ensuring 100% cross-platform parity.
