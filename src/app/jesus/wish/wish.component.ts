@@ -58,6 +58,7 @@ imagesData: any = [];
        image: [''],
        denomation: ['', [Validators.required]],
        number_ofmembers: [''],
+      state_id: ['1', [Validators.required]],
       district_id: ['', [Validators.required]],
       constituency_id: ['', [Validators.required]],
       mandal_id: ['', [Validators.required]],
@@ -80,6 +81,7 @@ get e() { return this.wishform.controls }
   logincon: boolean = false
   ngOnInit(): void {
     this.getdenomations();
+    this.getstates();
     this.getdistric();
     const datePipe = new DatePipe('en-Us');
     this.now = datePipe.transform(new Date(), 'yyyy-MM-dd');
@@ -132,6 +134,30 @@ onImageChange(e: any) {
       };
     }
   }
+  
+  states: any = [];
+  getstates() {
+    this.service.getstates().subscribe((res: any) => {
+      this.states = res.data;
+    });
+  }
+
+  onStateChange(event: any) {
+    const stateId = event && event.target ? event.target.value : event;
+    this.wishform.patchValue({ district_id: '', constituency_id: '', mandal_id: '', village_id: '' });
+    this.districts = [];
+    this.constituency = [];
+    this.mandals = [];
+    this.panchayati = [];
+    if (stateId) {
+      this.service.getdistrict(stateId).subscribe(res => {
+        if (res && res.status == 200) {
+          this.districts = res.data;
+        }
+      });
+    }
+  }
+
   getdistric() {
     this.showSpinner = true;
 

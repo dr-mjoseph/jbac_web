@@ -167,6 +167,21 @@ async function dynamicInsert(tableName, data) {
             }
         }
 
+                // Auto-populate state_id and state
+        if (colMap.has('state_id')) {
+            if (data.state_id !== undefined && data.state_id !== null && data.state_id !== '') {
+                data.state_id = Number(data.state_id);
+                if (colMap.has('state') && (!data.state || String(data.state).trim() === '')) {
+                    data.state = data.state_id === 2 ? 'Telangana' : 'Andhra Pradesh';
+                }
+            } else if (data.state_id === undefined || data.state_id === null || data.state_id === '') {
+                data.state_id = 1;
+                if (colMap.has('state') && (!data.state || String(data.state).trim() === '')) {
+                    data.state = 'Andhra Pradesh';
+                }
+            }
+        }
+        
         if (colMap.has('email') && (data.email === undefined || data.email === null)) {
             data.email = '';
         }
@@ -411,25 +426,35 @@ app.get(['/api/crud/:table', '/dashboardapi/crud/:table', '/crud/:table'], async
         const queryParams = [];
         let whereClause = '';
         const filters = [];
+
+        let cols: any = [];
+        try {
+            const [c]: any = await db.query(`DESCRIBE \`${table}\``);
+            cols = c || [];
+        } catch (_) {}
+
+        const colMap = new Set(cols.map((c: any) => String(c.Field || '').toLowerCase()));
+
         for (const [key, val] of Object.entries(req.query)) {
-            if (!['limit', 'offset', 'search', 'sort', 'order'].includes(key) && typeof val === 'string') {
-                filters.push(`\`${key.replace(/[^a-zA-Z0-9_]/g, '')}\` = ?`);
-                queryParams.push(val);
+            const cleanKey = key.replace(/[^a-zA-Z0-9_]/g, '');
+            if (!['limit', 'offset', 'search', 'sort', 'order'].includes(cleanKey) && typeof val === 'string' && val.trim() !== '' && val !== 'all') {
+                if (colMap.has(cleanKey.toLowerCase())) {
+                    filters.push(`\`${cleanKey}\` = ?`);
+                    queryParams.push(val);
+                }
             }
         }
         if (filters.length > 0) {
             whereClause = 'WHERE ' + filters.join(' AND ');
         }
         let orderClause = '';
-        try {
-            const [cols]: any = await db.query(`DESCRIBE \`${table}\``);
-            const hasId = cols.some((c: any) => c.Field && c.Field.toLowerCase() === 'id');
-            if (hasId) {
-                orderClause = 'ORDER BY `id` DESC';
-            } else if (cols.length > 0) {
-                orderClause = `ORDER BY \`${cols[0].Field}\` DESC`;
-            }
-        } catch (_) {}
+        const hasId = cols.some((c: any) => c.Field && c.Field.toLowerCase() === 'id');
+        if (hasId) {
+            orderClause = 'ORDER BY `id` DESC';
+        } else if (cols.length > 0) {
+            orderClause = `ORDER BY \`${cols[0].Field}\` DESC`;
+        }
+
         const sql = `SELECT * FROM \`${table}\` ${whereClause} ${orderClause} LIMIT ? OFFSET ?`;
         queryParams.push(limit, offset);
         const [rows] = await db.query(sql, queryParams);
@@ -750,11 +775,21 @@ app.post(['/dashboardapi/execute-query', '/api/execute-query', '/api/query', '/e
     }
 });
 
-// Admin Dashboard KPI Stats API
-app.get(['/dashboardapi/admin-dashboard-stats', '/api/admin-dashboard-stats', '/api/dashboard-stats'], async (_req, res) => {
+// Admin Dashboard KPI Stats API (Supports state-wise filtering: ?state_id=1 or ?state_id=2 or ?state_id=all)
+app.get(['/dashboardapi/admin-dashboard-stats', '/api/admin-dashboard-stats', '/api/dashboard-stats'], async (req, res) => {
     try {
-        async function getCount(tbl: string, where = ''): Promise<number> {
+        const stateId = req.query.state_id && req.query.state_id !== 'all' ? Number(req.query.state_id) : null;
+
+        async function getCount(tbl: string, baseWhere = ''): Promise<number> {
             try {
+                let where = baseWhere ? baseWhere.trim() : '';
+                if (stateId) {
+                    if (where) {
+                        where += ` AND (state_id = ${stateId} OR (state_id IS NULL AND ${stateId} = 1))`;
+                    } else {
+                        where = `WHERE (state_id = ${stateId} OR (state_id IS NULL AND ${stateId} = 1))`;
+                    }
+                }
                 const [r]: any = await db.query(`SELECT COUNT(*) as cnt FROM \`${tbl}\` ${where}`);
                 return r && r[0] ? Number(r[0].cnt) : 0;
             } catch (_) {
@@ -773,7 +808,7 @@ app.get(['/dashboardapi/admin-dashboard-stats', '/api/admin-dashboard-stats', '/
             events_total,
             users
         ] = await Promise.all([
-            getCount('reg_form', "WHERE status = 'Active' OR status = 1 OR status IS NULL"),
+            getCount('signup_form'),
             getCount('pastor_reg'),
             getCount('church_reg'),
             getCount('student_reg'),
@@ -787,6 +822,7 @@ app.get(['/dashboardapi/admin-dashboard-stats', '/api/admin-dashboard-stats', '/
         res.json({
             status: 200,
             success: true,
+            state_id: stateId || 'all',
             stats: {
                 believers,
                 pastors,
@@ -836,9 +872,27 @@ app.all(['/dashboardapi/educationalq', '/api/educationalq', '/educationalq'], as
     }
 });
 
-app.all(['/dashboardapi/getdistricts', '/dashboardapi/getmdistricts', '/api/districts', '/districts'], async (_req, res) => {
+// States (Andhra Pradesh = 1, Telangana = 2)
+app.all(['/dashboardapi/getstates', '/dashboardapi/getmstates', '/api/states', '/states'], async (_req, res) => {
     try {
-        const [rows] = await db.query('SELECT id, distrct_nm, distrct_nm as districtname, distrct_nm as district_name, d_in FROM dstrct WHERE d_in = 0 AND distrct_nm IS NOT NULL AND TRIM(distrct_nm) != "" ORDER BY distrct_nm ASC');
+        const [rows] = await db.query('SELECT id, state_name, state_name as name, code, d_in FROM states WHERE d_in = 0 ORDER BY id ASC');
+        res.json({ status: 200, data: rows });
+    } catch (err: any) {
+        res.status(500).json({ status: 500, error: err.message });
+    }
+});
+
+app.all(['/dashboardapi/getdistricts', '/dashboardapi/getmdistricts', '/api/districts', '/districts'], async (req, res) => {
+    try {
+        const stateId = req.query.state_id || req.body?.state_id || req.body?.stateid || req.query.stateId;
+        let sql = 'SELECT id, distrct_nm, distrct_nm as districtname, distrct_nm as district_name, state_id, d_in FROM dstrct WHERE d_in = 0 AND distrct_nm IS NOT NULL AND TRIM(distrct_nm) != ""';
+        const params: any[] = [];
+        if (stateId && stateId !== 'all') {
+            sql += ' AND state_id = ?';
+            params.push(Number(stateId));
+        }
+        sql += ' ORDER BY distrct_nm ASC';
+        const [rows] = await db.query(sql, params);
         res.json({ status: 200, data: rows });
     } catch (err: any) {
         res.status(500).json({ status: 500, error: err.message });
@@ -848,11 +902,16 @@ app.all(['/dashboardapi/getdistricts', '/dashboardapi/getmdistricts', '/api/dist
 app.all(['/dashboardapi/getconsistencys', '/dashboardapi/getmconsistencys', '/api/constituencies', '/constituencies'], async (req, res) => {
     try {
         const districtId = req.query.district_id || req.body?.district_id || req.body?.dstrct_id;
-        let sql = 'SELECT id, const_nm, const_nm as constituencyname, const_nm as name, dstrct_id, d_in FROM const_dtl_t WHERE d_in = 0 AND const_nm IS NOT NULL AND TRIM(const_nm) != ""';
-        const params = [];
+        const stateId = req.query.state_id || req.body?.state_id || req.body?.stateid || req.query.stateId;
+        let sql = 'SELECT id, const_nm, const_nm as constituencyname, const_nm as name, dstrct_id, state_id, d_in FROM const_dtl_t WHERE d_in = 0 AND const_nm IS NOT NULL AND TRIM(const_nm) != ""';
+        const params: any[] = [];
         if (districtId) {
             sql += ' AND dstrct_id = ?';
             params.push(districtId);
+        }
+        if (stateId && stateId !== 'all') {
+            sql += ' AND state_id = ?';
+            params.push(Number(stateId));
         }
         sql += ' ORDER BY const_nm ASC';
         const [rows] = await db.query(sql, params);
@@ -866,8 +925,9 @@ app.all(['/dashboardapi/getmandals', '/dashboardapi/getmmandals', '/api/mandals'
     try {
         const constId = req.query.const_id || req.body?.const_id || req.body?.constituency_id;
         const districtId = req.query.district_id || req.body?.district_id || req.body?.dstrct_id;
-        let sql = 'SELECT id, mndl_nm, mndl_nm as mandalname, mndl_nm as name, const_id, dstrct_id, d_in FROM mndls_lst_t WHERE d_in = 0 AND mndl_nm IS NOT NULL AND TRIM(mndl_nm) != ""';
-        const params = [];
+        const stateId = req.query.state_id || req.body?.state_id || req.body?.stateid || req.query.stateId;
+        let sql = 'SELECT id, mndl_nm, mndl_nm as mandalname, mndl_nm as name, const_id, dstrct_id, state_id, d_in FROM mndls_lst_t WHERE d_in = 0 AND mndl_nm IS NOT NULL AND TRIM(mndl_nm) != ""';
+        const params: any[] = [];
         if (constId) {
             sql += ' AND const_id = ?';
             params.push(constId);
@@ -875,6 +935,10 @@ app.all(['/dashboardapi/getmandals', '/dashboardapi/getmmandals', '/api/mandals'
         if (districtId) {
             sql += ' AND dstrct_id = ?';
             params.push(districtId);
+        }
+        if (stateId && stateId !== 'all') {
+            sql += ' AND state_id = ?';
+            params.push(Number(stateId));
         }
         sql += ' ORDER BY mndl_nm ASC';
         const [rows] = await db.query(sql, params);
@@ -887,11 +951,16 @@ app.all(['/dashboardapi/getmandals', '/dashboardapi/getmmandals', '/api/mandals'
 app.all(['/dashboardapi/gepanchayati', '/dashboardapi/gempanchayati', '/api/panchayats', '/panchayats'], async (req, res) => {
     try {
         const mandalId = req.query.mandal_id || req.body?.mandal_id || req.body?.mndl_id || req.query.mndl_id;
-        let sql = 'SELECT id, pnchyt_nm, pnchyt_nm as panchayatname, pnchyt_nm as name, mndl_id, d_in FROM pnchyt_lst_t WHERE d_in = 0 AND pnchyt_nm IS NOT NULL AND TRIM(pnchyt_nm) != ""';
-        const params = [];
+        const stateId = req.query.state_id || req.body?.state_id || req.body?.stateid || req.query.stateId;
+        let sql = 'SELECT id, pnchyt_nm, pnchyt_nm as panchayatname, pnchyt_nm as name, mndl_id, state_id, d_in FROM pnchyt_lst_t WHERE d_in = 0 AND pnchyt_nm IS NOT NULL AND TRIM(pnchyt_nm) != ""';
+        const params: any[] = [];
         if (mandalId) {
             sql += ' AND mndl_id = ?';
             params.push(mandalId);
+        }
+        if (stateId && stateId !== 'all') {
+            sql += ' AND state_id = ?';
+            params.push(Number(stateId));
         }
         sql += ' ORDER BY pnchyt_nm ASC';
         const [rows] = await db.query(sql, params);
@@ -963,12 +1032,18 @@ app.all(['/api/events', '/dashboardapi/getevents', '/dashboardapi/getupdateevent
         const showAll = req.query?.all === 'true' || req.body?.all === true || req.query?.admin === 'true';
         const dIn = req.query?.d_in !== undefined ? req.query.d_in : (req.body?.d_in !== undefined ? req.body.d_in : null);
 
-        let sql = 'SELECT id, eventname as title, eventname, eventname as event_name, orgname, meetsize, description, startdate, startdate as event_date, enddate, starttime, starttime as event_time, endtime, location, address, facebook, youtube, phone, eventcontactnumber, image, speaker1, speaker2, speaker3, speaker4, district_id, constituency_id, mandal_id, panchayat_id, d_in, activestatus FROM events WHERE 1=1';
+        const stateId = req.query?.state_id || req.body?.state_id;
+        let sql = 'SELECT id, eventname as title, eventname, eventname as event_name, orgname, meetsize, description, startdate, startdate as event_date, enddate, starttime, starttime as event_time, endtime, location, address, facebook, youtube, phone, eventcontactnumber, image, speaker1, speaker2, speaker3, speaker4, district_id, constituency_id, mandal_id, panchayat_id, state_id, state, d_in, activestatus FROM events WHERE 1=1';
         const params: any[] = [];
 
         if (dIn !== null && dIn !== '') {
             sql += ' AND d_in = ?';
             params.push(Number(dIn));
+        }
+
+        if (stateId && stateId !== 'all') {
+            sql += ' AND (state_id = ? OR (state_id IS NULL AND ? = 1))';
+            params.push(Number(stateId), Number(stateId));
         }
 
         if (isCurrentDateOnly) {
@@ -987,10 +1062,17 @@ app.all(['/api/events', '/dashboardapi/getevents', '/dashboardapi/getupdateevent
 });
 
 // Dedicated ribbon events endpoint (meetings with d_in = 1 and unexpired dates)
-app.all(['/dashboardapi/getribbonevents', '/api/getribbonevents'], async (_req: any, res: any) => {
+app.all(['/dashboardapi/getribbonevents', '/api/getribbonevents'], async (req: any, res: any) => {
     try {
-        const sql = 'SELECT id, eventname as title, eventname, eventname as event_name, orgname, meetsize, description, startdate, startdate as event_date, enddate, starttime, starttime as event_time, endtime, location, address, facebook, youtube, phone, eventcontactnumber, image, speaker1, speaker2, speaker3, speaker4, district_id, constituency_id, mandal_id, panchayat_id, d_in, activestatus FROM events WHERE d_in = 1 AND ((enddate IS NOT NULL AND enddate != "" AND enddate >= CURDATE()) OR ((enddate IS NULL OR enddate = "") AND (startdate IS NULL OR startdate >= CURDATE()))) ORDER BY id DESC';
-        const [rows] = await db.query(sql);
+        const stateId = req.query?.state_id || req.body?.state_id;
+        let sql = 'SELECT id, eventname as title, eventname, eventname as event_name, orgname, meetsize, description, startdate, startdate as event_date, enddate, starttime, starttime as event_time, endtime, location, address, facebook, youtube, phone, eventcontactnumber, image, speaker1, speaker2, speaker3, speaker4, district_id, constituency_id, mandal_id, panchayat_id, state_id, state, d_in, activestatus FROM events WHERE d_in = 1 AND ((enddate IS NOT NULL AND enddate != "" AND enddate >= CURDATE()) OR ((enddate IS NULL OR enddate = "") AND (startdate IS NULL OR startdate >= CURDATE())))';
+        const params: any[] = [];
+        if (stateId && stateId !== 'all') {
+            sql += ' AND (state_id = ? OR (state_id IS NULL AND ? = 1))';
+            params.push(Number(stateId), Number(stateId));
+        }
+        sql += ' ORDER BY id DESC';
+        const [rows] = await db.query(sql, params);
         res.json({ status: 200, data: rows });
     } catch (err: any) {
         res.status(500).json({ status: 500, error: err.message });
@@ -1317,6 +1399,7 @@ const searchPastorsHandler = async (req: any, res: any) => {
         
         let sql = 'SELECT id, pastorname, pastorname as name, phonenumber, phonenumber as mobile_number, description, district_id, constituency_id, mandal_id, village_id, address FROM pastor_reg WHERE d_in = 0';
         const params: any[] = [];
+        if (body.state_id) { sql += ' AND (state_id = ? OR (state_id IS NULL AND ? = 1))'; params.push(Number(body.state_id), Number(body.state_id)); }
         if (district) { sql += ' AND district_id = ?'; params.push(district); }
         if (constituency) { sql += ' AND constituency_id = ?'; params.push(constituency); }
         if (mandal) { sql += ' AND mandal_id = ?'; params.push(mandal); }
@@ -1436,6 +1519,7 @@ const searchChurchesHandler = async (req: any, res: any) => {
             LEFT JOIN church_reg cr ON ct.church_id = cr.id
             WHERE ct.d_in = 0`;
         const params: any[] = [];
+        if (body.state_id) { sql += ' AND (ct.state_id = ? OR cr.state_id = ? OR (ct.state_id IS NULL AND ? = 1))'; params.push(Number(body.state_id), Number(body.state_id), Number(body.state_id)); }
         if (district) { sql += ' AND (ct.district_id = ? OR cr.district_id = ?)'; params.push(district, district); }
         if (constituency) { sql += ' AND (ct.constituency_id = ? OR cr.constituency_id = ?)'; params.push(constituency, constituency); }
         if (mandal) { sql += ' AND (ct.mandal_id = ? OR cr.mandal_id = ?)'; params.push(mandal, mandal); }
@@ -1495,6 +1579,11 @@ app.post(['/dashboardapi/studentsignup', '/api/studentsignup'], async (req: any,
         s.cts = getIndianCts();
         s.is_first_login = 0;
 
+        const stateId = Number(s.state_id || s.stateId || (s.state === 'Telangana' || (s.state && s.state.includes('Telangana')) ? 2 : 1)) || 1;
+        const stateName = (stateId === 2 || (s.state && s.state.includes('Telangana'))) ? 'Telangana' : 'Andhra Pradesh';
+        s.state_id = stateId;
+        s.state = stateName;
+
         // Sync alias fields between frontend form and database columns
         if (s.study && !s.group_branch) s.group_branch = s.study;
         if (s.group_branch && !s.study) s.study = s.group_branch;
@@ -1519,6 +1608,8 @@ app.post(['/dashboardapi/studentsignup', '/api/studentsignup'], async (req: any,
                     name: s.studentname || 'Student',
                     number: phone,
                     email: s.email || null,
+                    state_id: stateId,
+                    state: stateName,
                     otp: 0,
                     d_in: 0
                 });
@@ -1530,9 +1621,17 @@ app.post(['/dashboardapi/studentsignup', '/api/studentsignup'], async (req: any,
     }
 });
 
-app.all(['/dashboardapi/getstudent', '/api/getstudent'], async (_req: any, res: any) => {
+app.all(['/dashboardapi/getstudent', '/api/getstudent'], async (req: any, res: any) => {
     try {
-        const [rows] = await db.query('SELECT * FROM student_reg WHERE d_in = 0 ORDER BY id DESC');
+        const stateId = req.query?.state_id || req.body?.state_id;
+        let sql = 'SELECT * FROM student_reg WHERE d_in = 0';
+        const params: any[] = [];
+        if (stateId && stateId !== 'all') {
+            sql += ' AND (state_id = ? OR (state_id IS NULL AND ? = 1))';
+            params.push(Number(stateId), Number(stateId));
+        }
+        sql += ' ORDER BY id DESC';
+        const [rows] = await db.query(sql, params);
         res.json({ status: 200, data: rows });
     } catch (err: any) {
         res.status(500).json({ status: 500, error: err.message });
@@ -1605,6 +1704,7 @@ app.all(['/dashboardapi/getorganizations', '/dashboardapi/searchorganization', '
         const body = req.body || {};
         let sql = 'SELECT * FROM independentorganisation_reg WHERE d_in = 0';
         const params: any[] = [];
+        if (body.state_id) { sql += ' AND (state_id = ? OR (state_id IS NULL AND ? = 1))'; params.push(Number(body.state_id), Number(body.state_id)); }
         
         sql += ' AND organisation_name IS NOT NULL AND TRIM(organisation_name) != ""';
 
@@ -1770,6 +1870,7 @@ app.all(['/dashboardapi/getjobs', '/dashboardapi/getjob', '/dashboardapi/searchj
         const body = req.body || {};
         let sql = 'SELECT * FROM jobs WHERE d_in = 0';
         const params: any[] = [];
+        if (body.state_id) { sql += ' AND (state_id = ? OR (state_id IS NULL AND ? = 1))'; params.push(Number(body.state_id), Number(body.state_id)); }
         if (body.colid && body.name) {
             if (body.colid == 1) { sql += ' AND (jobtitle LIKE ? OR title LIKE ?)'; params.push(`%${body.name}%`, `%${body.name}%`); }
             else if (body.colid == 2) { sql += ' AND qualification LIKE ?'; params.push(`%${body.name}%`); }
@@ -1812,6 +1913,7 @@ app.all(['/dashboardapi/searchmarriages', '/dashboardapi/Searchmarriages', '/das
         const body = req.body || {};
         let sql = 'SELECT * FROM marriages WHERE d_in = 0';
         const params: any[] = [];
+        if (body.state_id) { sql += ' AND (state_id = ? OR (state_id IS NULL AND ? = 1))'; params.push(Number(body.state_id), Number(body.state_id)); }
         
         // Handle name & columnid from marriages.component.ts:
         // columnid 1 = denomination, 2 = ministry, 3 = gender, 4 = status, 5 = caste, 6 = spiritual
@@ -1861,6 +1963,7 @@ app.all(['/dashboardapi/getbusiness', '/dashboardapi/searchingbusiness', '/api/b
         const body = req.body || {};
         let sql = 'SELECT * FROM business_table WHERE d_in = 0';
         const params: any[] = [];
+        if (body.state_id) { sql += ' AND (state_id = ? OR (state_id IS NULL AND ? = 1))'; params.push(Number(body.state_id), Number(body.state_id)); }
         if (body.district_id) { sql += ' AND district_id = ?'; params.push(body.district_id); }
         if (body.constenncy_id || body.constituency_id) { sql += ' AND constituency_id = ?'; params.push(body.constenncy_id || body.constituency_id); }
         if (body.mandal_id || body.mandals) { sql += ' AND mandal_id = ?'; params.push(body.mandal_id || body.mandals); }
@@ -1894,6 +1997,7 @@ app.all(['/dashboardapi/getinstitutes', '/dashboardapi/Searchinstitute', '/api/i
         const body = req.body || {};
         let sql = 'SELECT * FROM institutes WHERE d_in = 0';
         const params: any[] = [];
+        if (body.state_id) { sql += ' AND (state_id = ? OR (state_id IS NULL AND ? = 1))'; params.push(Number(body.state_id), Number(body.state_id)); }
         if (body.district_id) { sql += ' AND district_id = ?'; params.push(body.district_id); }
         if (body.constenncy_id || body.constituency_id) { sql += ' AND constituency_id = ?'; params.push(body.constenncy_id || body.constituency_id); }
         if (body.mandal_id || body.mandals) { sql += ' AND mandal_id = ?'; params.push(body.mandal_id || body.mandals); }
@@ -1923,6 +2027,11 @@ app.post(['/dashboardapi/postregform', '/api/postregform'], async (req: any, res
         const addr = body.address || '';
         const desc = body.description || '';
         const cts = getIndianCts();
+
+        const stateId = Number(body.state_id || body.stateId || (body.state === 'Telangana' || (body.state && body.state.includes('Telangana')) ? 2 : 1)) || 1;
+        const stateName = (stateId === 2 || (body.state && body.state.includes('Telangana'))) ? 'Telangana' : 'Andhra Pradesh';
+        body.state_id = stateId;
+        body.state = stateName;
 
         if (phone) {
             body.phonenum = phone;
@@ -1969,6 +2078,8 @@ app.post(['/dashboardapi/postregform', '/api/postregform'], async (req: any, res
                     constituency_id: constId,
                     mandal_id: mandalId,
                     panchayat_id: villageId,
+                    state_id: stateId,
+                    state: stateName,
                     address: addr,
                     description: desc,
                     password: pwd,
@@ -1992,6 +2103,8 @@ app.post(['/dashboardapi/postregform', '/api/postregform'], async (req: any, res
                     constituency_id: constId,
                     mandal_id: mandalId,
                     village_id: villageId,
+                    state_id: stateId,
+                    state: stateName,
                     address: addr,
                     description: desc,
                     password: pwd,
@@ -2013,6 +2126,8 @@ app.post(['/dashboardapi/postregform', '/api/postregform'], async (req: any, res
                     constituency_id: constId,
                     mandal_id: mandalId,
                     village_id: villageId,
+                    state_id: stateId,
+                    state: stateName,
                     address: addr,
                     description: desc,
                     password: pwd,
@@ -2033,6 +2148,8 @@ app.post(['/dashboardapi/postregform', '/api/postregform'], async (req: any, res
                     constituency_id: constId,
                     mandal_id: mandalId,
                     village_id: villageId,
+                    state_id: stateId,
+                    state: stateName,
                     address: addr,
                     description: desc,
                     password: pwd,
@@ -2056,6 +2173,8 @@ app.post(['/dashboardapi/postregform', '/api/postregform'], async (req: any, res
                     constituencyname: constId,
                     mandals: mandalId,
                     panchaiti: villageId,
+                    state_id: stateId,
+                    state: stateName,
                     address: addr,
                     description: desc,
                     password: pwd,
@@ -2075,6 +2194,8 @@ app.post(['/dashboardapi/postregform', '/api/postregform'], async (req: any, res
                     constituency_id: constId,
                     mandal_id: mandalId,
                     panchayat_id: villageId,
+                    state_id: stateId,
+                    state: stateName,
                     address: addr,
                     description: desc,
                     password: pwd,
@@ -2095,6 +2216,8 @@ app.post(['/dashboardapi/postregform', '/api/postregform'], async (req: any, res
                     constituencyname: constId,
                     mandals: mandalId,
                     panchayati: villageId,
+                    state_id: stateId,
+                    state: stateName,
                     org_address: addr,
                     description: desc,
                     password: pwd,
@@ -2113,6 +2236,8 @@ app.post(['/dashboardapi/postregform', '/api/postregform'], async (req: any, res
                     constituencyname: constId,
                     mandals: mandalId,
                     village_name: villageId,
+                    state_id: stateId,
+                    state: stateName,
                     description: desc,
                     d_in: 0
                 });
@@ -2128,6 +2253,8 @@ app.post(['/dashboardapi/postregform', '/api/postregform'], async (req: any, res
                     name: name || 'Member',
                     number: phone,
                     email: body.email || null,
+                    state_id: stateId,
+                    state: stateName,
                     otp: 0,
                     d_in: 0
                 });
@@ -2271,9 +2398,17 @@ app.post(['/dashboardapi/postattacks', '/api/postattacks'], async (req, res) => 
     }
 });
 
-app.all(['/dashboardapi/getatt', '/api/getatt'], async (_req, res) => {
+app.all(['/dashboardapi/getatt', '/api/getatt'], async (req: any, res: any) => {
     try {
-        const [rows] = await db.query('SELECT * FROM attacks WHERE d_in = 0 ORDER BY id DESC');
+        const stateId = req.query?.state_id || req.body?.state_id;
+        let sql = 'SELECT * FROM attacks WHERE d_in = 0';
+        const params: any[] = [];
+        if (stateId && stateId !== 'all') {
+            sql += ' AND (state_id = ? OR (state_id IS NULL AND ? = 1))';
+            params.push(Number(stateId), Number(stateId));
+        }
+        sql += ' ORDER BY id DESC';
+        const [rows] = await db.query(sql, params);
         res.json({ status: 200, data: rows });
     } catch (err) {
         res.status(500).json({ status: 500, error: err.message });
@@ -2584,6 +2719,13 @@ async function dynamicUpdate(tableName: string, whereClause: string, whereParams
         const [cols]: any = await db.query(`SHOW COLUMNS FROM \`${tableName}\``);
         const validColNames = new Set(cols.map((c: any) => c.Field));
 
+                if (validColNames.has('state_id') && data.state_id !== undefined && data.state_id !== null && data.state_id !== '') {
+            data.state_id = Number(data.state_id);
+            if (validColNames.has('state') && (!data.state || String(data.state).trim() === '')) {
+                data.state = data.state_id === 2 ? 'Telangana' : 'Andhra Pradesh';
+            }
+        }
+        
         const setChunks: string[] = [];
         const values: any[] = [];
         for (const [k, v] of entries) {

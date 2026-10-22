@@ -26,6 +26,7 @@ export class ChurchTimingsComponent {
   constructor(private formBuilder: FormBuilder, private service: ServiceService, private modalService: NgbModal, private router: Router) {
    
     this.searchchurchingform = this.formBuilder.group({
+      state_id: [''],
       district_id: ['', [Validators.required]],
       constenncy_id: ['', [Validators.required]],
       mandal_id: ['', [Validators.required]],
@@ -41,6 +42,7 @@ export class ChurchTimingsComponent {
       Swal.fire("Login Required")
       this.router.navigate(['/']);
     }
+    this.getstates();
     this.getdistric();
     this.churchtimings();
     this.getdenomations();
@@ -119,6 +121,40 @@ export class ChurchTimingsComponent {
   }
 
   // Backwards compatibility aliases
+  
+  states: any = [];
+  getstates() {
+    this.service.getstates().subscribe((res: any) => {
+      this.states = res.data;
+    });
+  }
+
+  onStateChange(event: any) {
+    const stateId = event && event.target ? event.target.value : event;
+    this.searchdist = '';
+    this.searchconts = '';
+    this.searchchurchingform.patchValue({ state_id: stateId, district_id: '', constenncy_id: '', mandal_id: '', panchayati_id: '' });
+    this.districts = [];
+    this.constituency = [];
+    this.mandals = [];
+    this.panchayati = [];
+    if (stateId) {
+      this.service.getdistrict(stateId).subscribe(res => {
+        if (res && res.status == 200) {
+          this.districts = res.data;
+        }
+      });
+      this.service.searchingchurchdata({ state_id: stateId }).subscribe((res: any) => {
+        if (res && res.status == 200 && Array.isArray(res.data)) {
+          this.church = res.data;
+        }
+      });
+    } else {
+      this.getdistric();
+      this.churchtimings();
+    }
+  }
+
   getconstency(event: any) { this.onDistrictChange(event); }
   getmandals(event: any) { this.onConstituencyChange(event); }
   gepanchayati(event: any) { this.onMandalChange(event); }

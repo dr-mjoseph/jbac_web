@@ -25,6 +25,7 @@ export class OrganisationregisterComponent {
   churchregsiterform: FormGroup;
   denomation: any;
   pattern: any;
+  states: any = [];
   districts: any;
   mandals: any;
   panchayati: any = (FALLBACK_DROPDOWN_DATA as any).panchayatis || [];
@@ -61,6 +62,7 @@ export class OrganisationregisterComponent {
       education: ['', [Validators.required]],
       designation: ['', [Validators.required]],
       dpartment: ['', [Validators.required]],
+      state_id: ['1', [Validators.required]],
       districts: ['', [Validators.required]],
       mandals: ['', [Validators.required]],
       panchayati: ['', [Validators.required]],
@@ -239,6 +241,7 @@ export class OrganisationregisterComponent {
       ministry_id: [''],
       password: ['', [Validators.required, Validators.minLength(6)]],
       retypepassword: ['', [Validators.required, Validators.minLength(6)]],
+      state_id: ['1', [Validators.required]],
       districts: ['', [Validators.required]],
       constituencyname: ['', [Validators.required]],
       mandals: ['', [Validators.required]],
@@ -303,7 +306,8 @@ export class OrganisationregisterComponent {
   ngOnInit(): void {
     this.getdenomations();
     this.getpatterns();
-    this.getdistric();
+    this.getstates();
+    this.getdistric(1);
     this.getbelivers();
     // this.getchurch();
     this.getbeliver();
@@ -373,8 +377,26 @@ export class OrganisationregisterComponent {
     })
   }
 
-  getdistric() {
-    this.service.getdistrict().subscribe(res => {
+  getstates() {
+    this.service.getstates().subscribe((res: any) => {
+      this.states = res.data;
+    });
+  }
+
+  onStateChange(event: any) {
+    const stateId = event && event.target ? event.target.value : event;
+    this.districts = [];
+    this.constituency = [];
+    this.mandals = [];
+    this.panchayati = [];
+    if (stateId) {
+      this.getdistric(stateId);
+    }
+  }
+
+  getdistric(stateId?: any) {
+    const sid = stateId || 1;
+    this.service.getdistrict(sid).subscribe(res => {
       this.districts = res.data;
     })
   }
@@ -660,7 +682,17 @@ export class OrganisationregisterComponent {
       });
       return;
     } else {
-      this.service.postindepedentorganisation(this.independentorgainsationform.value).subscribe({
+      const stateIdVal = Number(this.independentorgainsationform.value?.state_id) || 1;
+      const payload = {
+        ...this.independentorgainsationform.value,
+        district_id: this.independentorgainsationform.value?.districts,
+        constituency_id: this.independentorgainsationform.value?.constituencyname,
+        mandal_id: this.independentorgainsationform.value?.mandals,
+        panchayat_id: this.independentorgainsationform.value?.panchayati,
+        state_id: stateIdVal,
+        state: stateIdVal === 2 ? 'Telangana' : 'Andhra Pradesh'
+      };
+      this.service.postindepedentorganisation(payload).subscribe({
         next: (res: any) => {
           if (res.status == 451) {
             Swal.fire({

@@ -44,7 +44,7 @@
     <!-- Main Content Container -->
     <div class="container mt-3" style="padding-bottom: 28px">
         <div class="events-heading-row mb-3">
-            <h3 class="events-main-title"><b>ఆంధ్ర రాష్ట్రంలోని జరగబోయే క్రైస్తవ మీటింగ్స్</b></h3>
+            <h3 class="events-main-title"><b>ఆంధ్రప్రదేశ్ & తెలంగాణ రాష్ట్రాలలో జరగబోయే క్రైస్తవ మీటింగ్స్</b></h3>
             <button type="button" class="default-btn user-all-btn events-filter-toggle"
                 (click)="showFilters = !showFilters" [attr.aria-expanded]="showFilters">
                 <i class="fa fa-filter me-1"></i> ఫిల్టర్స్ సర్చ్
@@ -57,6 +57,16 @@
                 <div class="card p-3 shadow-sm border-0 filter-card">
                     <form [formGroup]="searchdenomation">
                         <div class="row g-3">
+                            <div class="col-lg-2 col-md-4 col-sm-6 col-12">
+                                <label class="form-label fw-bold">సెలెక్ట్ రాష్ట్రం / State</label>
+                                <select class="form-control form-select" formControlName="state_id"
+                                    (change)="onStateChange($event);">
+                                    <option value="" selected>అన్ని రాష్ట్రాలు (All States)</option>
+                                    <option value="{{item.id}}" *ngFor="let item of states">
+                                        {{item.state_name}}
+                                    </option>
+                                </select>
+                            </div>
                             <div class="col-lg-2 col-md-4 col-sm-6 col-12">
                                 <label class="form-label fw-bold">సెలెక్ట్ జిల్లా</label>
                                 <select class="form-control form-select" formControlName="district_id"
@@ -144,8 +154,17 @@
         <div class="row">
             <div class="col-12">
                 <div class="row">
+                    <!-- Loading / Fetching State -->
+                    <div class="col-12 text-center py-5" *ngIf="showSpinner">
+                        <div class="d-inline-flex flex-column align-items-center justify-content-center p-4 bg-white rounded shadow-sm border">
+                            <div class="cusloader mb-3"></div>
+                            <h5 class="fw-bold mb-1" style="color: #802f3e;">దయచేసి వేచి ఉండండి, మీటింగ్ వివరాలు లోడ్ అవుతున్నాయి...</h5>
+                            <p class="text-muted mb-0 small">Please wait, fetching meeting details...</p>
+                        </div>
+                    </div>
+
                     <!-- Empty State -->
-                    <div class="col-12 text-center py-5" *ngIf="searchevents.length === 0">
+                    <div class="col-12 text-center py-5" *ngIf="!showSpinner && searchevents.length === 0">
                         <div class="alert alert-info d-inline-block shadow-sm" style="padding: 20px 40px; border-radius: 12px; font-size: 16px;">
                             <i class="fa fa-info-circle me-2"></i>
                             <b>మీటింగ్స్ ఏవీ లేవు లేదా ఎంచుకున్న ఫిల్టర్‌కు ఫలితాలు లేవు.</b>

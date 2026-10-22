@@ -25,6 +25,7 @@ export class ChurchregisterComponent {
   churchregsiterform: FormGroup;
   denomation: any;
   pattern: any;
+  states: any = [];
   districts: any;
   mandals: any;
   panchayati: any = (FALLBACK_DROPDOWN_DATA as any).panchayatis || [];
@@ -201,6 +202,7 @@ export class ChurchregisterComponent {
       church_name: ['', [Validators.required]],
       denomination_id: ['', [Validators.required]],
       total_members: ['', [Validators.required]],
+      state_id: ['1', [Validators.required]],
       district_id: ['', [Validators.required]],
       constituency_id: ['', [Validators.required]],
       mandal_id: ['', [Validators.required]],
@@ -303,7 +305,8 @@ export class ChurchregisterComponent {
   ngOnInit(): void {
     this.getdenomations();
     this.getpatterns();
-    this.getdistric();
+    this.getstates();
+    this.getdistric(1);
     this.getbelivers();
     // this.getchurch();
     this.getbeliver();
@@ -373,8 +376,26 @@ export class ChurchregisterComponent {
     })
   }
 
-  getdistric() {
-    this.service.getdistrict().subscribe(res => {
+  getstates() {
+    this.service.getstates().subscribe((res: any) => {
+      this.states = res.data;
+    });
+  }
+
+  onStateChange(event: any) {
+    const stateId = event && event.target ? event.target.value : event;
+    this.districts = [];
+    this.constituency = [];
+    this.mandals = [];
+    this.panchayati = [];
+    if (stateId) {
+      this.getdistric(stateId);
+    }
+  }
+
+  getdistric(stateId?: any) {
+    const sid = stateId || 1;
+    this.service.getdistrict(sid).subscribe(res => {
       this.districts = res.data;
     })
   }

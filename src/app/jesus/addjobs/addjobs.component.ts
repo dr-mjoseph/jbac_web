@@ -91,6 +91,7 @@ export class AddjobsComponent {
       fromdate: ['', [Validators.required]],
       todate: ['', [Validators.required]],
       image: ['', [Validators.required]],
+      state_id: ['1', [Validators.required]],
       districtname: ['', [Validators.required]],
       constituencyname: ['', [Validators.required]],
       mandals: ['', [Validators.required]],
@@ -276,6 +277,7 @@ export class AddjobsComponent {
 
   ngOnInit(): void {
     this.getservice();
+    this.getstates();
     this.getdistric();
     this.getchurch();
     this.personaldata();
@@ -719,8 +721,32 @@ export class AddjobsComponent {
     this.showSpinner = false;
   }
 
+  
+  states: any = [];
+  getstates() {
+    this.service.getstates().subscribe((res: any) => {
+      this.states = res.data;
+    });
+  }
+
+  onStateChange(event: any) {
+    const stateId = event && event.target ? event.target.value : event;
+    this.jobsadding.patchValue({ districtname: '', constituencyname: '', mandals: '', village_name: '' });
+    this.districts = [];
+    this.constituency = [];
+    this.mandals = [];
+    this.panchayati = [];
+    if (stateId) {
+      this.service.getdistrict(stateId).subscribe(res => {
+        if (res && res.status == 200) {
+          this.districts = res.data;
+        }
+      });
+    }
+  }
+
   getdistric() {
-    this.service.getdistrict().subscribe(res => {
+    this.service.getdistrict(1).subscribe(res => {
       if (res.status == 202) {
         Swal.fire(res.message);
       } else if (res.status == 200) {

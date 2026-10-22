@@ -134,84 +134,76 @@
         </div>
     </section>
     <section class="gradient-custom">
-        <div class="container py-5 h-100">
-            <div class="row">
+        <div class="container py-4">
+            <div class="row g-4">
                 <div class="col-lg-8">
-                    <div class="row">
-                        <div class="row pt-45">
-                            <div class="col-lg-4"
-                                *ngFor="let item of searchnews | paginate: { itemsPerPage: 9, currentPage: page }">
-                                <div class="flex justify-center items-center h-screen">
-                                    <div class="main">
-                                        <ul class="cards">
-                                            <li class="cards_item">
-                                                <div class="card" tabindex="0">
-                                                    <a routerLink="/subnews/{{item.id}}">
-                                                        <img *ngIf="item.image == undefined || item.image == null || item.image == '' "
-                                                            src="../../../assets/images/no.jpg"
-                                                            style="height:263px;width:250px;">
-                                                        <img src="{{item.image}}" style="width:263px;height:250px;"
-                                                            alt="image" alt="Church Images"></a>
+                    <div class="row g-3">
+                        <div class="col-12 col-md-6 col-xl-4 d-flex align-items-stretch"
+                            *ngFor="let item of searchnews | paginate: { itemsPerPage: 9, currentPage: page }">
+                            <div class="card news-card h-100 w-100 shadow-sm border-0">
+                                <div class="news-img-wrap">
+                                    <a [routerLink]="['/subnews', item.id]">
+                                        <img [src]="item.image || 'assets/images/no.jpg'"
+                                            (error)="onImageError($event)"
+                                            class="news-thumbnail"
+                                            alt="News Image">
+                                    </a>
+                                    <span class="news-category-badge" *ngIf="item.news">{{item.news}}</span>
+                                </div>
 
-                                                    <div class="card_content">
-
-                                                        <div class="card_text">
-                                                            <!-- <p>Description :<strong> {{item.description}}</strong></p> -->
-                                                            <p>Description: <strong>
-                                                                {{ showFullDescription ? item.description : (item.description | slice:0:100) }}
-                                                                {{ item.description.length > 100 && !showFullDescription ? '...' : '' }}
-                                                            </strong></p>
-                                                            <p *ngIf="item.description.length > 100">
-                                                                <button (click)="toggleDescription()">
-                                                                    {{ showFullDescription ? 'Read Less' : 'Read More' }}
-                                                                </button>
-                                                            </p>
-                                                            &nbsp;
-                                                            <p>Type of Help :<strong> {{item.news}}</strong></p>
-                                                        </div>
-                                                    </div>
-
-                                                </div>
-                                            </li>
-                                        </ul>
+                                <div class="card-body d-flex flex-column p-3">
+                                    <p class="news-desc flex-grow-1 mb-2">
+                                        {{ item.description ? (item.description | slice:0:110) : 'సమాచారం లేదు' }}
+                                        {{ item.description && item.description.length > 110 ? '...' : '' }}
+                                    </p>
+                                    <div class="mt-auto pt-2 border-top">
+                                        <a [routerLink]="['/subnews', item.id]" class="btn btn-sm btn-outline-danger w-100">
+                                            పూర్తి వివరాలు చదవండి <i class="fa fa-arrow-right ms-1"></i>
+                                        </a>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
+                        <!-- Empty state if no news -->
+                        <div class="col-12 text-center py-5" *ngIf="!searchnews || searchnews.length === 0">
+                            <div class="alert alert-info d-inline-block shadow-sm p-4">
+                                <i class="fa fa-info-circle me-2"></i> ప్రస్తుతానికి వార్తలు ఏవీ లేవు.
+                            </div>
+                        </div>
+
+                        <!-- Pagination -->
+                        <div class="col-12 text-center mt-4" *ngIf="searchnews && searchnews.length > 9">
+                            <pagination-controls (pageChange)="page = $event" previousLabel="<" nextLabel=">">
+                            </pagination-controls>
+                        </div>
                     </div>
                 </div>
 
+                <!-- Right Sidebar Ads -->
                 <div class="col-lg-4">
-                    <marquee onmouseover="this.stop();" onmouseout="this.start();" direction="up"
-                        style="scroll-behavior: smooth;">
-                        <div class="container">
-                            <div style="border:solid green">
-                                <article>
-                                    <div class="article-wrapper">
-                                        <div class="article-body">
-                                            <h3 style="text-align:center;color: black; padding:2%;">
-                                                Welcome To JBAC.IN
-                                            </h3>
-                                        </div>
-                                    </div>
-                                </article>
+                    <div class="news-sidebar-card shadow-sm p-3">
+                        <h5 class="fw-bold text-center text-primary mb-3 border-bottom pb-2">
+                            <i class="fa fa-bullhorn me-1"></i> ప్రకటనలు / సమాచారం
+                        </h5>
+                        <marquee onmouseover="this.stop();" onmouseout="this.start();" direction="up"
+                            style="height: 550px; scroll-behavior: smooth;">
+                            <div class="sidebar-ad-card mb-3 p-3 text-center border rounded bg-white">
+                                <h5 class="fw-bold text-success mb-1">Welcome To JBAC.IN</h5>
+                                <p class="small text-muted mb-0">ఆంధ్ర & తెలంగాణ క్రైస్తవ సేవా సమాచారం</p>
                             </div>
-                            <div *ngFor="let item of adds" style="border:solid green;margin-bottom: 2%;">
-                                <article>
-                                    <div class="article-wrapper">
-                                        <div class="article-body">
-                                            <img style="height:85%;width:100%;" src="{{item.image}}"
-                                                (click)="openimg(item.image,openmodel)" alt="image" alt="images. ">
-                                            <p style="color: black; padding:2%;">
-                                                -- <b>{{item.description}}</b>
-                                            </p>
-                                        </div>
-                                    </div>
-                                </article>
+                            <div *ngFor="let item of adds" class="sidebar-ad-card mb-3 p-2 border rounded shadow-sm bg-white">
+                                <img [src]="item.image" (error)="onImageError($event)"
+                                    (click)="openimg(item.image, openmodel)"
+                                    class="img-fluid rounded mb-2 ad-img cursor-pointer"
+                                    style="width: 100%; max-height: 220px; object-fit: cover;"
+                                    alt="Advertisement">
+                                <p class="small text-dark mb-0 fw-semibold px-1">
+                                    {{item.description}}
+                                </p>
                             </div>
-                        </div>
-                    </marquee>
+                        </marquee>
+                    </div>
                 </div>
             </div>
         </div>

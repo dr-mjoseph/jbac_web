@@ -186,20 +186,60 @@ postwishform(data: any) {
   }
 
 
-  getdistrict(): Observable<any> {
-    var data = {}
-    return this.http.post<any>(this.testApi + `getdistricts`, data).pipe(
+  getstates(): Observable<any> {
+    return this.http.post<any>(this.testApi + `getstates`, {}).pipe(
       map(res => {
         if (!res || !res.data || res.data.length === 0) {
-          return { status: 200, data: FALLBACK_DROPDOWN_DATA.districts , message: "Success" } as any;
+          const fallbackStates = (FALLBACK_DROPDOWN_DATA as any).states || [
+            { id: 1, state_name: 'Andhra Pradesh-ఆంధ్రప్రదేశ్ (AP)', name: 'Andhra Pradesh-ఆంధ్రప్రదేశ్ (AP)', code: 'AP' },
+            { id: 2, state_name: 'Telangana-తెలంగాణ (TG)', name: 'Telangana-తెలంగాణ (TG)', code: 'TG' }
+          ];
+          return { status: 200, data: fallbackStates, message: "Success" } as any;
         }
         return res;
       }),
-      catchError(() => of({ status: 200, data: FALLBACK_DROPDOWN_DATA.districts , message: "Success" } as any))
+      catchError(() => {
+        const fallbackStates = (FALLBACK_DROPDOWN_DATA as any).states || [
+          { id: 1, state_name: 'Andhra Pradesh-ఆంధ్రప్రదేశ్ (AP)', name: 'Andhra Pradesh-ఆంధ్రప్రదేశ్ (AP)', code: 'AP' },
+          { id: 2, state_name: 'Telangana-తెలంగాణ (TG)', name: 'Telangana-తెలంగాణ (TG)', code: 'TG' }
+        ];
+        return of({ status: 200, data: fallbackStates, message: "Success" } as any);
+      })
     );
   }
-  getmdistrict(): Observable<any> {
-    return this.getdistrict();
+  getmstates(): Observable<any> {
+    return this.getstates();
+  }
+
+  getdistrict(stateId?: any): Observable<any> {
+    var data: any = {};
+    if (stateId !== undefined && stateId !== null && stateId !== '' && stateId !== 'all') {
+      data = typeof stateId === 'object' && stateId !== null ? stateId : { state_id: stateId };
+    }
+    return this.http.post<any>(this.testApi + `getdistricts`, data).pipe(
+      map(res => {
+        if (!res || !res.data || res.data.length === 0) {
+          let list = (FALLBACK_DROPDOWN_DATA as any).districts || [];
+          const sid = data.state_id || (typeof stateId === 'number' || typeof stateId === 'string' ? stateId : null);
+          if (sid && sid !== 'all') {
+            list = list.filter((d: any) => d.state_id == sid || (!d.state_id && sid == 1));
+          }
+          return { status: 200, data: list , message: "Success" } as any;
+        }
+        return res;
+      }),
+      catchError(() => {
+        let list = (FALLBACK_DROPDOWN_DATA as any).districts || [];
+        const sid = data.state_id || (typeof stateId === 'number' || typeof stateId === 'string' ? stateId : null);
+        if (sid && sid !== 'all') {
+          list = list.filter((d: any) => d.state_id == sid || (!d.state_id && sid == 1));
+        }
+        return of({ status: 200, data: list , message: "Success" } as any);
+      })
+    );
+  }
+  getmdistrict(stateId?: any): Observable<any> {
+    return this.getdistrict(stateId);
   }
   getmandals(constId?: any): Observable<any> {
     var data: any = {};

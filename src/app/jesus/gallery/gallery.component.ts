@@ -23,7 +23,11 @@ export class GalleryComponent {
   getimages() {
     this.service.getimages().subscribe((res: any) => {
       this.imagesget = res.data;
-    })
+    });
+  }
+
+  onImageError(event: any) {
+    event.target.src = 'assets/images/gallery.png';
   }
 
   ///////////////////mobile view///////////////

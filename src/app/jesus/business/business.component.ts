@@ -33,6 +33,7 @@ export class BusinessComponent {
   searchconts: any;
   constructor(public service: ServiceService, private modalService: NgbModal, private fromb: FormBuilder, private router: Router) {
     this.serachMeetingform = this.fromb.group({
+      state_id: [''],
       district_id: ['', [Validators.required]],
       constenncy_id: ['', [Validators.required]],
       mandal_id: ['', [Validators.required]],
@@ -56,6 +57,7 @@ export class BusinessComponent {
 
   ngOnInit(): void {
 
+    this.getstates();
     this.getdistric();
     this.searechevents();
     this.getadds();
@@ -237,6 +239,39 @@ export class BusinessComponent {
       error => {
       })
   }
+  
+  states: any = [];
+  getstates() {
+    this.service.getstates().subscribe((res: any) => {
+      this.states = res.data;
+    });
+  }
+
+  onStateChange(event: any) {
+    const stateId = event && event.target ? event.target.value : event;
+    this.searchdist = '';
+    this.searchconts = '';
+    this.serachMeetingform.patchValue({ state_id: stateId, district_id: '', constenncy_id: '', mandal_id: '', panchayati_id: '' });
+    this.districts = [];
+    this.constituency = [];
+    this.mandals = [];
+    if (stateId) {
+      this.service.getdistrict(stateId).subscribe(res => {
+        if (res && res.status == 200) {
+          this.districts = res.data;
+        }
+      });
+      this.service.searchingbusiness({ state_id: stateId }).subscribe((res: any) => {
+        if (res && res.status == 200 && Array.isArray(res.data)) {
+          this.searchevents = res.data;
+        }
+      });
+    } else {
+      this.getdistric();
+      this.searechevents();
+    }
+  }
+
   onDistrictChange(event: any) {
     const id = event && event.target ? event.target.value : event;
     this.searchdist = id;

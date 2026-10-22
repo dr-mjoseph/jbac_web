@@ -36,6 +36,7 @@ godOptions: string[] = [
   leaderlevel: any;
   educationqly: any;
   pattern: any;
+  states: any = [];
   districts: any;
   mandals: any;
   panchayati: any = (FALLBACK_DROPDOWN_DATA as any).panchayatis || [];
@@ -110,6 +111,7 @@ godOptions: string[] = [
       nativeplace: [''],
       caste: [''],
       talent: [''],
+      state_id: ['1', [Validators.required]],
       district_id: ['', [Validators.required]],
       constituency_id: ['', [Validators.required]],
       mandal_id: ['', [Validators.required]],
@@ -317,7 +319,8 @@ godOptions: string[] = [
     this.getleaderlevels();
    this.geteducational();
     this.getpatterns();
-    this.getdistric();
+    this.getstates();
+    this.getdistric(1);
     this.getbelivers();
     // this.getchurch();
     this.getbeliver();
@@ -418,10 +421,33 @@ geteducational() {
   //     this.districts = res.data;
   //   })
   // }
- getdistric() {
+ getstates() {
+    this.service.getstates().subscribe((res: any) => {
+      this.states = res?.data || [
+        { id: 1, state_name: 'Andhra Pradesh-ఆంధ్రప్రదేశ్ (AP)', name: 'Andhra Pradesh-ఆంధ్రప్రదేశ్ (AP)', code: 'AP' },
+        { id: 2, state_name: 'Telangana-తెలంగాణ (TG)', name: 'Telangana-తెలంగాణ (TG)', code: 'TG' }
+      ];
+    });
+  }
+
+  onStateChange(event: any) {
+    const stateId = event?.target?.value || event || '1';
+    this.pastorform.patchValue({
+      district_id: '',
+      constituency_id: '',
+      mandal_id: '',
+      panchayat_id: ''
+    });
+    this.constituency = [];
+    this.mandals = [];
+    this.panchayati = [];
+    this.getdistric(stateId);
+  }
+
+  getdistric(stateId?: any) {
     this.showSpinner = true;
-  
-    this.service.getdistrict().subscribe(
+    const sid = stateId || this.pastorform.get('state_id')?.value || 1;
+    this.service.getdistrict(sid).subscribe(
       (res: any) => {
         if (res && res.data) {
           this.districts = res.data;
@@ -895,7 +921,10 @@ geteducational() {
     } else {
       this.showSpinner = true;
       const formVal = this.pastorform.value;
+      const stateIdVal = Number(formVal.state_id) || 1;
       const payload = {
+        state_id: stateIdVal,
+        state: stateIdVal === 2 ? 'Telangana' : 'Andhra Pradesh',
         ...formVal,
         village_id: formVal.panchayat_id || formVal.village_id,
         leadership: formVal.leaders || formVal.leadership,

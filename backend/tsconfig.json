@@ -2,14 +2,15 @@
   "compilerOptions": {
     "module": "commonjs",
     "target": "es2020",
-    "moduleResolution": "node",
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "sourceMap": false,
     "strict": false,
     "noImplicitAny": false,
     "skipLibCheck": true,
-    "outDir": "./"
+    "noEmitOnError": false,
+    "typeRoots": [],
+    "outDir": "./dist"
   },
   "include": ["server.ts"]
 }

@@ -43,6 +43,7 @@ export class SignupComponent {
   constructor(private formBuilder: FormBuilder, private service: ServiceService, private router: Router, private modalService: NgbModal,
     private route: ActivatedRoute) {
     this.beliverform = this.formBuilder.group({
+      state_id: ['1', [Validators.required]],
       fname: ['', [Validators.required]],
       whatsapp: [''],
       // testwhatsapp: [''],
@@ -88,6 +89,7 @@ export class SignupComponent {
     })
 
     this.studentform = this.formBuilder.group({
+      state_id: ['1', [Validators.required]],
       studentname: ['', [Validators.required]],
       number: ['', [Validators.required, Validators.maxLength(10)]],
       study: ['', [Validators.required]],
@@ -134,6 +136,7 @@ export class SignupComponent {
     })
 
     this.ministryform = this.formBuilder.group({
+      state_id: ['1', [Validators.required]],
       firstname: ['', [Validators.required]],
       denomation: ['', [Validators.required]],
       // pattern: ['', [Validators.required]],
@@ -157,6 +160,7 @@ export class SignupComponent {
     })
 
     this.pastorform = this.formBuilder.group({
+      state_id: ['1', [Validators.required]],
       pastorname: ['', [Validators.required]],
       dob: [''],
       about_desp: [''],
@@ -196,6 +200,7 @@ export class SignupComponent {
     })
 
     this.churchregsiterform = this.formBuilder.group({
+      state_id: ['1', [Validators.required]],
       church_name: ['', [Validators.required]],
       denomination_id: ['', [Validators.required]],
       total_members: ['', [Validators.required]],
@@ -221,6 +226,7 @@ export class SignupComponent {
     })
 
     this.independentorgainsationform = this.formBuilder.group({
+      state_id: ['1', [Validators.required]],
 
       organisation_name: ['', [Validators.required]],
       checkbox: [''],
@@ -247,6 +253,7 @@ export class SignupComponent {
     })
 
     this.independentchurchform = this.formBuilder.group({
+      state_id: ['1', [Validators.required]],
       churchname: ['', [Validators.required]],
       denomination_id: ['', [Validators.required]],
       pattern_id: ['', [Validators.required]],
@@ -265,6 +272,7 @@ export class SignupComponent {
       retypepassword: ['', [Validators.required, Validators.minLength(6)]],
     })
     this.pastorsassociations = this.formBuilder.group({
+      state_id: ['1', [Validators.required]],
       pa_name: ['', [Validators.required]],
       pastor_id: ['', [Validators.required]],
       level: [''],
@@ -301,6 +309,7 @@ export class SignupComponent {
   ngOnInit(): void {
     this.getdenomations();
     this.getpatterns();
+    this.getstates();
     this.getdistric();
     this.getbelivers();
     // this.getchurch();
@@ -371,8 +380,29 @@ export class SignupComponent {
     })
   }
 
+  
+  states: any = [];
+  getstates() {
+    this.service.getstates().subscribe((res: any) => {
+      this.states = res.data;
+    });
+  }
+
+  onStateChange(event: any) {
+    const stateId = event && event.target ? event.target.value : event;
+    this.districts = [];
+    this.constituency = [];
+    this.mandals = [];
+    this.panchayati = [];
+    if (stateId) {
+      this.service.getdistrict(stateId).subscribe((res: any) => {
+        this.districts = res.data;
+      });
+    }
+  }
+
   getdistric() {
-    this.service.getdistrict().subscribe(res => {
+    this.service.getdistrict(1).subscribe(res => {
       this.districts = res.data;
     })
   }

@@ -130,7 +130,18 @@
                         </div>
 
                         <div class="row mt-2">
-                            <div class="col-md-2 mb-3">
+                                                        <div class="col-md-2 mb-3">
+                                <div class="form-outline">
+                                    <label class="form-label" style="font-weight: 600; font-size: 13px;">రాష్ట్రం / State</label>
+                                    <select class="form-control" formControlName="state_id" (change)="onStateChange($event);"
+                                        style="height:38px; width: 100%;">
+                                        <option value="">All States</option>
+                                        <option value="1">ఆంధ్రప్రదేశ్ (AP)</option>
+                                        <option value="2">తెలంగాణ (TG)</option>
+                                    </select>
+                                </div>
+                            </div>
+<div class="col-md-2 mb-3">
                                 <div class="form-outline">
                                     <label class="form-label" style="font-weight: 600; font-size: 13px;">Districts / జిల్లా</label>
                                     <select class="form-control" formControlName="district_id"

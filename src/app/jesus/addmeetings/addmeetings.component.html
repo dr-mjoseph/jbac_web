@@ -305,7 +305,21 @@
                                         <div class="row">
                                             <div class="col-md-6 mb-4 pb-2">
                                                 <div class="form-outline">
-                                                    <label class="form-label">1). సెలెక్ట్ జిల్లా <span
+                                                    <label class="form-label">1). సెలెక్ట్ రాష్ట్రం / State <span
+                                                            style="color:red; -webkit-text-stroke-width:thick;">*</span></label>
+                                                    <select class="form-control" formControlName="state_id"
+                                                        (change)="onStateChange($event);"
+                                                        style="height:37px;width: 273px;">
+                                                        <option value="" selected disabled>సెలెక్ట్ రాష్ట్రం</option>
+                                                        <option value="{{item.id}}" *ngFor="let item of states">
+                                                            {{item.state_name}}
+                                                        </option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6 mb-4 pb-2">
+                                                <div class="form-outline">
+                                                    <label class="form-label">2). సెలెక్ట్ జిల్లా <span
                                                             style="color:red; -webkit-text-stroke-width:thick;">*</span></label>
                                                     <select class="form-control" formControlName="districtname"
                                                         (change)="getconstency($event);"

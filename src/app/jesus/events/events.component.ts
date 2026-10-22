@@ -25,6 +25,10 @@ export class EventsComponent {
   mandals: any = [];
   constituency: any = [];
   districts: any = [];
+  states: any = [
+    { id: 1, state_name: 'ఆంధ్రప్రదేశ్ (Andhra Pradesh)' },
+    { id: 2, state_name: 'తెలంగాణ (Telangana)' }
+  ];
   searchevents: any = [];
   allEvents: any[] = [];
   todayEventsCount: number = 0;
@@ -39,12 +43,14 @@ export class EventsComponent {
   ministry_id: any;
   pastors: any;
   showFilters = false;
+  searchstate: any = '';
   searchdist: any;
   searchconts: any;
   searchdeno: any;
   constructor(public service: ServiceService, private modalService: NgbModal, private fromb: FormBuilder, private router: Router) {
 
     this.searchdenomation = this.fromb.group({
+      state_id: [''],
       mettingtype: [''],
       denomation_id: [''],
       speakerone: [''],
@@ -60,6 +66,7 @@ export class EventsComponent {
   ngOnInit(): void {
     const datePipe = new DatePipe('en-US');
     this.now = datePipe.transform(new Date(), 'yyyy-MM-dd') || this.now;
+    this.getstates();
     this.getpastors();
     this.getyouth();
     this.getrevival();
@@ -75,8 +82,16 @@ export class EventsComponent {
   }
   get h() { return this.searchdenomation.controls; }
 
-  getdistric() {
-    this.service.getdistrict().subscribe(res => {
+  getstates() {
+    this.service.getstates().subscribe((res: any) => {
+      if (res && res.data && res.data.length > 0) {
+        this.states = res.data;
+      }
+    });
+  }
+
+  getdistric(stateId?: any) {
+    this.service.getdistrict(stateId).subscribe(res => {
       if (res.status == 202) {
         Swal.fire(res.message);
       } else if (res.status == 200) {
@@ -84,7 +99,7 @@ export class EventsComponent {
       }
     }, error => {
       console.log(error);
-    })
+    });
   }
   getpastors() {
     this.service.getpastor().subscribe(res => {
@@ -407,6 +422,26 @@ export class EventsComponent {
   panchayati: any = [];
 
   // Unified cascading dropdown handlers
+  onStateChange(event: any) {
+    const id = event && event.target ? event.target.value : event;
+    this.searchstate = id;
+    this.searchdenomation.patchValue({
+      state_id: id,
+      district_id: '',
+      constenncy_id: '',
+      mandal_id: '',
+      panchayati_id: ''
+    });
+    this.searchdist = '';
+    this.searchconts = '';
+    this.districts = [];
+    this.constituency = [];
+    this.mandals = [];
+    this.panchayati = [];
+    this.getdistric(id);
+    this.applyCombinedFilter();
+  }
+
   onDistrictChange(event: any) {
     const id = event && event.target ? event.target.value : event;
     this.searchdist = id;
@@ -509,6 +544,7 @@ export class EventsComponent {
   applyCombinedFilter() {
     const formVals = this.searchdenomation.value || {};
     const queryPayload: any = {
+      state_id: formVals.state_id || this.searchstate || '',
       district_id: formVals.district_id || this.searchdist || '',
       constituency_id: formVals.constenncy_id || this.searchconts || '',
       constenncy_id: formVals.constenncy_id || this.searchconts || '',
@@ -547,6 +583,9 @@ export class EventsComponent {
 
   applyClientSideFilter(payload: any) {
     let filtered = this.allEvents.filter(item => !this.isOldMeeting(item));
+    if (payload.state_id) {
+      filtered = filtered.filter(item => item.state_id == payload.state_id || (!item.state_id && payload.state_id == 1));
+    }
     if (payload.district_id) {
       filtered = filtered.filter(item => item.district_id == payload.district_id || item.distrct_id == payload.district_id);
     }
@@ -610,6 +649,7 @@ export class EventsComponent {
 
   reset() {
     this.searchdenomation.reset({
+      state_id: '',
       mettingtype: '',
       denomation_id: '',
       speakerone: '',
@@ -620,6 +660,7 @@ export class EventsComponent {
       mandal_id: '',
       panchayati_id: ''
     });
+    this.searchstate = '';
     this.mettingtype = '';
     this.searchdeno = '';
     this.speaks = '';
@@ -627,6 +668,7 @@ export class EventsComponent {
     this.startdate = '';
     this.searchdist = '';
     this.searchconts = '';
+    this.getdistric();
     this.constituency = [];
     this.mandals = [];
     this.panchayati = [];

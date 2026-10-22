@@ -27,6 +27,7 @@ export class ChurchPastorSearchComponent {
   search: FormGroup;
   constructor(private formBuilder: FormBuilder, private service: ServiceService, private router: Router) {
     this.search = this.formBuilder.group({
+      state_id: [''],
       district_id: ['', [Validators.required]],
       constituency_id: [''],
       mandal_id: [''],
@@ -38,6 +39,7 @@ export class ChurchPastorSearchComponent {
 
   }
   ngOnInit(): void {
+    this.getstates();
     this.getdistric();
     this.defaultdata();
   }
@@ -91,6 +93,31 @@ export class ChurchPastorSearchComponent {
         console.error(err);
       }
     });
+  }
+
+  
+  states: any = [];
+  getstates() {
+    this.service.getstates().subscribe((res: any) => {
+      this.states = res.data;
+    });
+  }
+
+  onStateChange(event: any) {
+    const stateId = event && event.target ? event.target.value : event;
+    this.search.patchValue({ state_id: stateId, district_id: '', constituency_id: '', mandal_id: '' });
+    this.districts = [];
+    this.constituency = [];
+    this.mandals = [];
+    if (stateId) {
+      this.service.getdistrict(stateId).subscribe(res => {
+        if (res && res.status == 200) {
+          this.districts = res.data;
+        }
+      });
+    } else {
+      this.getdistric();
+    }
   }
 
   getdistric() {

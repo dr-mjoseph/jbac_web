@@ -41,12 +41,14 @@ export class OrganizationComponent {
       denomation_id: [''],
       ministry_id: [''],
       service_name: [''],
+      state_id: [''],
       district_id: [''],
       constenncy_id: [''],
       mandal_id: [''],
       panchayati_id: [''],
     })
 
+    this.getstates();
     this.getdistric();
     this.defaultdata();
     this.getadds();
@@ -284,6 +286,36 @@ export class OrganizationComponent {
   constenncy_id: any;
   mandal_id: any;
   panchayati_id: any;
+
+  
+  states: any = [];
+  getstates() {
+    this.service.getstates().subscribe((res: any) => {
+      this.states = res.data;
+    });
+  }
+
+  onStateChange(event: any) {
+    const stateId = event && event.target ? event.target.value : event;
+    this.searchdist = '';
+    this.searchconts = '';
+    this.searchmand = '';
+    this.serachMeetingform.patchValue({ state_id: stateId, district_id: '', constenncy_id: '', mandal_id: '', panchayati_id: '' });
+    this.districts = [];
+    this.constituency = [];
+    this.mandals = [];
+    this.panchayati = [];
+    if (stateId) {
+      this.service.getdistrict(stateId).subscribe(res => {
+        if (res && res.status == 200) {
+          this.districts = res.data;
+        }
+      });
+    } else {
+      this.getdistric();
+    }
+    this.search();
+  }
 
   onDistrictChange(event: any) {
     const id = event && event.target ? event.target.value : event;

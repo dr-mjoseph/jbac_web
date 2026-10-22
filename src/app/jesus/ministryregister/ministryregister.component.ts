@@ -19,6 +19,7 @@ export class MinistryregisterComponent {
   ministryform: FormGroup;
   denomation: any;
   pattern: any;
+  states: any = [];
   districts: any;
   mandals: any;
   panchayati: any;
@@ -44,6 +45,7 @@ export class MinistryregisterComponent {
       headnmber: ['', [Validators.required, Validators.maxLength(10)]],
       number_ofchurches: ['', [Validators.required]],
       number_ofmembers: ['', [Validators.required]],
+      state_id: ['1', [Validators.required]],
       district_id: ['', [Validators.required]],
       constituency_id: ['', [Validators.required]],
       mandal_id: ['', [Validators.required]],
@@ -65,7 +67,8 @@ export class MinistryregisterComponent {
   logincon: boolean = false
   ngOnInit(): void {
     this.getdenomations();
-    this.getdistric();
+    this.getstates();
+    this.getdistric(1);
     const datePipe = new DatePipe('en-Us');
     this.now = datePipe.transform(new Date(), 'yyyy-MM-dd');
     this.usr_id = sessionStorage.getItem('usr_id');
@@ -85,8 +88,32 @@ export class MinistryregisterComponent {
   }
 
 
-  getdistric() {
-    this.service.getdistrict().subscribe(res => {
+  getstates() {
+    this.service.getstates().subscribe((res: any) => {
+      this.states = res?.data || [
+        { id: 1, state_name: 'Andhra Pradesh-ఆంధ్రప్రదేశ్ (AP)', name: 'Andhra Pradesh-ఆంధ్రప్రదేశ్ (AP)', code: 'AP' },
+        { id: 2, state_name: 'Telangana-తెలంగాణ (TG)', name: 'Telangana-తెలంగాణ (TG)', code: 'TG' }
+      ];
+    });
+  }
+
+  onStateChange(event: any) {
+    const stateId = event?.target?.value || event || '1';
+    this.ministryform.patchValue({
+      district_id: '',
+      constituency_id: '',
+      mandal_id: '',
+      panchayat_id: ''
+    });
+    this.constituency = [];
+    this.mandals = [];
+    this.panchayati = [];
+    this.getdistric(stateId);
+  }
+
+  getdistric(stateId?: any) {
+    const sid = stateId || this.ministryform.get('state_id')?.value || 1;
+    this.service.getdistrict(sid).subscribe(res => {
       this.districts = res.data;
     })
   }

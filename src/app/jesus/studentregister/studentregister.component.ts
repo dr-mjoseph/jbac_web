@@ -20,6 +20,10 @@ export class StudentregisterComponent {
 
   denomation: any;
   pattern: any;
+  states: any = [
+    { id: 1, state_name: 'Andhra Pradesh-ఆంధ్రప్రదేశ్ (AP)', name: 'Andhra Pradesh-ఆంధ్రప్రదేశ్ (AP)', code: 'AP' },
+    { id: 2, state_name: 'Telangana-తెలంగాణ (TG)', name: 'Telangana-తెలంగాణ (TG)', code: 'TG' }
+  ];
   districts: any;
   mandals: any;
   mandals1: any;
@@ -55,6 +59,7 @@ export class StudentregisterComponent {
       passexam: [''],
       tmarks: ['', [Validators.required]],
       mmarks: ['', [Validators.required]],
+      state_id: ['1'],
       district_id: [''],
       constituency_id: [''],
       mandal_id: [''],
@@ -77,6 +82,7 @@ export class StudentregisterComponent {
       respanchayati: ['', [Validators.required]],
       resmandals: ['', [Validators.required]],
       resconstituencyname: ['', [Validators.required]],
+      res_state_id: ['1'],
       resdistricts: ['', [Validators.required]],
       god: [''],
       term: [true],
@@ -95,7 +101,8 @@ export class StudentregisterComponent {
   logincon: boolean = false
   ngOnInit(): void {
     this.getdenomations();
-    this.getdistric();
+    this.getstates();
+    this.getdistric(1);
     this.getwing();
     this.getpastor();
     this.getchurch();
@@ -158,10 +165,46 @@ export class StudentregisterComponent {
 
 
   // }
-  getdistric() {
-    this.showSpinner = true;
+  getstates() {
+    this.service.getstates().subscribe((res: any) => {
+      if (res && res.data) {
+        this.states = res.data;
+      }
+    });
+  }
 
-    this.service.getdistrict().subscribe(
+  onStateChange(event: any) {
+    const stateId = event?.target?.value || '1';
+    this.studentform.patchValue({
+      district_id: '',
+      constituency_id: '',
+      mandal_id: '',
+      village_id: ''
+    });
+    this.constituency = [];
+    this.mandals = [];
+    this.panchayati = [];
+    this.getdistric(stateId);
+  }
+
+  onResStateChange(event: any) {
+    const stateId = event?.target?.value || '1';
+    this.studentform.patchValue({
+      resdistricts: '',
+      resconstituencyname: '',
+      resmandals: '',
+      respanchayati: ''
+    });
+    this.constituency1 = [];
+    this.mandals1 = [];
+    this.panchayati1 = [];
+    this.getdistric(stateId);
+  }
+
+  getdistric(stateId?: any) {
+    this.showSpinner = true;
+    const sid = stateId || this.studentform.get('state_id')?.value || 1;
+    this.service.getdistrict(sid).subscribe(
       (res: any) => {
         if (res && res.data) {
           this.districts = res.data;
@@ -640,7 +683,11 @@ export class StudentregisterComponent {
     }
 
     // Sync alias fields so both old and new schema columns are populated
+    const stateIdVal = Number(this.studentform.value?.state_id) || 1;
+    const stateNameVal = stateIdVal === 2 ? 'Telangana' : 'Andhra Pradesh';
     const payload = {
+      state_id: stateIdVal,
+      state: stateNameVal,
       ...this.studentform.value,
       group_branch: this.studentform.value.study || '',
       totmarks: this.studentform.value.tmarks || '',

@@ -34,6 +34,10 @@ export class AddmeetingsComponent {
   constituency: any;
   mandals: any;
   districts: any;
+  states: any = [
+    { id: 1, state_name: 'ఆంధ్రప్రదేశ్ (Andhra Pradesh)' },
+    { id: 2, state_name: 'తెలంగాణ (Telangana)' }
+  ];
   panchayati: any;
   usr_id: any;
   name: any;
@@ -96,6 +100,7 @@ export class AddmeetingsComponent {
     })
     
     this.addingmeetings = this.formBuilder.group({
+      state_id: ['1', [Validators.required]],
       mettingtype: ['', [Validators.required]],
       speakerone: [''],
       // pastor_id:[''],
@@ -295,6 +300,7 @@ export class AddmeetingsComponent {
 
 
   ngOnInit(): void {
+    this.getstates();
     this.getservice();
     this.getdistric();
     this.getchurch();
@@ -761,6 +767,8 @@ getbelivers() {
         evntphone: this.addingmeetings.value.evntphone,
         fromdate: this.addingmeetings.value.fromdate,
         todate: this.addingmeetings.value.todate,
+        state_id: this.addingmeetings.value.state_id || 1,
+        state: (this.addingmeetings.value.state_id == 2 ? 'Telangana' : 'Andhra Pradesh'),
         districtname: this.addingmeetings.value.districtname,
         description: this.addingmeetings.value.description,
         constituencyname: this.addingmeetings.value.constituencyname,
@@ -999,17 +1007,37 @@ console.log(data);
     this.showSpinner = false;
   }
 
-  getdistric() {
-    this.service.getdistrict().subscribe(res => {
+  getstates() {
+    this.service.getstates().subscribe((res: any) => {
+      if (res && res.data && res.data.length > 0) {
+        this.states = res.data;
+      }
+    });
+  }
+
+  onStateChange(event: any) {
+    const stateId = event && event.target ? event.target.value : event || '1';
+    this.addingmeetings.patchValue({
+      districtname: '',
+      constituencyname: '',
+      mandals: '',
+      village_name: ''
+    });
+    this.constituency = [];
+    this.mandals = [];
+    this.panchayati = [];
+    this.getdistric(stateId);
+  }
+
+  getdistric(stateId?: any) {
+    this.service.getdistrict(stateId).subscribe(res => {
       if (res.status == 202) {
         Swal.fire(res.message);
       } else if (res.status == 200) {
         this.districts = res.data;
       }
     }, error => {
-    })
-
-
+    });
   }
   getmandals(event: any) {
     this.showSpinner = true;

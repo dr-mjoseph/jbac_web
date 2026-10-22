@@ -30,6 +30,7 @@ export class InstituteComponent {
   ngOnInit(): void {
 
     this.serachMeetingform = this.fromb.group({
+      state_id: [''],
       district_id: [''],
       constenncy_id: [''],
       mandal_id: [''],
@@ -47,6 +48,7 @@ export class InstituteComponent {
     }
 
 
+    this.getstates();
     this.getdistric();
     // this.defaultdata();
     this.getdenomations();
@@ -104,6 +106,41 @@ export class InstituteComponent {
     }, error => {
       console.log(error);
     })
+  }
+
+  
+  states: any = [];
+  getstates() {
+    this.service.getstates().subscribe((res: any) => {
+      this.states = res.data;
+    });
+  }
+
+  onStateChange(event: any) {
+    const stateId = event && event.target ? event.target.value : event;
+    this.searchdist = '';
+    this.searchconts = '';
+    this.searchmand = '';
+    this.serachMeetingform.patchValue({ state_id: stateId, district_id: '', constenncy_id: '', mandal_id: '', panchayati_id: '' });
+    this.districts = [];
+    this.constituency = [];
+    this.mandals = [];
+    this.panchayati = [];
+    if (stateId) {
+      this.service.getdistrict(stateId).subscribe(res => {
+        if (res && res.status == 200) {
+          this.districts = res.data;
+        }
+      });
+      this.service.Searchinstitute({ state_id: stateId }).subscribe((res: any) => {
+        if (res && res.status == 200 && Array.isArray(res.data)) {
+          this.institutedata = res.data.map((item: any) => ({ ...item, showMore: false }));
+        }
+      });
+    } else {
+      this.getdistric();
+      this.getinstitutes();
+    }
   }
 
   onDistrictChange(event: any) {

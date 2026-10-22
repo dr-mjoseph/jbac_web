@@ -59,6 +59,8 @@ export class DoctorregisterComponent implements OnInit {
       available_days: ['Monday to Saturday', [Validators.required]],
       available_time_start: ['10:00 AM', [Validators.required]],
       available_time_end: ['05:00 PM', [Validators.required]],
+      state_id: ['1', [Validators.required]],
+      state: ['Andhra Pradesh'],
       location: ['Vijayawada & Online Consultation', [Validators.required]],
       address: ['', [Validators.required]],
       bio: ['', [Validators.required, Validators.minLength(20)]],

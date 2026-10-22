@@ -34,6 +34,10 @@ export class AddattacksComponent {
   constituency: any;
   mandals: any;
   districts: any;
+  states: any = [
+    { id: 1, state_name: 'ఆంధ్రప్రదేశ్ (Andhra Pradesh)' },
+    { id: 2, state_name: 'తెలంగాణ (Telangana)' }
+  ];
   panchayati: any;
   usr_id: any;
   name: any;
@@ -219,6 +223,7 @@ export class AddattacksComponent {
     })
 
     this.attacksform = this.formBuilder.group({
+      state_id: ['1', [Validators.required]],
       image: [''],
       videoa: [''],
       videob: [''],
@@ -278,6 +283,7 @@ export class AddattacksComponent {
 
 
   ngOnInit(): void {
+    this.getstates();
     this.getservice();
     this.getdistric();
     this.getchurch();
@@ -682,17 +688,37 @@ export class AddattacksComponent {
     this.showSpinner = false;
   }
 
-  getdistric() {
-    this.service.getdistrict().subscribe(res => {
+  getstates() {
+    this.service.getstates().subscribe((res: any) => {
+      if (res && res.data && res.data.length > 0) {
+        this.states = res.data;
+      }
+    });
+  }
+
+  onStateChange(event: any) {
+    const stateId = event && event.target ? event.target.value : event || '1';
+    this.attacksform.patchValue({
+      district_id: '',
+      constituency_id: '',
+      mandal_id: '',
+      village_id: ''
+    });
+    this.constituency = [];
+    this.mandals = [];
+    this.panchayati = [];
+    this.getdistric(stateId);
+  }
+
+  getdistric(stateId?: any) {
+    this.service.getdistrict(stateId).subscribe(res => {
       if (res.status == 202) {
         Swal.fire(res.message);
       } else if (res.status == 200) {
         this.districts = res.data;
       }
     }, error => {
-    })
-
-
+    });
   }
   getmandals(event: any) {
     var id = event.target.value;
@@ -875,12 +901,12 @@ export class AddattacksComponent {
       this.attacksform.value.videoa = this.url;
       this.attacksform.value.videob = this.urlb;
       this.attacksform.value.document = this.documentarray;
-      this.attacksform.value.audio = this.urlaudio
-      // this.attacksform.value.usr_id = sessionStorage.getItem('usr_id')
-      // this.attacksform.value.username = sessionStorage.getItem('name')
-      // this.attacksform.value.usernumber = sessionStorage.getItem('mobile_number')
+      this.attacksform.value.audio = this.urlaudio;
+      const sId = Number(this.attacksform.value.state_id) || 1;
+      this.attacksform.value.state = sId === 2 ? 'Telangana' : 'Andhra Pradesh';
+      this.attacksform.value.state_id = sId;
 
-      console.log( this.attacksform.value);
+      console.log(this.attacksform.value);
 
       
       this.service.postattacks(this.attacksform.value).subscribe((res: any) => {

@@ -22,6 +22,10 @@ export class NewsComponent {
   toggleDescription() {
     this.showFullDescription = !this.showFullDescription;
   }
+
+  onImageError(event: any) {
+    event.target.src = 'assets/images/no.jpg';
+  }
   constructor(private formBuilder: FormBuilder, private service: ServiceService, private modalService: NgbModal , private router: Router) {
 
     this.addingnews = this.formBuilder.group({

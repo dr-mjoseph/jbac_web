@@ -75,6 +75,7 @@ export class AddinstituteComponent {
       time_end: ['', [Validators.required]],
       description: ['', [Validators.required]],
       church: ['', [Validators.required]],
+      state_id: ['1', [Validators.required]],
       district_id: ['', [Validators.required]],
       constituency_id: ['', [Validators.required]],
       // mandal_id: ['', [Validators.required]],
@@ -277,6 +278,7 @@ export class AddinstituteComponent {
 
   ngOnInit(): void {
     this.getservice();
+    this.getstates();
     this.getdistric();
     this.getchurch();
     this.personaldata();
@@ -680,8 +682,32 @@ export class AddinstituteComponent {
     this.showSpinner = false;
   }
 
+  
+  states: any = [];
+  getstates() {
+    this.service.getstates().subscribe((res: any) => {
+      this.states = res.data;
+    });
+  }
+
+  onStateChange(event: any) {
+    const stateId = event && event.target ? event.target.value : event;
+    this.addinginsututies.patchValue({ district_id: '', constituency_id: '', mandal_id: '', village_name: '' });
+    this.districts = [];
+    this.constituency = [];
+    this.mandals = [];
+    this.panchayati = [];
+    if (stateId) {
+      this.service.getdistrict(stateId).subscribe(res => {
+        if (res && res.status == 200) {
+          this.districts = res.data;
+        }
+      });
+    }
+  }
+
   getdistric() {
-    this.service.getdistrict().subscribe(res => {
+    this.service.getdistrict(1).subscribe(res => {
       if (res.status == 202) {
         Swal.fire(res.message);
       } else if (res.status == 200) {

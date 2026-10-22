@@ -19,6 +19,7 @@ export class BelieverregisterComponent {
   beliverform: FormGroup;
   denomation: any;
   pattern: any;
+  states: any = [];
   districts: any;
   mandals: any;
   panchayati: any;
@@ -51,6 +52,7 @@ export class BelieverregisterComponent {
       education: ['', [Validators.required]],
       designation: ['', [Validators.required]],
       dpartment: ['', [Validators.required]],
+      state_id: ['1', [Validators.required]],
       districts: ['', [Validators.required]],
       mandals: ['', [Validators.required]],
       panchayati: ['', [Validators.required]],
@@ -85,7 +87,8 @@ export class BelieverregisterComponent {
   constituencyname: any;
   logincon: boolean = false
   ngOnInit(): void {
-    this.getdistric();
+    this.getstates();
+    this.getdistric(1);
     this.getdenomations();
     this.getwing();
     const datePipe = new DatePipe('en-Us');
@@ -115,10 +118,34 @@ export class BelieverregisterComponent {
     this.subward = false;
     this.father = false;
   }
-  getdistric() {
-    this.service.getdistrict().subscribe(res => {
+  getstates() {
+    this.service.getstates().subscribe((res: any) => {
+      this.states = res?.data || [
+        { id: 1, state_name: 'Andhra Pradesh-ఆంధ్రప్రదేశ్ (AP)', name: 'Andhra Pradesh-ఆంధ్రప్రదేశ్ (AP)', code: 'AP' },
+        { id: 2, state_name: 'Telangana-తెలంగాణ (TG)', name: 'Telangana-తెలంగాణ (TG)', code: 'TG' }
+      ];
+    });
+  }
+
+  onStateChange(event: any) {
+    const stateId = event?.target?.value || event || '1';
+    this.beliverform.patchValue({
+      districts: '',
+      constituencyname: '',
+      mandals: '',
+      panchayati: ''
+    });
+    this.constituency = [];
+    this.mandals = [];
+    this.panchayati = [];
+    this.getdistric(stateId);
+  }
+
+  getdistric(stateId?: any) {
+    const sid = stateId || this.beliverform.get('state_id')?.value || 1;
+    this.service.getdistrict(sid).subscribe(res => {
       this.districts = res.data;
-    })
+    });
   }
 
   getmandals(event: any) {
@@ -192,7 +219,10 @@ export class BelieverregisterComponent {
       Swal.fire("Passwords are Unmatched")
     } else {
       const val = this.beliverform.value;
+      const stateIdVal = Number(val.state_id) || 1;
       const payload = {
+        state_id: stateIdVal,
+        state: stateIdVal === 2 ? 'Telangana' : 'Andhra Pradesh',
         ...val,
         district_id: val.districts || val.district_id,
         constituency_id: val.constituencyname || val.constituency_id,

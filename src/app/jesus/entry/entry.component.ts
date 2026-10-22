@@ -34,6 +34,7 @@ export class EntryComponent {
 
   denomation: any;
   pattern: any;
+  states: any = [];
   districts: any;
   mdistricts: any;
  
@@ -73,6 +74,7 @@ export class EntryComponent {
       // optselect:[''],
       // meetdate:[''],
       name: ['', [Validators.required]],
+      state_id: ['1', [Validators.required]],
       
       // option1:[''],
       // option2:[''],
@@ -104,7 +106,8 @@ export class EntryComponent {
   logincon: boolean = false
   ngOnInit(): void {
     this.getdenomations();
-    this.getdistric();
+    this.getstates();
+    this.getdistric(1);
     this.getmdistric();
     const datePipe = new DatePipe('en-Us');
     this.now = datePipe.transform(new Date(), 'yyyy-MM-dd');
@@ -138,10 +141,33 @@ export class EntryComponent {
   //    // this.loading = false;
   //   })
   // }
-  getdistric() {
+  getstates() {
+    this.service.getstates().subscribe((res: any) => {
+      this.states = res?.data || [
+        { id: 1, state_name: 'Andhra Pradesh-ఆంధ్రప్రదేశ్ (AP)', name: 'Andhra Pradesh-ఆంధ్రప్రదేశ్ (AP)', code: 'AP' },
+        { id: 2, state_name: 'Telangana-తెలంగాణ (TG)', name: 'Telangana-తెలంగాణ (TG)', code: 'TG' }
+      ];
+    });
+  }
+
+  onStateChange(event: any) {
+    const stateId = event?.target?.value || '1';
+    this.entryform.patchValue({
+      district_id: '',
+      constituency_id: '',
+      mandal_id: '',
+      village_id: ''
+    });
+    this.constituency = [];
+    this.mandals = [];
+    this.panchayati = [];
+    this.getdistric(stateId);
+  }
+
+  getdistric(stateId?: any) {
     this.showSpinner = true;
-  
-    this.service.getdistrict().subscribe(
+    const sid = stateId || this.entryform.get('state_id')?.value || 1;
+    this.service.getdistrict(sid).subscribe(
       (res: any) => {
         if (res && res.data) {
           this.districts = res.data;
@@ -426,7 +452,14 @@ getmandals(event: any) {
     }
 
     const submittedPhone = this.entryform.value?.phnumber || this.entryform.value?.phonenum || '';
-    this.service.postregform(this.entryform.value).subscribe(
+    const stateIdVal = Number(this.entryform.value?.state_id) || 1;
+    const stateNameVal = stateIdVal === 2 ? 'Telangana' : 'Andhra Pradesh';
+    const payload = {
+      ...this.entryform.value,
+      state_id: stateIdVal,
+      state: stateNameVal
+    };
+    this.service.postregform(payload).subscribe(
       (res: any) => {
         if (res.status === 200) {
           Swal.fire({
@@ -464,6 +497,7 @@ getmandals(event: any) {
             phnumber: '',
             whatsapnum: '',
             denomation: '',
+            state_id: '1',
             district_id: '',
             constituency_id: '',
             mandal_id: '',

@@ -22,6 +22,7 @@ export class JobsComponent {
   searchchurchingform: FormGroup;
   constructor(private formBuilder: FormBuilder, private service: ServiceService, private modalService: NgbModal ,  private router: Router) {
     this.searchchurchingform = this.formBuilder.group({
+      state_id: [''],
       district_id: [''],
       constenncy_id: [''],
       mandal_id: [''],
@@ -32,6 +33,7 @@ export class JobsComponent {
     });
   }
   ngOnInit(): void {
+    this.getstates();
     this.getdistric();
     this.getjobs();
     this.getadds();
@@ -56,6 +58,40 @@ export class JobsComponent {
       console.log(error);
       this.showSpinner = false;
     })
+  }
+
+  
+  states: any = [];
+  getstates() {
+    this.service.getstates().subscribe((res: any) => {
+      this.states = res.data;
+    });
+  }
+
+  onStateChange(event: any) {
+    const stateId = event && event.target ? event.target.value : event;
+    this.searchdist = '';
+    this.searchconts = '';
+    this.searchchurchingform.patchValue({ state_id: stateId, district_id: '', constenncy_id: '', mandal_id: '', panchayati_id: '' });
+    this.districts = [];
+    this.constituency = [];
+    this.mandals = [];
+    this.panchayati = [];
+    if (stateId) {
+      this.service.getdistrict(stateId).subscribe(res => {
+        if (res && res.status == 200) {
+          this.districts = res.data;
+        }
+      });
+      this.service.searchjobswise({ state_id: stateId }).subscribe((res: any) => {
+        if (res && res.status == 200 && Array.isArray(res.data)) {
+          this.jobs = res.data;
+        }
+      });
+    } else {
+      this.getdistric();
+      this.getjobs();
+    }
   }
 
   onDistrictChange(event: any) {

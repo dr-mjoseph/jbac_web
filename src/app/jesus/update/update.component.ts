@@ -57,6 +57,7 @@ export class UpdateComponent {
   constructor(private service: ServiceService, private formBuilder: FormBuilder, private router: Router, private modalService: NgbModal) {
 
     this.pastorform = this.formBuilder.group({
+      state_id: ['1'],
       pastorname: [''],
       dob: [''],
       about_desp: [''],
@@ -100,6 +101,7 @@ export class UpdateComponent {
     })
 
     this.churchregsiterform = this.formBuilder.group({
+      state_id: ['1'],
       church_name: [''],
       denomination_id: [''],
       total_members: [''],
@@ -121,6 +123,7 @@ export class UpdateComponent {
 
     })
     this.updateprofileministry = this.formBuilder.group({
+      state_id: ['1'],
 
       firstname: [''],
       denomation: [''],
@@ -140,6 +143,7 @@ export class UpdateComponent {
       term: [''],
     })
     this.beliverform = this.formBuilder.group({
+      state_id: ['1'],
       fname: [''],
       whatsapp: [''],
       dob: [''],
@@ -181,6 +185,7 @@ export class UpdateComponent {
       term: [''],
     })
     this.studentform = this.formBuilder.group({
+      state_id: ['1'],
       studentname: [''],
       number: [''],
       study: [''],
@@ -224,6 +229,7 @@ export class UpdateComponent {
 
     })
     this.independentorgainsationform = this.formBuilder.group({
+      state_id: ['1'],
 
       organisation_name: [''],
       checkbox: [''],
@@ -248,6 +254,7 @@ export class UpdateComponent {
       term: ['']
     })
     this.pastorsassociations = this.formBuilder.group({
+      state_id: ['1'],
       pa_name: [''],
       pastor_id: [''],
       level: [''],
@@ -288,6 +295,7 @@ export class UpdateComponent {
     });
 
     this.doctorform = this.formBuilder.group({
+      state_id: ['1'],
       doctor_name: [''],
       license_number: [''],
       specialization: ['Family Counsellor & Clinical Psychologist'],
@@ -307,6 +315,7 @@ export class UpdateComponent {
     });
 
     this.entryform = this.formBuilder.group({
+      state_id: ['1'],
       category: [''],
       name: [''],
       phnumber: [''],
@@ -360,6 +369,7 @@ export class UpdateComponent {
       this.router.navigate(['/']);
     }
     this.geteditdtails();
+    this.getstates();
     this.getdistric();
     // this.getchurch();
     this.getservice();
@@ -453,8 +463,31 @@ export class UpdateComponent {
   }
 
 
+  
+  states: any = [];
+  getstates() {
+    this.service.getstates().subscribe((res: any) => {
+      this.states = res.data;
+    });
+  }
+
+  onStateChange(event: any) {
+    const stateId = event && event.target ? event.target.value : event;
+    this.districts = [];
+    this.constituency = [];
+    this.mandals = [];
+    this.panchayati = [];
+    if (stateId) {
+      this.service.getdistrict(stateId).subscribe(res => {
+        if (res && res.status == 200) {
+          this.districts = res.data;
+        }
+      });
+    }
+  }
+
   getdistric() {
-    this.service.getdistrict().subscribe(res => {
+    this.service.getdistrict(1).subscribe(res => {
       this.districts = res.data;
     })
   }
@@ -558,6 +591,7 @@ export class UpdateComponent {
         about_desp: this.details.about_desp,
         lifegoal: this.details.lifegoal,
         god: this.details.god,
+        state_id: this.details.state_id ? String(this.details.state_id) : "1",
         district_id: this.details.district_id,
         constituency_id: this.details.constituency_id,
         mandal_id: this.details.mandal_id,
