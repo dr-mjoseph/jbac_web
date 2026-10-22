@@ -404,9 +404,9 @@
                                                         style="color:red; -webkit-text-stroke-width:thick;">*</span></label>
                                                 <input type="text" formControlName="tmarks" class="form-control"
                                                     placeholder="Enter Total Marks You Secured" (keypress)="numericOnly($event)"
-                                                    [ngClass]="{'is-invalid': submitted && e['tmarks']?.errors }" />
-                                                <div *ngIf="submitted && e['tmarks']?.errors" class="invalid-feedback">
-                                                    <div *ngIf="e['tmarks']?.errors?.['required']">Total Marks you Secured is required</div>
+                                                    [ngClass]="{'is-invalid': submitted && e['tmarks'].errors }" />
+                                                <div *ngIf="submitted && e['tmarks'].errors" class="invalid-feedback">
+                                                    <div *ngIf="e['tmarks'].errors?.['required']">Total Marks you Secured is required</div>
                                                 </div>
                                             </div>
                                              </div>
@@ -467,9 +467,9 @@
                                                         style="color:red; -webkit-text-stroke-width:thick;">*</span></label>
                                                 <input type="text" formControlName="mmarks" class="form-control"
                                                     placeholder="Enter Maximum Marks that Board Conducted" (keypress)="numericOnly($event)"
-                                                    [ngClass]="{'is-invalid': submitted && e['mmarks']?.errors }" />
-                                                <div *ngIf="submitted && e['mmarks']?.errors" class="invalid-feedback">
-                                                    <div *ngIf="e['mmarks']?.errors?.['required']">Board Conducted for Total Maximum Marks is Required</div>
+                                                    [ngClass]="{'is-invalid': submitted && e['mmarks'].errors }" />
+                                                <div *ngIf="submitted && e['mmarks'].errors" class="invalid-feedback">
+                                                    <div *ngIf="e['mmarks'].errors?.['required']">Board Conducted for Total Maximum Marks is Required</div>
                                                 </div>
                                             </div>
                                         </div>
@@ -548,10 +548,10 @@
                                                             style="color:red; -webkit-text-stroke-width:thick;">*</span></label>
                                                     <input type="text" formControlName="schname" class="form-control"
                                                         placeholder="Enter Your College/School Name"
-                                                        [ngClass]="{'is-invalid': submitted && e['schname']?.errors }" />
-                                                    <div *ngIf="submitted && e['schname']?.errors"
+                                                        [ngClass]="{'is-invalid': submitted && e['schname'].errors }" />
+                                                    <div *ngIf="submitted && e['schname'].errors"
                                                         class="invalid-feedback">
-                                                        <div *ngIf="e['schname']?.errors['required']">College/School Name
+                                                        <div *ngIf="e['schname'].errors?.['required']">College/School Name
                                                             is
                                                             required </div>
                                                     </div>
@@ -568,16 +568,16 @@
                                                     <select class="form-control" formControlName="district_id"
                                                         (change)="getconstency($event);"
                                                         style="height:37px;width: 273px;"
-                                                        [ngClass]="{'is-invalid': submitted && e['district_id']?.errors }">
+                                                        [ngClass]="{'is-invalid': submitted && e['district_id'].errors }">
                                                         <option value="" selected disabled>Click & Select District
                                                         </option>
                                                         <option value="{{item.id}}" *ngFor="let item of districts">
                                                             {{item.distrct_nm}}
                                                         </option>
                                                     </select>
-                                                    <div *ngIf="submitted && e['district_id']?.errors"
+                                                    <div *ngIf="submitted && e['district_id'].errors"
                                                         class="invalid-feedback">
-                                                        <div *ngIf="e['district_id']?.errors['required']">District is
+                                                        <div *ngIf="e['district_id'].errors?.['required']">District is
                                                             required </div>
                                                     </div>
                                                 </div>
@@ -589,16 +589,16 @@
                                                     </label>
                                                     <select class="form-control" formControlName="constituency_id"
                                                         (change)="getmandals($event);" style="height:37px;width: 273px;"
-                                                        [ngClass]="{'is-invalid': submitted && e['constituency_id']?.errors }">
+                                                        [ngClass]="{'is-invalid': submitted && e['constituency_id'].errors }">
                                                         <option value="" selected disabled>Click & నియోజకవర్గం ఎంచుకోండి
                                                         </option>
                                                         <option value="{{item.id}}" *ngFor="let item of constituency">
                                                             {{item.const_nm}}
                                                         </option>
                                                     </select>
-                                                    <div *ngIf="submitted && e['constituency_id']?.errors"
+                                                    <div *ngIf="submitted && e['constituency_id'].errors"
                                                         class="invalid-feedback">
-                                                        <div *ngIf="e['constituency_id']?.errors['required']">
+                                                        <div *ngIf="e['constituency_id'].errors?.['required']">
                                                            నియోజకవర్గం తప్పనిసరిగా సెలెక్ట్ చేయాలి </div>
                                                     </div>
                                                 </div>
@@ -613,16 +613,16 @@
                                                     <select class="form-control" formControlName="mandal_id"
                                                         (change)="gepanchayati($event);"
                                                         style="height:37px;width: 273px;"
-                                                        [ngClass]="{'is-invalid': submitted && e['mandal_id']?.errors }">
+                                                        [ngClass]="{'is-invalid': submitted && e['mandal_id'].errors }">
                                                         <option value="" selected disabled>Click & Select Mandal
                                                         </option>
                                                         <option value="{{item.id}}" *ngFor="let item of mandals">
                                                             {{item.mndl_nm}}
                                                         </option>
                                                     </select>
-                                                    <div *ngIf="submitted && e['mandal_id']?.errors"
+                                                    <div *ngIf="submitted && e['mandal_id'].errors"
                                                         class="invalid-feedback">
-                                                        <div *ngIf="e['mandal_id']?.errors['required']">Mandal is
+                                                        <div *ngIf="e['mandal_id'].errors?.['required']">Mandal is
                                                             required </div>
                                                     </div>
                                                 </div>
@@ -634,16 +634,16 @@
                                                     </label>
                                                     <select class="form-control" formControlName="village_id"
                                                         style="height:37px;width: 273px;"
-                                                        [ngClass]="{'is-invalid': submitted && e['village_id']?.errors }">
+                                                        [ngClass]="{'is-invalid': submitted && e['village_id'].errors }">
                                                         <option value="" selected disabled>Click & పంచాయతీ ఎంచుకోండి
                                                         </option>
                                                         <option value="{{item.id}}" *ngFor="let item of panchayati">
                                                             {{item.pnchyt_nm}}
                                                         </option>
                                                     </select>
-                                                    <div *ngIf="submitted && e['village_id']?.errors"
+                                                    <div *ngIf="submitted && e['village_id'].errors"
                                                         class="invalid-feedback">
-                                                        <div *ngIf="e['village_id']?.errors['required']">Panchayati is
+                                                        <div *ngIf="e['village_id'].errors?.['required']">Panchayati is
                                                             required </div>
                                                     </div>
                                                 </div>
@@ -985,9 +985,9 @@
                                                 <label class="form-label">పాస్వర్డ్ సెట్ చేసుకోండి (కనీసం 4 అక్షరాలు / సంఖ్యలు)</label>
                                                 <input type="password" formControlName="password" class="form-control"
                                                     placeholder="ఇక్కడ క్లిక్ చేసి నమోదు చేయండి" minlength="4"
-                                                    [ngClass]="{'is-invalid': submitted && e['password']?.errors }" />
-                                                <div *ngIf="submitted && e['password']?.errors" class="invalid-feedback">
-                                                    <div *ngIf="e['password']?.errors?.['minlength']">కనీసం 4 అక్షరాలు / సంఖ్యలు ఉండాలి</div>
+                                                    [ngClass]="{'is-invalid': submitted && e['password'].errors }" />
+                                                <div *ngIf="submitted && e['password'].errors" class="invalid-feedback">
+                                                    <div *ngIf="e['password'].errors?.['minlength']">కనీసం 4 అక్షరాలు / సంఖ్యలు ఉండాలి</div>
                                                 </div>
                                             </div>
                                         </div> 
@@ -997,10 +997,10 @@
                                                 <input type="password" formControlName="retypepassword"
                                                     class="form-control" placeholder="ఇక్కడ క్లిక్ చేసి నమోదు చేయండి"
                                                     maxlength="16" minlength="4"
-                                                    [ngClass]="{'is-invalid': submitted && e['retypepassword']?.errors }" />
-                                                <div *ngIf="submitted && e['retypepassword']?.errors"
+                                                    [ngClass]="{'is-invalid': submitted && e['retypepassword'].errors }" />
+                                                <div *ngIf="submitted && e['retypepassword'].errors"
                                                     class="invalid-feedback">
-                                                    <div *ngIf="e['retypepassword']?.errors?.['minlength']">కనీసం 4 అక్షరాలు / సంఖ్యలు ఉండాలి</div>
+                                                    <div *ngIf="e['retypepassword'].errors?.['minlength']">కనీసం 4 అక్షరాలు / సంఖ్యలు ఉండాలి</div>
                                                 </div>
                                             </div>
                                         </div> 
