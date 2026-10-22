@@ -49,7 +49,7 @@ if (Test-Path $tsFile) {
     # Add state properties
     $propTarget = "export class AddmeetingsPage {`n  form: FormGroup"
     $propNew = "export class AddmeetingsPage {`n  form: FormGroup;`n  locationLoading: boolean = false;`n  locationError: string = '';`n  locationSuccess: string = '';`n  locationName: string = '';`n  locationSourceMessage: string = '';"
-    if ($normTs.Contains($propTarget)) {
+    if ($normTs.Contains($propTarget) -and -not $normTs.Contains("locationLoading")) {
         $normTs = $normTs.Replace($propTarget, $propNew)
         Write-Host "[SUCCESS] addmeetings.ts properties added"
     }
