@@ -137,6 +137,25 @@ You can also execute custom SQL queries programmatically via HTTP REST with your
   }
   ```
 
+#### 📥 How to Export Database Tables (CSV & JSON):
+You can export any of the 89 database tables to spreadsheet (CSV) or JSON format directly from the browser:
+
+##### Method 1: 1-Click Table Export (Tables & Schema Explorer)
+1. Sign in to [https://jbac.in/admin](https://jbac.in/admin) with `admin` / `JbacAdmin@2026`.
+2. Navigate to the **"🗄️ Tables & Schema Explorer"** tab.
+3. Select any table from the left sidebar (e.g., `signup_form`, `pastor_reg`, `church_reg`, `events`, `student_reg`, `users`).
+4. On the top toolbar right next to `➕ New Record`, click:
+   - **`📥 Export CSV`**: Exports the entire table to a `.csv` spreadsheet file with UTF-8 BOM encoding for seamless Microsoft Excel and Google Sheets viewing.
+   - **`📥 Export JSON`**: Exports all records to a formatted `.json` file.
+5. The browser will automatically save the file named `jbac_<tablename>_export_<timestamp>.csv` (or `.json`).
+
+##### Method 2: Custom Export via SQL Query Console
+1. Navigate to the **"⚡ SQL Query Console"** tab.
+2. Enter your custom SQL query (e.g., `SELECT * FROM signup_form;` or `SELECT id, fname, mobile_number, cts FROM signup_form ORDER BY id DESC LIMIT 500;`).
+3. Click **"⚡ Run Query"** (or press `Ctrl + Enter`).
+4. In the results header bar above the data grid, click **`📥 CSV`** or **`📥 JSON`**.
+5. The downloaded file contains the exact query results with headers matching your chosen columns.
+
 #### 🛡️ Data Manipulation & Foreign Key Handling:
 When modifying or inserting rows through the Cockpit's **Edit Record** or **New Record** modals:
 * **Automatic NULL Mapping**: Any input left blank or containing literal `NULL` is automatically stored as SQL `NULL` rather than an empty string `""` or `0`.

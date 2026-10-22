@@ -186,7 +186,7 @@ GitHub Issue: [#1](https://github.com/dr-mjoseph/jbac_web/issues/1)
   - Created [`public.html`](public.html) featuring a sleek dark-mode, responsive single-page application.
   - Built **Executive Dashboard** with live metric counters across 8 sectors (Believers, Pastors, Churches, Students, Ministries, Organisations, Active Events, Users) and AWS RDS telemetry.
   - Built **SQL Query Console** with monospace code editor, `Ctrl+Enter` shortcut execution, 12+ preloaded SQL query presets, execution timing (`ms`), formatted data grid with image thumbnails, CSV / JSON exports, and persistent query history.
-  - Built **Table Explorer & Schema Browser** listing all 89 tables with live row counts, field metadata inspector, in-table search, and pagination.
+  - Built **Table Explorer & Schema Browser** listing all 89 tables with live row counts, field metadata inspector, in-table search, pagination, and 1-click **Export CSV** & **Export JSON** buttons with UTF-8 BOM encoding.
   - Implemented dynamic modal dialogs for row insertions (INSERT), row edits (UPDATE), and deletions (DELETE).
 - [x] **Universal SQL Runner & CRUD API**:
   - Implemented `POST /dashboardapi/execute-query` (and `/api/query`, `/execute-query`) on AWS Lambda supporting both SELECT queries and mutation queries (affected rows, insert IDs).

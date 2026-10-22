@@ -1703,6 +1703,32 @@ The repository contains two query execution engines:
   - **Standard Upload AAB**: `C:\Users\rajes\StudioProjects\jbac_app\appreleasesigned.aab` *(115.81 MB)*
   - Verified badging: `versionCode='37'`, `versionName='0.0.37'`, `minSdkVersion='24'`, `targetSdkVersion='36'`.
 
+---
+
+## 27. Cloud Database Cockpit Table Export Feature & Admin Documentation (`jbac.in/admin`)
+
+### 1. Requirements & Overview
+- Implemented convenient table export mechanisms for administrators accessing the cloud database at `https://jbac.in/admin` (and `https://www.jbac.in/admin`).
+- Provided two distinct export workflows:
+  1. **1-Click Direct Table Export** from the **Tables & Schema Explorer** tab.
+  2. **Custom SQL Query Export** from the **SQL Query Console** tab.
+
+### 2. Implementation Details
+- **Tables & Schema Explorer Toolbar**:
+  - Added `📥 Export CSV` (`#exportCsvBtn`) and `📥 Export JSON` (`#exportJsonBtn`) directly to the explorer toolbar adjacent to `➕ New Record`.
+  - Created `exportCurrentTable(format)` function in `public.html`:
+    - Checks selected active table (`currentTable`).
+    - Dispatches a background query `SELECT * FROM \`${currentTable}\`;` to `/dashboardapi/execute-query` with authenticated headers (`x-admin-auth`) to fetch the full dataset.
+    - Gracefully falls back to loaded page rows if full query fails.
+    - Prepends UTF-8 Byte Order Mark (`\uFEFF`) to CSV output so Microsoft Excel, LibreOffice Calc, and Google Sheets correctly render Telugu script and special unicode characters without mojibake.
+    - Generates client-side Blob download named `jbac_${currentTable}_export_${Date.now()}.csv` (or `.json`).
+- **SQL Query Console Enhancement**:
+  - Enhanced `exportResults(format)` with UTF-8 BOM encoding and `text/csv;charset=utf-8;` MIME type.
+- **Synchronized Across All Cockpit Mirrors**:
+  - Updated `scripts/build_admin_cockpit.py` to compile and distribute updates to `public.html`, `backend/public.html`, `Api/public.html`, `src/assets/public.html`, and `src/public.html`.
+  - Documented complete user guide and admin credentials in `DATABASE_CONNECTION.md` and `README.md`.
+
+
 
 
 
