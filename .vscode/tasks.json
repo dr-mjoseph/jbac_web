@@ -1,0 +1,18 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Start Angular development server",
+			"type": "shell",
+			"command": "npm",
+			"args": [
+				"start",
+				"--",
+				"--host",
+				"0.0.0.0"
+			],
+			"isBackground": true,
+			"problemMatcher": []
+		}
+	]
+}

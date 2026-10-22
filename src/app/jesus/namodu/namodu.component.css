@@ -1,0 +1,27 @@
+.my-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 10000;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    background-color: rgba(0, 0, 0, 0.75);
+    cursor: wait;
+}
+
+.cusloader {
+    width: 52px;
+    height: 52px;
+    border: 5px solid rgba(255, 255, 255, 0.35);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: namodu-spinner 0.8s linear infinite;
+}
+
+@keyframes namodu-spinner {
+    to {
+        transform: rotate(360deg);
+    }
+}

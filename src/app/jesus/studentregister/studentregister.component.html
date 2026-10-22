@@ -300,37 +300,13 @@
 
                                             </div>
                                         </div>
-                                        <div class="col-md-6 mb-4 pb-2">
-                                            <div class="form-outline">
-                                                <label class="form-label">Talent</label>
-                                                <select class="form-control" formControlName="talent"
-                                                    style="height:37px;width: 273px;">
-                                                    <option value="" selected disabled>Select your Talent</option>
-                                                    <option value="Video editing">Video editing</option>
-                                                    <option value="Photo Graphy">Photo Graphy</option>
-                                                    <option value="Using Social Meadia">Social Meadia</option>
-                                                    <option value="Organiser">Organiser</option>
-                                                    <option value="Sound Management">Sound Management</option>
-                                                    <option value="Drumist">Drumist</option>
-                                                    <option value="Keyboard Player">Keyboard Player</option>
-                                                    <option value="Giving Gospel">Giving Gospel</option>
-                                                    <option value="Singer">Singer</option>
-                                                    <option value="Songs Writer">Songs Writer</option>
-                                                    <option value="Social Service">Social Service</option>
-                                                    <option value="Good in Studies">Good in Studies</option>
-                                                    <option value="Multy Talent">Multy Talent</option>
-                                                    <option value="Others">Others</option>
-                                                </select>
-
-                                            </div>
-                                        </div>
-
+                                       
                                     </div>
                                     <br> -->
                                     <div class="row">
                                         <div class="col-md-6 mb-4 pb-2">
                                             <div class="form-outline">
-                                                <label class="form-label">Going to Study</label>
+                                                <label class="form-label">Studying</label>
                                                 <select class="form-control" formControlName="god"
                                                     style="height:37px;width: 273px;">
                                                     <option value="" selected disabled>Select your Study </option>
@@ -349,7 +325,7 @@
 
                                             </div>
                                         </div>
-                                        <!-- <div class="col-md-6 mb-4 pb-2">
+                                        <div class="col-md-6 mb-4 pb-2">
                                             <div class="form-outline">
                                                 <label class="form-label">Studied / Studying Year(Ex. 1oth Class, Select
                                                     10)</label>
@@ -374,10 +350,12 @@
                                                 </select>
 
                                             </div>
-                                        </div> -->
-  <div class="col-md-6 mb-4 pb-2">
+                                        </div>
+                                    </div><br>
+                                        <div class="row">
+                                            <div class="col-md-6 mb-4 pb-2">
                                             <div class="form-outline">
-                                                <label class="form-label">Going Study Group / Branch<span
+                                                <label class="form-label">Group / Branch<span
                                                         style="color:red; -webkit-text-stroke-width:thick;">
                                                         *</span></label>
                                                 <select class="form-control" formControlName="study"
@@ -418,9 +396,25 @@
                                                         required </div>
                                                 </div>
                                             </div>
-                                        </div>
-                                    </div>
-                                    <br>
+                                            </div>
+                                    
+                                            <div class="col-md-6 mb-4">
+                                            <div class="form-outline">
+                                                <label class="form-label">Total Marks You Secured in Previous Exam <span
+                                                        style="color:red; -webkit-text-stroke-width:thick;">*</span></label>
+                                                <input type="text" formControlName="tmarks" class="form-control"
+                                                    placeholder="Enter Total Marks You Secured" (keypress)="numericOnly($event)"
+                                                    [ngClass]="{'is-invalid': submitted && e['number'].errors }" />
+                                                <div *ngIf="submitted && e['number'].errors" class="invalid-feedback">
+                                                    <div *ngIf="e['number'].errors['required']">Total Marks you Secured
+                                                        is
+                                                        required
+                                                    </div>
+
+                                                </div>
+                                            </div>
+                                             </div>
+                                        </div> <br>
                                     <!-- <div class="row">
                                       
                                         <div class="col-md-6 mb-4 pb-2">
@@ -445,25 +439,35 @@
                                     </div>
                                     <br> -->
                                     <div class="row">
-                                        <div class="col-md-6 mb-4">
+                                         <div class="col-md-6 mb-4 pb-2">
                                             <div class="form-outline">
-                                                <label class="form-label">Total Marks You Secured in Previous <span
-                                                        style="color:red; -webkit-text-stroke-width:thick;">*</span></label>
-                                                <input type="text" formControlName="tmarks" class="form-control"
-                                                    placeholder="Enter Total Marks You Secured" (keypress)="numericOnly($event)"
-                                                    [ngClass]="{'is-invalid': submitted && e['number'].errors }" />
-                                                <div *ngIf="submitted && e['number'].errors" class="invalid-feedback">
-                                                    <div *ngIf="e['number'].errors['required']">Total Marks you Secured
-                                                        is
-                                                        required
-                                                    </div>
+                                                <label class="form-label">Talent</label>
+                                                <select class="form-control" formControlName="talent"
+                                                    style="height:37px;width: 273px;">
+                                                    <option value="" selected disabled>Select your Talent</option>
+                                                    <option value="Video editing">Video editing</option>
+                                                    <option value="Photo Graphy">Photo Graphy</option>
+                                                    <option value="Using Social Meadia">Social Meadia</option>
+                                                    <option value="Organiser">Organiser</option>
+                                                    <option value="Sound Management">Sound Management</option>
+                                                    <option value="Drumist">Drumist</option>
+                                                    <option value="Keyboard Player">Keyboard Player</option>
+                                                    <option value="Giving Gospel">Giving Gospel</option>
+                                                    <option value="Singer">Singer</option>
+                                                    <option value="Songs Writer">Songs Writer</option>
+                                                    <option value="Social Service">Social Service</option>
+                                                    <option value="Good in Studies">Good in Studies</option>
+                                                    <option value="Multy Talent">Multy Talent</option>
+                                                    <option value="Others">Others</option>
+                                                </select>
 
-                                                </div>
                                             </div>
                                         </div>
+
+                                        
                                         <div class="col-md-6 mb-4">
                                             <div class="form-outline">
-                                                <label class="form-label">Enter Maximum Marks that  Board Conducted<span
+                                                <label class="form-label">Enter Maximum Marks that University or Board Conducted<span
                                                         style="color:red; -webkit-text-stroke-width:thick;">*</span></label>
                                                 <input type="text" formControlName="mmarks" class="form-control"
                                                     placeholder="Enter Maximum Marks that  Board Conducted " (keypress)="numericOnly($event)"
@@ -481,7 +485,7 @@
                                     </div>
                                     <br>
 
-                                    <div class="row">
+                                    <!-- <div class="row">
                                         <div class="col-md-6">
                                             <div class="form-outline">
                                                 <label class="form-label">Select below the Entrance you wrote
@@ -530,7 +534,7 @@
                                             </div>
                                         </div> 
  
-                                        <!-- <div class="col-md-6" *ngIf="father">
+                                         <div class="col-md-6" *ngIf="father">
                                             <div class="form-outline">
                                                 <label class="form-label">Entrance Name
                                                   
@@ -539,11 +543,11 @@
                                                     placeholder="write below the Entrance Rank " />
 
                                             </div>
-                                        </div> -->
+                                        </div> 
                                     </div>
-                                    <br> <br>
+                                    <br> <br> -->
 
-                                    <!-- <div class="card shadow-2-strong card-registration" style="border-radius: 15px;">
+                                     <div class="card shadow-2-strong card-registration" style="border-radius: 15px;">
                                         <p><b> &nbsp;&nbsp; Studyied / Studying College / School Address</b></p>
                                         <div class="row">
                                             <div class="col-md-11 mb-4 pb-2">
@@ -654,7 +658,7 @@
                                             </div>
                                         </div>
                                         <br>
-                                    </div> -->
+                                    </div>
 
                                     <br>
                                     <div class="card shadow-2-strong card-registration" style="border-radius: 15px;">
@@ -860,7 +864,7 @@
                                         <br> -->
                                     </div>
                                     <br>
-                                    <!-- <div class="row">
+                                     <div class="row">
                                         <div class="col-md-6 mb-4 pb-2">
                                             <div class="form-outline">
                                                 <label class="form-label">Do you want to be a Christian Student
@@ -899,6 +903,12 @@
                                                         Level</option>
                                                     <option value="Ward / Panchayati Level">Ward / Panchayati Level
                                                     </option>
+                                                    <option value="Constituency Level">Church Level</option>
+                                                    <option value="Constituency Level">College Level</option>
+                                                    <option value="Constituency Level">Branch Level</option>
+                                                    <option value="Constituency Level">Branch / Group Level</option>
+                                                    <option value="Constituency Level">Branch / Group Year Level</option>
+                                                    <option value="Constituency Level">Section / Class Level</option>
                                                 </select>
                                                 <div *ngIf="submitted && e['generaltype'].errors"
                                                     class="invalid-feedback">
@@ -908,7 +918,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <br> -->
+                                    <br> 
 
                                     <!-- <div class="row">
                                         <div class="col-md-6 mb-4 pb-2">
