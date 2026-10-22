@@ -134,12 +134,13 @@ After starting the server, perform a browser hard-refresh (`Ctrl + Shift + R` or
 The mobile application is housed in `C:\Users\rajes\StudioProjects\jbac_app` (repository: `dr-mjoseph/jbac_app`).
 
 - **Release Scripts**:
-  - `powershell -ExecutionPolicy Bypass -File .\scripts\build_and_sign_release_v38.ps1`
-  - Automated tasks compile Gradle release binaries, perform 4-byte `zipalign`, sign the APK with `apksigner`, and sign the AAB with `jarsigner` using `Jbac.keystore`.
-- **Active Release Artifacts (v0.0.38 / versionCode 38)**:
-  - **APK**: `C:\Users\rajes\StudioProjects\jbac_app\jbacApp-0.0.38.apk` (118.7 MB)
-  - **AAB**: `C:\Users\rajes\StudioProjects\jbac_app\appreleasesigned.aab` / `jbacApp-0.0.38.aab` (115.84 MB)
+  - `powershell -ExecutionPolicy Bypass -File .\scripts\build_and_sign_release_v39.ps1`
+  - Automated tasks compile Gradle release binaries, perform 4-byte `zipalign`, sign the APK with `apksigner` (v1 + v2 schemes), and sign the AAB with `jarsigner` using `Jbac.keystore`.
+- **Active Release Artifacts (v0.0.39 / versionCode 39)**:
+  - **APK**: `C:\Users\rajes\StudioProjects\jbac_app\jbacApp-0.0.39.apk` (118.61 MB)
+  - **AAB**: `C:\Users\rajes\StudioProjects\jbac_app\appreleasesigned.aab` / `jbacApp-0.0.39.aab` (115.81 MB)
   - **SDK Settings**: `minSdkVersion 24`, `targetSdkVersion 34`, `compileSdkVersion 34`.
+  - **Fixes**: Activated Ministry (`MinistryPage`), Church (`ChurchPage`), and Organization (`OrganisationPage`) registration forms from `FormsPage` (`రిజిస్ట్రేషన్`) by resolving missing ReactiveForm controls (`retypepassword`, `term`) and adding template getter `r`.
 
 ---
 

@@ -1977,4 +1977,71 @@ The repository contains two query execution engines:
 - **Standard Upload Bundle**: `C:\Users\rajes\StudioProjects\jbac_app\appreleasesigned.aab` *(115.84 MB)*
 - **Release Notes File**: `RELEASE_NOTES_v0.0.38.md` (English, Telugu, and Play Console XML).
 
+---
+
+## 36. Ministry, Church & Organization Registration Activation & Release v0.0.39
+
+### 1. Root Cause Analysis of Registration Forms Failing to Open
+- **Reported Bug**: When tapping `మినిస్ట్రీ రిజిస్టర్` (Card 3), `చర్చి రిజిస్టర్` (Card 5), or `సంస్థ రిజిస్టర్` (Card 6) on `FormsPage` (`రిజిస్ట్రేషన్`), the forms failed to open.
+- **Root Cause Discovered**:
+  - In Angular 5 / Ionic 3 `ReactiveFormsModule`, when a component template contains `formControlName="<name>"` or checks `form.get('<name>')`, Angular throws an uncaught fatal exception (`Error: Cannot find control with name: '<name>'`) during component view initialization if that control is missing from `formBuilder.group({...})`.
+  - When this exception is thrown during Ionic's lazy-loading navigation (`navCtrl.push(...)`), module resolution fails and the page navigation is silently aborted.
+  - **Ministry Registration** (`MinistryPage` / `21.js` & `src/pages/ministry/ministry.ts`):
+    - Template bound `formControlName="retypepassword"` and `formControlName="term"`, but both were missing/commented out in `this.ministryform`.
+    - Template bound validation error classes and conditionals using `r['firstname'].errors`, but getter `get r()` was missing on `MinistryPage`, throwing `TypeError: Cannot read properties of undefined (reading 'firstname')`.
+    - Source TypeScript file contained a syntax typo: `term: [true],],`.
+  - **Church Registration** (`ChurchPage` / `35.js` & `src/pages/church/church.ts`):
+    - Template bound `formControlName="retypepassword"` and `formControlName="term"`, but both were commented out/missing in `this.form`.
+    - Source TypeScript file contained a syntax typo: `term: [true],],`.
+  - **Organization Registration** (`OrganisationPage` / `18.js` & `src/pages/organisation/organisation.ts`):
+    - Template bound `formControlName="retypepassword"`, but it was commented out in `this.form`.
+
+### 2. Comprehensive Remediation & Verification
+- **Ministry Registration Fixes**:
+  - In `src/pages/ministry/ministry.ts` & `www/build/21.js`:
+    - Added `retypepassword: ['', [Validators.required, Validators.minLength(6)]]` and `term: [true]` to `this.ministryform`.
+    - Defined property getter `Object.defineProperty(MinistryPage.prototype, "r", { get: () => this.ministryform ? this.ministryform.controls : {} })` and initialized `this.r = this.ministryform.controls;`.
+    - Added `this.submitted = true;` to `postministrysignup`.
+- **Church Registration Fixes**:
+  - In `src/pages/church/church.ts` & `www/build/35.js`:
+    - Added `retypepassword: ['', [Validators.required, Validators.minLength(6)]]` and `term: [true]` to `this.form`.
+    - Added `this.submitted = true;` to `postchurchregister`.
+- **Organization Registration Fixes**:
+  - In `src/pages/organisation/organisation.ts` & `www/build/18.js`:
+    - Added `retypepassword: ['', [Validators.required, Validators.minLength(6)]]` to `this.form`.
+    - Configured `term: [true]` for terms agreement.
+- **Verification Across All Chunks**:
+  - Validated syntax with `node -c` on all modified chunks (`21.js`, `35.js`, `18.js`) with 0 errors.
+  - Copied modified runtime chunks into `platforms/android/app/src/main/assets/www/build/`.
+
+### 3. Release v0.0.39 Build & Signing (`build_and_sign_release_v39.ps1`)
+- **Version Bumping**:
+  - `config.xml`: `version="0.0.39"` / `android-versionCode="39"`.
+  - `package.json`: `"version": "0.0.39"`.
+  - `AndroidManifest.xml`: `android:versionCode="39"` / `android:versionName="0.0.39"`.
+  - `platforms/android/app/src/main/res/xml/config.xml`: `android-versionCode="39"` / `version="0.0.39"`.
+- **Execution & Badging**:
+  - Executed Gradle `assembleRelease` and `bundleRelease` (`-PcdvBuildToolsVersion=30.0.3`).
+  - Aligned release APK with `zipalign -f -p 4`.
+  - Dual-signed APK with `apksigner` (v1 + v2 schemes active, verified valid).
+  - Signed AAB with `jarsigner` using `Jbac.keystore` (SHA256withRSA).
+  - Badging verified via `aapt dump badging`:
+    - `package: name='io.ionic.starterjbac' versionCode='39' versionName='0.0.39' compileSdkVersion='34'`
+    - `sdkVersion:'24'`
+    - `targetSdkVersion:'34'`
+- **Deep APK Inspection (`scripts/verify_final_apk_contents_v39.py`)**:
+  - Verified all 15 chunks (`main.js`, `12.js`, `13.js`, `14.js`, `16.js`, `18.js`, `21.js`, `22.js`, `23.js`, `29.js`, `32.js`, `35.js`, `37.js`, `38.js`, `41.js`):
+    - Zero raw newline terminators in templates.
+    - Zero Byte Order Marks (BOM).
+    - `node -c` syntax valid.
+    - Controls present (`retypepassword`, `term`, `r` getter).
+    - Dual state dropdown logic verified (`onStateChange`, `state_id`, `getdistrict(1)`).
+
+### 4. Release Deliverables (Release v0.0.39)
+- **Signed Test APK**: `C:\Users\rajes\StudioProjects\jbac_app\jbacApp-0.0.39.apk` *(118.61 MB)*
+- **Signed Production AAB**: `C:\Users\rajes\StudioProjects\jbac_app\jbacApp-0.0.39.aab` *(115.81 MB)*
+- **Standard Upload Bundle**: `C:\Users\rajes\StudioProjects\jbac_app\appreleasesigned.aab` *(115.81 MB)*
+- **Release Notes File**: `RELEASE_NOTES_v0.0.39.md`.
+
+
 
