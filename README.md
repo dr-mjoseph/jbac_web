@@ -16,7 +16,7 @@ Welcome to the **Jesus Believers Association Council (JBAC)** unified ecosystem 
                                     v                                   v
                       +---------------------------+       +---------------------------+
                       |   AWS Route 53 (DNS)      |       |  Android Mobile App       |
-                      |   jbac.in / www.jbac.in   |       |  (jbacApp-0.0.36.apk/aab) |
+                      |   jbac.in / www.jbac.in   |       |  (jbacApp-0.0.37.apk/aab) |
                       +---------------------------+       +---------------------------+
                                     |                                   |
                                     v                                   |

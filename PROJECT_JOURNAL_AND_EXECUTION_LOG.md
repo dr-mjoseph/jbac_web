@@ -1677,6 +1677,33 @@ The repository contains two query execution engines:
   - **Standard Bundle**: `C:\Users\rajes\StudioProjects\jbac_app\appreleasesigned.aab`
   - Verified APK badging with `aapt`: `targetSdkVersion='36'`, `versionCode='36'`, `versionName='0.0.36'`.
 
+---
+
+## 26. Student Registration Navigation Unresponsiveness Fix & Release v0.0.37
+
+### 1. Issue Diagnosis
+- **Symptom**: In the mobile app, navigating to `Registrations` ➔ `Student Registration` (`విద్యార్థుల రిజిస్టర్`) produced no response when tapped.
+- **Root Cause**:
+  - In `FormsPage` (`forms.ts`), tapping option 2 invokes `this.navCtrl.push('StudentPage')`, which dynamically loads chunk `12.js`.
+  - In `student.html` line 175, an `<ion-col col-12>` element was inserted directly inside `<form>` without an opening `<ion-row>` wrapper, but closed with `</ion-row>` on line 197.
+  - This unbalanced HTML tag nesting caused an Angular JIT `TemplateParseError` during component template compilation, leading to silent promise rejection and preventing page transition.
+  - Additionally, `gotohome()` and `numericOnly()` methods were missing in `StudentPage` component class.
+
+### 2. Implementation & Fix
+- Fixed HTML tag hierarchy in [`src/pages/student/student.html`](../../StudioProjects/jbac_app/src/pages/student/student.html), ensuring proper `<ion-row>` opening before the `study` field and verifying with an automated tag-stack validator.
+- Added `gotohome()` and `numericOnly()` methods to [`src/pages/student/student.ts`](../../StudioProjects/jbac_app/src/pages/student/student.ts).
+- Re-synchronized the corrected inline template and class methods into runtime chunks `12.js` in both `www/build/` and `platforms/android/app/src/main/assets/www/build/`.
+
+### 3. Release v0.0.37 Generation
+- Bumped version to `0.0.37` (`versionCode: 37`) across `config.xml`, `package.json`, and `AndroidManifest.xml`.
+- Created and executed [`scripts/build_and_sign_release_v37.ps1`](scripts/build_and_sign_release_v37.ps1).
+- Generated release binaries:
+  - **Signed Test APK**: `C:\Users\rajes\StudioProjects\jbac_app\jbacApp-0.0.37.apk` *(118.68 MB)*
+  - **Signed Publishing AAB**: `C:\Users\rajes\StudioProjects\jbac_app\jbacApp-0.0.37.aab` *(115.81 MB)*
+  - **Standard Upload AAB**: `C:\Users\rajes\StudioProjects\jbac_app\appreleasesigned.aab` *(115.81 MB)*
+  - Verified badging: `versionCode='37'`, `versionName='0.0.37'`, `minSdkVersion='24'`, `targetSdkVersion='36'`.
+
+
 
 
 
