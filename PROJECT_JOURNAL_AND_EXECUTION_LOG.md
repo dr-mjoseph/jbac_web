@@ -1853,3 +1853,75 @@ The repository contains two query execution engines:
      - `Sign Android Release APK`: **Success**
      - `Upload APK`: **Success** (`app-release.apk`, 115.64 MB)
      - Overall status: **Completed (Success)**.
+
+---
+
+## 34. Mobile Registration Form Navigation Failure Root-Cause Analysis, Webpack String Syntax Remediation & Release v0.0.37 Build
+
+### 1. Incident Overview & Problem Statement
+- **User Issue**: After State dropdowns were enabled on mobile search views, tapping on any registration form card on the Registrations page (`FormsPage` / `forms.html` / `29.js`) produced no response; the app stayed on the forms list screen without transitioning to the selected registration form.
+- Affected registration forms:
+  - Believer Register (`BelieverPage` / chunk `37.js`)
+  - Student Register (`StudentPage` / chunk `12.js`)
+  - Ministry Register (`MinistryPage` / chunk `21.js`)
+  - Pastor Register (`PastorPage` / chunk `16.js`)
+  - Church Register (`ChurchPage` / chunk `35.js`)
+  - Organisation Register (`OrganisationPage` / chunk `18.js`)
+  - Pastor Association Register (`AssociationPage` / chunk `38.js`)
+  - Add Jobs Form (`AddjobsPage` / chunk `41.js`)
+
+### 2. Deep Root-Cause Analysis
+1. **Unescaped Line Terminators in Webpack Bundle Chunk Templates**:
+   - In compiled Webpack bundle chunks, `template: '...'` is an inline single-quoted JavaScript string literal.
+   - Per ECMA-262 specification, `LineTerminator` characters (`0x0A` LF / `0x0D` CR) cannot appear unescaped inside single-quoted string literals.
+   - The previous patch script used standard Python format strings `f'<{col_tag}>\n\n'`, which evaluated `\n\n` into actual raw `0x0A 0x0A` newline bytes.
+   - When written into chunk files (`12.js`, `16.js`, `18.js`, `37.js`, `38.js`, `41.js`, etc.), the JavaScript string literals contained raw CR/LF bytes.
+   - When the Android WebView dynamically loaded the chunk upon a card tap, V8 failed during evaluation with:
+     ```text
+     SyntaxError: Invalid or unexpected token (Unterminated string literal)
+     ```
+   - This evaluation failure rejected Webpack's module loading promise, silently aborting Ionic's `this.navCtrl.push(...)` transition.
+2. **Missing `tappable` on Card 1 (Believer Register)**:
+   - On Cordova Android WebView, `<ion-card>` elements require `tappable` for optimal 300ms tap dispatching. Card 1 was missing `tappable` in `forms.html` and `29.js`.
+3. **Missing State Support on `MinistryPage`**:
+   - `MinistryPage` (`21.js`, `src/pages/ministry/ministry.html`, `src/pages/ministry/ministry.ts`) was previously omitted from state selection and cascading district loading.
+
+### 3. Remediation & Implementation Details
+1. **Flawless Chunk Patching Engine (`scripts/patch_all_chunks_flawless.py`)**:
+   - **Template String Encoding**: All linebreaks inside `template: '...'` are now strictly formatted using raw Python strings `r'\n\n'` (the literal two characters `\` and `n`), ensuring zero raw `0x0A` or `0x0D` bytes inside any string literal.
+   - **Executable JavaScript Code**: FormBuilder controls (`state_id: ['1']`) and Prototype methods (`onStateChange`) utilize valid executable newlines (`0x0A`).
+   - **Initial District Loading**: Registration pages call `this.service.getdistrict(1)` so AP districts populate immediately on initial load.
+   - **Ministry Registration**: Added State selection (`రాష్ట్రం / State`) and `onStateChange()` cascading logic to `MinistryPage` (`21.js`, `ministry.html`, `ministry.ts`).
+   - **Forms Page Tap Handling**: Added `tappable` attribute to all registration cards in `src/pages/forms/forms.html` and `29.js`.
+2. **Automated Verification Pipeline**:
+   - Executed `node -c` syntax compilation check on **all 57 JavaScript chunk files** in `www/build/` and Android assets: **0 errors**.
+   - Verified byte-level integrity: **0 raw CR/LF in template strings**, **0 BOM bytes**.
+   - Synchronized all 15 patched files to `platforms/android/app/src/main/assets/www/build/` with 100% matching SHA256 hashes.
+3. **Clean Android Compilation & Production Signing**:
+   - Executed `gradlew.bat clean assembleRelease bundleRelease -PcdvBuildToolsVersion=30.0.3`.
+   - Zipaligned and signed APK using `apksigner` with `Jbac.keystore` (v1 and v2 schemes active).
+   - Signed AAB using `jarsigner` with `Jbac.keystore`.
+   - Verified output badging with `aapt`: `versionCode='37'`, `versionName='0.0.37'`, `minSdkVersion='24'`, `targetSdkVersion='34'`.
+4. **Post-Build Artifact Verification (`scripts/verify_final_apk_contents.py`)**:
+   - Extracted and verified all target chunks inside `jbacApp-0.0.37.apk` and `jbacApp-0.0.37.aab`:
+     - `main.js`: [PASS]
+     - `12.js` (StudentPage): [PASS]
+     - `13.js` (SearchorganisationPage): [PASS]
+     - `14.js` (SearchhousePage): [PASS]
+     - `16.js` (PastorPage): [PASS]
+     - `18.js` (OrganisationPage): [PASS]
+     - `21.js` (MinistryPage): [PASS]
+     - `22.js` (MarriagePage): [PASS]
+     - `23.js` (JobsPage): [PASS]
+     - `29.js` (FormsPage): [PASS]
+     - `32.js` (EntryFormPage): [PASS]
+     - `35.js` (ChurchPage): [PASS]
+     - `37.js` (BelieverPage): [PASS]
+     - `38.js` (AssociationPage): [PASS]
+     - `41.js` (AddjobsPage): [PASS]
+
+### 4. Output Artifacts (Release v0.0.37)
+- **Signed Test APK**: `C:\Users\rajes\StudioProjects\jbac_app\jbacApp-0.0.37.apk` *(118.7 MB)*
+- **Signed Production AAB**: `C:\Users\rajes\StudioProjects\jbac_app\jbacApp-0.0.37.aab` *(115.84 MB)*
+- **Standard Upload Bundle**: `C:\Users\rajes\StudioProjects\jbac_app\appreleasesigned.aab` *(115.84 MB)*
+
