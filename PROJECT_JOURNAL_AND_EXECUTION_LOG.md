@@ -1815,3 +1815,41 @@ The repository contains two query execution engines:
   - **Deploy Web App to AWS (S3 + CloudFront + Lambda Backend)**: `completed (success)`
   - **Auto-Sync Web App to Android Mobile App**: `completed (success)`
 - Pulled sync commits into mobile app repository [`dr-mjoseph/jbac_app`](https://github.com/dr-mjoseph/jbac_app) ensuring 100% cross-platform parity.
+
+---
+
+## 33. Mobile App Android CI Build Remediation (`fs.cpSync` & SDK Mismatch Resolution)
+
+### 1. Incident Overview
+- **Trigger**: GitHub Actions workflow `Build Android APK` failed at step `Add Android Platform` with exit code 1:
+  ```text
+  The "android-compileSdkVersion" (34) should be greater than or equal to the "android-targetSdkVersion" (36).
+  fs.cpSync is not a function
+  Error: Process completed with exit code 1.
+  ```
+
+### 2. Root Cause Analysis
+1. **`fs.cpSync is not a function`**:
+   - `jbac_app/package.json` had `"cordova-android": "^13.0.0"` in `devDependencies`.
+   - The CI runner environment (`.github/workflows/build-apk.yml`) uses Node.js 14 (`node-version: '14'`), which is strictly required by the legacy Ionic 3 / `@ionic/app-scripts` (v3.2.4) build toolchain.
+   - `cordova-android@13.0.0` uses `fs.cpSync()`, an API introduced in Node.js v16.7.0. In Node 14, `fs.cpSync` is undefined, throwing `TypeError: fs.cpSync is not a function`.
+2. **`compileSdkVersion (34) < targetSdkVersion (36)`**:
+   - `config.xml` had `<preference name="android-targetSdkVersion" value="36" />` while `android-compileSdkVersion` was `34`.
+   - Android build systems strictly enforce `compileSdkVersion >= targetSdkVersion`. Setting target to 36 with compile at 34 triggers Cordova errors.
+
+### 3. Resolution Applied & Verification
+1. **Pinned `cordova-android`**:
+   - Reverted `cordova-android` in `package.json` from `^13.0.0` to `^10.1.2`, aligning with `package-lock.json`.
+2. **SDK Alignment**:
+   - Updated `config.xml` to `<preference name="android-targetSdkVersion" value="34" />` and `<preference name="android-compileSdkVersion" value="34" />`.
+3. **Mobile Form Parity & Syntax Fix**:
+   - Added state selection (`రాష్ట్రం / State`) and `getstates()` / `onStateChange()` handling to `entry-form` and `student` in `jbac_app`.
+   - Fixed stray syntax closure in `src/pages/student/student.ts`.
+4. **CI/CD Execution Verification**:
+   - Pushed commit `4078ba1` to `dr-mjoseph/jbac_app`.
+   - Monitored GitHub Actions Run ID `39777740509`:
+     - `Add Android Platform`: **Success**
+     - `Build Android Release Package`: **Success**
+     - `Sign Android Release APK`: **Success**
+     - `Upload APK`: **Success** (`app-release.apk`, 115.64 MB)
+     - Overall status: **Completed (Success)**.
