@@ -1319,6 +1319,8 @@ html_content = r'''<!DOCTYPE html>
         <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
           <input type="text" id="recordFilterInput" class="input-field" style="width:160px;" placeholder="Filter rows..." oninput="filterTableRows()">
           <button class="btn btn-sm btn-success" onclick="openAddRecordModal()">➕ New Record</button>
+          <button class="btn btn-sm" id="exportCsvBtn" onclick="exportCurrentTable('csv')" title="Export full table to CSV / Excel">📥 Export CSV</button>
+          <button class="btn btn-sm" id="exportJsonBtn" onclick="exportCurrentTable('json')" title="Export full table to JSON">📥 Export JSON</button>
           <select id="pageSizeSelect" class="input-field" style="width:90px;" onchange="changePageSize()">
             <option value="50">50 rows</option>
             <option value="100" selected>100 rows</option>
@@ -2042,12 +2044,14 @@ html_content = r'''<!DOCTYPE html>
       const cols = currentTableCols.length > 0 ? currentTableCols : (record ? Object.keys(record) : ['name', 'status']);
       cols.forEach(c => {
         if (c.toLowerCase() === 'id' && editingRecordId) return; // ID is readonly
-        const val = record && record[c] !== undefined && record[c] !== null ? String(record[c]) : '';
+        const isNullOrUndefined = !record || record[c] === undefined || record[c] === null;
+        const val = isNullOrUndefined ? '' : String(record[c]);
+        const placeholder = isNullOrUndefined ? 'NULL (leave blank for NULL)' : `Enter ${escapeHtml(c)}`;
         const group = document.createElement('div');
         group.className = 'form-group';
         group.innerHTML = `
-          <label for="field_${c}">${escapeHtml(c)}</label>
-          <input type="text" id="field_${c}" name="${escapeHtml(c)}" class="input-field" value="${escapeHtml(val)}" placeholder="Enter ${escapeHtml(c)}">
+          <label for="field_${c}">${escapeHtml(c)} ${isNullOrUndefined ? '<span style="color:var(--text-dim); font-size:0.75rem; font-weight:normal;">(Currently NULL)</span>' : ''}</label>
+          <input type="text" id="field_${c}" name="${escapeHtml(c)}" class="input-field" value="${escapeHtml(val)}" placeholder="${placeholder}">
         `;
         form.appendChild(group);
       });
@@ -2065,10 +2069,14 @@ html_content = r'''<!DOCTYPE html>
 
     async function saveRecord() {
       const form = document.getElementById('recordForm');
-      const inputs = form.querySelectorAll('input');
+      const inputs = form.querySelectorAll('input, textarea, select');
       const payload = {};
       inputs.forEach(inp => {
-        payload[inp.name] = inp.value;
+        if (!inp.name) return;
+        const raw = inp.value;
+        const trimmed = typeof raw === 'string' ? raw.trim() : '';
+        // If field is left empty or set to literal NULL, pass null so foreign key constraints and numeric columns succeed
+        payload[inp.name] = (trimmed === '' || trimmed.toUpperCase() === 'NULL') ? null : raw;
       });
 
       const btn = document.getElementById('saveRecordBtn');
@@ -2152,6 +2160,68 @@ html_content = r'''<!DOCTYPE html>
     }
 
     // Export Utilities
+    async function exportCurrentTable(format) {
+      if (!currentTable) {
+        alert('Please select a table from the sidebar first.');
+        return;
+      }
+
+      const btn = format === 'csv' ? document.getElementById('exportCsvBtn') : document.getElementById('exportJsonBtn');
+      const origText = btn ? btn.textContent : '';
+      if (btn) {
+        btn.textContent = '⏳ Exporting...';
+        btn.disabled = true;
+      }
+
+      try {
+        let rows = currentTableRows;
+        // Attempt full table export via backend SQL execute query
+        try {
+          const res = await fetch(`${API_BASE}/dashboardapi/execute-query`, {
+            method: 'POST',
+            headers: getAuthHeaders(),
+            body: JSON.stringify({ query: `SELECT * FROM \`${currentTable}\`;` })
+          });
+          if (res.ok) {
+            const json = await res.json();
+            if (json.success && Array.isArray(json.data) && json.data.length > 0) {
+              rows = json.data;
+            }
+          }
+        } catch (e) {
+          console.warn('Full table fetch fallback to loaded rows:', e);
+        }
+
+        if (!rows || rows.length === 0) {
+          alert(`No records found in table "${currentTable}" to export.`);
+          return;
+        }
+
+        if (format === 'json') {
+          const blob = new Blob([JSON.stringify(rows, null, 2)], { type: 'application/json' });
+          downloadBlob(blob, `jbac_${currentTable}_export_${Date.now()}.json`);
+        } else if (format === 'csv') {
+          const cols = Object.keys(rows[0]);
+          let csv = '\uFEFF' + cols.map(c => `"${c.replace(/"/g, '""')}"`).join(',') + '\n';
+          rows.forEach(r => {
+            csv += cols.map(c => {
+              const v = r[c] !== null && r[c] !== undefined ? String(r[c]) : '';
+              return `"${v.replace(/"/g, '""')}"`;
+            }).join(',') + '\n';
+          });
+          const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+          downloadBlob(blob, `jbac_${currentTable}_export_${Date.now()}.csv`);
+        }
+      } catch (err) {
+        alert(`Export failed: ${err.message}`);
+      } finally {
+        if (btn) {
+          btn.textContent = origText;
+          btn.disabled = false;
+        }
+      }
+    }
+
     function exportResults(format) {
       if (!lastQueryResults || lastQueryResults.length === 0) {
         alert('No query results available to export.');
@@ -2163,14 +2233,14 @@ html_content = r'''<!DOCTYPE html>
         downloadBlob(blob, `jbac_query_export_${Date.now()}.json`);
       } else if (format === 'csv') {
         const cols = Object.keys(lastQueryResults[0]);
-        let csv = cols.map(c => `"${c.replace(/"/g, '""')}"`).join(',') + '\n';
+        let csv = '\uFEFF' + cols.map(c => `"${c.replace(/"/g, '""')}"`).join(',') + '\n';
         lastQueryResults.forEach(r => {
           csv += cols.map(c => {
             const v = r[c] !== null && r[c] !== undefined ? String(r[c]) : '';
             return `"${v.replace(/"/g, '""')}"`;
           }).join(',') + '\n';
         });
-        const blob = new Blob([csv], { type: 'text/csv' });
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
         downloadBlob(blob, `jbac_query_export_${Date.now()}.csv`);
       }
     }
@@ -2214,7 +2284,8 @@ targets = [
     'public.html',
     'backend/public.html',
     'Api/public.html',
-    'src/assets/public.html'
+    'src/assets/public.html',
+    'src/public.html'
 ]
 
 for t in targets:
