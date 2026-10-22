@@ -315,6 +315,7 @@ godOptions: string[] = [
   constituencyname: any;
   logincon: boolean = false
   ngOnInit(): void {
+    this.showSpinner = false;
     this.getdenomations();
     this.getleaderlevels();
    this.geteducational();
@@ -445,152 +446,76 @@ geteducational() {
   }
 
   getdistric(stateId?: any) {
-    this.showSpinner = true;
-    const sid = stateId || this.pastorform.get('state_id')?.value || 1;
-    this.service.getdistrict(sid).subscribe(
-      (res: any) => {
-        if (res && res.data) {
+    this.showSpinner = false;
+    const sid = stateId || this.pastorform?.get('state_id')?.value || 1;
+    this.service.getdistrict(sid).subscribe({
+      next: (res: any) => {
+        this.showSpinner = false;
+        if (res && res.data && Array.isArray(res.data) && res.data.length > 0) {
           this.districts = res.data;
+        } else {
+          this.districts = ((FALLBACK_DROPDOWN_DATA as any).districts || []).filter((d: any) => d.state_id == sid);
         }
-         else {
-          Swal.fire({
-            icon: 'warning',
-            title: 'గమనిక!',
-            text: 'జిల్లాల సమాచారము అందుబాటులో లేదు.',
-          });
-        }
-        this.showSpinner = false;
       },
-      (error) => {
-        console.error('జిల్లా పొందడంలో సమస్య వుంది', error);
-        Swal.fire({
-          icon: 'error',
-          title: 'లోపం!',
-          text: 'జిల్లా పొందడంలో సమస్య వుంది, దయచేసి మరల ప్రయత్నించండి.',
-        });
+      error: (error: any) => {
+        console.error('Error fetching districts:', error);
         this.showSpinner = false;
+        this.districts = ((FALLBACK_DROPDOWN_DATA as any).districts || []).filter((d: any) => d.state_id == sid);
       }
-    );
+    });
   }
-  
- getconstency(event: any) {
-    const id = event.target.value?.trim(); // Ensure valid ID
-  
-    if (!id) {
-      Swal.fire({
-        icon: 'warning',
-        title: 'గమనిక!',
-        text: 'దయచేసి సరైన జిల్లా ఎంపిక చేయండి.',
-      });
-      return;
-    }
-  
-    this.showSpinner = true; // Start loading indicator
-  
-    this.service.getconsistencys().subscribe(
-      (res: any) => {
-        if (res && res.data && res.data.length > 0) {
+
+  getconstency(event: any) {
+    const id = event?.target?.value !== undefined ? event.target.value?.trim() : event;
+    if (!id) return;
+
+    this.service.getconsistencys().subscribe({
+      next: (res: any) => {
+        this.showSpinner = false;
+        if (res && res.data && Array.isArray(res.data) && res.data.length > 0) {
           this.constituency = res.data.filter((data: any) => data.dstrct_id == id);
-  
           if (this.constituency.length === 0) {
-            Swal.fire({
-              icon: 'info',
-              title: 'సమాచారం',
-              text: 'ఎంచుకున్న జిల్లాకు నియోజకవర్గాల సమాచారం అందుబాటులో లేదు.',
-            });
+            this.constituency = ((FALLBACK_DROPDOWN_DATA as any).constituencies || []).filter((c: any) => c.dstrct_id == id);
           }
         } else {
-          Swal.fire({
-            icon: 'warning',
-            title: 'గమనిక!',
-            text: 'నియోజకవర్గాల సమాచారం అందుబాటులో లేదు.',
-          });
+          this.constituency = ((FALLBACK_DROPDOWN_DATA as any).constituencies || []).filter((c: any) => c.dstrct_id == id);
         }
-        this.showSpinner = false; // Stop loading indicator
       },
-      (error) => {
+      error: (error: any) => {
         console.error('Error fetching constituencies:', error);
-        Swal.fire({
-          icon: 'error',
-          title: 'లోపం!',
-          text: 'నియోజకవర్గాల సమాచారం పొందడంలో సమస్య, దయచేసి మరల ప్రయత్నించండి.',
-        });
-        this.showSpinner = false; // Stop loading indicator on error
+        this.showSpinner = false;
+        this.constituency = ((FALLBACK_DROPDOWN_DATA as any).constituencies || []).filter((c: any) => c.dstrct_id == id);
       }
-    );
+    });
   }
-  // getconstency(event: any) {
-  //   var id = event.target.value;
-  //   this.service.getconsistencys().subscribe(res => {
-  //     this.constituency = res.data.filter((data: any) => data.dstrct_id == id);
-  //   })
-  // }
-// getmandals(event: any) {
-//     var id = event.target.value;
-//     this.service.getmandals().subscribe(res => {
-//       this.mandals = res.data.filter((data: any) => data.const_id == id);
-//     })
-//   }
+
   getmandals(event: any) {
-      const id = event.target.value?.trim(); // Ensure ID is valid
-    
-        if (!id) {
-        Swal.fire({
-          icon: 'warning',
-          title: 'గమనిక!',
-          text: 'దయచేసి చక్కటి నియోజకవర్గాన్ని ఎంచుకోండి.',
-        });
-        return;
-      }
-    
-      this.showSpinner = true;
-    
-      this.service.getmandals().subscribe(
-        (res: any) => {
-          if (res && res.data && res.data.length > 0) {
-            // Filter and assign mandals
-            this.mandals = res.data.filter((data: any) => data.const_id == id);
-            
-            if (this.mandals.length === 0) {
-              Swal.fire({
-                icon: 'info',
-                title: 'సమాచారం',
-                text: 'ఎంచుకున్న నియోజకవర్గానికి మండలాలు లభ్యం కావడంలేదు.',
-              });
-            }
-          } else {
-            Swal.fire({
-              icon: 'warning',
-              title: 'గమనిక!',
-              text: 'మండలాల సమాచారం అందుబాటులో లేదు.',
-            });
+    const id = event?.target?.value !== undefined ? event.target.value?.trim() : event;
+    if (!id) return;
+
+    this.service.getmandals().subscribe({
+      next: (res: any) => {
+        this.showSpinner = false;
+        if (res && res.data && Array.isArray(res.data) && res.data.length > 0) {
+          this.mandals = res.data.filter((data: any) => data.const_id == id);
+          if (this.mandals.length === 0) {
+            this.mandals = ((FALLBACK_DROPDOWN_DATA as any).mandals || []).filter((m: any) => m.const_id == id);
           }
-          this.showSpinner = false;
-        },
-        (error) => {
-          console.error('Error fetching mandals:', error);
-          Swal.fire({
-            icon: 'error',
-            title: 'లోపం!',
-            text: 'మండలాలను / మున్సిపాలిటీ పొందడంలో సమస్య, దయచేసి మరల ప్రయత్నించండి.',
-          });
-          this.showSpinner = false;
+        } else {
+          this.mandals = ((FALLBACK_DROPDOWN_DATA as any).mandals || []).filter((m: any) => m.const_id == id);
         }
-      );
-    }
-  
-  // gepanchayati(event: any) {
-  //   var id = event.target.value;
-  //   this.service.gepanchayatis().subscribe(res => {
-  //     this.panchayati = res.data.filter((data: any) => data.mndl_id == id);
+      },
+      error: (error: any) => {
+        console.error('Error fetching mandals:', error);
+        this.showSpinner = false;
+        this.mandals = ((FALLBACK_DROPDOWN_DATA as any).mandals || []).filter((m: any) => m.const_id == id);
+      }
+    });
+  }
 
-
-  //   })
-  // }
   gepanchayati(event: any) {
     const id = event?.target?.value !== undefined ? event.target.value?.trim() : event;
     if (!id) return;
-    this.showSpinner = true;
     this.service.gepanchayatis(id).subscribe({
       next: (res: any) => {
         this.showSpinner = false;
