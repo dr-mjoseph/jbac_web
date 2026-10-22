@@ -26,7 +26,7 @@ Set-Location -Path $androidDir
 
 # Step 1: Run Gradle build
 Write-Host "`n[1/5] Executing Gradle assembleRelease and bundleRelease..." -ForegroundColor Yellow
-& .\gradlew.bat assembleRelease bundleRelease "-PcdvBuildToolsVersion=30.0.3" --stacktrace
+& .\gradlew.bat clean assembleRelease bundleRelease "-PcdvBuildToolsVersion=30.0.3" --stacktrace
 
 if ($LASTEXITCODE -ne 0) {
     Write-Error "Gradle build failed with exit code $LASTEXITCODE"

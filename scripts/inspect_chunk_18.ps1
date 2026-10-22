@@ -1,18 +1,22 @@
-$c = Get-Content "C:\Users\rajes\StudioProjects\jbac_app\www\build\18.js" -Raw -Encoding UTF8
-Write-Host "18.js length: $($c.Length)"
-
-Write-Host "--- Template District Match ---"
-$m = [regex]::Match($c, '<ion-card>[\s\S]*?districts[\s\S]*?</ion-select>')
-if ($m.Success) {
-    Write-Host $m.Value
-} else {
-    Write-Host "District col not matched in template"
+$p18 = 'C:\Users\rajes\StudioProjects\jbac_app\www\build\18.js'
+$c18 = [System.IO.File]::ReadAllText($p18, [System.Text.Encoding]::UTF8)
+$idx = $c18.IndexOf('onStateChange')
+Write-Host "onStateChange index in 18.js: $idx"
+if ($idx -gt 0) {
+    Write-Host "--- ONSTATECHANGE SNIPPET ---"
+    Write-Host $c18.Substring($idx - 50, 400)
 }
 
-Write-Host "--- FormBuilder Group Match ---"
-$m2 = [regex]::Match($c, 'this\.form\s*=\s*this\.formBuilder\.group\(\{[\s\S]*?\}\);')
-if ($m2.Success) {
-    Write-Host $m2.Value
-} else {
-    Write-Host "FormBuilder group not matched"
+$idxTpl = $c18.IndexOf('formControlName="state_id"')
+Write-Host "formControlName='state_id' index in 18.js: $idxTpl"
+if ($idxTpl -gt 0) {
+    Write-Host "--- TEMPLATE SNIPPET ---"
+    Write-Host $c18.Substring($idxTpl - 100, 300)
+}
+
+$idxForm = $c18.IndexOf('state_id:')
+Write-Host "state_id: index in 18.js: $idxForm"
+if ($idxForm -gt 0) {
+    Write-Host "--- FORM SNIPPET ---"
+    Write-Host $c18.Substring($idxForm - 50, 200)
 }
