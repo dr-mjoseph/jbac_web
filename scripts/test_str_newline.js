@@ -1,0 +1,1 @@
+var str = 'hello\nworld';\nWScript.Echo('str with escaped \n: ' + str);

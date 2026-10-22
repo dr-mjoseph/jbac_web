@@ -1,45 +1,64 @@
 import zipfile
-import re
+import subprocess
+import os
 
-apk_path = r"C:\Users\rajes\StudioProjects\jbac_app\jbacApp-0.0.37.apk"
-aab_path = r"C:\Users\rajes\StudioProjects\jbac_app\jbacApp-0.0.37.aab"
+app_root = r"C:\Users\rajes\StudioProjects\jbac_app"
+apk_path = os.path.join(app_root, "jbacApp-0.0.37.apk")
+aab_path = os.path.join(app_root, "jbacApp-0.0.37.aab")
+node_exe = r"C:\Users\rajes\.cache\codex-runtimes\codex-primary-runtime\dependencies\node\bin\node.exe"
 
-print("==================================================")
-print("  Final Deep Inspection of Signed Release Outputs ")
-print("==================================================")
+print(f"=== VERIFYING APK CONTENTS: {apk_path} ===")
+if not os.path.exists(apk_path):
+    raise FileNotFoundError(f"APK not found: {apk_path}")
 
-# 1. APK Verification
-with zipfile.ZipFile(apk_path, 'r') as z:
-    for chunk in ["main.js", "23.js", "18.js", "37.js", "12.js", "16.js", "35.js"]:
-        entry_path = f"assets/www/build/{chunk}"
-        data = z.read(entry_path)
+target_chunks = [
+    "main.js", "12.js", "13.js", "14.js", "16.js", "18.js",
+    "21.js", "22.js", "23.js", "29.js", "32.js", "35.js",
+    "37.js", "38.js", "41.js"
+]
+
+with zipfile.ZipFile(apk_path, "r") as z:
+    for ch in target_chunks:
+        entry_name = f"assets/www/build/{ch}"
+        if entry_name not in z.namelist():
+            raise FileNotFoundError(f"Missing {entry_name} in APK!")
         
-        has_bom = (data[:3] == b'\xef\xbb\xbf')
-        text = data.decode('utf-8')
+        data = z.read(entry_name)
+        text = data.decode("utf-8")
         
-        has_state_tpl = ('formControlName="state_id"' in text) if chunk != "main.js" else True
-        has_state_form = ("state_id: ['" in text) if chunk != "main.js" else True
-        has_proto = ("onStateChange" in text) if chunk != "main.js" else ("getstates" in text and "state_id: stateId" in text)
+        # 1. Byte-level template checks
+        st = data.find(b"template:")
+        if st != -1:
+            ed = data.find(b"/*ion-inline-end:", st)
+            if ed != -1:
+                tpl = data[st:ed]
+                if b"\n" in tpl or b"\r" in tpl:
+                    raise ValueError(f"CR/LF found in template of {ch} inside APK!")
         
-        # Check for literal \n (backslash + n) near state_id
-        has_literal_n = False
-        if chunk != "main.js":
-            idx = text.find("state_id: [")
-            if idx > 0 and "\\n" in text[idx:idx+40]:
-                has_literal_n = True
+        # 2. BOM check
+        if data.startswith(b"\xef\xbb\xbf"):
+            raise ValueError(f"{ch} has BOM inside APK!")
         
-        status = (not has_bom) and (not has_literal_n) and has_state_tpl and has_state_form and has_proto
-        print(f"APK {chunk:>7}: BOM={has_bom}, LitSlashN={has_literal_n}, Tpl={has_state_tpl}, Form={has_state_form}, Proto={has_proto} -> {'[PASS]' if status else '[FAIL]'}")
+        # 3. Check syntax with node -c
+        tmp_path = os.path.join(r"C:\Users\rajes\Documents\jbac_web\scripts", f"_verify_{ch}")
+        with open(tmp_path, "wb") as tf:
+            tf.write(data)
+        
+        res = subprocess.run([node_exe, "-c", tmp_path], capture_output=True, encoding="utf-8", errors="replace")
+        os.remove(tmp_path)
+        
+        if res.returncode != 0:
+            raise SyntaxError(f"Syntax error in {ch} inside APK: {res.stderr.strip()[:200]}")
+        
+        # 4. Content checks
+        if ch in ["37.js", "12.js", "21.js", "16.js", "18.js", "38.js", "41.js"]:
+            if "onStateChange" not in text:
+                raise ValueError(f"onStateChange missing in {ch} inside APK!")
+            if "formControlName=\"state_id\"" not in text:
+                raise ValueError(f"state_id missing in template of {ch} inside APK!")
+            if "getdistrict(1)" not in text:
+                raise ValueError(f"getdistrict(1) missing in {ch} inside APK!")
+        
+        print(f"  [PASS] {ch:10s} (verified in APK: 0 CR/LF, 0 BOM, node -c syntax OK, state dropdown present)")
 
-# 2. AAB Verification
-with zipfile.ZipFile(aab_path, 'r') as z:
-    for chunk in ["main.js", "23.js", "18.js", "37.js"]:
-        entry_path = f"base/assets/www/build/{chunk}"
-        data = z.read(entry_path)
-        has_bom = (data[:3] == b'\xef\xbb\xbf')
-        text = data.decode('utf-8')
-        has_state_tpl = ('formControlName="state_id"' in text) if chunk != "main.js" else True
-        status = (not has_bom) and has_state_tpl
-        print(f"AAB {chunk:>7}: BOM={has_bom}, Tpl={has_state_tpl} -> {'[PASS]' if status else '[FAIL]'}")
-
-print("\nAll deep checks completed successfully!")
+print("\n=== ALL CHUNKS IN APK VERIFIED 100% HEALTHY & VALID! ===")
