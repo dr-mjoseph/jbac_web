@@ -1075,8 +1075,23 @@
        TAB 1: DASHBOARD OVERVIEW
        ========================================================================= -->
   <div class="view-container dashboard-view active" id="tab-dashboard">
+    <!-- State-wise Categorical Filter Bar -->
+    <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:18px; background:var(--bg-surface); padding:12px 18px; border-radius:10px; border:1px solid var(--border-subtle); flex-wrap:wrap; gap:12px;">
+      <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+        <span style="font-weight:600; font-size:0.92rem; color:var(--text-main);">📍 Categorical State View:</span>
+        <div style="display:flex; gap:8px;">
+          <button class="btn btn-sm active" id="pillStateAll" onclick="setDashboardStateFilter('all')">🌐 All States (AP & TG)</button>
+          <button class="btn btn-sm" id="pillStateAp" onclick="setDashboardStateFilter('1')">🏛️ Andhra Pradesh (AP)</button>
+          <button class="btn btn-sm" id="pillStateTg" onclick="setDashboardStateFilter('2')">🏛️ Telangana (TG)</button>
+        </div>
+      </div>
+      <div id="dashboardStateIndicator" style="font-size:0.82rem; color:var(--text-dim);">
+        Showing all registered users & activities across AP & TG
+      </div>
+    </div>
+
     <div class="metrics-grid" id="metricsGrid">
-      <div class="metric-card" onclick="openQueryPreset('SELECT * FROM signup_form ORDER BY id DESC LIMIT 50;')">
+      <div class="metric-card" onclick="openStateCategoryQuery('signup_form')">
         <div class="metric-card-header">
           <span>Believers Registered</span>
           <div class="metric-card-icon">👥</div>
@@ -1085,7 +1100,7 @@
         <div class="metric-card-footer">signup_form &bull; Click to query</div>
       </div>
 
-      <div class="metric-card" onclick="openQueryPreset('SELECT * FROM pastor_reg ORDER BY id DESC LIMIT 50;')">
+      <div class="metric-card" onclick="openStateCategoryQuery('pastor_reg')">
         <div class="metric-card-header">
           <span>Pastors Registered</span>
           <div class="metric-card-icon">✝️</div>
@@ -1094,7 +1109,7 @@
         <div class="metric-card-footer">pastor_reg &bull; Click to query</div>
       </div>
 
-      <div class="metric-card" onclick="openQueryPreset('SELECT * FROM church_reg ORDER BY id DESC LIMIT 50;')">
+      <div class="metric-card" onclick="openStateCategoryQuery('church_reg')">
         <div class="metric-card-header">
           <span>Churches Registered</span>
           <div class="metric-card-icon">⛪</div>
@@ -1103,7 +1118,7 @@
         <div class="metric-card-footer">church_reg &bull; Click to query</div>
       </div>
 
-      <div class="metric-card" onclick="openQueryPreset('SELECT * FROM student_reg ORDER BY id DESC LIMIT 50;')">
+      <div class="metric-card" onclick="openStateCategoryQuery('student_reg')">
         <div class="metric-card-header">
           <span>Students Registered</span>
           <div class="metric-card-icon">🎓</div>
@@ -1112,7 +1127,7 @@
         <div class="metric-card-footer">student_reg &bull; Click to query</div>
       </div>
 
-      <div class="metric-card" onclick="openQueryPreset('SELECT * FROM ministry_signup ORDER BY id DESC LIMIT 50;')">
+      <div class="metric-card" onclick="openStateCategoryQuery('ministry_signup')">
         <div class="metric-card-header">
           <span>Ministries Registered</span>
           <div class="metric-card-icon">🕊️</div>
@@ -1121,7 +1136,7 @@
         <div class="metric-card-footer">ministry_signup &bull; Click to query</div>
       </div>
 
-      <div class="metric-card" onclick="openQueryPreset('SELECT * FROM independentorganisation_reg ORDER BY id DESC LIMIT 50;')">
+      <div class="metric-card" onclick="openStateCategoryQuery('independentorganisation_reg')">
         <div class="metric-card-header">
           <span>Organizations Registered</span>
           <div class="metric-card-icon">🏛️</div>
@@ -1130,7 +1145,7 @@
         <div class="metric-card-footer">independentorganisation_reg &bull; Click to query</div>
       </div>
 
-      <div class="metric-card" onclick="openQueryPreset('SELECT * FROM events ORDER BY id DESC LIMIT 50;')">
+      <div class="metric-card" onclick="openStateCategoryQuery('events')">
         <div class="metric-card-header">
           <span>Active Events</span>
           <div class="metric-card-icon">📅</div>
@@ -1139,7 +1154,7 @@
         <div class="metric-card-footer" id="stat-events-total">Loading total...</div>
       </div>
 
-      <div class="metric-card" onclick="openQueryPreset('SELECT * FROM users ORDER BY id DESC LIMIT 50;')">
+      <div class="metric-card" onclick="openStateCategoryQuery('users')">
         <div class="metric-card-header">
           <span>Total Portal Accounts</span>
           <div class="metric-card-icon">🔐</div>
@@ -1314,7 +1329,12 @@
         </div>
 
         <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
-          <input type="text" id="recordFilterInput" class="input-field" style="width:160px;" placeholder="Filter rows..." oninput="filterTableRows()">
+          <input type="text" id="recordFilterInput" class="input-field" style="width:140px;" placeholder="Filter rows..." oninput="filterTableRows()">
+          <select id="tableStateFilter" class="input-field" style="width:130px; font-weight:600;" onchange="onTableStateFilterChange()" title="Filter records state-wise">
+            <option value="all">🌐 All States</option>
+            <option value="1">🏛️ AP Only</option>
+            <option value="2">🏛️ TG Only</option>
+          </select>
           <button class="btn btn-sm btn-success" onclick="openAddRecordModal()">➕ New Record</button>
           <button class="btn btn-sm" id="exportCsvBtn" onclick="exportCurrentTable('csv')" title="Export full table to CSV / Excel">📥 Export CSV</button>
           <button class="btn btn-sm" id="exportJsonBtn" onclick="exportCurrentTable('json')" title="Export full table to JSON">📥 Export JSON</button>
@@ -1419,9 +1439,18 @@
           </select>
         </div>
 
+        <div class="form-group" style="margin-top:14px;">
+          <label for="importStateAttributionSelect" style="font-weight:600; margin-bottom:6px; display:block;">3. State Attribution (for State-aware Tables):</label>
+          <select id="importStateAttributionSelect" class="input-field" style="width:100%; font-size:0.9rem;">
+            <option value="auto" selected>🌐 Auto: Retain existing state_id from imported data (fallback to AP if missing)</option>
+            <option value="1">🏛️ Force AP: Tag all imported records as Andhra Pradesh (state_id = 1, state = 'Andhra Pradesh')</option>
+            <option value="2">🏛️ Force TG: Tag all imported records as Telangana (state_id = 2, state = 'Telangana')</option>
+          </select>
+        </div>
+
         <div id="importPreviewContainer" style="display:none; margin-top:16px;">
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
-            <label style="margin:0; font-weight:600;">3. Data Preview & Validation</label>
+            <label style="margin:0; font-weight:600;">4. Data Preview & Validation</label>
             <span id="importRowsCountBadge" class="row-count-badge" style="background:var(--primary); color:#fff;">0 rows</span>
           </div>
           <div id="importPreviewSummary" style="font-size:0.8rem; color:var(--text-muted); margin-bottom:8px;"></div>
@@ -1458,6 +1487,57 @@
     }
 
     let API_BASE = localStorage.getItem('jbac_api_base') || resolveDefaultApiBase();
+    let dashboardActiveState = 'all';
+
+    function setDashboardStateFilter(stateId) {
+      dashboardActiveState = String(stateId);
+      const pills = {
+        'all': document.getElementById('pillStateAll'),
+        '1': document.getElementById('pillStateAp'),
+        '2': document.getElementById('pillStateTg')
+      };
+      Object.keys(pills).forEach(k => {
+        const el = pills[k];
+        if (el) {
+          if (k === String(stateId)) {
+            el.classList.add('active');
+            el.style.background = 'var(--primary)';
+            el.style.color = '#fff';
+            el.style.borderColor = 'var(--primary)';
+          } else {
+            el.classList.remove('active');
+            el.style.background = 'transparent';
+            el.style.color = 'var(--text-main)';
+            el.style.borderColor = 'var(--border-subtle)';
+          }
+        }
+      });
+
+      const indicator = document.getElementById('dashboardStateIndicator');
+      if (indicator) {
+        if (String(stateId) === '1') indicator.textContent = 'Showing registered users & activities for Andhra Pradesh (AP)';
+        else if (String(stateId) === '2') indicator.textContent = 'Showing registered users & activities for Telangana (TG)';
+        else indicator.textContent = 'Showing all registered users & activities across AP & TG';
+      }
+
+      loadDashboardMetrics(stateId);
+    }
+
+    function openStateCategoryQuery(tableName) {
+      switchTab('query');
+      let q = `SELECT * FROM \`${tableName}\``;
+      if (dashboardActiveState !== 'all') {
+        q += ` WHERE \`state_id\` = ${dashboardActiveState}`;
+      }
+      q += ` ORDER BY id DESC LIMIT 50;`;
+      document.getElementById('sqlEditor').value = q;
+      executeQuery();
+    }
+
+    function onTableStateFilterChange() {
+      currentOffset = 0;
+      fetchActiveTableData();
+    }
     let currentTable = 'signup_form';
     let currentOffset = 0;
     let currentLimit = 100;
@@ -1715,9 +1795,10 @@
     }
 
     // Dashboard Metrics
-    async function loadDashboardMetrics() {
+    async function loadDashboardMetrics(stateId = dashboardActiveState) {
       try {
-        const res = await fetch(`${API_BASE}/dashboardapi/admin-dashboard-stats`, {
+        const url = `${API_BASE}/dashboardapi/admin-dashboard-stats${stateId && stateId !== 'all' ? `?state_id=${stateId}` : ''}`;
+        const res = await fetch(url, {
           headers: getAuthHeaders()
         });
         if (res.status === 401) {
@@ -1977,7 +2058,9 @@
       container.innerHTML = '<div class="empty-state" style="padding:40px; text-align:center;"><h3>Loading table records...</h3></div>';
 
       try {
-        const res = await fetch(`${API_BASE}/dashboardapi/crud/${currentTable}?limit=${currentLimit}&offset=${currentOffset}`, {
+        const stateSelect = document.getElementById('tableStateFilter');
+        const stateParam = stateSelect && stateSelect.value !== 'all' ? `&state_id=${stateSelect.value}` : '';
+        const res = await fetch(`${API_BASE}/dashboardapi/crud/${currentTable}?limit=${currentLimit}&offset=${currentOffset}${stateParam}`, {
           headers: getAuthHeaders()
         });
 
@@ -2239,16 +2322,33 @@
       try {
         let rows = currentTableRows;
         // Attempt full table export via backend SQL execute query
+        const stateSelect = document.getElementById('tableStateFilter');
+        const stateVal = stateSelect ? stateSelect.value : 'all';
         try {
+          let exportQuery = `SELECT * FROM \`${currentTable}\``;
+          if (stateVal !== 'all') {
+            exportQuery += ` WHERE \`state_id\` = ${stateVal}`;
+          }
+          exportQuery += ';';
           const res = await fetch(`${API_BASE}/dashboardapi/execute-query`, {
             method: 'POST',
             headers: getAuthHeaders(),
-            body: JSON.stringify({ query: `SELECT * FROM \`${currentTable}\`;` })
+            body: JSON.stringify({ query: exportQuery })
           });
           if (res.ok) {
             const json = await res.json();
             if (json.success && Array.isArray(json.data) && json.data.length > 0) {
               rows = json.data;
+            } else if (json.error && json.error.includes("Unknown column 'state_id'")) {
+              const fallbackRes = await fetch(`${API_BASE}/dashboardapi/execute-query`, {
+                method: 'POST',
+                headers: getAuthHeaders(),
+                body: JSON.stringify({ query: `SELECT * FROM \`${currentTable}\`;` })
+              });
+              if (fallbackRes.ok) {
+                const fbJson = await fallbackRes.json();
+                if (fbJson.success && Array.isArray(fbJson.data)) rows = fbJson.data;
+              }
             }
           }
         } catch (e) {
@@ -2262,7 +2362,7 @@
 
         if (format === 'json') {
           const blob = new Blob([JSON.stringify(rows, null, 2)], { type: 'application/json' });
-          downloadBlob(blob, `jbac_${currentTable}_export_${Date.now()}.json`);
+          const sfx = (stateVal && stateVal !== "all") ? (stateVal === "1" ? "_ap" : "_tg") : ""; downloadBlob(blob, `jbac_${currentTable}${sfx}_export_${Date.now()}.json`);
         } else if (format === 'csv') {
           const cols = Object.keys(rows[0]);
           let csv = '\uFEFF' + cols.map(c => `"${c.replace(/"/g, '""')}"`).join(',') + '\n';
@@ -2273,7 +2373,7 @@
             }).join(',') + '\n';
           });
           const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-          downloadBlob(blob, `jbac_${currentTable}_export_${Date.now()}.csv`);
+          const sfx = (stateVal && stateVal !== "all") ? (stateVal === "1" ? "_ap" : "_tg") : ""; downloadBlob(blob, `jbac_${currentTable}${sfx}_export_${Date.now()}.csv`);
         }
       } catch (err) {
         alert(`Export failed: ${err.message}`);
@@ -2493,6 +2593,14 @@
       if (!pendingImportRecords || pendingImportRecords.length === 0) return;
       const btn = document.getElementById('startImportBtn');
       const mode = document.getElementById('importModeSelect').value;
+      const stateAttrSelect = document.getElementById('importStateAttributionSelect');
+      const stateAttr = stateAttrSelect ? stateAttrSelect.value : 'auto';
+      if (stateAttr === '1' || stateAttr === '2') {
+        pendingImportRecords.forEach(r => {
+          r.state_id = Number(stateAttr);
+          r.state = stateAttr === '2' ? 'Telangana' : 'Andhra Pradesh';
+        });
+      }
       btn.disabled = true;
       btn.textContent = '⏳ Importing to MySQL...';
       showImportStatus(`Processing and adjusting ${pendingImportRecords.length} records into table "${currentTable}"...`, 'warning');

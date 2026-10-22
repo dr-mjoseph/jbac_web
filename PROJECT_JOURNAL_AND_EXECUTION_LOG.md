@@ -1925,3 +1925,56 @@ The repository contains two query execution engines:
 - **Signed Production AAB**: `C:\Users\rajes\StudioProjects\jbac_app\jbacApp-0.0.37.aab` *(115.84 MB)*
 - **Standard Upload Bundle**: `C:\Users\rajes\StudioProjects\jbac_app\appreleasesigned.aab` *(115.84 MB)*
 
+---
+
+## 35. Web Database Cockpit State Sync to https://jbac.in/admin, Google Play Console Version Code 38 Bump & Release v0.0.38 Deliverables
+
+### 1. Web Database Cockpit Synchronization (`https://jbac.in/admin`)
+- **Issue**: Categorical State View ribbon and state-wise filtering present at `https://1a8kqxawxd.execute-api.ap-southeast-2.amazonaws.com/admin` (Lambda) were not reflected at `https://jbac.in/admin` (CloudFront/S3).
+- **Root Cause**: `backend/public.html` (101,933 bytes) contained the new state filtering ribbon and table-level filter logic, but static web assets in root `public.html`, `src/public.html`, `dist/churchwebsite/`, and AWS S3 bucket `jbac-web-production-298363284024` were still on the previous build (96,216 bytes / 93,611 bytes).
+- **Resolution**:
+  - Synchronized `backend/public.html` across all local paths (`public.html`, `src/public.html`, `src/assets/public.html`, `dist/churchwebsite/public.html`, `dist/churchwebsite/admin/index.html`, `dist/churchwebsite/dashboard/index.html`, `dist/churchwebsite/assets/public.html`, `Api/public.html`).
+  - Uploaded to S3 bucket `jbac-web-production-298363284024` keys:
+    - `public.html`
+    - `admin`
+    - `admin/index.html`
+    - `dashboard`
+    - `dashboard/index.html`
+    - `assets/public.html`
+    - Metadata: `Content-Type: text/html; charset=utf-8`, `Cache-Control: no-cache, no-store, must-revalidate`.
+  - Created CloudFront cache invalidation `I6RN5BMEDMUT0CXJ38U9O40VSZ` on distribution `EOBBU8SU7H3BI` for paths `"/admin"`, `"/admin/*"`, `"/public.html"`, `"/public*"`, `"/dashboard"`, `"/dashboard/*"`, `"/assets/public.html"`.
+  - Verified live:
+    - `https://jbac.in/admin`: **HTTP 200 OK**, Length: `101,933`, Categorical State View: **True**, State Pills: **True**.
+    - `https://jbac.in/admin/`: **HTTP 200 OK**, Length: `101,933`, State View: **True**.
+    - `https://www.jbac.in/admin`: **HTTP 200 OK**, Length: `101,933`, State View: **True**.
+    - `https://jbac.in/public.html`: **HTTP 200 OK**, Length: `101,933`, State View: **True**.
+
+### 2. Google Play Console Version Code Conflict Resolution (`versionCode 38`)
+- **Issue**: Google Play Console rejected `jbacApp-0.0.37.aab` with error: *"Version code 37 has already been used. Try another version code."*
+- **Resolution**:
+  - Updated `config.xml` (`version="0.0.38" android-versionCode="38"`).
+  - Updated `platforms/android/app/src/main/AndroidManifest.xml` (`android:versionCode="38" android:versionName="0.0.38"`).
+  - Updated `platforms/android/app/src/main/res/xml/config.xml` (`android-versionCode="38" version="0.0.38"`).
+  - Updated `package.json` (`"version": "0.0.38"`).
+- **Clean Build & Signing (`scripts/build_and_sign_release_v38.ps1`)**:
+  - Ran `gradlew.bat clean assembleRelease bundleRelease -PcdvBuildToolsVersion=30.0.3 --stacktrace`.
+  - Aligned release APK with `zipalign -f -p 4`.
+  - Signed release APK with `apksigner` using `Jbac.keystore` (v1 and v2 schemes active).
+  - Signed release AAB with `jarsigner -sigalg SHA256withRSA -digestalg SHA-256` using `Jbac.keystore`.
+  - Validated APK badging with `aapt dump badging`:
+    - `package: name='io.ionic.starterjbac' versionCode='38' versionName='0.0.38' compileSdkVersion='34'`
+    - `sdkVersion:'24'`
+    - `targetSdkVersion:'34'`
+- **Automated Verification (`scripts/verify_final_apk_contents.py`)**:
+  - All 15 critical JavaScript chunks (`main.js`, `12.js`, `13.js`, `14.js`, `16.js`, `18.js`, `21.js`, `22.js`, `23.js`, `29.js`, `32.js`, `35.js`, `37.js`, `38.js`, `41.js`) verified:
+    - Zero raw newline terminators (`0x0A`/`0x0D`) inside single-quoted string literals.
+    - Zero Byte Order Marks (BOM).
+    - Passed `node -c` JavaScript syntax validation.
+
+### 3. Deliverables & Release Artifacts (Release v0.0.38)
+- **Signed Test APK**: `C:\Users\rajes\StudioProjects\jbac_app\jbacApp-0.0.38.apk` *(118.7 MB)*
+- **Signed Production AAB**: `C:\Users\rajes\StudioProjects\jbac_app\jbacApp-0.0.38.aab` *(115.84 MB)*
+- **Standard Upload Bundle**: `C:\Users\rajes\StudioProjects\jbac_app\appreleasesigned.aab` *(115.84 MB)*
+- **Release Notes File**: `RELEASE_NOTES_v0.0.38.md` (English, Telugu, and Play Console XML).
+
+

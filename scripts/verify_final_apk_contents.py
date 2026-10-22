@@ -3,8 +3,8 @@ import subprocess
 import os
 
 app_root = r"C:\Users\rajes\StudioProjects\jbac_app"
-apk_path = os.path.join(app_root, "jbacApp-0.0.37.apk")
-aab_path = os.path.join(app_root, "jbacApp-0.0.37.aab")
+apk_path = os.path.join(app_root, "jbacApp-0.0.38.apk")
+aab_path = os.path.join(app_root, "jbacApp-0.0.38.aab")
 node_exe = r"C:\Users\rajes\.cache\codex-runtimes\codex-primary-runtime\dependencies\node\bin\node.exe"
 
 print(f"=== VERIFYING APK CONTENTS: {apk_path} ===")
