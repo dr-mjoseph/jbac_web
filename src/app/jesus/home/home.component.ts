@@ -48,7 +48,13 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
   preloadBanners(): void {
     if (typeof window !== 'undefined') {
       const bannerNums = ['01', '03', '04', '05', '06', '07'];
+      const updatedBannerNums = new Set(['01', '03', '07']);
       for (const num of bannerNums) {
+        if (updatedBannerNums.has(num)) {
+          const updatedBanner = new Image();
+          updatedBanner.src = `assets/images/Banner${num}.png?v=2`;
+          continue;
+        }
         const webpImg = new Image();
         webpImg.src = `assets/images/Banner${num}.webp`;
         const pngImg = new Image();
@@ -221,7 +227,6 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
 }
-
 
 
 
