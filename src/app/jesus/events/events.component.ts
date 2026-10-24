@@ -69,7 +69,10 @@ export class EventsComponent {
     this.showSpinner = true;
     this.getstates();
     this.getpastors();
-    this.getdistric();
+    this.districts = [];
+    this.constituency = [];
+    this.mandals = [];
+    this.panchayati = [];
     this.getdenomations();
     this.getRibbonEvents();
     this.searechevents();
@@ -85,6 +88,10 @@ export class EventsComponent {
   }
 
   getdistric(stateId?: any) {
+    if (!stateId || stateId === 'all') {
+      this.districts = [];
+      return;
+    }
     this.service.getdistrict(stateId).subscribe(res => {
       if (res.status == 202) {
         Swal.fire(res.message);
@@ -413,7 +420,9 @@ export class EventsComponent {
     this.constituency = [];
     this.mandals = [];
     this.panchayati = [];
-    this.getdistric(id);
+    if (id && id !== 'all') {
+      this.getdistric(id);
+    }
     this.applyCombinedFilter();
   }
 
@@ -421,6 +430,7 @@ export class EventsComponent {
     const id = event && event.target ? event.target.value : event;
     this.searchdist = id;
     this.searchdenomation.patchValue({ district_id: id, constenncy_id: '', mandal_id: '', panchayati_id: '' });
+    this.searchconts = '';
     this.constituency = [];
     this.mandals = [];
     this.panchayati = [];
@@ -517,7 +527,7 @@ export class EventsComponent {
   searchmandals(event: any) { this.onMandalChange(event); }
 
   applyCombinedFilter() {
-    const formVals = this.searchdenomation.value || {};
+    const formVals = this.searchdenomation.getRawValue ? this.searchdenomation.getRawValue() : (this.searchdenomation.value || {});
     const queryPayload: any = {
       state_id: formVals.state_id || this.searchstate || '',
       district_id: formVals.district_id || this.searchdist || '',
@@ -655,7 +665,7 @@ export class EventsComponent {
     this.startdate = '';
     this.searchdist = '';
     this.searchconts = '';
-    this.getdistric();
+    this.districts = [];
     this.constituency = [];
     this.mandals = [];
     this.panchayati = [];

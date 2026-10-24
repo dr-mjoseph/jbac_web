@@ -2240,3 +2240,41 @@ The user submitted three key requirements:
 - **Production Build**:
   - Executed `ng build --configuration production` with Node 24: Generated all bundles (`main.674b7f71531b58d1.js`) with zero compile errors.
 
+---
+
+## 24. Milestone 14: View Meetings Strict Sequential Order Filtering (`State ➔ District ➔ Constituency ➔ Mandal ➔ Panchayat`)
+
+### 1. Requirement & Condition
+- When a user selects a state (TG / AP), all meetings in that state are displayed across all districts, constituencies, mandals, and panchayats.
+- If the user wants to filter further into geographic subdivisions (`District ➔ Constituency ➔ Mandal ➔ Panchayat`), the user **must select State first**.
+- Strict cascading hierarchy:
+  - **District** is disabled until **State** is selected.
+  - **Constituency** is disabled until **District** is selected.
+  - **Mandal** is disabled until **Constituency** is selected.
+  - **Panchayat** is disabled until **Mandal** is selected.
+
+### 2. Implementation
+1. **`src/app/jesus/events/events.component.html`**:
+   - Numbered labels:
+     - `1). సెలెక్ట్ రాష్ట్రం / State`
+     - `2). సెలెక్ట్ జిల్లా` (`[disabled]="!searchdenomation.value.state_id || districts.length === 0"`)
+     - `3). సెలెక్ట్ నియోజకవర్గం` (`[disabled]="!searchdenomation.value.district_id || constituency.length === 0"`)
+     - `4). మండలం/మున్సిపాలిటీ` (`[disabled]="!searchdenomation.value.constenncy_id || mandals.length === 0"`)
+     - `5). సెలెక్ట్ పంచాయతీ/వార్డు` (`[disabled]="!searchdenomation.value.mandal_id || panchayati.length === 0"`)
+   - Intuitive placeholder text explaining what parent selection is needed:
+     - District placeholder: `{{ !searchdenomation.value.state_id ? 'మొదట రాష్ట్రాన్ని ఎంచుకోండి' : 'అన్ని జిల్లాలు (All Districts)' }}`
+     - Constituency placeholder: `{{ !searchdenomation.value.district_id ? 'మొదట జిల్లాను ఎంచుకోండి' : 'అన్ని నియోజకవర్గాలు' }}`
+     - Mandal placeholder: `{{ !searchdenomation.value.constenncy_id ? 'మొదట నియోజకవర్గాన్ని ఎంచుకోండి' : 'అన్ని మండలాలు / మున్సిపాలిటీ' }}`
+     - Panchayat placeholder: `{{ !searchdenomation.value.mandal_id ? 'మొదట మండలాన్ని ఎంచుకోండి' : 'అన్ని పంచాయతీలు / వార్డులు' }}`
+2. **`src/app/jesus/events/events.component.ts`**:
+   - `ngOnInit`: Removed pre-fetching of all districts (`this.getdistric()`), initializing `districts = []`, `constituency = []`, `mandals = []`, `panchayati = []`.
+   - `getdistric`: Returns empty array if no `stateId` is passed, preventing accidental unconstrained district loading.
+   - `onStateChange`: Resets downstream collections and controls (`district_id`, `constenncy_id`, `mandal_id`, `panchayati_id`), then fetches districts only for the selected state.
+   - `onDistrictChange`, `onConstituencyChange`, `onMandalChange`: Cascades resets downstream and enables only the next immediate tier upon selection.
+   - `reset`: Resets all geographic collections to empty arrays so downstream selects return to their disabled state until State is chosen.
+   - `applyCombinedFilter`: Uses `getRawValue()` to ensure clean value extraction even when downstream controls are disabled.
+
+### 3. Verification
+- `ng build --configuration production` succeeded with zero errors (`Hash: ded9e4a05ad4b6d5`).
+
+

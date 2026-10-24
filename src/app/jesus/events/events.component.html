@@ -58,7 +58,7 @@
                     <form [formGroup]="searchdenomation">
                         <div class="row g-3">
                             <div class="col-lg-2 col-md-4 col-sm-6 col-12">
-                                <label class="form-label fw-bold">సెలెక్ట్ రాష్ట్రం / State</label>
+                                <label class="form-label fw-bold">1). సెలెక్ట్ రాష్ట్రం / State</label>
                                 <select class="form-control form-select" formControlName="state_id"
                                     (change)="onStateChange($event);">
                                     <option value="" selected>అన్ని రాష్ట్రాలు (All States)</option>
@@ -68,40 +68,44 @@
                                 </select>
                             </div>
                             <div class="col-lg-2 col-md-4 col-sm-6 col-12">
-                                <label class="form-label fw-bold">సెలెక్ట్ జిల్లా</label>
+                                <label class="form-label fw-bold">2). సెలెక్ట్ జిల్లా</label>
                                 <select class="form-control form-select" formControlName="district_id"
-                                    (change)="onDistrictChange($event);">
-                                    <option value="" selected>అన్ని జిల్లాలు (All Districts)</option>
+                                    (change)="onDistrictChange($event);"
+                                    [disabled]="!searchdenomation.value.state_id || districts.length === 0">
+                                    <option value="" selected>{{ !searchdenomation.value.state_id ? 'మొదట రాష్ట్రాన్ని ఎంచుకోండి' : 'అన్ని జిల్లాలు (All Districts)' }}</option>
                                     <option value="{{item.id}}" *ngFor="let item of districts">
                                         {{item.distrct_nm}}
                                     </option>
                                 </select>
                             </div>
                             <div class="col-lg-2 col-md-4 col-sm-6 col-12">
-                                <label class="form-label fw-bold">సెలెక్ట్ నియోజకవర్గం</label>
+                                <label class="form-label fw-bold">3). సెలెక్ట్ నియోజకవర్గం</label>
                                 <select class="form-control form-select" formControlName="constenncy_id"
-                                    (change)="onConstituencyChange($event);">
-                                    <option value="" selected>అన్ని నియోజకవర్గాలు</option>
+                                    (change)="onConstituencyChange($event);"
+                                    [disabled]="!searchdenomation.value.district_id || constituency.length === 0">
+                                    <option value="" selected>{{ !searchdenomation.value.district_id ? 'మొదట జిల్లాను ఎంచుకోండి' : 'అన్ని నియోజకవర్గాలు' }}</option>
                                     <option value="{{item.id}}" *ngFor="let item of constituency">
                                         {{item.const_nm}}
                                     </option>
                                 </select>
                             </div>
                             <div class="col-lg-2 col-md-4 col-sm-6 col-12">
-                                <label class="form-label fw-bold">మండలం/మున్సిపాలిటీ</label>
+                                <label class="form-label fw-bold">4). మండలం/మున్సిపాలిటీ</label>
                                 <select class="form-control form-select" formControlName="mandal_id"
-                                    (change)="onMandalChange($event);">
-                                    <option value="" selected>అన్ని మండలాలు / మున్సిపాలిటీ</option>
+                                    (change)="onMandalChange($event);"
+                                    [disabled]="!searchdenomation.value.constenncy_id || mandals.length === 0">
+                                    <option value="" selected>{{ !searchdenomation.value.constenncy_id ? 'మొదట నియోజకవర్గాన్ని ఎంచుకోండి' : 'అన్ని మండలాలు / మున్సిపాలిటీ' }}</option>
                                     <option value="{{item.id}}" *ngFor="let item of mandals">
                                         {{item.mndl_nm}}
                                     </option>
                                 </select>
                             </div>
                             <div class="col-lg-2 col-md-4 col-sm-6 col-12">
-                                <label class="form-label fw-bold">సెలెక్ట్ పంచాయతీ/వార్డు</label>
+                                <label class="form-label fw-bold">5). సెలెక్ట్ పంచాయతీ/వార్డు</label>
                                 <select class="form-control form-select" formControlName="panchayati_id"
-                                    (change)="onPanchayatiChange($event);">
-                                    <option value="" selected>అన్ని పంచాయతీలు / వార్డులు</option>
+                                    (change)="onPanchayatiChange($event);"
+                                    [disabled]="!searchdenomation.value.mandal_id || panchayati.length === 0">
+                                    <option value="" selected>{{ !searchdenomation.value.mandal_id ? 'మొదట మండలాన్ని ఎంచుకోండి' : 'అన్ని పంచాయతీలు / వార్డులు' }}</option>
                                     <option value="{{item.id}}" *ngFor="let item of panchayati">
                                         {{item.pnchyt_nm}}
                                     </option>
