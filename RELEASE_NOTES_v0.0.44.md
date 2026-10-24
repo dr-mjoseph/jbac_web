@@ -11,41 +11,39 @@
 
 ---
 
-## Critical Fix: Android 12+ Package Parse Failure (`INSTALL_PARSE_FAILED_MANIFEST_MALFORMED`)
+## Key Updates & Bug Fixes in v0.0.44
 
-### 1. Root Cause Analysis
-- **Problem**: When attempting to install the release APK on Android 12, 13, 14, 15, or 16 (including Samsung One UI devices), the Android PackageInstaller aborted with:
-  > **"App not installed as package appears to be invalid."**
-- **Cause**: Starting with Android 12 (API 31), any application component (`<activity>`, `<service>`, `<receiver>`) containing an `<intent-filter>` **must explicitly declare `android:exported="true"` or `android:exported="false"`**.
-- In earlier releases targeting API >= 31, `MainActivity` had `<intent-filter>` (for `android.intent.action.MAIN` and `android.intent.category.LAUNCHER`) without an explicit `android:exported` attribute. The Android OS `PackageParser` threw `INSTALL_PARSE_FAILED_MANIFEST_MALFORMED`, which Samsung One UI displays as "package appears to be invalid".
-- Additionally, strict dual-layer signing (`v1` JAR signature + `v2` APK signature block) was enforced with `--min-sdk-version 23` during signing, ensuring compatibility with all Android device package managers.
+### 1. Unified Native File & Camera Upload Container (`div.imgerdt`)
+- **Root Cause**: In legacy Ionic 3, standard `<input type="file">` and action buttons placed inside `<ion-item>` had their UI collapsed and hidden by Ionic's `.item-inner` flex container. Furthermore, programmatic file input triggering from asynchronous ActionSheet callbacks was blocked by Chromium WebView security.
+- **Solution**: Replaced `<ion-item>` wrappers with a dedicated `<div class="imgerdt">` container featuring a visible, styled native file chooser (`<input type="file" accept="image/*">`), an outline Camera/Gallery button (`openphoto()`), and an instant preview thumbnail.
+- **Pages Updated**:
+  - `Submit Institutes`: [`addinstitute.html`](file:///C:/Users/rajes/StudioProjects/jbac_app/src/pages/addinstitute/addinstitute.html)
+  - `Submit Your Business`: [`addbussiness.html`](file:///C:/Users/rajes/StudioProjects/jbac_app/src/pages/addbussiness/addbussiness.html)
+  - `Submit for Marriages`: [`addmarriage.html`](file:///C:/Users/rajes/StudioProjects/jbac_app/src/pages/addmarriage/addmarriage.html)
+  - `For Jobs`: [`addjobs.html`](file:///C:/Users/rajes/StudioProjects/jbac_app/src/pages/addjobs/addjobs.html)
+  - `For Adds`: [`addads.html`](file:///C:/Users/rajes/StudioProjects/jbac_app/src/pages/addads/addads.html)
+  - `Submit Meeting Poster`: [`addmeetings.html`](file:///C:/Users/rajes/StudioProjects/jbac_app/src/pages/addmeetings/addmeetings.html)
+  - `Record News`: [`news.html`](file:///C:/Users/rajes/StudioProjects/jbac_app/src/pages/news/news.html)
+  - `For Our Help`: [`help.html`](file:///C:/Users/rajes/StudioProjects/jbac_app/src/pages/help/help.html)
 
-### 2. Applied Fixes
-- Added `android:exported="true"` to `MainActivity` in `AndroidManifest.xml` and `config.xml`.
-- Bumped `versionCode` to `44` and `versionName` to `0.0.44` (strictly higher than published `0.0.42` and `0.0.43`).
-- Ensured `targetSdkVersion` is strictly `36` (`cdvTargetSdkVersion=36`).
-- Enforced dual v1 (JAR) and v2/v3 (APK) signature verification using `apksigner sign --min-sdk-version 23 --max-sdk-version 36 --v1-signing-enabled true --v2-signing-enabled true --v3-signing-enabled true`.
+### 2. Strict Sequential Geographic Cascading
+- Enforced strict state selection prerequisite: District, Constituency, Mandal, and Panchayat dropdowns remain disabled (`[disabled]`) until a State is chosen.
+- Selecting a state or changing an upstream filter clears and resets all downstream selections.
+- **Pages Updated**:
+  - `Marriage Services`: [`marriage.html`](file:///C:/Users/rajes/StudioProjects/jbac_app/src/pages/marriage/marriage.html) & [`marriage.ts`](file:///C:/Users/rajes/StudioProjects/jbac_app/src/pages/marriage/marriage.ts)
+  - `View Meetings`: [`meeting.html`](file:///C:/Users/rajes/StudioProjects/jbac_app/src/pages/meeting/meeting.html) & [`meeting.ts`](file:///C:/Users/rajes/StudioProjects/jbac_app/src/pages/meeting/meeting.ts)
+  - `Christian Services`: [`institute.html`](file:///C:/Users/rajes/StudioProjects/jbac_app/src/pages/institute/institute.html) & [`institute.ts`](file:///C:/Users/rajes/StudioProjects/jbac_app/src/pages/institute/institute.ts)
+  - `Jobs`: [`jobs.html`](file:///C:/Users/rajes/StudioProjects/jbac_app/src/pages/jobs/jobs.html) & [`jobs.ts`](file:///C:/Users/rajes/StudioProjects/jbac_app/src/pages/jobs/jobs.ts)
+  - `Search Business/Rent`: [`searchhouse.html`](file:///C:/Users/rajes/StudioProjects/jbac_app/src/pages/searchhouse/searchhouse.html) & [`searchhouse.ts`](file:///C:/Users/rajes/StudioProjects/jbac_app/src/pages/searchhouse/searchhouse.ts)
 
----
+### 3. About Me YouTube Channel Link
+- Added dedicated YouTube card with a red subscribe button and direct external link to:
+  `https://www.youtube.com/@DrJOSEPHPRAKASHMOSIGANTI7/featured` via `window.open(..., '_system')`.
+- **Files**: [`about.html`](file:///C:/Users/rajes/StudioProjects/jbac_app/src/pages/about/about.html) & [`about.ts`](file:///C:/Users/rajes/StudioProjects/jbac_app/src/pages/about/about.ts)
 
-## Critical Fix: White / Empty Display on App Launch
-
-### 1. Root Cause Analysis
-- **Problem**: The APK installed cleanly on Android devices, but upon launch, the app remained on a blank/white screen.
-- **Cause 1 (`usesCleartextTraffic`)**:
-  - The Cordova WebView plugin was configured with `<preference name="Scheme" value="http" />`, loading the internal app bundle via `http://localhost`.
-  - Android 9+ (API 28+) and strictly enforced under `targetSdkVersion="36"` disables cleartext HTTP by default. WebView requests to `http://localhost` failed with `net::ERR_CLEARTEXT_NOT_PERMITTED` because `android:usesCleartextTraffic="true"` was missing from `<application>`.
-- **Cause 2 (Ionic Root Page Bootstrapping Race Condition)**:
-  - In `src/app/app.component.ts`, `rootPage` was declared as `rootPage: any;` (undefined).
-  - It only navigated to `'HomePage'` inside `this.platform.ready()`. If native Cordova plugin handshakes took too long or if `getcount()` had an issue, `<ion-nav [root]="rootPage">` remained unmounted with a blank white screen after the splash screen faded.
-- **Cause 3 (Asset Compilation)**:
-  - `npm run build` needed to be run before copying compiled web assets to `platforms/android/app/src/main/assets/www` to guarantee fresh Angular/Ionic bundles were packaged.
-
-### 2. Applied Fixes
-- **Cleartext Traffic Enabled**: Added `android:usesCleartextTraffic="true"` to `<application>` in `AndroidManifest.xml` and `config.xml`.
-- **Immediate Root Page Mounting**: Initialized `rootPage: any = 'HomePage';` in `app.component.ts` so `HomePage` is immediately mounted on boot without waiting for async platform callbacks.
-- **Guarded Analytics / Count Calls**: Wrapped `this.service.updatecount()` and `this.service.getcount()` in defensive checks with error callbacks to prevent any uncaught exceptions from blocking component rendering.
-- **Automated Web Asset Compilation**: Updated `scripts/build_and_sign_release_v44.ps1` to execute `npm run build` prior to asset sync and packaging.
+### 4. Android 12+ Manifest & Dual-Layer Signing
+- Added `android:exported="true"` to `MainActivity` in `AndroidManifest.xml` and `config.xml` preventing `INSTALL_PARSE_FAILED_MANIFEST_MALFORMED`.
+- Enforced dual v1 (JAR signing) + v2/v3 (APK signing) with `--min-sdk-version 23 --max-sdk-version 36`.
 
 ---
 
@@ -75,7 +73,6 @@ Digest Algorithm:                         SHA-256
 ---
 
 ## Artifact File Locations
-- **Signed APK**: `C:\Users\rajes\StudioProjects\jbac_app\jbacApp-0.0.44.apk` (124.48 MB)
-- **Signed AAB**: `C:\Users\rajes\StudioProjects\jbac_app\jbacApp-0.0.44.aab` (121.58 MB)
-- **Google Play AAB**: `C:\Users\rajes\StudioProjects\jbac_app\appreleasesigned.aab` (121.58 MB)
-
+- **Signed APK**: `C:\Users\rajes\StudioProjects\jbac_app\jbacApp-0.0.44.apk`
+- **Signed AAB**: `C:\Users\rajes\StudioProjects\jbac_app\jbacApp-0.0.44.aab`
+- **Google Play AAB**: `C:\Users\rajes\StudioProjects\jbac_app\appreleasesigned.aab`
