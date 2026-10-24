@@ -2043,5 +2043,108 @@ The repository contains two query execution engines:
 - **Standard Upload Bundle**: `C:\Users\rajes\StudioProjects\jbac_app\appreleasesigned.aab` *(115.81 MB)*
 - **Release Notes File**: `RELEASE_NOTES_v0.0.39.md`.
 
+---
 
+## 37. Meeting State-Wise Filtering (AP & TG), Strict Cascading Submission Order, and VS Code Gradle Server Fix
 
+### 1. Objectives & Requirements
+The user submitted three key requirements:
+1. **Fix VS Code Notification**: Resolve the persistent popup warning: *"No connection to gradle server. Try restarting the server. Source: Gradle for Java"*.
+2. **View Meetings (`/events`) State-Wise Filtering**: Implement state filtering ("filter state wise"). The existing filter supported District, Constituency, Mandal, Panchayat, and Date. Now add state selection such that selecting **TG** filters meetings in Telangana, and selecting **AP** filters meetings in Andhra Pradesh.
+3. **Submit Meetings (`/addmeetings` & `/profile`) Sequential Cascading Order**: Enforce a strict dependency order: if and only if State is selected, then fetch **1. District ➔ 2. Constituency ➔ 3. Mandal ➔ 4. Panchayat**. Child dropdowns must be disabled until their parent is selected, and changing any parent must reset all downstream selections.
+
+---
+
+### 2. VS Code Gradle Server Error Resolution
+- **Root Cause**: The VS Code `"Gradle for Java"` extension automatically attempted to start its background Gradle Language Server for Java projects. Because the environment only has OpenJDK 1.8.0 installed (while the extension requires Java 17+) and this repository is an Angular 15 web application without any `build.gradle` or Gradle wrapper, the server crashed on startup and displayed repeated modal warnings.
+- **Resolution**:
+  - Configured workspace settings in [`.vscode/settings.json`](.vscode/settings.json):
+    ```json
+    {
+        "gradle.autoDetect": "off",
+        "gradle.nestedProjects": false,
+        "java.import.gradle.enabled": false,
+        "gradle.javaDebug.clean": false
+    }
+    ```
+  - Permanently prevented the Gradle Language Server from initializing within this workspace.
+
+---
+
+### 3. Backend Implementation & State Mapping
+- **Files Modified**: [`backend/server.ts`](backend/server.ts) and [`backend/server.js`](backend/server.js)
+- **Database Context**:
+  - `dstrct` table defines districts with `state_id = 1` for Andhra Pradesh (districts 1–26) and `state_id = 2` for Telangana (districts 31+).
+  - Legacy rows in `events` had `state_id = NULL`.
+- **Architectural Enhancements**:
+  1. **Resilient State Projection & Joins**:
+     - Updated `/api/events`, `/dashboardapi/getevents`, `/dashboardapi/getupdateevents`, and `/dashboardapi/getribbonevents` with:
+       ```sql
+       LEFT JOIN dstrct d ON e.district_id = d.id
+       COALESCE(e.state_id, d.state_id, CASE WHEN e.district_id >= 31 THEN 2 ELSE 1 END) AS state_id
+       ```
+     - Added query filtering: when `state_id` query/body parameter is provided, it filters exclusively by that state.
+  2. **Search API (`/dashboardapi/searchingdata` / `searchMeetingsHandler`)**:
+     - Added `LEFT JOIN dstrct d` and projected `COALESCE(e.state_id, d.state_id, CASE WHEN e.district_id >= 31 THEN 2 ELSE 1 END) AS state_id`.
+     - Filtered by `body.state_id` using the computed expression.
+  3. **District Fetching by State (`/dashboardapi/getdistricts`)**:
+     - Updated `getdistricts` endpoint to accept `state_id`:
+       - `state_id = 1` filters AP districts (`state_id = 1 OR (state_id IS NULL AND id < 31)`).
+       - `state_id = 2` filters TG districts (`state_id = 2 OR (state_id IS NULL AND id >= 31)`).
+  4. **State Persistence on Meeting Creation (`/dashboardapi/postmeetings`)**:
+     - Updated `postmeetings` handler to store `state_id` (`1` or `2`) and `state` (`'AP'` or `'TG'`) directly into the `events` table upon submission.
+
+---
+
+### 4. Frontend Implementation & Cascading Flows
+
+#### A. View Meetings Filter (`/events`)
+- **Files Modified**: [`src/app/jesus/events/events.component.ts`](src/app/jesus/events/events.component.ts), [`src/app/jesus/events/events.component.html`](src/app/jesus/events/events.component.html)
+- **Implementation**:
+  - Configured state options:
+    - ID 1: `ఆంధ్రప్రదేశ్ - Andhra Pradesh (AP)`
+    - ID 2: `తెలంగాణ - Telangana (TG)`
+  - Added `onStateChange(event)` handler:
+    - Updates `searchdenomation` state control.
+    - Clears downstream filter controls (`district_id`, `constenncy_id`, `mandal_id`, `panchayati_id`).
+    - Fetches only the selected state's districts via `service.getdistrict(stateId)`.
+    - Automatically executes `applyCombinedFilter()`.
+  - Updated `applyClientSideFilter()`:
+    - Matches items using `item.state_id || (item.district_id >= 31 ? 2 : 1) === targetState`.
+    - Removed premature returns in date comparison logic to allow full multi-attribute filtering.
+
+#### B. Submit Meetings Cascading Order (`/addmeetings` & `/profile`)
+- **Files Modified**:
+  - [`src/app/jesus/addmeetings/addmeetings.component.ts`](src/app/jesus/addmeetings/addmeetings.component.ts)
+  - [`src/app/jesus/addmeetings/addmeetings.component.html`](src/app/jesus/addmeetings/addmeetings.component.html)
+  - [`src/app/jesus/profile/profile.component.ts`](src/app/jesus/profile/profile.component.ts)
+  - [`src/app/jesus/profile/profile.component.html`](src/app/jesus/profile/profile.component.html)
+- **Implementation**:
+  - Removed initial district prefetching (`this.getdistric()` was removed from `ngOnInit`), ensuring districts are never loaded without state selection.
+  - Initialized `state_id: ['', [Validators.required]]` and reset child collections to empty arrays `[]`.
+  - **Sequential Cascading Handlers**:
+    - `onStateChange`: Clears district, constituency, mandal, and panchayat. Fetches districts for selected state.
+    - `getconstency`: Clears constituency, mandal, and panchayat. Fetches constituencies for selected district.
+    - `getmandals`: Clears mandal and panchayat. Fetches mandals for selected constituency.
+    - `gepanchayati`: Clears panchayat. Fetches panchayats for selected mandal.
+  - **Form Template Enforcement**:
+    - **1). సెలెక్ట్ రాష్ట్రం / State**: AP / TG options.
+    - **2). సెలెక్ట్ జిల్లా / Select District**: `[disabled]="!form.value.state_id || districts.length === 0"`.
+    - **3). సెలెక్ట్ నియోజకవర్గం / Select Constituency**: `[disabled]="!form.value.districtname || constituency.length === 0"`.
+    - **4). సెలెక్ట్ మండలం / మున్సిపాలిటీ**: `[disabled]="!form.value.constituencyname || mandals.length === 0"`.
+    - **5). సెలెక్ట్ పంచాయతీ/వార్డు**: `[disabled]="!form.value.mandals || panchayati.length === 0"`.
+    - Corrected validation feedback bindings for `village_name`.
+  - **Submission Payload**:
+    - Explicitly passes `state_id` and `state` (`'AP'` / `'TG'`) in `data` payload sent to `service.postsmeetings(data)`.
+
+---
+
+### 5. Verification Checklist
+- [x] VS Code settings suppress Gradle Language Server errors.
+- [x] Events API (`/api/events`, `/dashboardapi/getevents`, `/dashboardapi/getupdateevents`, `/dashboardapi/getribbonevents`) filters accurately by `state_id=1` (AP) and `state_id=2` (TG).
+- [x] Multi-tier meeting search (`/dashboardapi/searchingdata`) accurately maps legacy rows via `dstrct` join and filters by `state_id`.
+- [x] District endpoint (`/dashboardapi/getdistricts`) returns state-isolated district lists.
+- [x] View Meetings UI (`/events`) features dual-state dropdown and instant filtered results.
+- [x] Add Meetings UI (`/addmeetings`) and Profile UI (`/profile`) enforce 1. State ➔ 2. District ➔ 3. Constituency ➔ 4. Mandal ➔ 5. Panchayat with disabled child controls until parent selection.
+- [x] Changing state or district resets downstream controls preventing invalid geographic combinations.
+- [x] `postmeetings` persists `state_id` and `state` into MySQL `events` table.

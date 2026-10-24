@@ -64,7 +64,15 @@ Welcome to the **Jesus Believers Association Council (JBAC)** unified ecosystem 
    - Login-gated appointment bookings preventing anonymous submissions.
 4. **News, Events & Notifications**:
    - Interactive 6-slide hero banner carousel (optimized with preloaded WebP assets), live announcements, job postings, and media galleries.
-   - Dynamic **Events & Meetings Portal** with horizontal scrolling ribbon powered by the `events` table with automatic date-based expiration (displaying if and only if `d_in == 1` and meeting date is current or upcoming, automatically expiring upon completion without requiring manual database resets), date-based tabs ("నేటి మీటింగ్స్" vs "రాబోయే మీటింగ్స్"), cascading geographic filters, and responsive 3-column meeting cards with poster zoom previews.
+   - Dynamic **Events & Meetings Portal** with horizontal scrolling ribbon powered by the `events` table with automatic date-based expiration (displaying if and only if `d_in == 1` and meeting date is current or upcoming, automatically expiring upon completion without requiring manual database resets), date-based tabs ("నేటి మీటింగ్స్" vs "రాబోయే మీటింగ్స్"), responsive 3-column meeting cards with poster zoom previews, and complete multi-tier filtering:
+     - **State-Wise Filter (`సెలెక్ట్ రాష్ట్రం / State`)**: Filter meetings by **Telangana (TG)** or **Andhra Pradesh (AP)**, powered by resilient backend joins on `dstrct` and client-side fallback matching.
+     - **Geographic Cascade**: District ➔ Parliamentary / Assembly Constituency ➔ Mandal / Municipality ➔ Village / Ward.
+     - **Date-Wise Filter (`డేట్ వైజ్ మీటింగ్స్`)**: Single-day and multi-day date range meeting filters.
+   - **Structured Meeting Submission Workflow (`కూటముల నమోదు`)**:
+     - Strict dependency-ordered location selection: **1. State ➔ 2. District ➔ 3. Constituency ➔ 4. Mandal ➔ 5. Panchayat**.
+     - Child dropdowns remain safely disabled with descriptive Telugu placeholders until their immediate parent is selected.
+     - Changing any parent level immediately resets and clears child selections to prevent invalid combinations.
+     - Automatically persists `state_id` (`1` for AP, `2` for TG) and `state` (`'AP'` / `'TG'`) into the `events` table.
 5. **Native Android Application (`jbac_app`)**:
    - Android app compliant with Google Play Store standards (`targetSdkVersion 34`, `minSdkVersion 24`, release version `0.0.38` / `versionCode 38`).
    - Official production release signing via `Jbac.keystore`.

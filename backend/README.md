@@ -48,11 +48,27 @@ CREATE TABLE IF NOT EXISTS jbac_db.registrations (
 
 ### 1. `GET /api/events` & `POST /dashboardapi/getupdateevents`
 Fetches upcoming meetings and landing-page metadata from the `events` table:
-- **Filtering Options**: Supports `?current_date_only=true` (meetings covering current date) and `?d_in=0` or `?d_in=1` (filtering by display-in ribbon status).
-- **Default Behavior**: Automatically hides past meetings (`enddate < CURDATE()`), while returning `d_in` and `activestatus` fields.
+- **Filtering Options**: Supports `?current_date_only=true` (meetings covering current date), `?state_id=1` (Andhra Pradesh), `?state_id=2` (Telangana), and `?d_in=0` or `?d_in=1` (filtering by display-in ribbon status).
+- **State Resolution**: Automatically joins `dstrct` on `events.district_id = dstrct.id` to compute `COALESCE(e.state_id, d.state_id, CASE WHEN e.district_id >= 31 THEN 2 ELSE 1 END) AS state_id`, ensuring accurate state filtering even for legacy meeting rows.
+- **Default Behavior**: Automatically hides past meetings (`enddate < CURDATE()`), while returning `d_in`, `state_id`, and `activestatus` fields.
 
 ### 1a. `GET/POST /api/getribbonevents` & `POST /dashboardapi/getribbonevents`
-Dedicated endpoint returning small horizontal ribbon items from `events` where `d_in = 1` and dates have not passed (`enddate >= CURDATE()` or `startdate >= CURDATE()`) ordered by `id DESC`. Meetings with `d_in = 0` as well as expired meetings are automatically excluded from this endpoint.
+Dedicated endpoint returning small horizontal ribbon items from `events` where `d_in = 1` and dates have not passed (`enddate >= CURDATE()` or `startdate >= CURDATE()`) ordered by `id DESC`. Supports optional `?state_id` filtering (AP/TG). Meetings with `d_in = 0` as well as expired meetings are automatically excluded from this endpoint.
+
+### 1b. `POST /dashboardapi/searchingdata` (Meeting Search & Multi-tier Filter)
+Searches meetings across multiple combined criteria: `state_id`, `district_id`, `constituency_id`, `mandal_id`, `panchayati_id`, `startdate`, `mettingtype`, `denomation_id`, `speakerone`, and `ministry_id`.
+- Automatically maps and filters by `state_id` (`1` = AP, `2` = TG).
+- Excludes old/expired meetings.
+
+### 1c. `POST /dashboardapi/postmeetings` (Meeting Submission)
+Stores newly created meetings into `events`:
+- Automatically persists `state_id` (`1` or `2`) and `state` (`'AP'` or `'TG'`).
+- Enforces proper linkage to `district_id`, `constituency_id`, `mandal_id`, and `village_id`.
+
+### 1d. `GET/POST /dashboardapi/getdistricts`
+Retrieves active districts with optional `?state_id` filtering:
+- `state_id=1` returns Andhra Pradesh districts (including fallback range `id < 31`).
+- `state_id=2` returns Telangana districts (including fallback range `id >= 31`).
 
 ### 2. `POST /api/register-all`
 Consumes multi-form request bodies, dynamically flattening custom data fields into the open MySQL JSON property column block.
@@ -157,4 +173,4 @@ python scripts/package_backend.py
 
 # 3. Deploy to AWS Lambda
 aws lambda update-function-code --function-name jbac-backend-api --zip-file fileb://backend/backend-deploy.zip --region ap-southeast-2
-```
+```
