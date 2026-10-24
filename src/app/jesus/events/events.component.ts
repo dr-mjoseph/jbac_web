@@ -17,7 +17,7 @@ export class EventsComponent {
   form_ind: any;
   youth: any;
   revival: any;
-  showSpinner: boolean = false;
+  showSpinner: boolean = true;
   women: any;
   pastor: any;
   childern: any;
@@ -66,19 +66,13 @@ export class EventsComponent {
   ngOnInit(): void {
     const datePipe = new DatePipe('en-US');
     this.now = datePipe.transform(new Date(), 'yyyy-MM-dd') || this.now;
+    this.showSpinner = true;
     this.getstates();
     this.getpastors();
-    this.getyouth();
-    this.getrevival();
-    this.getwomen();
-    this.getpastor();
-    this.getchildern();
-    this.getmusical();
     this.getdistric();
-    this.searechevents();
-    this.getRibbonEvents();
     this.getdenomations();
-    this.getbeliver();
+    this.getRibbonEvents();
+    this.searechevents();
   }
   get h() { return this.searchdenomation.controls; }
 
@@ -124,18 +118,15 @@ export class EventsComponent {
   }
 
   getyouth() {
-    this.showSpinner = true;
     this.service.getyouth().subscribe(res => {
       if (res.status == 202) {
         Swal.fire(res.message);
       } else if (res.status == 200) {
-        this.showSpinner = false;
         this.youth = res.data;
       }
     }, error => {
-      this.showSpinner = false;
-    })
-
+      console.error(error);
+    });
   }
   image: any;
   openimg(image: any, openmodel: any) {
@@ -144,70 +135,56 @@ export class EventsComponent {
   }
 
   proofmodalDismis() {
-    this.modalService.dismissAll()
+    this.modalService.dismissAll();
   }
 
   getrevival() {
-    this.showSpinner = true;
     this.service.getrevival().subscribe(res => {
       if (res.status == 202) {
         Swal.fire(res.message);
       } else if (res.status == 200) {
-        this.showSpinner = false;
         this.revival = res.data;
       }
     }, error => {
-      this.showSpinner = false;
-    })
-
+      console.error(error);
+    });
   }
 
 
   getwomen() {
-    this.showSpinner = true;
     this.service.getwomen().subscribe(res => {
       if (res.status == 202) {
         Swal.fire(res.message);
       } else if (res.status == 200) {
-        this.showSpinner = false;
         this.women = res.data;
       }
     }, error => {
-      this.showSpinner = false;
-    })
-
+      console.error(error);
+    });
   }
 
   getpastor() {
-    this.showSpinner = true;
     this.service.getpastormeeting().subscribe(res => {
-      console.log(res.data, 'hii');
-
       if (res.status == 202) {
         Swal.fire(res.message);
       } else if (res.status == 200) {
-        this.showSpinner = false;
         this.pastor = res.data;
       }
     }, error => {
-      this.showSpinner = false;
-    })
-
+      console.error(error);
+    });
   }
 
   getchildern() {
-    this.showSpinner = true;
     this.service.getchildern().subscribe(res => {
       if (res.status == 202) {
         Swal.fire(res.message);
       } else if (res.status == 200) {
-        this.showSpinner = false;
         this.childern = res.data;
       }
     }, error => {
-      this.showSpinner = false;
-    })
-
+      console.error(error);
+    });
   }
   getdenomations() {
     this.service.getdenomation().subscribe(res => {
@@ -218,17 +195,15 @@ export class EventsComponent {
   }
 
   getmusical() {
-    this.showSpinner = true;
     this.service.getmusicals().subscribe(res => {
       if (res.status == 202) {
         Swal.fire(res.message);
       } else if (res.status == 200) {
-        this.showSpinner = false;
         this.musical = res.data;
       }
     }, error => {
-      this.showSpinner = false;
-    })
+      console.error(error);
+    });
   }
 
   ribbonEvents: any[] = [];
@@ -564,8 +539,10 @@ export class EventsComponent {
       return;
     }
 
+    this.showSpinner = true;
     this.service.searchingdata(queryPayload).subscribe({
       next: (res: any) => {
+        this.showSpinner = false;
         if (res && res.status == 200 && Array.isArray(res.data)) {
           const results = res.data
             .filter((item: any) => !this.isOldMeeting(item))
@@ -576,12 +553,14 @@ export class EventsComponent {
         }
       },
       error: () => {
+        this.showSpinner = false;
         this.applyClientSideFilter(queryPayload);
       }
     });
   }
 
   applyClientSideFilter(payload: any) {
+    this.showSpinner = false;
     let filtered = this.allEvents.filter(item => !this.isOldMeeting(item));
     if (payload.state_id) {
       filtered = filtered.filter(item => item.state_id == payload.state_id || (!item.state_id && payload.state_id == 1));
@@ -674,6 +653,7 @@ export class EventsComponent {
     this.panchayati = [];
     this.activeTab = 'today';
     this.submitted = false;
+    this.showSpinner = true;
     this.searechevents();
   }
 
