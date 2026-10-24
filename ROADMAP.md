@@ -254,10 +254,38 @@ GitHub Issue: [#1](https://github.com/dr-mjoseph/jbac_web/issues/1)
 
 ---
 
-## 🎯 14. Pending Launch & Post-Release Tasks
-- [ ] Complete Google Play Console Review & Rollout for Release 35 (`jbacApp-0.0.35.aab`).
+## 📱 14. Milestone 14: Mobile App v0.0.40 Comprehensive Bug Fixes & Signed Release Delivery
+- [x] **Universal Strict Geographic Cascading**:
+  - Enforced `State ➔ District ➔ Constituency ➔ Mandal ➔ Panchayat` across all search, filter, and registration forms.
+  - Bound `[disabled]` attributes to parent selections with automated downstream clearing.
+- [x] **Photo & Media Upload Resilience**:
+  - Fixed camera/gallery pickers across Submit Meetings (`addmeetings`), Submit News (`news`), Help (`help`), and service registrations.
+  - Added native fallback input triggers (`#meetingFileInput`, `#newsFileInput`, `#helpFileInput`, etc.) bypassing Android 13+ permission blocks.
+- [x] **Touch Digitizer & Header Bubbling Fixes**:
+  - Bound `tappable (click)="gotopage(X)"` directly to `<ion-card-header>` in `forms.html` and `account.html` resolving unresponsive card taps.
+  - Eliminated premature constructor `this.form.reset()` calls in registration components.
+- [x] **News Dropdowns & Gallery Fallbacks**:
+  - Fixed news category filter endpoint (`/dashboardapi/getnews`) and guarded `item.description`.
+  - Added image load error fallback `(error)="onImgError($event, gt)"` in photo galleries.
+- [x] **Profile Photo Buffering & Home Carousel Refresh**:
+  - Removed infinite blocking `LoadingController` spinner in `profile.ts`.
+  - Replaced banners 1, 3, 7 and deleted banners 2, 8.
+- [x] **Android Build & Official Signing Pipeline**:
+  - Executed Gradle `assembleRelease` and `bundleRelease` using Java 8 and Gradle 4.10.3 with Android Build Tools 30.0.3.
+  - Zipalign-verified and signed APK with `apksigner` (v2 & v3 schemes, targetSdkVersion 34, versionCode 40).
+  - Signed release AAB with `jarsigner` (`SHA256withRSA`).
+  - Generated production release assets:
+    - [`jbacApp-0.0.40.apk`](file:///C:/Users/rajes/StudioProjects/jbac_app/jbacApp-0.0.40.apk) (121.2 MB)
+    - [`jbacApp-0.0.40.aab`](file:///C:/Users/rajes/StudioProjects/jbac_app/jbacApp-0.0.40.aab) (118.5 MB)
+    - [`appreleasesigned.aab`](file:///C:/Users/rajes/StudioProjects/jbac_app/appreleasesigned.aab) (118.5 MB)
+
+---
+
+## 🎯 15. Pending Launch & Post-Release Tasks
+- [ ] Complete Google Play Console Review & Rollout for Release 40 (`appreleasesigned.aab` / `jbacApp-0.0.40.aab`).
 - [ ] Monitor crash telemetry and user feedback via Google Play Console dashboard.
 - [ ] Run automated end-to-end smoke testing across all live production forms on https://jbac.in.
+
 
 
 

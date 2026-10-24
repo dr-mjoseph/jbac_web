@@ -2277,4 +2277,47 @@ The user submitted three key requirements:
 ### 3. Verification
 - `ng build --configuration production` succeeded with zero errors (`Hash: ded9e4a05ad4b6d5`).
 
+---
+
+## 25. Milestone 15: Android Mobile App Comprehensive Bug Fixes, Strict Geographic Cascading Everywhere, and v0.0.40 Release Package Generation (.apk & .aab)
+
+### 1. Scope & User Requirements
+The user identified 16 key issues in the Android mobile application, demanding full cross-screen compatibility, universal strict geographic cascading (`State ➔ District ➔ Constituency ➔ Mandal ➔ Panchayat`), and production release artifact generation:
+1. Submit Meetings (`addmeetings`): Camera/gallery picker not responding/opening; missing "Select State" field.
+2. View News (`news-view`): Category dropdown selection not loading news items.
+3. Submit News (`news`): Upload news gallery/camera not responding.
+4. Photo Gallery (`gallery`, `sub-gallery`): Images broken / not displaying.
+5. Church Timings (`church-timings`): Add "Select State" filter for Telangana and Andhra Pradesh.
+6. Church Permission (`churchgo`): YouTube link error, missing navigation buttons, broken local routes.
+7. Christian Organizations & For Help: Add "Select State" filter, fix camera/gallery upload.
+8. Other Services Register (`account`): Unresponsive taps on Ministry Related Institutes, Business Info, Marriages, Job Needs, News/Ads; missing state selectors.
+9. Register of Attacks (`addattacks`): Add "Select State", fix form non-responsiveness and image upload.
+10. Profile Photo / Information: Continuous buffering "Wait, it is processing" (`ప్రాసెస్ అవుతుంది దయచేసి ఆగండి`).
+11. Home Page Banners: Replace banners 1, 3, 7 with new assets; delete banners 2 and 8.
+12. Student Registration (`student`): Add "Select State" for Home Address section with strict cascading.
+13. Ministry Registration: Card tap non-responsiveness and validation syntax typo.
+14. Mobile Compatibility & Card Tap Bubbling: Resolving unclickable card headers on mobile digitizers.
+15. Strict Geographic Cascading Everywhere: `State` ➔ `District` ➔ `Constituency` ➔ `Mandal` ➔ `Panchayat`.
+16. Production Release Generation: Generate signed release `.apk` and `.aab` packages.
+
+### 2. Architecture, Diagnostics & Root Cause Analysis
+- **Camera/Gallery Picker Non-responsiveness**: ActionSheet buttons configured with restrictive handler patterns and deprecated Android storage permission checks failed silently on Android 13+ (API 33+). Solved by integrating direct camera invocation alongside hidden HTML file inputs (`#fileInput`) triggered via native events.
+- **Form Opening Non-responsiveness**: Several component constructors (`AddjobsPage`, `AddattacksPage`, `AddinstitutePage`, `AddbussinessPage`, `AddmarriagePage`, `AddadsPage`, `StudentPage`) invoked `this.form.reset()` prior to form group initialization, resetting controls into an invalid state and throwing unhandled Angular exceptions. Removed all premature `reset()` calls.
+- **Card Header Event Bubbling**: In `forms.html` and `account.html`, click handlers were bound to `<ion-card>` but not `<ion-card-header>`, preventing taps on mobile header surfaces from bubbling to the navigation controller. Added `tappable (click)="gotopage(X)"` to headers.
+- **Infinite Profile Buffering**: `ProfilePage.prototype.gepanchayati` presented a modal `LoadingController` spinner without an unconditional dismiss handler in error/empty branches. Removed the blocking overlay.
+- **Gradle & Toolchain Compatibility**: Cordova Android 8 project with AGP 3.3.0 required Gradle 4.10.3 and Java 8 (`jdk-8.0.504.1-hotspot`). Fixed JFrog/Bintray repository deprecations by commenting out inactive publishing plugins in `CordovaLib/build.gradle` and routing dependencies through Google and Maven Central.
+
+### 3. Build & Signing Execution
+- **Web Compilation**: `npm run build` completed cleanly in 11.17s.
+- **Gradle Release Build**: Executed `clean assembleRelease bundleRelease -PcdvBuildToolsVersion=30.0.3` producing:
+  - Raw APK: `app-release-unsigned.apk` (121.13 MB)
+  - Raw AAB: `app.aab` (118.39 MB)
+- **Zipalign & Apksigner**: Aligned to 4-byte boundaries and signed with `Jbac.keystore` (v2 & v3 schemes enabled).
+- **Jarsigner**: Signed Android App Bundle with `SHA256withRSA` and verified signature integrity.
+- **Final Deliverables**:
+  - `jbacApp-0.0.40.apk`: 127,096,725 bytes (121.2 MB)
+  - `jbacApp-0.0.40.aab`: 124,231,393 bytes (118.5 MB)
+  - `appreleasesigned.aab`: 124,231,393 bytes (118.5 MB)
+
+
 
