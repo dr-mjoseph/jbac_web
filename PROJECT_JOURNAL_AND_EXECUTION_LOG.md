@@ -2148,3 +2148,95 @@ The user submitted three key requirements:
 - [x] Add Meetings UI (`/addmeetings`) and Profile UI (`/profile`) enforce 1. State ➔ 2. District ➔ 3. Constituency ➔ 4. Mandal ➔ 5. Panchayat with disabled child controls until parent selection.
 - [x] Changing state or district resets downstream controls preventing invalid geographic combinations.
 - [x] `postmeetings` persists `state_id` and `state` into MySQL `events` table.
+
+---
+
+## 23. Milestone 13: View Meetings State-Only Filtering Fix, SQL Ternary Syntax Correction, Database State Alignment, and Lambda Deployment
+
+### 1. Problem Statement & Root Cause Diagnosis
+1. **Broken State-Only Filter**:
+   - In `/events` (View Meetings), selecting all other filters (District, Constituency, Mandal, Panchayat, Date) functioned as expected.
+   - However, when the user selected **only the State** (`TG` / Telangana or `AP` / Andhra Pradesh) without selecting any district or child parameters, the filter failed to display meetings for that state.
+2. **Backend SQL Syntax Error (HTTP 500)**:
+   - Investigation of `/dashboardapi/searchingdata`, `/dashboardapi/getevents`, and `/dashboardapi/getribbonevents` revealed an invalid JavaScript ternary expression embedded directly inside the raw SQL string:
+     `(? = 2 ? e.district_id >= 31 : (e.district_id < 31 OR e.district_id IS NULL))`
+   - MySQL rejected this query with `HTTP 500: You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '? e.district_id >= 31 : ...'`.
+3. **Database State Inconsistency on Legacy Rows**:
+   - Existing event rows in the RDS database (e.g. event ID 178 in Medchal-Malkajgiri with `district_id = 47`) historically contained `state_id = 1` and `state = 'Andhra Pradesh'` hardcoded during legacy insert operations.
+   - Because `COALESCE(e.state_id, d.state_id, ...)` gave precedence to `e.state_id`, event 178 was treated as Andhra Pradesh instead of Telangana, causing client-side fallback filtering to omit it when `TG` was selected.
+
+---
+
+### 2. Implementation & Technical Fixes
+
+#### A. Backend SQL Query Hardening (`backend/server.ts` & `backend/server.js`)
+- Replaced the broken ternary syntax with valid SQL conditional blocks:
+  ```typescript
+  if (stateId && stateId !== 'all') {
+      const sid = Number(stateId);
+      if (sid === 2) {
+          sql += ' AND (d.state_id = 2 OR e.district_id >= 31 OR (e.state_id = 2 AND (e.district_id IS NULL OR e.district_id = 0)))';
+      } else if (sid === 1) {
+          sql += ' AND (d.state_id = 1 OR (e.district_id IS NOT NULL AND e.district_id < 31) OR (e.state_id = 1 AND (e.district_id IS NULL OR e.district_id = 0)) OR (e.district_id IS NULL AND e.state_id IS NULL))';
+      } else {
+          sql += ' AND (e.state_id = ? OR d.state_id = ?)';
+          params.push(sid, sid);
+      }
+  }
+  ```
+- Updated `SELECT` projections across `getevents`, `getribbonevents`, and `searchingdata` to guarantee that `d.state_id` and `district_id >= 31` take authority over legacy `e.state_id`:
+  ```sql
+  CASE 
+      WHEN d.state_id = 2 OR e.district_id >= 31 THEN 2 
+      WHEN d.state_id = 1 OR (e.district_id IS NOT NULL AND e.district_id < 31) THEN 1 
+      ELSE COALESCE(e.state_id, 1) 
+  END AS state_id, 
+  CASE 
+      WHEN d.state_id = 2 OR e.district_id >= 31 THEN 'Telangana' 
+      WHEN d.state_id = 1 OR (e.district_id IS NOT NULL AND e.district_id < 31) THEN 'Andhra Pradesh' 
+      WHEN COALESCE(e.state_id, 1) = 2 THEN 'Telangana' 
+      ELSE 'Andhra Pradesh' 
+  END AS state
+  ```
+- Repackaged `backend-deploy.zip` and deployed to AWS Lambda `jbac-backend-api` in `ap-southeast-2`.
+
+#### B. Database Data Harmonization
+- Executed database update to synchronize legacy rows:
+  ```sql
+  UPDATE events SET state_id = 2, state = 'Telangana' WHERE district_id >= 31;
+  ```
+  Verified row 178 now correctly reflects `state_id: 2, state: 'Telangana'`.
+
+#### C. Frontend State & Cascading Filter Logic (`src/app/jesus/events/`)
+- **`events.component.ts`**:
+  - In `applyClientSideFilter`, prioritized district-based state resolution:
+    ```typescript
+    if (payload.state_id) {
+      const targetState = Number(payload.state_id);
+      filtered = filtered.filter(item => {
+        const did = item.district_id ? Number(item.district_id) : (item.distrct_id ? Number(item.distrct_id) : null);
+        let itemState = Number(item.state_id);
+        if (did) {
+          itemState = did >= 31 ? 2 : 1;
+        } else if (!itemState) {
+          itemState = 1;
+        }
+        return itemState === targetState;
+      });
+    }
+    ```
+- **`events.component.html`**:
+  - Removed `disabled` attribute from default options (`అన్ని జిల్లాలు`, `అన్ని నియోజకవర్గాలు`, `అన్ని మండలాలు`, `అన్ని పంచాయతీలు`), allowing users to freely clear downstream filters or switch between state-wide view and district drill-downs.
+
+---
+
+### 3. Verification & Live API Testing
+- **Live Backend Tests**:
+  - `POST /dashboardapi/searchingdata` with `{ state_id: '2' }`: HTTP 200, returned all Telangana meetings across all districts.
+  - `POST /dashboardapi/searchingdata` with `{ state_id: '1' }`: HTTP 200, returned all Andhra Pradesh meetings across all districts.
+  - `POST /dashboardapi/searchingdata` with `{ state_id: '2', district_id: '47' }`: HTTP 200, successfully narrowed from state to district 47.
+  - `GET /dashboardapi/getevents?state_id=2`: HTTP 200.
+  - `GET /dashboardapi/getevents?state_id=1`: HTTP 200.
+- **Production Build**:
+  - Executed `ng build --configuration production` with Node 24: Generated all bundles (`main.674b7f71531b58d1.js`) with zero compile errors.
+

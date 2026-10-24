@@ -1029,8 +1029,17 @@ app.all(['/api/events', '/dashboardapi/getevents', '/dashboardapi/getupdateevent
             e.address, e.facebook, e.youtube, e.phone, e.eventcontactnumber, e.image, 
             e.speaker1, e.speaker2, e.speaker3, e.speaker4, e.district_id, e.constituency_id, 
             e.mandal_id, e.panchayat_id, 
-            COALESCE(e.state_id, d.state_id, CASE WHEN e.district_id >= 31 THEN 2 ELSE 1 END) as state_id, 
-            COALESCE(e.state, CASE WHEN COALESCE(e.state_id, d.state_id, CASE WHEN e.district_id >= 31 THEN 2 ELSE 1 END) = 2 THEN 'Telangana' ELSE 'Andhra Pradesh' END) as state, 
+            CASE 
+                WHEN d.state_id = 2 OR e.district_id >= 31 THEN 2 
+                WHEN d.state_id = 1 OR (e.district_id IS NOT NULL AND e.district_id < 31) THEN 1 
+                ELSE COALESCE(e.state_id, 1) 
+            END AS state_id, 
+            CASE 
+                WHEN d.state_id = 2 OR e.district_id >= 31 THEN 'Telangana' 
+                WHEN d.state_id = 1 OR (e.district_id IS NOT NULL AND e.district_id < 31) THEN 'Andhra Pradesh' 
+                WHEN COALESCE(e.state_id, 1) = 2 THEN 'Telangana' 
+                ELSE 'Andhra Pradesh' 
+            END AS state, 
             e.d_in, e.activestatus 
         FROM events e 
         LEFT JOIN dstrct d ON e.district_id = d.id 
@@ -1042,13 +1051,14 @@ app.all(['/api/events', '/dashboardapi/getevents', '/dashboardapi/getupdateevent
         }
         if (stateId && stateId !== 'all') {
             const sid = Number(stateId);
-            sql += ` AND (
-                e.state_id = ? 
-                OR (
-                    (e.state_id IS NULL OR e.state_id = 0) 
-                    AND (d.state_id = ? OR (d.state_id IS NULL AND (? = 2 ? e.district_id >= 31 : (e.district_id < 31 OR e.district_id IS NULL)))))
-            )`;
-            params.push(sid, sid, sid);
+            if (sid === 2) {
+                sql += ' AND (d.state_id = 2 OR e.district_id >= 31 OR (e.state_id = 2 AND (e.district_id IS NULL OR e.district_id = 0)))';
+            } else if (sid === 1) {
+                sql += ' AND (d.state_id = 1 OR (e.district_id IS NOT NULL AND e.district_id < 31) OR (e.state_id = 1 AND (e.district_id IS NULL OR e.district_id = 0)) OR (e.district_id IS NULL AND e.state_id IS NULL))';
+            } else {
+                sql += ' AND (e.state_id = ? OR d.state_id = ?)';
+                params.push(sid, sid);
+            }
         }
         if (isCurrentDateOnly) {
             sql += ' AND ((e.startdate <= CURDATE() AND (e.enddate >= CURDATE() OR e.enddate IS NULL OR e.enddate = "")) OR e.startdate = CURDATE())';
@@ -1076,8 +1086,17 @@ app.all(['/dashboardapi/getribbonevents', '/api/getribbonevents'], async (req, r
             e.address, e.facebook, e.youtube, e.phone, e.eventcontactnumber, e.image, 
             e.speaker1, e.speaker2, e.speaker3, e.speaker4, e.district_id, e.constituency_id, 
             e.mandal_id, e.panchayat_id, 
-            COALESCE(e.state_id, d.state_id, CASE WHEN e.district_id >= 31 THEN 2 ELSE 1 END) as state_id, 
-            COALESCE(e.state, CASE WHEN COALESCE(e.state_id, d.state_id, CASE WHEN e.district_id >= 31 THEN 2 ELSE 1 END) = 2 THEN 'Telangana' ELSE 'Andhra Pradesh' END) as state, 
+            CASE 
+                WHEN d.state_id = 2 OR e.district_id >= 31 THEN 2 
+                WHEN d.state_id = 1 OR (e.district_id IS NOT NULL AND e.district_id < 31) THEN 1 
+                ELSE COALESCE(e.state_id, 1) 
+            END AS state_id, 
+            CASE 
+                WHEN d.state_id = 2 OR e.district_id >= 31 THEN 'Telangana' 
+                WHEN d.state_id = 1 OR (e.district_id IS NOT NULL AND e.district_id < 31) THEN 'Andhra Pradesh' 
+                WHEN COALESCE(e.state_id, 1) = 2 THEN 'Telangana' 
+                ELSE 'Andhra Pradesh' 
+            END AS state, 
             e.d_in, e.activestatus 
         FROM events e 
         LEFT JOIN dstrct d ON e.district_id = d.id 
@@ -1085,13 +1104,14 @@ app.all(['/dashboardapi/getribbonevents', '/api/getribbonevents'], async (req, r
         const params = [];
         if (stateId && stateId !== 'all') {
             const sid = Number(stateId);
-            sql += ` AND (
-                e.state_id = ? 
-                OR (
-                    (e.state_id IS NULL OR e.state_id = 0) 
-                    AND (d.state_id = ? OR (d.state_id IS NULL AND (? = 2 ? e.district_id >= 31 : (e.district_id < 31 OR e.district_id IS NULL)))))
-            )`;
-            params.push(sid, sid, sid);
+            if (sid === 2) {
+                sql += ' AND (d.state_id = 2 OR e.district_id >= 31 OR (e.state_id = 2 AND (e.district_id IS NULL OR e.district_id = 0)))';
+            } else if (sid === 1) {
+                sql += ' AND (d.state_id = 1 OR (e.district_id IS NOT NULL AND e.district_id < 31) OR (e.state_id = 1 AND (e.district_id IS NULL OR e.district_id = 0)) OR (e.district_id IS NULL AND e.state_id IS NULL))';
+            } else {
+                sql += ' AND (e.state_id = ? OR d.state_id = ?)';
+                params.push(sid, sid);
+            }
         }
         sql += ' ORDER BY e.id DESC';
         const [rows] = await db.query(sql, params);
@@ -1168,8 +1188,17 @@ const searchMeetingsHandler = async (req, res) => {
             e.address, e.facebook, e.youtube, e.phone, e.eventcontactnumber, e.image, 
             e.speaker1, e.speaker2, e.speaker3, e.speaker4, e.district_id, e.constituency_id, 
             e.mandal_id, e.panchayat_id, 
-            COALESCE(e.state_id, d.state_id, CASE WHEN e.district_id >= 31 THEN 2 ELSE 1 END) as state_id, 
-            COALESCE(e.state, CASE WHEN COALESCE(e.state_id, d.state_id, CASE WHEN e.district_id >= 31 THEN 2 ELSE 1 END) = 2 THEN 'Telangana' ELSE 'Andhra Pradesh' END) as state, 
+            CASE 
+                WHEN d.state_id = 2 OR e.district_id >= 31 THEN 2 
+                WHEN d.state_id = 1 OR (e.district_id IS NOT NULL AND e.district_id < 31) THEN 1 
+                ELSE COALESCE(e.state_id, 1) 
+            END AS state_id, 
+            CASE 
+                WHEN d.state_id = 2 OR e.district_id >= 31 THEN 'Telangana' 
+                WHEN d.state_id = 1 OR (e.district_id IS NOT NULL AND e.district_id < 31) THEN 'Andhra Pradesh' 
+                WHEN COALESCE(e.state_id, 1) = 2 THEN 'Telangana' 
+                ELSE 'Andhra Pradesh' 
+            END AS state, 
             e.d_in, e.activestatus 
         FROM events e 
         LEFT JOIN dstrct d ON e.district_id = d.id 
@@ -1177,13 +1206,14 @@ const searchMeetingsHandler = async (req, res) => {
         const params = [];
         if (body.state_id && body.state_id !== 'all') {
             const sid = Number(body.state_id);
-            sql += ` AND (
-                e.state_id = ? 
-                OR (
-                    (e.state_id IS NULL OR e.state_id = 0) 
-                    AND (d.state_id = ? OR (d.state_id IS NULL AND (? = 2 ? e.district_id >= 31 : (e.district_id < 31 OR e.district_id IS NULL)))))
-            )`;
-            params.push(sid, sid, sid);
+            if (sid === 2) {
+                sql += ' AND (d.state_id = 2 OR e.district_id >= 31 OR (e.state_id = 2 AND (e.district_id IS NULL OR e.district_id = 0)))';
+            } else if (sid === 1) {
+                sql += ' AND (d.state_id = 1 OR (e.district_id IS NOT NULL AND e.district_id < 31) OR (e.state_id = 1 AND (e.district_id IS NULL OR e.district_id = 0)) OR (e.district_id IS NULL AND e.state_id IS NULL))';
+            } else {
+                sql += ' AND (e.state_id = ? OR d.state_id = ?)';
+                params.push(sid, sid);
+            }
         }
         if (body.district_id) {
             sql += ' AND e.district_id = ?';

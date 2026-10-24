@@ -71,7 +71,7 @@
                                 <label class="form-label fw-bold">సెలెక్ట్ జిల్లా</label>
                                 <select class="form-control form-select" formControlName="district_id"
                                     (change)="onDistrictChange($event);">
-                                    <option value="" selected disabled>సెలెక్ట్ జిల్లా</option>
+                                    <option value="" selected>అన్ని జిల్లాలు (All Districts)</option>
                                     <option value="{{item.id}}" *ngFor="let item of districts">
                                         {{item.distrct_nm}}
                                     </option>
@@ -81,7 +81,7 @@
                                 <label class="form-label fw-bold">సెలెక్ట్ నియోజకవర్గం</label>
                                 <select class="form-control form-select" formControlName="constenncy_id"
                                     (change)="onConstituencyChange($event);">
-                                    <option value="" selected disabled>సెలెక్ట్ నియోజకవర్గం</option>
+                                    <option value="" selected>అన్ని నియోజకవర్గాలు</option>
                                     <option value="{{item.id}}" *ngFor="let item of constituency">
                                         {{item.const_nm}}
                                     </option>
@@ -91,7 +91,7 @@
                                 <label class="form-label fw-bold">మండలం/మున్సిపాలిటీ</label>
                                 <select class="form-control form-select" formControlName="mandal_id"
                                     (change)="onMandalChange($event);">
-                                    <option value="" selected disabled>సెలెక్ట్ మండలం / మున్సిపాలిటీ</option>
+                                    <option value="" selected>అన్ని మండలాలు / మున్సిపాలిటీ</option>
                                     <option value="{{item.id}}" *ngFor="let item of mandals">
                                         {{item.mndl_nm}}
                                     </option>
@@ -101,7 +101,7 @@
                                 <label class="form-label fw-bold">సెలెక్ట్ పంచాయతీ/వార్డు</label>
                                 <select class="form-control form-select" formControlName="panchayati_id"
                                     (change)="onPanchayatiChange($event);">
-                                    <option value="" selected disabled>సెలెక్ట్ పంచాయతీ/వార్డు</option>
+                                    <option value="" selected>అన్ని పంచాయతీలు / వార్డులు</option>
                                     <option value="{{item.id}}" *ngFor="let item of panchayati">
                                         {{item.pnchyt_nm}}
                                     </option>

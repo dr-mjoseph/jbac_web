@@ -565,7 +565,13 @@ export class EventsComponent {
     if (payload.state_id) {
       const targetState = Number(payload.state_id);
       filtered = filtered.filter(item => {
-        const itemState = Number(item.state_id || (item.district_id >= 31 ? 2 : 1));
+        const did = item.district_id ? Number(item.district_id) : (item.distrct_id ? Number(item.distrct_id) : null);
+        let itemState = Number(item.state_id);
+        if (did) {
+          itemState = did >= 31 ? 2 : 1;
+        } else if (!itemState) {
+          itemState = 1;
+        }
         return itemState === targetState;
       });
     }
