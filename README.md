@@ -16,7 +16,7 @@ Welcome to the **Jesus Believers Association Council (JBAC)** unified ecosystem 
                                     v                                   v
                       +---------------------------+       +---------------------------+
                       |   AWS Route 53 (DNS)      |       |  Android Mobile App       |
-                      |   jbac.in / www.jbac.in   |       |  (jbacApp-0.0.40.apk/aab) |
+                      |   jbac.in / www.jbac.in   |       |  (jbacApp-0.0.43.apk/aab) |
                       +---------------------------+       +---------------------------+
                                     |                                   |
                                     v                                   |
@@ -202,7 +202,8 @@ Downloaded directly from the user's Google Drive archive into [`Api/`](file:///c
 ## 📚 Project Documentation Directory
 
 - [ROADMAP.md](ROADMAP.md): Detailed milestones, completed deliverables, and pending features.
-- [RELEASE_NOTES_v0.0.40.md](RELEASE_NOTES_v0.0.40.md): Complete mobile release notes for v0.0.40 (versionCode 40) covering 16 bug fixes and cascading hierarchy.
+- [RELEASE_NOTES_v0.0.43.md](RELEASE_NOTES_v0.0.43.md): Mobile app release notes for v0.0.43 (versionCode 43, targetSdk 36, APK install fix).
+- [RELEASE_NOTES_v0.0.40.md](RELEASE_NOTES_v0.0.40.md): Complete mobile release notes for v0.0.40 covering 16 bug fixes and cascading hierarchy.
 - [DATABASE_CONNECTION.md](DATABASE_CONNECTION.md): Active AWS RDS MySQL credentials, connection strings, and security setup.
 - [AWS_DEPLOYMENT_AND_SYNC_GUIDE.md](AWS_DEPLOYMENT_AND_SYNC_GUIDE.md): Complete AWS infrastructure provisioning and web-to-mobile sync guide.
 - [PROJECT_JOURNAL_AND_EXECUTION_LOG.md](PROJECT_JOURNAL_AND_EXECUTION_LOG.md): Exhaustive chronological project history and troubleshooting log.
