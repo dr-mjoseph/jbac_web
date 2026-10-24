@@ -267,16 +267,16 @@
                                                             style="color:red; -webkit-text-stroke-width:thick;">*</span></label>
                                                     <select class="form-control" formControlName="state_id"
                                                         (change)="onMeetingStateChange($event);"
-                                                        [ngClass]="{'is-invalid': submitted && t['state_id']?.errors }"
+                                                        [ngClass]="{'is-invalid': submitted && t['state_id'].errors }"
                                                         style="height:37px;width: 273px;">
                                                         <option value="" selected disabled>సెలెక్ట్ రాష్ట్రం / Select State</option>
                                                         <option value="{{item.id}}" *ngFor="let item of states">
                                                             {{item.state_name}}
                                                         </option>
                                                     </select>
-                                                    <div *ngIf="submitted && t['state_id']?.errors"
+                                                    <div *ngIf="submitted && t['state_id'].errors"
                                                         class="invalid-feedback">
-                                                        <div *ngIf="t['state_id'].errors['required']">రాష్ట్రం ఎంచుకోండి / State is required</div>
+                                                        <div *ngIf="t['state_id'].errors && t['state_id'].errors['required']">రాష్ట్రం ఎంచుకోండి / State is required</div>
                                                     </div>
                                                 </div>
                                             </div>
