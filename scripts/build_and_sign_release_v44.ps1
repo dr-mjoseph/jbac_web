@@ -32,9 +32,18 @@ Write-Host "Build Tools : $buildTools"
 Write-Host "Android Dir : $androidDir"
 Write-Host "Gradle Bat  : $gradleBat"
 
-# Step 0: Sync compiled web assets from www to platforms/android
+# Step 0: Compile Angular/TypeScript and Sync web assets to platforms/android
 if (-not $SkipGradle) {
-    Write-Host "`n[0/5] Syncing web assets from www to platforms/android..." -ForegroundColor Yellow
+    Write-Host "`n[0/5] Compiling Angular/Ionic web assets (npm run build)..." -ForegroundColor Yellow
+    Push-Location $appRoot
+    & npm.cmd run build
+    Pop-Location
+    if ($LASTEXITCODE -ne 0) {
+        Write-Error "npm run build failed with exit code $LASTEXITCODE"
+        exit 1
+    }
+
+    Write-Host "Syncing web assets from www to platforms/android..." -ForegroundColor Yellow
     $src = "$appRoot\www"
     $dst = "$androidDir\app\src\main\assets\www"
 

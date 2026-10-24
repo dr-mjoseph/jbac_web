@@ -28,6 +28,27 @@
 
 ---
 
+## Critical Fix: White / Empty Display on App Launch
+
+### 1. Root Cause Analysis
+- **Problem**: The APK installed cleanly on Android devices, but upon launch, the app remained on a blank/white screen.
+- **Cause 1 (`usesCleartextTraffic`)**:
+  - The Cordova WebView plugin was configured with `<preference name="Scheme" value="http" />`, loading the internal app bundle via `http://localhost`.
+  - Android 9+ (API 28+) and strictly enforced under `targetSdkVersion="36"` disables cleartext HTTP by default. WebView requests to `http://localhost` failed with `net::ERR_CLEARTEXT_NOT_PERMITTED` because `android:usesCleartextTraffic="true"` was missing from `<application>`.
+- **Cause 2 (Ionic Root Page Bootstrapping Race Condition)**:
+  - In `src/app/app.component.ts`, `rootPage` was declared as `rootPage: any;` (undefined).
+  - It only navigated to `'HomePage'` inside `this.platform.ready()`. If native Cordova plugin handshakes took too long or if `getcount()` had an issue, `<ion-nav [root]="rootPage">` remained unmounted with a blank white screen after the splash screen faded.
+- **Cause 3 (Asset Compilation)**:
+  - `npm run build` needed to be run before copying compiled web assets to `platforms/android/app/src/main/assets/www` to guarantee fresh Angular/Ionic bundles were packaged.
+
+### 2. Applied Fixes
+- **Cleartext Traffic Enabled**: Added `android:usesCleartextTraffic="true"` to `<application>` in `AndroidManifest.xml` and `config.xml`.
+- **Immediate Root Page Mounting**: Initialized `rootPage: any = 'HomePage';` in `app.component.ts` so `HomePage` is immediately mounted on boot without waiting for async platform callbacks.
+- **Guarded Analytics / Count Calls**: Wrapped `this.service.updatecount()` and `this.service.getcount()` in defensive checks with error callbacks to prevent any uncaught exceptions from blocking component rendering.
+- **Automated Web Asset Compilation**: Updated `scripts/build_and_sign_release_v44.ps1` to execute `npm run build` prior to asset sync and packaging.
+
+---
+
 ## Verification Results
 
 ### APK Verification (`jbacApp-0.0.44.apk`)
@@ -57,3 +78,4 @@ Digest Algorithm:                         SHA-256
 - **Signed APK**: `C:\Users\rajes\StudioProjects\jbac_app\jbacApp-0.0.44.apk` (124.48 MB)
 - **Signed AAB**: `C:\Users\rajes\StudioProjects\jbac_app\jbacApp-0.0.44.aab` (121.58 MB)
 - **Google Play AAB**: `C:\Users\rajes\StudioProjects\jbac_app\appreleasesigned.aab` (121.58 MB)
+
