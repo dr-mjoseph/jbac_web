@@ -26,8 +26,8 @@ export class EventsComponent {
   constituency: any = [];
   districts: any = [];
   states: any = [
-    { id: 1, state_name: 'ఆంధ్రప్రదేశ్ (Andhra Pradesh)' },
-    { id: 2, state_name: 'తెలంగాణ (Telangana)' }
+    { id: 1, state_name: 'ఆంధ్రప్రదేశ్ - Andhra Pradesh (AP)', code: 'AP' },
+    { id: 2, state_name: 'తెలంగాణ - Telangana (TG)', code: 'TG' }
   ];
   searchevents: any = [];
   allEvents: any[] = [];
@@ -563,7 +563,11 @@ export class EventsComponent {
     this.showSpinner = false;
     let filtered = this.allEvents.filter(item => !this.isOldMeeting(item));
     if (payload.state_id) {
-      filtered = filtered.filter(item => item.state_id == payload.state_id || (!item.state_id && payload.state_id == 1));
+      const targetState = Number(payload.state_id);
+      filtered = filtered.filter(item => {
+        const itemState = Number(item.state_id || (item.district_id >= 31 ? 2 : 1));
+        return itemState === targetState;
+      });
     }
     if (payload.district_id) {
       filtered = filtered.filter(item => item.district_id == payload.district_id || item.distrct_id == payload.district_id);
@@ -587,8 +591,6 @@ export class EventsComponent {
         }
         return itemStart === payload.startdate;
       });
-      this.displayEvents(filtered);
-      return;
     }
     if (payload.mettingtype) {
       filtered = filtered.filter(item => item.mettingtype == payload.mettingtype);

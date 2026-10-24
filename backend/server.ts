@@ -888,8 +888,15 @@ app.all(['/dashboardapi/getdistricts', '/dashboardapi/getmdistricts', '/api/dist
         let sql = 'SELECT id, distrct_nm, distrct_nm as districtname, distrct_nm as district_name, state_id, d_in FROM dstrct WHERE d_in = 0 AND distrct_nm IS NOT NULL AND TRIM(distrct_nm) != ""';
         const params: any[] = [];
         if (stateId && stateId !== 'all') {
-            sql += ' AND state_id = ?';
-            params.push(Number(stateId));
+            const sid = Number(stateId);
+            if (sid === 2) {
+                sql += ' AND (state_id = 2 OR (state_id IS NULL AND id >= 31))';
+            } else if (sid === 1) {
+                sql += ' AND (state_id = 1 OR (state_id IS NULL AND id < 31))';
+            } else {
+                sql += ' AND state_id = ?';
+                params.push(sid);
+            }
         }
         sql += ' ORDER BY distrct_nm ASC';
         const [rows] = await db.query(sql, params);
@@ -1033,27 +1040,45 @@ app.all(['/api/events', '/dashboardapi/getevents', '/dashboardapi/getupdateevent
         const dIn = req.query?.d_in !== undefined ? req.query.d_in : (req.body?.d_in !== undefined ? req.body.d_in : null);
 
         const stateId = req.query?.state_id || req.body?.state_id;
-        let sql = 'SELECT id, eventname as title, eventname, eventname as event_name, orgname, meetsize, description, startdate, startdate as event_date, enddate, starttime, starttime as event_time, endtime, location, address, facebook, youtube, phone, eventcontactnumber, image, speaker1, speaker2, speaker3, speaker4, district_id, constituency_id, mandal_id, panchayat_id, state_id, state, d_in, activestatus FROM events WHERE 1=1';
+        let sql = `SELECT 
+            e.id, e.eventname as title, e.eventname, e.eventname as event_name, 
+            e.orgname, e.meetsize, e.description, e.startdate, e.startdate as event_date, 
+            e.enddate, e.starttime, e.starttime as event_time, e.endtime, e.location, 
+            e.address, e.facebook, e.youtube, e.phone, e.eventcontactnumber, e.image, 
+            e.speaker1, e.speaker2, e.speaker3, e.speaker4, e.district_id, e.constituency_id, 
+            e.mandal_id, e.panchayat_id, 
+            COALESCE(e.state_id, d.state_id, CASE WHEN e.district_id >= 31 THEN 2 ELSE 1 END) as state_id, 
+            COALESCE(e.state, CASE WHEN COALESCE(e.state_id, d.state_id, CASE WHEN e.district_id >= 31 THEN 2 ELSE 1 END) = 2 THEN 'Telangana' ELSE 'Andhra Pradesh' END) as state, 
+            e.d_in, e.activestatus 
+        FROM events e 
+        LEFT JOIN dstrct d ON e.district_id = d.id 
+        WHERE 1=1`;
         const params: any[] = [];
 
         if (dIn !== null && dIn !== '') {
-            sql += ' AND d_in = ?';
+            sql += ' AND e.d_in = ?';
             params.push(Number(dIn));
         }
 
         if (stateId && stateId !== 'all') {
-            sql += ' AND (state_id = ? OR (state_id IS NULL AND ? = 1))';
-            params.push(Number(stateId), Number(stateId));
+            const sid = Number(stateId);
+            sql += ` AND (
+                e.state_id = ? 
+                OR (
+                    (e.state_id IS NULL OR e.state_id = 0) 
+                    AND (d.state_id = ? OR (d.state_id IS NULL AND (? = 2 ? e.district_id >= 31 : (e.district_id < 31 OR e.district_id IS NULL)))))
+            )`;
+            params.push(sid, sid, sid);
         }
 
         if (isCurrentDateOnly) {
-            sql += ' AND ((startdate <= CURDATE() AND (enddate >= CURDATE() OR enddate IS NULL OR enddate = "")) OR startdate = CURDATE())';
+            sql += ' AND ((e.startdate <= CURDATE() AND (e.enddate >= CURDATE() OR e.enddate IS NULL OR e.enddate = "")) OR e.startdate = CURDATE())';
         } else if (!showAll) {
             // By default hide old meetings where enddate < CURDATE()
-            sql += ' AND ((enddate IS NOT NULL AND enddate != "" AND enddate >= CURDATE()) OR ((enddate IS NULL OR enddate = "") AND (startdate IS NULL OR startdate >= CURDATE())))';
+            sql += ' AND ((e.enddate IS NOT NULL AND e.enddate != "" AND e.enddate >= CURDATE()) OR ((e.enddate IS NULL OR e.enddate = "") AND (e.startdate IS NULL OR e.startdate >= CURDATE())))';
         }
 
-        sql += ' ORDER BY id DESC';
+        sql += ' ORDER BY e.id DESC';
         const [eventsRows] = await db.query(sql, params);
         res.json({ status: 200, data: eventsRows });
     } catch (err: any) {
@@ -1065,13 +1090,31 @@ app.all(['/api/events', '/dashboardapi/getevents', '/dashboardapi/getupdateevent
 app.all(['/dashboardapi/getribbonevents', '/api/getribbonevents'], async (req: any, res: any) => {
     try {
         const stateId = req.query?.state_id || req.body?.state_id;
-        let sql = 'SELECT id, eventname as title, eventname, eventname as event_name, orgname, meetsize, description, startdate, startdate as event_date, enddate, starttime, starttime as event_time, endtime, location, address, facebook, youtube, phone, eventcontactnumber, image, speaker1, speaker2, speaker3, speaker4, district_id, constituency_id, mandal_id, panchayat_id, state_id, state, d_in, activestatus FROM events WHERE d_in = 1 AND ((enddate IS NOT NULL AND enddate != "" AND enddate >= CURDATE()) OR ((enddate IS NULL OR enddate = "") AND (startdate IS NULL OR startdate >= CURDATE())))';
+        let sql = `SELECT 
+            e.id, e.eventname as title, e.eventname, e.eventname as event_name, 
+            e.orgname, e.meetsize, e.description, e.startdate, e.startdate as event_date, 
+            e.enddate, e.starttime, e.starttime as event_time, e.endtime, e.location, 
+            e.address, e.facebook, e.youtube, e.phone, e.eventcontactnumber, e.image, 
+            e.speaker1, e.speaker2, e.speaker3, e.speaker4, e.district_id, e.constituency_id, 
+            e.mandal_id, e.panchayat_id, 
+            COALESCE(e.state_id, d.state_id, CASE WHEN e.district_id >= 31 THEN 2 ELSE 1 END) as state_id, 
+            COALESCE(e.state, CASE WHEN COALESCE(e.state_id, d.state_id, CASE WHEN e.district_id >= 31 THEN 2 ELSE 1 END) = 2 THEN 'Telangana' ELSE 'Andhra Pradesh' END) as state, 
+            e.d_in, e.activestatus 
+        FROM events e 
+        LEFT JOIN dstrct d ON e.district_id = d.id 
+        WHERE e.d_in = 1 AND ((e.enddate IS NOT NULL AND e.enddate != "" AND e.enddate >= CURDATE()) OR ((e.enddate IS NULL OR e.enddate = "") AND (e.startdate IS NULL OR e.startdate >= CURDATE())))`;
         const params: any[] = [];
         if (stateId && stateId !== 'all') {
-            sql += ' AND (state_id = ? OR (state_id IS NULL AND ? = 1))';
-            params.push(Number(stateId), Number(stateId));
+            const sid = Number(stateId);
+            sql += ` AND (
+                e.state_id = ? 
+                OR (
+                    (e.state_id IS NULL OR e.state_id = 0) 
+                    AND (d.state_id = ? OR (d.state_id IS NULL AND (? = 2 ? e.district_id >= 31 : (e.district_id < 31 OR e.district_id IS NULL)))))
+            )`;
+            params.push(sid, sid, sid);
         }
-        sql += ' ORDER BY id DESC';
+        sql += ' ORDER BY e.id DESC';
         const [rows] = await db.query(sql, params);
         res.json({ status: 200, data: rows });
     } catch (err: any) {
@@ -1083,13 +1126,14 @@ app.post(['/dashboardapi/postmeetings', '/dashboardapi/postchuechmeetings', '/da
     try {
         const m = req.body;
         const img = extractUploadedImage(m);
+        const stateIdVal = m.state_id ? Number(m.state_id) : (m.districtname >= 31 || m.district_id >= 31 ? 2 : 1);
         
         const eventData = {
             eventname: m.mettingtype || m.eventname || 'Meeting',
             speaker1: m.speakerone || m.speaker1 || '',
             speaker2: m.speakertwo || m.speaker2 || '',
             speaker3: m.speakerthree || m.speaker3 || '',
-            speaker4: m.speakerfour || m.speaker4 || '',
+            speaker4: m.speakerfour || m.speakerfour || '',
             startdate: m.fromdate || null,
             enddate: m.todate || null,
             starttime: m.fromtime || '',
@@ -1103,6 +1147,8 @@ app.post(['/dashboardapi/postmeetings', '/dashboardapi/postchuechmeetings', '/da
             description: m.description || '',
             facebook: m.facebook || '',
             youtube: m.youtube || '',
+            state_id: stateIdVal,
+            state: stateIdVal === 2 ? 'Telangana' : 'Andhra Pradesh',
             district_id: m.districtname || m.district_id || null,
             constituency_id: m.constituencyname || m.constituency_id || null,
             mandal_id: m.mandals || m.mandal_id || null,
@@ -1138,37 +1184,59 @@ app.post(['/dashboardapi/postmeetings', '/dashboardapi/postchuechmeetings', '/da
 const searchMeetingsHandler = async (req: any, res: any) => {
     try {
         const body = req.body || {};
-        let sql = 'SELECT id, eventname as title, eventname, eventname as event_name, orgname, meetsize, description, startdate, startdate as event_date, enddate, starttime, starttime as event_time, endtime, location, address, facebook, youtube, phone, eventcontactnumber, image, speaker1, speaker2, speaker3, speaker4, district_id, constituency_id, mandal_id, panchayat_id, d_in, activestatus FROM events WHERE 1=1';
+        let sql = `SELECT 
+            e.id, e.eventname as title, e.eventname, e.eventname as event_name, 
+            e.orgname, e.meetsize, e.description, e.startdate, e.startdate as event_date, 
+            e.enddate, e.starttime, e.starttime as event_time, e.endtime, e.location, 
+            e.address, e.facebook, e.youtube, e.phone, e.eventcontactnumber, e.image, 
+            e.speaker1, e.speaker2, e.speaker3, e.speaker4, e.district_id, e.constituency_id, 
+            e.mandal_id, e.panchayat_id, 
+            COALESCE(e.state_id, d.state_id, CASE WHEN e.district_id >= 31 THEN 2 ELSE 1 END) as state_id, 
+            COALESCE(e.state, CASE WHEN COALESCE(e.state_id, d.state_id, CASE WHEN e.district_id >= 31 THEN 2 ELSE 1 END) = 2 THEN 'Telangana' ELSE 'Andhra Pradesh' END) as state, 
+            e.d_in, e.activestatus 
+        FROM events e 
+        LEFT JOIN dstrct d ON e.district_id = d.id 
+        WHERE 1=1`;
         const params: any[] = [];
         
-        if (body.district_id) { sql += ' AND district_id = ?'; params.push(body.district_id); }
-        if (body.constenncy_id || body.constituency_id) { sql += ' AND constituency_id = ?'; params.push(body.constenncy_id || body.constituency_id); }
-        if (body.mandal_id || body.mandals) { sql += ' AND mandal_id = ?'; params.push(body.mandal_id || body.mandals); }
-        if (body.village_id || body.panchayat_id || body.panchayati_id) { sql += ' AND panchayat_id = ?'; params.push(body.village_id || body.panchayat_id || body.panchayati_id); }
-        if (body.denomation_id || body.denomation) { sql += ' AND denomation_id = ?'; params.push(body.denomation_id || body.denomation); }
-        if (body.ministry_id) { sql += ' AND ministry_id = ?'; params.push(body.ministry_id); }
-        if (body.mettingtype) { sql += ' AND (LOWER(eventname) LIKE ? OR eventname = ?)'; params.push(`%${body.mettingtype}%`, body.mettingtype); }
-        if (body.speakerone) { sql += ' AND (speaker1 LIKE ? OR speaker2 LIKE ?)'; params.push(`%${body.speakerone}%`, `%${body.speakerone}%`); }
+        if (body.state_id && body.state_id !== 'all') {
+            const sid = Number(body.state_id);
+            sql += ` AND (
+                e.state_id = ? 
+                OR (
+                    (e.state_id IS NULL OR e.state_id = 0) 
+                    AND (d.state_id = ? OR (d.state_id IS NULL AND (? = 2 ? e.district_id >= 31 : (e.district_id < 31 OR e.district_id IS NULL)))))
+            )`;
+            params.push(sid, sid, sid);
+        }
+        if (body.district_id) { sql += ' AND e.district_id = ?'; params.push(body.district_id); }
+        if (body.constenncy_id || body.constituency_id) { sql += ' AND e.constituency_id = ?'; params.push(body.constenncy_id || body.constituency_id); }
+        if (body.mandal_id || body.mandals) { sql += ' AND e.mandal_id = ?'; params.push(body.mandal_id || body.mandals); }
+        if (body.village_id || body.panchayat_id || body.panchayati_id) { sql += ' AND e.panchayat_id = ?'; params.push(body.village_id || body.panchayat_id || body.panchayati_id); }
+        if (body.denomation_id || body.denomation) { sql += ' AND e.denomation_id = ?'; params.push(body.denomation_id || body.denomation); }
+        if (body.ministry_id) { sql += ' AND e.ministry_id = ?'; params.push(body.ministry_id); }
+        if (body.mettingtype) { sql += ' AND (LOWER(e.eventname) LIKE ? OR e.eventname = ?)'; params.push(`%${body.mettingtype}%`, body.mettingtype); }
+        if (body.speakerone) { sql += ' AND (e.speaker1 LIKE ? OR e.speaker2 LIKE ?)'; params.push(`%${body.speakerone}%`, `%${body.speakerone}%`); }
         if (body.d_in !== undefined && body.d_in !== null && body.d_in !== '') {
-            sql += ' AND d_in = ?';
+            sql += ' AND e.d_in = ?';
             params.push(Number(body.d_in));
         }
         
         if (body.startdate) {
             // Match event that covers this date
-            sql += ' AND ((startdate <= ? AND (enddate >= ? OR enddate IS NULL OR enddate = "")) OR startdate = ?)';
+            sql += ' AND ((e.startdate <= ? AND (e.enddate >= ? OR e.enddate IS NULL OR e.enddate = "")) OR e.startdate = ?)';
             params.push(body.startdate, body.startdate, body.startdate);
         } else if (body.current_date_only) {
-            sql += ' AND ((startdate <= CURDATE() AND (enddate >= CURDATE() OR enddate IS NULL OR enddate = "")) OR startdate = CURDATE())';
+            sql += ' AND ((e.startdate <= CURDATE() AND (e.enddate >= CURDATE() OR e.enddate IS NULL OR e.enddate = "")) OR e.startdate = CURDATE())';
         } else if (body.show_old !== true) {
             // By default hide old past meetings
-            sql += ' AND ((enddate IS NOT NULL AND enddate != "" AND enddate >= CURDATE()) OR ((enddate IS NULL OR enddate = "") AND (startdate IS NULL OR startdate >= CURDATE())))';
+            sql += ' AND ((e.enddate IS NOT NULL AND e.enddate != "" AND e.enddate >= CURDATE()) OR ((e.enddate IS NULL OR e.enddate = "") AND (e.startdate IS NULL OR e.startdate >= CURDATE())))';
         }
 
-        if (body.fromdate) { sql += ' AND startdate >= ?'; params.push(body.fromdate); }
-        if (body.todate) { sql += ' AND startdate <= ?'; params.push(body.todate); }
+        if (body.fromdate) { sql += ' AND e.startdate >= ?'; params.push(body.fromdate); }
+        if (body.todate) { sql += ' AND e.startdate <= ?'; params.push(body.todate); }
 
-        sql += ' ORDER BY id DESC';
+        sql += ' ORDER BY e.id DESC';
         const [rows] = await db.query(sql, params);
         res.json({ status: 200, data: rows });
     } catch (err: any) {

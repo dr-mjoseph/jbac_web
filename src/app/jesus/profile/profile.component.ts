@@ -36,6 +36,10 @@ export class ProfileComponent {
   mandals: any;
   districts: any;
   panchayati: any;
+  states: any = [
+    { id: 1, state_name: 'ఆంధ్రప్రదేశ్ - Andhra Pradesh (AP)', code: 'AP' },
+    { id: 2, state_name: 'తెలంగాణ - Telangana (TG)', code: 'TG' }
+  ];
   usr_id: any;
   name: any;
   imagesData: any = [];
@@ -84,6 +88,7 @@ export class ProfileComponent {
     })
 
     this.addingmeetings = this.formBuilder.group({
+      state_id: ['', [Validators.required]],
       mettingtype: ['', [Validators.required]],
       speakerone: [''],
       // pastor_id:[''],
@@ -439,6 +444,8 @@ export class ProfileComponent {
       Swal.fire('* ఉన్న తప్పనిసరి  ఫీల్డ్స్ ఎంటర్ చేయండి');
     } else {
       var data = {
+        state_id: this.addingmeetings.value.state_id,
+        state: Number(this.addingmeetings.value.state_id) === 2 ? 'TG' : 'AP',
         mettingtype: this.addingmeetings.value.mettingtype,
         denomation: this.addingmeetings.value.denomation,
         speakerone: this.addingmeetings.value.speakerone,
@@ -719,49 +726,91 @@ export class ProfileComponent {
     this.showSpinner = false;
   }
 
-  getdistric() {
-    this.service.getdistrict().subscribe(res => {
+  onMeetingStateChange(event: any) {
+    const stateId = event && event.target ? event.target.value : event;
+    this.addingmeetings.patchValue({
+      state_id: stateId,
+      districtname: '',
+      constituencyname: '',
+      mandals: '',
+      village_name: ''
+    });
+    this.districts = [];
+    this.constituency = [];
+    this.mandals = [];
+    this.panchayati = [];
+    if (stateId) {
+      this.getdistric(stateId);
+    }
+  }
+
+  getdistric(stateId?: any) {
+    this.service.getdistrict(stateId).subscribe(res => {
       if (res.status == 202) {
         Swal.fire(res.message);
       } else if (res.status == 200) {
         this.districts = res.data;
       }
     }, error => {
-    })
-
-
-  }
-  getmandals(event: any) {
-    var id = event.target.value;
-    this.service.getmandals().subscribe(res => {
-      if (res.status == 202) {
-        Swal.fire(res.message);
-      } else if (res.status == 200) {
-        this.mandals = res.data.filter((data: any) => data.const_id == id);
-      }
-    }, error => {
-
-    })
+      console.log(error);
+    });
   }
 
   getconstency(event: any) {
     var id = event.target.value;
-    this.service.getconsistencys().subscribe(res => {
-      this.constituency = res.data.filter((data: any) => data.dstrct_id == id);
+    this.addingmeetings.patchValue({
+      constituencyname: '',
+      mandals: '',
+      village_name: ''
     });
+    this.constituency = [];
+    this.mandals = [];
+    this.panchayati = [];
+    if (id) {
+      this.service.getconsistencys().subscribe(res => {
+        this.constituency = res.data.filter((data: any) => data.dstrct_id == id);
+      });
+    }
+  }
+
+  getmandals(event: any) {
+    var id = event.target.value;
+    this.addingmeetings.patchValue({
+      mandals: '',
+      village_name: ''
+    });
+    this.mandals = [];
+    this.panchayati = [];
+    if (id) {
+      this.service.getmandals().subscribe(res => {
+        if (res.status == 202) {
+          Swal.fire(res.message);
+        } else if (res.status == 200) {
+          this.mandals = res.data.filter((data: any) => data.const_id == id);
+        }
+      }, error => {
+        console.log(error);
+      });
+    }
   }
 
   gepanchayati(event: any) {
     var id = event.target.value;
-    this.service.gepanchayatis(id).subscribe(res => {
-      if (res.status == 202) {
-        Swal.fire(res.message);
-      } else if (res.status == 200 && res.data) {
-        this.panchayati = res.data.filter((data: any) => !id || data.mndl_id == id);
-      }
-    }, error => {
-
-    })
+    this.addingmeetings.patchValue({
+      village_name: ''
+    });
+    this.panchayati = [];
+    if (id) {
+      this.service.gepanchayatis(id).subscribe(res => {
+        if (res.status == 202) {
+          Swal.fire(res.message);
+        } else if (res.status == 200 && res.data) {
+          this.panchayati = res.data.filter((data: any) => !id || data.mndl_id == id);
+        }
+      }, error => {
+        console.log(error);
+      });
+    }
   }
 
   church: any;
