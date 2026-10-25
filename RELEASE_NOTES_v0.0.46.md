@@ -13,6 +13,44 @@
 
 ---
 
+## 📋 Google Play Console Submission Snippets
+
+### 1. English (`en-US`) [Under 500 characters]
+```text
+What's new in version 0.0.46:
+• Sequential Location Filtering: Easily filter District, Constituency, Mandal, and Panchayat in strict sequential order once State is selected.
+• User Edit Profile: State selection enabled across all profile types (Believers, Pastors, Churches, Students, Ministries, Associations) with automatic cascading.
+• Smooth Navigation: Fixed back arrow responsiveness for instant return after selecting options.
+• API 36 compliance & clean jbacApp display name.
+```
+
+### 2. Telugu (`te-IN`) [Under 500 characters]
+```text
+వెర్షన్ 0.0.46 నూతన విశేషాలు:
+• క్రమబద్ధమైన భౌగోళిక ఎంపిక: రాష్ట్రాన్ని ఎంచుకున్న తర్వాత జిల్లా, నియోజకవర్గం, మండలం, పంచాయతీలు సరైన క్రమంలో మాత్రమే కనిపిస్తాయి.
+• ప్రొఫైల్ ఎడిట్: అన్ని విభాగాలలో రాష్ట్రాల ఎంపిక మరియు ఆటోమేటిక్ ఫిల్టరింగ్ సదుపాయం.
+• వేగవంతమైన నావిగేషన్: ఆప్షన్లు ఎంచుకున్న తర్వాత బ్యాక్ బటన్ తక్షణమే స్పందించేలా మెరుగుపరచబడింది.
+• యాప్ పేరు నుండి beta2 తొలగింపు & ఆండ్రాయిడ్ 16 (API 36) అనుకూలత.
+```
+
+### 3. Google Play Console XML Format
+```xml
+<en-US>
+• Sequential Location Filtering: Easily filter District, Constituency, Mandal, and Panchayat in strict sequential order once State is selected.
+• User Edit Profile: State selection enabled across all profile types (Believers, Pastors, Churches, Students, Ministries, Associations) with automatic cascading.
+• Smooth Navigation: Fixed back arrow responsiveness for instant return after selecting options.
+• API 36 compliance & clean jbacApp display name.
+</en-US>
+<te-IN>
+• క్రమబద్ధమైన భౌగోళిక ఎంపిక: రాష్ట్రాన్ని ఎంచుకున్న తర్వాత జిల్లా, నియోజకవర్గం, మండలం, పంచాయతీలు సరైన క్రమంలో మాత్రమే కనిపిస్తాయి.
+• ప్రొఫైల్ ఎడిట్: అన్ని విభాగాలలో రాష్ట్రాల ఎంపిక మరియు ఆటోమేటిక్ ఫిల్టరింగ్ సదుపాయం.
+• వేగవంతమైన నావిగేషన్: ఆప్షన్లు ఎంచుకున్న తర్వాత బ్యాక్ బటన్ తక్షణమే స్పందించేలా మెరుగుపరచబడింది.
+• యాప్ పేరు నుండి beta2 తొలగింపు & ఆండ్రాయిడ్ 16 (API 36) అనుకూలత.
+</te-IN>
+```
+
+---
+
 ## Key Features & Bug Fixes in v0.0.46
 
 ### 1. Strict Sequential Geographic Filtering for Activation Form (`EntryFormPage`)
