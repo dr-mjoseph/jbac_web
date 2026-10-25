@@ -2347,3 +2347,85 @@ The user identified 16 key issues in the Android mobile application, demanding f
 - `jbacApp-0.0.44.apk`
 - `jbacApp-0.0.44.aab`
 - `appreleasesigned.aab`
+
+---
+
+## 27. Milestone 17: Universal Strict Cascading Geographic Architecture (`State ➔ District ➔ Constituency ➔ Mandal ➔ Panchayat`), Edit Profile Cross-Platform Parity, Mobile Navigation Responsiveness Overhaul, and Release v0.0.46 Build (Target SDK 36)
+
+### 1. Scope & Core Requirements
+The user established four critical requirements across the JBAC ecosystem (Web Portal & Android Mobile App):
+1. **Activation Form (`EntryFormPage` & `update.component`)**:
+   - Filter `District`, `Constituency`, `Mandal`, and `Panchayat` in strict sequential order if and only if `State` is selected.
+   - Child dropdowns must be disabled until their immediate parent is selected.
+   - Fixed header and back navigation styling.
+2. **User Edit Profile (`ProfilePage` & `update.component`)**:
+   - Universal `Select State` (`రాష్ట్రం / State`) dropdown added wherever applicable across all 7 registration categories:
+     - Believer (`signup_form`)
+     - Student (`student_reg` - both College Address and Home/Residential Address)
+     - Ministry (`ministry_signup`)
+     - Pastor (`pastor_reg`)
+     - Church (`church_reg`)
+     - Independent Organisation (`independentorganisation_reg`)
+     - Pastor Association (`pastors_associations`)
+   - Strict sequential cascading order: `State ➔ District ➔ Constituency ➔ Mandal ➔ Panchayat` if and only if `State` is selected.
+   - Non-destructive profile details pre-population (`geteditdtails`), ensuring existing district, constituency, mandal, and panchayat values are cleanly loaded and preserved without premature cascading resets.
+3. **Mobile Navigation Responsiveness & Touch Latency Overhaul**:
+   - Diagnose and resolve sluggish/unresponsive "go back" arrow symbol in the mobile application when navigating back after selecting items.
+   - Diagnose Ionic 3 framework overlay interaction blocking, touch targets, and hardware back button handling.
+4. **Target SDK 36 Production Release Packages**:
+   - Build and dual-sign new version `.apk` and `.aab` packages targeting Android API level 36 (`targetSdkVersion='36'`, `versionCode='46'`, `versionName='0.0.46'`).
+   - Push all verified commits to GitHub (`origin main`).
+
+---
+
+### 2. Deep Root-Cause Analysis & Engineering Solutions
+
+#### A. Mobile Go-Back Navigation Sluggishness & Touch Unresponsiveness
+1. **Ionic 3 Click-Block Overlay (`.click-block-active`)**:
+   - *Diagnosis*: In Ionic 3, whenever an `<ion-select>` action sheet, alert popover, or modal dismisses, the Ionic gesture engine injects an invisible viewport-covering overlay `<div class="click-block click-block-active">` at `z-index: 9999` with a hardcoded 330ms timeout to swallow phantom tap events.
+   - *Problem*: Because the top-left navigation header and back button had standard stacking contexts, this invisible full-screen overlay sat directly above the back button for 330ms+ upon closing selects. Tapping the back button immediately after selecting a dropdown option resulted in the tap being swallowed, creating a perceptibly sluggish or broken "double tap needed" experience.
+   - *Solution*:
+     - In `src/app/app.scss`, constrained `.click-block` and `.click-block-active` with `top: 56px !important`, `z-index: 999 !important`, and `pointer-events: none !important`.
+     - Elevated `ion-header`, `ion-navbar`, and `.toolbar-background` to `z-index: 100000 !important`.
+     - Expanded `.back-button` to a comfortable touch target (minimum 48x48px) with `z-index: 100002 !important`, `touch-action: manipulation !important`, `pointer-events: auto !important`, and zero 300ms click delay.
+     - Set `pointer-events: none` on the centered `.toolbar-title` container so title text boxes never overlap or intercept back button touch vectors.
+2. **Hardware Back Button Navigation Handling**:
+   - *Diagnosis*: Unregistered or default Cordova back-button behaviors left open menus, loading overlays, or active modals lingering on pop.
+   - *Solution*: In `src/app/app.component.ts`, registered `platform.registerBackButtonAction()` with priority handling:
+     1. Closes open side menus if active.
+     2. Dismisses active overlays (loading indicators, alert dialogs, modals).
+     3. Pops the active navigation stack smoothly if `nav.canGoBack()`.
+     4. Prompts to exit cleanly when reaching root `HomePage`.
+
+#### B. Strict Sequential Cascading Architecture (`State ➔ District ➔ Constituency ➔ Mandal ➔ Panchayat`)
+1. **Activation Form (`EntryFormPage` & `update.component`)**:
+   - Initialized with empty child collections (`districts = []`, `constituency = []`, `mandals = []`, `panchayati = []`).
+   - Removed blocking `LoadingController` spinners from geographic fetching methods (`getdistrict`, `getconstituency`, `getmandal`, `getpanchayati`), replacing them with smooth non-blocking asynchronous fetching.
+   - Disabled child controls via `[disabled]` bindings until immediate parent has a valid selection.
+   - Added sequential reset handlers: selecting a State resets District, Constituency, Mandal, and Panchayat; selecting a District resets Constituency, Mandal, and Panchayat; selecting a Constituency resets Mandal and Panchayat; selecting a Mandal resets Panchayat.
+2. **User Edit Profile (`ProfilePage` & `update.component`)**:
+   - Integrated `state_id` across all 7 profile categories in Web and Mobile.
+   - Added student residential state (`res_state_id`) with dedicated residential geographic collections (`res_districts`, `res_constituency`, `res_mandals`, `res_panchayati`).
+   - Hardened `geteditdtails()` with a non-destructive sequential pre-population sequence:
+     - Loads states first.
+     - Fetches districts for user's assigned state.
+     - Fetches constituencies, mandals, and panchayats before setting form values, avoiding premature cascading wipeouts during data hydration.
+
+#### C. Android SDK Platform Schema Compatibility (AGP 3.3.0 & API 36/37)
+1. **Schema Validation Errors**:
+   - *Diagnosis*: AGP 3.3.0 repository parser rejected `<extension-level>` elements placed before `<layoutlib>` in newer Android SDK platform `package.xml` files (`android-33`, `android-35`, `android-36`, `android-37.0`), failing with `cvc-complex-type.2.4.a`.
+   - *Diagnosis 2*: Android preview platform 37 contained `<api-level>37.0</api-level>` in `platforms/android-37.0/package.xml` and `sources/android-37.0/package.xml`. The older JAXB unmarshaller parses `xs:integer` as integer, failing with `java.lang.NumberFormatException: Not a number: 37.0`.
+   - *Solution*: Sanitized `<extension-level>` and normalized `<api-level>37.0</api-level>` to integer `37` across SDK platforms and sources.
+
+---
+
+### 3. Verification & Release Deliverables
+- **Android Target SDK**: `36` (Android 15+ compatible)
+- **Version Code**: `46`
+- **Version Name**: `0.0.46`
+- **Signing**: Dual-signed with v1 (JAR Signature) and v2/v3 (APK Full Signature) schemes using `Jbac.keystore`.
+- **Output Artifacts**:
+  - `jbacApp-0.0.46.apk` (Signed Release APK)
+  - `jbacApp-0.0.46.aab` (Signed Release App Bundle)
+  - `appreleasesigned.aab` (Google Play Console Release Bundle)
+

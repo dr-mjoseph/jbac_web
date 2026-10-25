@@ -251,6 +251,7 @@
                                                 <label class="form-label">Select Districts
                                                 </label>
                                                 <select class="form-control" formControlName="districts"
+                                                    [disabled]="!beliverform.value.state_id || !districts || districts.length === 0"
                                                     (change)="getconstency($event);" style="height:37px;width: 273px;">
                                                     <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
                                                     <option value="{{item.id}}" *ngFor="let item of districts">
@@ -264,8 +265,9 @@
                                             <div class="form-outline">
                                                 <label class="form-label">నియోజకవర్గం ఎంచుకోండి </label>
                                                 <select class="form-control" formControlName="constituencyname"
+                                                    [disabled]="!beliverform.value.districts || !constituency || constituency.length === 0"
                                                     (change)="getmandals($event);" style="height:37px;width: 273px;">
-                                                    <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
+                                                    <option value="" selected disabled>{{ !beliverform.value.districts ? 'దయచేసి మొదట జిల్లాను ఎంచుకోండి' : 'ఇక్కడ క్లిక్ చేసి ఎంచుకోండి' }}</option>
                                                     <option value="{{item.id}}" *ngFor="let item of constituency">
                                                         {{item.const_nm}}
                                                     </option>
@@ -282,8 +284,9 @@
                                                 <label class="form-label">మండలం ఎంచుకోండి
                                                 </label>
                                                 <select class="form-control" formControlName="mandals"
+                                                    [disabled]="!beliverform.value.constituencyname || !mandals || mandals.length === 0"
                                                     (change)="gepanchayati($event);" style="height:37px;width: 273px;">
-                                                    <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
+                                                    <option value="" selected disabled>{{ !beliverform.value.constituencyname ? 'దయచేసి మొదట నియోజకవర్గాన్ని ఎంచుకోండి' : 'ఇక్కడ క్లిక్ చేసి ఎంచుకోండి' }}</option>
                                                     <option value="{{item.id}}" *ngFor="let item of mandals">
                                                         {{item.mndl_nm}}
                                                     </option>
@@ -296,8 +299,9 @@
                                                 <label class="form-label">పంచాయతీ ఎంచుకోండి
                                                 </label>
                                                 <select class="form-control" formControlName="panchayati"
+                                                    [disabled]="!beliverform.value.mandals || !panchayati || panchayati.length === 0"
                                                     style="height:37px;width: 273px;">
-                                                    <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
+                                                    <option value="" selected disabled>{{ !beliverform.value.mandals ? 'దయచేసి మొదట మండలాన్ని ఎంచుకోండి' : 'ఇక్కడ క్లిక్ చేసి ఎంచుకోండి' }}</option>
                                                     <option value="{{item.id}}" *ngFor="let item of panchayati">
                                                         {{item.pnchyt_nm}}
                                                     </option>
@@ -776,8 +780,9 @@
                                                 <label class="form-label">Select Districts
                                                 </label>
                                                 <select class="form-control" formControlName="district_id"
+                                                    [disabled]="!studentform.value.state_id || !districts || districts.length === 0"
                                                     (change)="getconstency($event);" style="height:37px;width: 273px;">
-                                                    <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
+                                                    <option value="" selected disabled>{{ !studentform.value.state_id ? 'దయచేసి మొదట రాష్ట్రాన్ని ఎంచుకోండి' : 'ఇక్కడ క్లిక్ చేసి ఎంచుకోండి' }}</option>
                                                     <option value="{{item.id}}" *ngFor="let item of districts">
                                                         {{item.distrct_nm}}
                                                     </option>
@@ -790,8 +795,9 @@
                                                 <label class="form-label">నియోజకవర్గం ఎంచుకోండి
                                                 </label>
                                                 <select class="form-control" formControlName="constituency_id"
+                                                    [disabled]="!studentform.value.district_id || !constituency || constituency.length === 0"
                                                     (change)="getmandals($event);" style="height:37px;width: 273px;">
-                                                    <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
+                                                    <option value="" selected disabled>{{ !studentform.value.district_id ? 'దయచేసి మొదట జిల్లాను ఎంచుకోండి' : 'ఇక్కడ క్లిక్ చేసి ఎంచుకోండి' }}</option>
                                                     <option value="{{item.id}}" *ngFor="let item of constituency">
                                                         {{item.const_nm}}
                                                     </option>
@@ -806,8 +812,9 @@
                                             <div class="form-outline">
                                                 <label class="form-label">మండలం ఎంచుకోండి </label>
                                                 <select class="form-control" formControlName="mandal_id"
+                                                    [disabled]="!studentform.value.constituency_id || !mandals || mandals.length === 0"
                                                     (change)="gepanchayati($event);" style="height:37px;width: 273px;">
-                                                    <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
+                                                    <option value="" selected disabled>{{ !studentform.value.constituency_id ? 'దయచేసి మొదట నియోజకవర్గాన్ని ఎంచుకోండి' : 'ఇక్కడ క్లిక్ చేసి ఎంచుకోండి' }}</option>
                                                     <option value="{{item.id}}" *ngFor="let item of mandals">
                                                         {{item.mndl_nm}}
                                                     </option>
@@ -819,8 +826,9 @@
                                             <div class="form-outline">
                                                 <label class="form-label">పంచాయతీ ఎంచుకోండి</label>
                                                 <select class="form-control" formControlName="village_id"
+                                                    [disabled]="!studentform.value.mandal_id || !panchayati || panchayati.length === 0"
                                                     style="height:37px;width: 273px;">
-                                                    <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
+                                                    <option value="" selected disabled>{{ !studentform.value.mandal_id ? 'దయచేసి మొదట మండలాన్ని ఎంచుకోండి' : 'ఇక్కడ క్లిక్ చేసి ఎంచుకోండి' }}</option>
                                                     <option value="{{item.id}}" *ngFor="let item of panchayati">
                                                         {{item.pnchyt_nm}}
                                                     </option>
@@ -835,14 +843,26 @@
                                 <div class="card shadow-2-strong card-registration" style="border-radius: 15px;">
                                     <p>&nbsp;&nbsp; Residential Address</p>
                                     <div class="row">
-
+                                        <div class="col-md-6 mb-4 pb-2">
+                                            <div class="form-outline">
+                                                <label class="form-label">రాష్ట్రం / State <span
+                                                        style="color:red; -webkit-text-stroke-width:thick;">*</span></label>
+                                                <select class="form-control" formControlName="state_id"
+                                                    (change)="onStateChange($event);"
+                                                    style="height:37px;width: 273px;">
+                                                    <option value="1">ఆంధ్రప్రదేశ్ (Andhra Pradesh - AP)</option>
+                                                    <option value="2">తెలంగాణ (Telangana - TG)</option>
+                                                </select>
+                                            </div>
+                                        </div>
                                         <div class="col-md-6 mb-4 pb-2">
                                             <div class="form-outline">
                                                 <label class="form-label">Select Districts
                                                 </label>
                                                 <select class="form-control" formControlName="resdistricts"
+                                                    [disabled]="!studentform.value.state_id || !districts || districts.length === 0"
                                                     (change)="getconstency($event);" style="height:37px;width: 273px;">
-                                                    <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
+                                                    <option value="" selected disabled>{{ !studentform.value.state_id ? 'దయచేసి మొదట రాష్ట్రాన్ని ఎంచుకోండి' : 'ఇక్కడ క్లిక్ చేసి ఎంచుకోండి' }}</option>
                                                     <option value="{{item.id}}" *ngFor="let item of districts">
                                                         {{item.distrct_nm}}
                                                     </option>
@@ -854,8 +874,9 @@
                                             <div class="form-outline">
                                                 <label class="form-label">నియోజకవర్గం ఎంచుకోండి </label>
                                                 <select class="form-control" formControlName="resconstituencyname"
+                                                    [disabled]="!studentform.value.resdistricts || !constituency || constituency.length === 0"
                                                     (change)="getmandals($event);" style="height:37px;width: 273px;">
-                                                    <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
+                                                    <option value="" selected disabled>{{ !studentform.value.resdistricts ? 'దయచేసి మొదట జిల్లాను ఎంచుకోండి' : 'ఇక్కడ క్లిక్ చేసి ఎంచుకోండి' }}</option>
                                                     <option value="{{item.id}}" *ngFor="let item of constituency">
                                                         {{item.const_nm}}
                                                     </option>
@@ -872,8 +893,9 @@
                                                 <label class="form-label">మండలం ఎంచుకోండి
                                                 </label>
                                                 <select class="form-control" formControlName="resmandals"
+                                                    [disabled]="!studentform.value.resconstituencyname || !mandals || mandals.length === 0"
                                                     (change)="gepanchayati($event);" style="height:37px;width: 273px;">
-                                                    <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
+                                                    <option value="" selected disabled>{{ !studentform.value.resconstituencyname ? 'దయచేసి మొదట నియోజకవర్గాన్ని ఎంచుకోండి' : 'ఇక్కడ క్లిక్ చేసి ఎంచుకోండి' }}</option>
                                                     <option value="{{item.id}}" *ngFor="let item of mandals">
                                                         {{item.mndl_nm}}
                                                     </option>
@@ -886,8 +908,9 @@
                                                 <label class="form-label">పంచాయతీ ఎంచుకోండి
                                                 </label>
                                                 <select class="form-control" formControlName="respanchayati"
+                                                    [disabled]="!studentform.value.resmandals || !panchayati || panchayati.length === 0"
                                                     style="height:37px;width: 273px;">
-                                                    <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
+                                                    <option value="" selected disabled>{{ !studentform.value.resmandals ? 'దయచేసి మొదట మండలాన్ని ఎంచుకోండి' : 'ఇక్కడ క్లిక్ చేసి ఎంచుకోండి' }}</option>
                                                     <option value="{{item.id}}" *ngFor="let item of panchayati">
                                                         {{item.pnchyt_nm}}
                                                     </option>
@@ -1316,6 +1339,7 @@
                                             <div class="form-outline">
                                                 <label class="form-label">Select District</label>
                                                 <select class="form-control" formControlName="district_id"
+                                                    [disabled]="!pastorsassociations.value.state_id || !districts || districts.length === 0"
                                                     (change)="getconstency($event);" style="height:37px;width: 273px;">
                                                     <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
                                                     <option value="{{item.id}}" *ngFor="let item of districts">
@@ -1331,6 +1355,7 @@
                                                 <label class="form-label">నియోజకవర్గం ఎంచుకోండి
                                                 </label>
                                                 <select class="form-control" formControlName="constituency_id"
+                                                    [disabled]="!pastorsassociations.value.district_id || !constituency || constituency.length === 0"
                                                     (change)="getmandals($event);" style="height:37px;width: 273px;">
                                                     <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
                                                     <option value="{{item.id}}" *ngFor="let item of constituency">
@@ -1348,6 +1373,7 @@
                                                 <label class="form-label">Select Mandal
                                                 </label>
                                                 <select class="form-control" formControlName="mandal_id"
+                                                    [disabled]="!pastorsassociations.value.constituency_id || !mandals || mandals.length === 0"
                                                     (change)="gepanchayati($event);" style="height:37px;width: 273px;">
                                                     <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
                                                     <option value="{{item.id}}" *ngFor="let item of mandals">
@@ -1362,6 +1388,7 @@
                                                 <label class="form-label">పంచాయతీ ఎంచుకోండి
                                                 </label>
                                                 <select class="form-control" formControlName="village_id"
+                                                    [disabled]="!pastorsassociations.value.mandal_id || !panchayati || panchayati.length === 0"
                                                     style="height:37px;width: 273px;">
                                                     <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
                                                     <option value="{{item.id}}" *ngFor="let item of panchayati">
@@ -1785,6 +1812,7 @@
                                                     <label class="form-label">Select District
                                                     </label>
                                                     <select class="form-control" formControlName="district_id"
+                                                        [disabled]="!pastorform.value.state_id || !districts || districts.length === 0"
                                                         (change)="getconstency($event);"
                                                         style="height:37px;width: 273px;">
                                                         <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
@@ -1800,6 +1828,7 @@
                                                     <label class="form-label">నియోజకవర్గం ఎంచుకోండి
                                                     </label>
                                                     <select class="form-control" formControlName="constituency_id"
+                                                        [disabled]="!pastorform.value.district_id || !constituency || constituency.length === 0"
                                                         (change)="getmandals($event);"
                                                         style="height:37px;width: 273px;">
                                                         <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
@@ -1817,6 +1846,7 @@
                                                     <label class="form-label">Select Mandal
                                                     </label>
                                                     <select class="form-control" formControlName="mandal_id"
+                                                        [disabled]="!pastorform.value.constituency_id || !mandals || mandals.length === 0"
                                                         (change)="gepanchayati($event);"
                                                         style="height:37px;width: 273px;">
                                                         <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
@@ -1831,7 +1861,8 @@
                                                 <div class="form-outline">
                                                     <label class="form-label">పంచాయతీ ఎంచుకోండి
                                                     </label>
-                                                    <select class="form-control" formControlName="village_id"
+                                                    <select class="form-control" formControlName="panchayat_id"
+                                                        [disabled]="!pastorform.value.mandal_id || !panchayati || panchayati.length === 0"
                                                         style="height:37px;width: 273px;">
                                                         <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
                                                         <option value="{{item.id}}" *ngFor="let item of panchayati">
@@ -2002,6 +2033,7 @@
                                                 <label class="form-label">Select District
                                                 </label>
                                                 <select class="form-control" formControlName="district_id"
+                                                    [disabled]="!churchregsiterform.value.state_id || !districts || districts.length === 0"
                                                     (change)="getconstency($event);" style="height:37px;width: 273px;">
                                                     <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
                                                     <option value="{{item.id}}" *ngFor="let item of districts">
@@ -2016,6 +2048,7 @@
                                                 <label class="form-label">నియోజకవర్గం ఎంచుకోండి
                                                 </label>
                                                 <select class="form-control" formControlName="constituency_id"
+                                                    [disabled]="!churchregsiterform.value.district_id || !constituency || constituency.length === 0"
                                                     (change)="getmandals($event);" style="height:37px;width: 273px;">
                                                     <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
                                                     <option value="{{item.id}}" *ngFor="let item of constituency">
@@ -2032,6 +2065,7 @@
                                                 <label class="form-label">Select Mandal
                                                 </label>
                                                 <select class="form-control" formControlName="mandal_id"
+                                                    [disabled]="!churchregsiterform.value.constituency_id || !mandals || mandals.length === 0"
                                                     (change)="gepanchayati($event);" style="height:37px;width: 273px;">
                                                     <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
                                                     <option value="{{item.id}}" *ngFor="let item of mandals">
@@ -2046,6 +2080,7 @@
                                                 <label class="form-label">పంచాయతీ ఎంచుకోండి
                                                 </label>
                                                 <select class="form-control" formControlName="village_id"
+                                                    [disabled]="!churchregsiterform.value.mandal_id || !panchayati || panchayati.length === 0"
                                                     style="height:37px;width: 273px;">
                                                     <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
                                                     <option value="{{item.id}}" *ngFor="let item of panchayati">
@@ -2322,6 +2357,7 @@
                                                 <label class="form-label">Select Districts
                                                 </label>
                                                 <select class="form-control" formControlName="districts"
+                                                    [disabled]="!independentorgainsationform.value.state_id || !districts || districts.length === 0"
                                                     (change)="getconstency($event);" style="height:37px;width: 273px;">
                                                     <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
                                                     <option value="{{item.id}}" *ngFor="let item of districts">
@@ -2335,6 +2371,7 @@
                                             <div class="form-outline">
                                                 <label class="form-label">నియోజకవర్గం ఎంచుకోండి </label>
                                                 <select class="form-control" formControlName="constituencyname"
+                                                    [disabled]="!independentorgainsationform.value.districts || !constituency || constituency.length === 0"
                                                     (change)="getmandals($event);" style="height:37px;width: 273px;">
                                                     <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
                                                     <option value="{{item.id}}" *ngFor="let item of constituency">
@@ -2352,6 +2389,7 @@
                                                 <label class="form-label">మండలం ఎంచుకోండి
                                                 </label>
                                                 <select class="form-control" formControlName="mandals"
+                                                    [disabled]="!independentorgainsationform.value.constituencyname || !mandals || mandals.length === 0"
                                                     (change)="gepanchayati($event);" style="height:37px;width: 273px;">
                                                     <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
                                                     <option value="{{item.id}}" *ngFor="let item of mandals">
@@ -2366,6 +2404,7 @@
                                                 <label class="form-label">పంచాయతీ ఎంచుకోండి
                                                 </label>
                                                 <select class="form-control" formControlName="panchayati"
+                                                    [disabled]="!independentorgainsationform.value.mandals || !panchayati || panchayati.length === 0"
                                                     style="height:37px;width: 273px;">
                                                     <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
                                                     <option value="{{item.id}}" *ngFor="let item of panchayati">
@@ -2558,6 +2597,7 @@
                                                 <label class="form-label">Select Districts
                                                 </label>
                                                 <select class="form-control" formControlName="district_id"
+                                                    [disabled]="!ministryform.value.state_id || !districts || districts.length === 0"
                                                     (change)="getconstency($event);" style="height:37px;width: 273px;">
                                                     <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
                                                     <option value="{{item.id}}" *ngFor="let item of districts">
@@ -2572,6 +2612,7 @@
                                                 <label class="form-label">నియోజకవర్గం ఎంచుకోండి
                                                 </label>
                                                 <select class="form-control" formControlName="constituency_id"
+                                                    [disabled]="!ministryform.value.district_id || !constituency || constituency.length === 0"
                                                     (change)="getmandals($event);" style="height:37px;width: 273px;">
                                                     <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
                                                     <option value="{{item.id}}" *ngFor="let item of constituency">
@@ -2588,6 +2629,7 @@
                                             <div class="form-outline">
                                                 <label class="form-label">మండలం ఎంచుకోండి </label>
                                                 <select class="form-control" formControlName="mandal_id"
+                                                    [disabled]="!ministryform.value.constituency_id || !mandals || mandals.length === 0"
                                                     (change)="gepanchayati($event);" style="height:37px;width: 273px;">
                                                     <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
                                                     <option value="{{item.id}}" *ngFor="let item of mandals">
@@ -2601,6 +2643,7 @@
                                             <div class="form-outline">
                                                 <label class="form-label">పంచాయతీ ఎంచుకోండి</label>
                                                 <select class="form-control" formControlName="panchayat_id"
+                                                    [disabled]="!ministryform.value.mandal_id || !panchayati || panchayati.length === 0"
                                                     style="height:37px;width: 273px;">
                                                     <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
                                                     <option value="{{item.id}}" *ngFor="let item of panchayati">
@@ -2879,10 +2922,25 @@
                                     </div>
                                 </div>
                                 <div class="row">
+                                    <div class="col-md-12 mb-4">
+                                        <div class="form-outline">
+                                            <label class="form-label">రాష్ట్రం / State <span
+                                                    style="color:red; -webkit-text-stroke-width:thick;">*</span></label>
+                                            <select class="form-control" formControlName="state_id"
+                                                (change)="onStateChange($event);">
+                                                <option value="" disabled selected>రాష్ట్రం ఎంచుకోండి / Select State</option>
+                                                <option value="1">ఆంధ్రప్రదేశ్ (Andhra Pradesh - AP)</option>
+                                                <option value="2">తెలంగాణ (Telangana - TG)</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
                                     <div class="col-md-6 mb-4">
                                         <div class="form-outline">
                                             <label class="form-label">1) జిల్లా (District)</label>
                                             <select class="form-control" formControlName="district_id"
+                                                [disabled]="!entryform.value.state_id || !districts || districts.length === 0"
                                                 (change)="getconstency($event);">
                                                 <option value="" selected disabled>జిల్లా ఎంచుకోండి</option>
                                                 <option value="{{item.id}}" *ngFor="let item of districts">
@@ -2895,6 +2953,7 @@
                                         <div class="form-outline">
                                             <label class="form-label">2) నియోజకవర్గం (Constituency)</label>
                                             <select class="form-control" formControlName="constituency_id"
+                                                [disabled]="!entryform.value.district_id || !constituency || constituency.length === 0"
                                                 (change)="getmandals($event);">
                                                 <option value="" selected disabled>నియోజకవర్గం ఎంచుకోండి</option>
                                                 <option value="{{item.id}}" *ngFor="let item of constituency">
@@ -2909,6 +2968,7 @@
                                         <div class="form-outline">
                                             <label class="form-label">3) మండలం / మున్సిపాలిటీ (Mandal)</label>
                                             <select class="form-control" formControlName="mandal_id"
+                                                [disabled]="!entryform.value.constituency_id || !mandals || mandals.length === 0"
                                                 (change)="gepanchayati($event);">
                                                 <option value="" selected disabled>మండలం ఎంచుకోండి</option>
                                                 <option value="{{item.id}}" *ngFor="let item of mandals">
@@ -2920,7 +2980,8 @@
                                     <div class="col-md-6 mb-4">
                                         <div class="form-outline">
                                             <label class="form-label">4) పంచాయితీ / వార్డ్ నంబర్ (Panchayat)</label>
-                                            <select class="form-control" formControlName="village_id">
+                                            <select class="form-control" formControlName="village_id"
+                                                [disabled]="!entryform.value.mandal_id || !panchayati || panchayati.length === 0">
                                                 <option value="" selected disabled>పంచాయితీ ఎంచుకోండి</option>
                                                 <option value="{{item.id}}" *ngFor="let item of panchayati">
                                                     {{item.pnchyt_nm}}
