@@ -45,10 +45,28 @@
 - **Title Hitbox Shielding**: Added `pointer-events: none` to the toolbar title container so centered titles do not obstruct the back arrow touch bounding box.
 - **Hardware Back Button Handler**: Registered `platform.registerBackButtonAction()` to cleanly close open menus, dismiss active alerts/modals, and pop navigation views down to `HomePage`.
 
-### 4. Android 16 (API Level 36) Compliance & Security
+### 4. Application Display Name: Removed 'beta2'
+- Cleaned `<name>jbacApp</name>` across `config.xml` and `platforms/android/.../strings.xml`, removing the legacy `-beta2` suffix.
+- The application launcher title now renders cleanly as **`jbacApp`** on all Android device home screens and app drawers.
+
+### 5. Android 16 (API Level 36) Compliance & Security
 - `targetSdkVersion` set to `36`.
 - Verified zero requests for `READ_MEDIA_IMAGES` (maintaining full Google Play Photos & Videos policy compliance).
-- Dual signed with v1, v2, and v3 schemes.
+- Dual signed with v1 (JAR signing), v2, and v3 schemes with full 4-byte zipalign verification.
+
+---
+
+## Direct APK Sideload Installation Guide ("App not installed" Resolution)
+When testing release APKs on physical Android devices, Android's Package Manager enforces strict security rules that can trigger the generic system error message **"App not installed"**:
+
+1. **Existing Version Signature Conflict (Primary Cause)**:
+   - If an existing version of JBAC was previously installed from the **Google Play Store** (which is signed with Google Play App Signing key) or built with a different debug key, Android refuses to install a locally signed update over it.
+   - **Resolution**: **Uninstall the existing JBAC App from the phone first** (go to Android *Settings ➔ Apps ➔ jbacApp ➔ Uninstall*), then tap `jbacApp-0.0.46.apk` to install cleanly.
+2. **Version Code Downgrade Protection**:
+   - If a higher version code (e.g. `versionCode 46`) was previously installed on the phone, Android strictly blocks installing older APKs (like `0.0.45.apk`). Always install the latest `jbacApp-0.0.46.apk`.
+3. **Play Protect / Unknown Apps Permission**:
+   - Allow "Install unknown apps" for the browser or file manager used to download the APK.
+   - If Google Play Protect shows a scanning dialog, tap **"More details" ➔ "Install anyway"**.
 
 ---
 
@@ -56,3 +74,4 @@
 - **Signed APK**: `C:\Users\rajes\StudioProjects\jbac_app\jbacApp-0.0.46.apk`
 - **Signed AAB**: `C:\Users\rajes\StudioProjects\jbac_app\jbacApp-0.0.46.aab`
 - **Google Play AAB**: `C:\Users\rajes\StudioProjects\jbac_app\appreleasesigned.aab`
+
