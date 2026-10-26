@@ -338,7 +338,7 @@
                                                     <select class="form-control" formControlName="district_id"
                                                         (change)="getconstency($event);"
                                                         style="height:37px;width: 273px;"
-                                                        [ngClass]="{'is-invalid': submitted && o['district_id'].errors }">
+                                                        [ngClass]="{'is-invalid': submitted && o['district_id'].errors }" [disabled]="!pastorform.get('state_id')?.value">
                                                         <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి
                                                         </option>
                                                         <option value="{{item.id}}" *ngFor="let item of districts">
@@ -359,7 +359,7 @@
                                                             style="color:red; -webkit-text-stroke-width:thick;">*</span></label>
                                                     <select class="form-control" formControlName="constituency_id"
                                                         (change)="getmandals($event);" style="height:37px;width: 273px;"
-                                                        [ngClass]="{'is-invalid': submitted && o['constituency_id'].errors }">
+                                                        [ngClass]="{'is-invalid': submitted && o['constituency_id'].errors }" [disabled]="!pastorform.get('district_id')?.value">
                                                         <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి
                                                         </option>
                                                         <option value="{{item.id}}" *ngFor="let item of constituency">
@@ -385,7 +385,7 @@
                                                     <select class="form-control" formControlName="mandal_id"
                                                         (change)="gepanchayati($event);"
                                                         style="height:37px;width: 273px;"
-                                                        [ngClass]="{'is-invalid': submitted && o['mandal_id'].errors }">
+                                                        [ngClass]="{'is-invalid': submitted && o['mandal_id'].errors }" [disabled]="!pastorform.get('constituency_id')?.value">
                                                         <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి
                                                         </option>
                                                         <option value="{{item.id}}" *ngFor="let item of mandals">
@@ -408,7 +408,7 @@
                                                         (click)="onPanchayatClick()"
                                                         (focus)="onPanchayatClick()"
                                                         style="height:37px;width: 273px;"
-                                                        [ngClass]="{'is-invalid': submitted && o['panchayat_id'].errors }">
+                                                        [ngClass]="{'is-invalid': submitted && o['panchayat_id'].errors }" [disabled]="!pastorform.get('mandal_id')?.value">
                                                         <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి
                                                         </option>
                                                         <option value="{{item.id}}" *ngFor="let item of panchayati">

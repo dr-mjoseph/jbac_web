@@ -78,6 +78,7 @@ export class NewsComponent {
     const data = {
       description: this.addingnews.value.description,
       news: this.addingnews.value.news,
+      image: (this.imagesData && this.imagesData[0]) ? this.imagesData[0].reviewimg : '',
       reviewImg: this.imagesData
     };
   

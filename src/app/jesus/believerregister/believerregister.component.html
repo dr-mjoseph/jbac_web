@@ -380,6 +380,7 @@
                                                     <select class="form-control" formControlName="state_id"
                                                         (change)="onStateChange($event);"
                                                         style="height:37px;width: 273px;">
+                                                        <option value="" disabled selected>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి / Select State</option>
                                                         <option value="1">ఆంధ్రప్రదేశ్ (Andhra Pradesh - AP)</option>
                                                         <option value="2">తెలంగాణ (Telangana - TG)</option>
                                                     </select>
@@ -395,7 +396,7 @@
                                                     <select class="form-control" formControlName="districts"
                                                         (change)="getconstency($event);"
                                                         style="height:37px;width: 273px;"
-                                                        [ngClass]="{'is-invalid': submitted && h['districts'].errors }">
+                                                        [ngClass]="{'is-invalid': submitted && h['districts'].errors }" [disabled]="!beliverform.get('state_id')?.value">
                                                         <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
                                                         <option value="{{item.id}}" *ngFor="let item of districts">
                                                             {{item.distrct_nm}}
@@ -414,7 +415,7 @@
                                                             style="color:red; -webkit-text-stroke-width:thick;">*</span></label>
                                                     <select class="form-control" formControlName="constituencyname"
                                                         (change)="getmandals($event);" style="height:37px;width: 273px;"
-                                                        [ngClass]="{'is-invalid': submitted && h['constituencyname'].errors }">
+                                                        [ngClass]="{'is-invalid': submitted && h['constituencyname'].errors }" [disabled]="!beliverform.get('districts')?.value">
                                                         <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
                                                         <option value="{{item.id}}" *ngFor="let item of constituency">
                                                             {{item.const_nm}}
@@ -439,7 +440,7 @@
                                                     <select class="form-control" formControlName="mandals"
                                                         (change)="gepanchayati($event);"
                                                         style="height:37px;width: 273px;"
-                                                        [ngClass]="{'is-invalid': submitted && h['mandals'].errors }">
+                                                        [ngClass]="{'is-invalid': submitted && h['mandals'].errors }" [disabled]="!beliverform.get('constituencyname')?.value">
                                                         <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
                                                         <option value="{{item.id}}" *ngFor="let item of mandals">
                                                             {{item.mndl_nm}}
@@ -459,7 +460,7 @@
                                                     </label>
                                                     <select class="form-control" formControlName="panchayati"
                                                         style="height:37px;width: 273px;"
-                                                        [ngClass]="{'is-invalid': submitted && h['panchayati'].errors }">
+                                                        [ngClass]="{'is-invalid': submitted && h['panchayati'].errors }" [disabled]="!beliverform.get('mandals')?.value">
                                                         <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
                                                         <option value="{{item.id}}" *ngFor="let item of panchayati">
                                                             {{item.pnchyt_nm}}

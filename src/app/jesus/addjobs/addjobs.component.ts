@@ -174,6 +174,7 @@ export class AddjobsComponent {
     })
 
     this.jobsadding = this.formBuilder.group({
+      state_id: ['', [Validators.required]],
       jobname: ['', [Validators.required]],
 
       experience_t: [''],
@@ -508,7 +509,10 @@ export class AddjobsComponent {
     }
 
     const val = this.jobsadding.value;
+    const sId = Number(val.state_id) || (Number(val.districtname) >= 31 && Number(val.districtname) <= 63 ? 2 : 1);
     const data = {
+      state_id: sId,
+      state: sId === 2 ? 'Telangana' : 'Andhra Pradesh',
       jobname: val.jobname,
       jobtitle: val.jobname,
       qualification: val.qualification || '',

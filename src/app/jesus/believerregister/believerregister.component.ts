@@ -52,7 +52,7 @@ export class BelieverregisterComponent {
       education: ['', [Validators.required]],
       designation: ['', [Validators.required]],
       dpartment: ['', [Validators.required]],
-      state_id: ['1', [Validators.required]],
+      state_id: ['', [Validators.required]],
       districts: ['', [Validators.required]],
       mandals: ['', [Validators.required]],
       panchayati: ['', [Validators.required]],
@@ -148,8 +148,29 @@ export class BelieverregisterComponent {
     });
   }
 
+  getconstency(event: any) {
+    var id = event.target.value;
+    this.beliverform.patchValue({
+      constituencyname: '',
+      mandals: '',
+      panchayati: ''
+    });
+    this.constituency = [];
+    this.mandals = [];
+    this.panchayati = [];
+    this.service.getconsistencys().subscribe(res => {
+      this.constituency = res.data.filter((data: any) => data.dstrct_id == id);
+    })
+  }
+
   getmandals(event: any) {
     var id = event.target.value;
+    this.beliverform.patchValue({
+      mandals: '',
+      panchayati: ''
+    });
+    this.mandals = [];
+    this.panchayati = [];
     this.service.getmandals().subscribe(res => {
       this.mandals = res.data.filter((data: any) => data.const_id == id);
     })
@@ -160,15 +181,13 @@ export class BelieverregisterComponent {
       this.denomation = res.data;
     })
   }
-  getconstency(event: any) {
-    var id = event.target.value;
-    this.service.getconsistencys().subscribe(res => {
-      this.constituency = res.data.filter((data: any) => data.dstrct_id == id);
-    })
-  }
 
   gepanchayati(event: any) {
     var id = event.target.value;
+    this.beliverform.patchValue({
+      panchayati: ''
+    });
+    this.panchayati = [];
     this.service.gepanchayatis(id).subscribe(res => {
       this.panchayati = res.data ? res.data.filter((data: any) => !id || data.mndl_id == id) : [];
     })

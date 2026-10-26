@@ -75,7 +75,7 @@ export class AddinstituteComponent {
       time_end: ['', [Validators.required]],
       description: ['', [Validators.required]],
       church: ['', [Validators.required]],
-      state_id: ['1', [Validators.required]],
+      state_id: ['', [Validators.required]],
       district_id: ['', [Validators.required]],
       constituency_id: ['', [Validators.required]],
       // mandal_id: ['', [Validators.required]],
@@ -628,6 +628,9 @@ export class AddinstituteComponent {
       this.addinginsututies.value.image = this.imagesDatains
       this.addinginsututies.value.usr_id = sessionStorage.getItem('usr_id')
       this.addinginsututies.value.number = sessionStorage.getItem('mobile_number')
+      const sId = Number(this.addinginsututies.value.state_id) || (Number(this.addinginsututies.value.district_id) >= 31 && Number(this.addinginsututies.value.district_id) <= 63 ? 2 : 1);
+      this.addinginsututies.value.state_id = sId;
+      this.addinginsututies.value.state = sId === 2 ? 'Telangana' : 'Andhra Pradesh';
       this.service.postinsututies(this.addinginsututies.value).subscribe((res: any) => {
         if (res.status == 200) {
           Swal.fire('విజయవంతముగా నమోదు చేయబడింది, మీ ఫోన్ నెంబర్ మరియు పాస్వర్డ్ తో లాగిన్ అవగలరు')
@@ -720,6 +723,9 @@ export class AddinstituteComponent {
   }
   getmandals(event: any) {
     var id = event.target.value;
+    this.addinginsututies.patchValue({ mandal_id: '', village_id: '' });
+    this.mandals = [];
+    this.panchayati = [];
     this.service.getmandals().subscribe(res => {
       if (res.status == 202) {
         Swal.fire(res.message);
@@ -733,6 +739,10 @@ export class AddinstituteComponent {
 
   getconstency(event: any) {
     var id = event.target.value;
+    this.addinginsututies.patchValue({ constituency_id: '', mandal_id: '', village_id: '' });
+    this.constituency = [];
+    this.mandals = [];
+    this.panchayati = [];
     this.service.getconsistencys().subscribe(res => {
       this.constituency = res.data.filter((data: any) => data.dstrct_id == id);
     });
@@ -740,6 +750,8 @@ export class AddinstituteComponent {
 
   gepanchayati(event: any) {
     var id = event.target.value;
+    this.addinginsututies.patchValue({ village_id: '' });
+    this.panchayati = [];
     this.service.gepanchayatis().subscribe(res => {
       if (res.status == 202) {
         Swal.fire(res.message);

@@ -202,7 +202,7 @@ export class ChurchregisterComponent {
       church_name: ['', [Validators.required]],
       denomination_id: ['', [Validators.required]],
       total_members: ['', [Validators.required]],
-      state_id: ['1', [Validators.required]],
+      state_id: ['', [Validators.required]],
       district_id: ['', [Validators.required]],
       constituency_id: ['', [Validators.required]],
       mandal_id: ['', [Validators.required]],
@@ -402,6 +402,9 @@ export class ChurchregisterComponent {
 
   getmandals(event: any) {
     var id = event.target.value;
+    this.churchregsiterform.patchValue({ mandal_id: '', village_id: '' });
+    this.mandals = [];
+    this.panchayati = [];
     this.service.getmandals().subscribe(res => {
       this.mandals = res.data.filter((data: any) => data.const_id == id);
     })
@@ -409,6 +412,10 @@ export class ChurchregisterComponent {
 
   getconstency(event: any) {
     var id = event.target.value;
+    this.churchregsiterform.patchValue({ constituency_id: '', mandal_id: '', village_id: '' });
+    this.constituency = [];
+    this.mandals = [];
+    this.panchayati = [];
     this.service.getconsistencys().subscribe(res => {
       this.constituency = res.data.filter((data: any) => data.dstrct_id == id);
     })
@@ -416,6 +423,8 @@ export class ChurchregisterComponent {
 
   gepanchayati(event: any) {
     const id = event?.target?.value !== undefined ? event.target.value : event;
+    this.churchregsiterform.patchValue({ village_id: '' });
+    this.panchayati = [];
     if (!id) return;
     this.service.gepanchayatis(id).subscribe(
       (res: any) => {

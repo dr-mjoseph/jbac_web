@@ -59,7 +59,7 @@ export class StudentregisterComponent {
       passexam: [''],
       tmarks: ['', [Validators.required]],
       mmarks: ['', [Validators.required]],
-      state_id: ['1'],
+      state_id: ['', [Validators.required]],
       district_id: [''],
       constituency_id: [''],
       mandal_id: [''],
@@ -82,7 +82,7 @@ export class StudentregisterComponent {
       respanchayati: ['', [Validators.required]],
       resmandals: ['', [Validators.required]],
       resconstituencyname: ['', [Validators.required]],
-      res_state_id: ['1'],
+      res_state_id: ['', [Validators.required]],
       resdistricts: ['', [Validators.required]],
       god: [''],
       term: [true],
@@ -237,7 +237,11 @@ export class StudentregisterComponent {
   //   })
   // }
   getconstency(event: any) {
-    const id = event.target.value?.trim(); // Ensure valid ID
+    const id = event.target.value?.trim();
+    this.studentform.patchValue({ constituency_id: '', mandal_id: '', village_id: '' });
+    this.constituency = [];
+    this.mandals = [];
+    this.panchayati = []; // Ensure valid ID
 
     if (!id) {
       Swal.fire({
@@ -290,7 +294,11 @@ export class StudentregisterComponent {
   //   })
   // }
   getconstency1(event: any) {
-    const id = event.target.value?.trim(); // Ensure valid ID
+    const id = event.target.value?.trim();
+    this.studentform.patchValue({ resconstituencyname: '', resmandals: '', respanchayati: '' });
+    this.constituency1 = [];
+    this.mandals1 = [];
+    this.panchayati1 = []; // Ensure valid ID
 
     if (!id) {
       Swal.fire({
@@ -343,7 +351,10 @@ export class StudentregisterComponent {
   //   })
   // }
   getmandals(event: any) {
-    const id = event.target.value?.trim(); // Ensure ID is valid
+    const id = event.target.value?.trim();
+    this.studentform.patchValue({ mandal_id: '', village_id: '' });
+    this.mandals = [];
+    this.panchayati = []; // Ensure ID is valid
 
     if (!id) {
       Swal.fire({
@@ -407,7 +418,10 @@ export class StudentregisterComponent {
   //   })
   // }
   getmandals1(event: any) {
-    const id = event.target.value?.trim(); // Ensure ID is valid
+    const id = event.target.value?.trim();
+    this.studentform.patchValue({ resmandals: '', respanchayati: '' });
+    this.mandals1 = [];
+    this.panchayati1 = []; // Ensure ID is valid
 
     if (!id) {
       Swal.fire({
@@ -455,7 +469,9 @@ export class StudentregisterComponent {
   }
 
   gepanchayati(event: any) {
-    const id = event.target.value?.trim(); // Ensure valid ID
+    const id = event.target.value?.trim();
+    this.studentform.patchValue({ village_id: '' });
+    this.panchayati = []; // Ensure valid ID
 
     if (!id) {
       Swal.fire({
@@ -512,7 +528,9 @@ export class StudentregisterComponent {
   //   })
   // }
   gepanchayati1(event: any) {
-    const id = event.target.value?.trim(); // Ensure valid ID
+    const id = event.target.value?.trim();
+    this.studentform.patchValue({ respanchayati: '' });
+    this.panchayati1 = []; // Ensure valid ID
 
     if (!id) {
       Swal.fire({

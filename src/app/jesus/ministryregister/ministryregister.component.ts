@@ -45,7 +45,7 @@ export class MinistryregisterComponent {
       headnmber: ['', [Validators.required, Validators.maxLength(10)]],
       number_ofchurches: ['', [Validators.required]],
       number_ofmembers: ['', [Validators.required]],
-      state_id: ['1', [Validators.required]],
+      state_id: ['', [Validators.required]],
       district_id: ['', [Validators.required]],
       constituency_id: ['', [Validators.required]],
       mandal_id: ['', [Validators.required]],
@@ -120,6 +120,9 @@ export class MinistryregisterComponent {
 
   getmandals(event: any) {
     var id = event.target.value;
+    this.ministryform.patchValue({ mandal_id: '', panchayat_id: '' });
+    this.mandals = [];
+    this.panchayati = [];
     this.service.getmandals().subscribe(res => {
       this.mandals = res.data.filter((data: any) => data.const_id == id);
     })
@@ -127,6 +130,10 @@ export class MinistryregisterComponent {
 
   getconstency(event: any) {
     var id = event.target.value;
+    this.ministryform.patchValue({ constituency_id: '', mandal_id: '', panchayat_id: '' });
+    this.constituency = [];
+    this.mandals = [];
+    this.panchayati = [];
     this.service.getconsistencys().subscribe(res => {
       this.constituency = res.data.filter((data: any) => data.dstrct_id == id);
     })
@@ -134,6 +141,8 @@ export class MinistryregisterComponent {
 
   gepanchayati(event: any) {
     var id = event.target.value;
+    this.ministryform.patchValue({ panchayat_id: '' });
+    this.panchayati = [];
     this.service.gepanchayatis(id).subscribe(res => {
       this.panchayati = res.data ? res.data.filter((data: any) => !id || data.mndl_id == id) : [];
       console.log(this.panchayati, 'hhh');

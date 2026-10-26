@@ -100,7 +100,7 @@ export class PastorassociationregisterComponent {
       nativeplace: [''],
       caste: [''],
       talent: [''],
-      state_id: ['1', [Validators.required]],
+      state_id: ['', [Validators.required]],
       district_id: ['', [Validators.required]],
       constituency_id: ['', [Validators.required]],
       mandal_id: ['', [Validators.required]],
@@ -426,6 +426,9 @@ export class PastorassociationregisterComponent {
 
   getmandals(event: any) {
     const id = event?.target?.value !== undefined ? event.target.value?.trim() : event;
+    this.pastorsassociations.patchValue({ mandal_id: '', village_id: '' });
+    this.mandals = [];
+    this.panchayati = [];
     if (!id) return;
 
     this.service.getmandals().subscribe({
@@ -450,6 +453,10 @@ export class PastorassociationregisterComponent {
 
   getconstency(event: any) {
     const id = event?.target?.value !== undefined ? event.target.value?.trim() : event;
+    this.pastorsassociations.patchValue({ constituency_id: '', mandal_id: '', village_id: '' });
+    this.constituency = [];
+    this.mandals = [];
+    this.panchayati = [];
     if (!id) return;
 
     this.service.getconsistencys().subscribe({
@@ -474,6 +481,8 @@ export class PastorassociationregisterComponent {
 
   gepanchayati(event: any) {
     const id = event?.target?.value !== undefined ? event.target.value?.trim() : event;
+    this.pastorsassociations.patchValue({ village_id: '' });
+    this.panchayati = [];
     if (!id) return;
     this.service.gepanchayatis(id).subscribe({
       next: (res: any) => {
@@ -801,8 +810,11 @@ export class PastorassociationregisterComponent {
 
     this.showSpinner = true;
     const formVal = this.pastorsassociations.value;
+    const sId = Number(formVal.state_id) || (Number(formVal.district_id) >= 31 && Number(formVal.district_id) <= 63 ? 2 : 1);
     const payload = {
       ...formVal,
+      state_id: sId,
+      state: sId === 2 ? 'Telangana' : 'Andhra Pradesh',
       paname: formVal.pa_name || formVal.paname,
       headname: formVal.headname,
       phonenumber: formVal.phonenumber,

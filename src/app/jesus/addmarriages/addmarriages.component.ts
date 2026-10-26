@@ -144,6 +144,7 @@ export class AddmarriagesComponent {
     })
 
     this.addingmarriages = this.formBuilder.group({
+      state_id: ['', [Validators.required]],
       gender: ['', [Validators.required]],
       status: [''],
       name: ['', [Validators.required]],
@@ -720,6 +721,9 @@ export class AddmarriagesComponent {
   }
   getmandals(event: any) {
     var id = event.target.value;
+    this.addingmarriages.patchValue({ mandals: '', village_name: '' });
+    this.mandals = [];
+    this.panchayati = [];
     this.service.getmandals(id).subscribe(res => {
       if (res.status == 202) {
         Swal.fire(res.message);
@@ -740,6 +744,8 @@ export class AddmarriagesComponent {
 
   gepanchayati(event: any) {
     var id = event.target.value;
+    this.addingmarriages.patchValue({ village_name: '' });
+    this.panchayati = [];
     this.service.gepanchayatis(id).subscribe(res => {
       if (res.status == 202) {
         Swal.fire(res.message);
@@ -950,7 +956,10 @@ export class AddmarriagesComponent {
     if (this.addingmarriages.invalid) {
       alert('please fiil the details ');
     } else {
+      const sId = Number(this.addingmarriages.value.state_id) || (Number(this.addingmarriages.value.districtname) >= 31 && Number(this.addingmarriages.value.districtname) <= 63 ? 2 : 1);
       var data = {
+        state_id: sId,
+        state: sId === 2 ? 'Telangana' : 'Andhra Pradesh',
         description: this.addingmarriages.value.description,
         height: this.addingmarriages.value.height,
         color: this.addingmarriages.value.color,

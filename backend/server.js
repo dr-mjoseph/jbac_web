@@ -117,28 +117,28 @@ function extractUploadedImage(body) {
         return '';
     if (typeof body === 'string')
         return body.trim();
-    if (typeof body.image === 'string' && body.image.trim())
-        return body.image.trim();
-    if (typeof body.reviewimg === 'string' && body.reviewimg.trim())
-        return body.reviewimg.trim();
-    if (typeof body.reviewImg === 'string' && body.reviewImg.trim())
-        return body.reviewImg.trim();
-    const candidates = [body.reviewImg, body.reviewimg, body.imagesData, body.images, body.image, body.imagedata];
-    for (const cand of candidates) {
-        if (Array.isArray(cand) && cand.length > 0) {
-            const first = cand[0];
-            if (typeof first === 'string' && first.trim())
-                return first.trim();
-            if (first && typeof first === 'object') {
-                const val = first.reviewimg || first.reviewImg || first.image || first.url || first.src || '';
-                if (typeof val === 'string' && val.trim())
-                    return val.trim();
+    if (Array.isArray(body)) {
+        for (const item of body) {
+            const res = extractUploadedImage(item);
+            if (res)
+                return res;
+        }
+        return '';
+    }
+    if (typeof body === 'object') {
+        const directKeys = ['image', 'reviewimg', 'reviewImg', 'photo', 'url', 'src', 'imagedata', 'image_url', 'audiorecordonincident', 'audio', 'video1', 'video2', 'videoa', 'videob'];
+        for (const k of directKeys) {
+            if (typeof body[k] === 'string' && body[k].trim()) {
+                return body[k].trim();
             }
         }
-        else if (cand && typeof cand === 'object') {
-            const val = cand.reviewimg || cand.reviewImg || cand.image || cand.url || cand.src || '';
-            if (typeof val === 'string' && val.trim())
-                return val.trim();
+        const containerKeys = ['reviewImg', 'reviewimg', 'imagesData', 'images', 'image', 'photo', 'document', 'documentarray'];
+        for (const k of containerKeys) {
+            if (body[k]) {
+                const res = extractUploadedImage(body[k]);
+                if (res)
+                    return res;
+            }
         }
     }
     return '';
@@ -158,6 +158,17 @@ async function dynamicInsert(tableName, data) {
                 defaultVal: c.Default
             });
         }
+        // Auto-populate timestamp columns if present and empty
+        const nowCts = getIndianCts();
+        if (colMap.has('cts') && (!data.cts || data.cts === 'NULL' || String(data.cts).trim() === '')) {
+            data.cts = nowCts;
+        }
+        if (colMap.has('ctsdate') && (!data.ctsdate || data.ctsdate === 'NULL' || String(data.ctsdate).trim() === '')) {
+            data.ctsdate = nowCts;
+        }
+        if (colMap.has('i_ts') && (!data.i_ts || data.i_ts === 'NULL' || String(data.i_ts).trim() === '')) {
+            data.i_ts = nowCts;
+        }
         // Auto-extract image if table has image column and data has reviewImg/imagesData
         if (colMap.has('image') && (!data.image || typeof data.image === 'object' || Array.isArray(data.image))) {
             const extracted = extractUploadedImage(data);
@@ -171,21 +182,33 @@ async function dynamicInsert(tableName, data) {
                 data.photo = extracted;
             }
         }
-                // Auto-populate state_id and state
-        if (colMap.has('state_id')) {
-            if (data.state_id !== undefined && data.state_id !== null && data.state_id !== '') {
-                data.state_id = Number(data.state_id);
-                if (colMap.has('state') && (!data.state || String(data.state).trim() === '')) {
-                    data.state = data.state_id === 2 ? 'Telangana' : 'Andhra Pradesh';
+        // Auto-populate state_id and state intelligently
+        if (colMap.has('state_id') || colMap.has('state')) {
+            const distVal = Number(data.district_id || data.districts || data.districtname || data.district || 0);
+            const stateStr = String(data.state || '').toLowerCase();
+            const rawStateId = Number(data.state_id || data.stateId || 0);
+            let isTelangana = false;
+            if (rawStateId === 2 || stateStr.includes('telan') || stateStr === 'tg') {
+                isTelangana = true;
+            }
+            else if (distVal >= 31 && distVal <= 63) {
+                isTelangana = true;
+            }
+            if (isTelangana) {
+                if (colMap.has('state_id'))
+                    data.state_id = 2;
+                if (colMap.has('state'))
+                    data.state = 'Telangana';
+            }
+            else {
+                if (colMap.has('state_id') && (!data.state_id || data.state_id === 1)) {
+                    data.state_id = 1;
                 }
-            } else if (data.state_id === undefined || data.state_id === null || data.state_id === '') {
-                data.state_id = 1;
-                if (colMap.has('state') && (!data.state || String(data.state).trim() === '')) {
+                if (colMap.has('state') && (!data.state || data.state === 'Andhra Pradesh' || String(data.state).trim() === '')) {
                     data.state = 'Andhra Pradesh';
                 }
             }
         }
-        
         if (colMap.has('email') && (data.email === undefined || data.email === null)) {
             data.email = '';
         }
@@ -426,7 +449,7 @@ app.get(['/api/crud/:table', '/dashboardapi/crud/:table', '/crud/:table'], async
         return res.status(400).json({ status: 400, error: `Invalid or restricted table: ${table}` });
     }
     try {
-        const limit = Math.min(Number(req.query.limit) || 100, 500);
+        const limit = Math.min(Number(req.query.limit) || 50, 200);
         const offset = Number(req.query.offset) || 0;
         const queryParams = [];
         let whereClause = '';
@@ -873,9 +896,11 @@ app.all(['/dashboardapi/getdistricts', '/dashboardapi/getmdistricts', '/api/dist
             const sid = Number(stateId);
             if (sid === 2) {
                 sql += ' AND (state_id = 2 OR (state_id IS NULL AND id >= 31))';
-            } else if (sid === 1) {
+            }
+            else if (sid === 1) {
                 sql += ' AND (state_id = 1 OR (state_id IS NULL AND id < 31))';
-            } else {
+            }
+            else {
                 sql += ' AND state_id = ?';
                 params.push(sid);
             }
@@ -1053,9 +1078,11 @@ app.all(['/api/events', '/dashboardapi/getevents', '/dashboardapi/getupdateevent
             const sid = Number(stateId);
             if (sid === 2) {
                 sql += ' AND (d.state_id = 2 OR e.district_id >= 31 OR (e.state_id = 2 AND (e.district_id IS NULL OR e.district_id = 0)))';
-            } else if (sid === 1) {
+            }
+            else if (sid === 1) {
                 sql += ' AND (d.state_id = 1 OR (e.district_id IS NOT NULL AND e.district_id < 31) OR (e.state_id = 1 AND (e.district_id IS NULL OR e.district_id = 0)) OR (e.district_id IS NULL AND e.state_id IS NULL))';
-            } else {
+            }
+            else {
                 sql += ' AND (e.state_id = ? OR d.state_id = ?)';
                 params.push(sid, sid);
             }
@@ -1106,9 +1133,11 @@ app.all(['/dashboardapi/getribbonevents', '/api/getribbonevents'], async (req, r
             const sid = Number(stateId);
             if (sid === 2) {
                 sql += ' AND (d.state_id = 2 OR e.district_id >= 31 OR (e.state_id = 2 AND (e.district_id IS NULL OR e.district_id = 0)))';
-            } else if (sid === 1) {
+            }
+            else if (sid === 1) {
                 sql += ' AND (d.state_id = 1 OR (e.district_id IS NOT NULL AND e.district_id < 31) OR (e.state_id = 1 AND (e.district_id IS NULL OR e.district_id = 0)) OR (e.district_id IS NULL AND e.state_id IS NULL))';
-            } else {
+            }
+            else {
                 sql += ' AND (e.state_id = ? OR d.state_id = ?)';
                 params.push(sid, sid);
             }
@@ -1121,7 +1150,7 @@ app.all(['/dashboardapi/getribbonevents', '/api/getribbonevents'], async (req, r
         res.status(500).json({ status: 500, error: err.message });
     }
 });
-app.post(['/dashboardapi/postmeetings', '/dashboardapi/postchuechmeetings', '/dashboardapi/postchurchmeetings', '/api/postmeetings'], async (req, res) => {
+app.post(['/dashboardapi/postmeetings', '/api/postmeetings'], async (req, res) => {
     try {
         const m = req.body;
         const img = extractUploadedImage(m);
@@ -1178,6 +1207,44 @@ app.post(['/dashboardapi/postmeetings', '/dashboardapi/postchuechmeetings', '/da
         res.status(500).json({ status: 500, error: err.message });
     }
 });
+// Dedicated Church Timings Endpoint
+app.post(['/dashboardapi/postchuechmeetings', '/dashboardapi/postchurchmeetings', '/dashboardapi/postchurchtimings', '/api/postchurchtimings'], async (req, res) => {
+    try {
+        const c = req.body || {};
+        const distId = c.district_id || c.districtname || null;
+        const constId = c.constituency_id || c.constituencyname || null;
+        const mndlId = c.mandal_id || c.mandals || null;
+        const vlgId = c.village_id || c.village_name || c.panchayat_id || null;
+        const distVal = Number(distId || 0);
+        const rawStateId = Number(c.state_id || 0);
+        const stateStr = String(c.state || '').toLowerCase();
+        const isTelangana = rawStateId === 2 || stateStr.includes('telan') || (distVal >= 31 && distVal <= 63);
+        const timingData = {
+            cts: getIndianCts(),
+            service_id: c.service_id || c.service_name || '',
+            church_id: c.church_id || c.church || '',
+            day: c.day || '',
+            starttime: c.starttime || c.time_start || '',
+            endtime: c.endtime || c.time_end || '',
+            descriptions: c.descriptions || c.description || '',
+            district_id: distId,
+            constituency_id: constId,
+            mandal_id: mndlId,
+            village_id: vlgId,
+            user_id: c.user_id || c.usr_id || null,
+            user_name: c.user_name || c.name || '',
+            user_phn: c.user_phn || c.mobile_number || '',
+            state_id: isTelangana ? 2 : 1,
+            state: isTelangana ? 'Telangana' : 'Andhra Pradesh',
+            d_in: 0
+        };
+        const result = await dynamicInsert('church_timings', timingData);
+        res.json({ status: 200, message: 'Church timing submitted successfully', insertId: result?.insertId });
+    }
+    catch (err) {
+        res.status(500).json({ status: 500, error: err.message });
+    }
+});
 const searchMeetingsHandler = async (req, res) => {
     try {
         const body = req.body || {};
@@ -1208,9 +1275,11 @@ const searchMeetingsHandler = async (req, res) => {
             const sid = Number(body.state_id);
             if (sid === 2) {
                 sql += ' AND (d.state_id = 2 OR e.district_id >= 31 OR (e.state_id = 2 AND (e.district_id IS NULL OR e.district_id = 0)))';
-            } else if (sid === 1) {
+            }
+            else if (sid === 1) {
                 sql += ' AND (d.state_id = 1 OR (e.district_id IS NOT NULL AND e.district_id < 31) OR (e.state_id = 1 AND (e.district_id IS NULL OR e.district_id = 0)) OR (e.district_id IS NULL AND e.state_id IS NULL))';
-            } else {
+            }
+            else {
                 sql += ' AND (e.state_id = ? OR d.state_id = ?)';
                 params.push(sid, sid);
             }
@@ -1344,17 +1413,27 @@ app.all(['/dashboardapi/getaddsdata', '/api/getadds'], async (_req, res) => {
 // News Management
 app.post(['/dashboardapi/postnews', '/api/postnews'], async (req, res) => {
     try {
-        const n = req.body;
-        const result = await dynamicInsert('post_news', {
-            news: n.news || n.title || '',
-            description: n.description || '',
-            image: n.image || null,
-            name: n.name || '',
-            mobile_number: n.mobile_number || n.number || '',
-            user_id: n.usr_id || null,
+        const n = req.body || {};
+        const img = extractUploadedImage(n) || (typeof n.image === 'string' ? n.image : null);
+        const cts = getIndianCts();
+        const newsTitle = n.news || n.title || '';
+        const desc = n.description || '';
+        const name = n.name || '';
+        const mobile = n.mobile_number || n.mobilenumber || n.number || '';
+        const userId = n.usr_id || n.user_id || null;
+        const newsData = {
+            news: newsTitle,
+            description: desc,
+            image: img,
+            name: name,
+            mobile_number: mobile,
+            user_id: userId,
+            cts: cts,
             d_in: 0,
-            approval_ind: 0
-        });
+            approval_ind: 1
+        };
+        const result = await dynamicInsert('post_news', newsData);
+        await dynamicInsert('news', newsData).catch((e) => console.error('insert into news table error:', e.message));
         res.json({ status: 200, message: 'News posted successfully', insertId: result?.insertId });
     }
     catch (err) {
@@ -1373,14 +1452,16 @@ app.all(['/dashboardapi/getnews', '/api/getnews'], async (_req, res) => {
 // Helps & Welfare Assistance
 app.post(['/dashboardapi/posthelping', '/api/posthelping'], async (req, res) => {
     try {
-        const h = req.body;
+        const h = req.body || {};
+        const img = extractUploadedImage(h) || (typeof h.image === 'string' ? h.image : null);
         const result = await dynamicInsert('helps', {
             help: h.help || h.help_type || '',
             name: h.name || '',
             mobile_number: h.mobile_number || h.phone || '',
             description: h.description || '',
-            image: h.image || null,
-            user_id: h.usr_id || null,
+            image: img,
+            user_id: h.usr_id || h.user_id || null,
+            cts: getIndianCts(),
             d_in: 0,
             approval_ind: 0
         });
@@ -1501,7 +1582,10 @@ const searchPastorsHandler = async (req, res) => {
         const pastor = body.pastor_id || body.pastorname || body.pastor;
         let sql = 'SELECT id, pastorname, pastorname as name, phonenumber, phonenumber as mobile_number, description, district_id, constituency_id, mandal_id, village_id, address FROM pastor_reg WHERE d_in = 0';
         const params = [];
-        if (body.state_id) { sql += ' AND (state_id = ? OR (state_id IS NULL AND ? = 1))'; params.push(Number(body.state_id), Number(body.state_id)); }
+        if (body.state_id) {
+            sql += ' AND (state_id = ? OR (state_id IS NULL AND ? = 1))';
+            params.push(Number(body.state_id), Number(body.state_id));
+        }
         if (district) {
             sql += ' AND district_id = ?';
             params.push(district);
@@ -1641,6 +1725,10 @@ const searchChurchesHandler = async (req, res) => {
             LEFT JOIN church_reg cr ON ct.church_id = cr.id
             WHERE ct.d_in = 0`;
         const params = [];
+        if (body.state_id) {
+            sql += ' AND (ct.state_id = ? OR cr.state_id = ? OR (ct.state_id IS NULL AND ? = 1))';
+            params.push(Number(body.state_id), Number(body.state_id), Number(body.state_id));
+        }
         if (district) {
             sql += ' AND (ct.district_id = ? OR cr.district_id = ?)';
             params.push(district, district);
@@ -1836,7 +1924,8 @@ app.all(['/dashboardapi/getministry', '/api/getministry', '/dashboardapi/getbeli
 // Organisations (independentorganisation_reg)
 app.post(['/dashboardapi/postindepedentorganisation', '/dashboardapi/postindependentorganisation', '/dashboardapi/postindepedentchurch', '/dashboardapi/postindependentchurch', '/api/postindepedentorganisation', '/api/postindependentorganisation'], async (req, res) => {
     try {
-        const o = req.body;
+        const o = req.body || {};
+        o.image = extractUploadedImage(o) || (typeof o.image === 'string' ? o.image : null);
         o.d_in = 0;
         o.cts = getIndianCts();
         o.is_first_login = 0;
@@ -1865,7 +1954,10 @@ app.all(['/dashboardapi/getorganizations', '/dashboardapi/searchorganization', '
         const body = req.body || {};
         let sql = 'SELECT * FROM independentorganisation_reg WHERE d_in = 0';
         const params = [];
-        if (body.state_id) { sql += ' AND (state_id = ? OR (state_id IS NULL AND ? = 1))'; params.push(Number(body.state_id), Number(body.state_id)); }
+        if (body.state_id) {
+            sql += ' AND (state_id = ? OR (state_id IS NULL AND ? = 1))';
+            params.push(Number(body.state_id), Number(body.state_id));
+        }
         sql += ' AND organisation_name IS NOT NULL AND TRIM(organisation_name) != ""';
         const denom = body.denomation_id || body.denomation || body.denomination_id;
         if (denom) {
@@ -2070,7 +2162,10 @@ app.all(['/dashboardapi/getjobs', '/dashboardapi/getjob', '/dashboardapi/searchj
         const body = req.body || {};
         let sql = 'SELECT * FROM jobs WHERE d_in = 0';
         const params = [];
-        if (body.state_id) { sql += ' AND (state_id = ? OR (state_id IS NULL AND ? = 1))'; params.push(Number(body.state_id), Number(body.state_id)); }
+        if (body.state_id) {
+            sql += ' AND (state_id = ? OR (state_id IS NULL AND ? = 1))';
+            params.push(Number(body.state_id), Number(body.state_id));
+        }
         if (body.colid && body.name) {
             if (body.colid == 1) {
                 sql += ' AND (jobtitle LIKE ? OR title LIKE ?)';
@@ -2148,7 +2243,10 @@ app.all(['/dashboardapi/searchmarriages', '/dashboardapi/Searchmarriages', '/das
         const body = req.body || {};
         let sql = 'SELECT * FROM marriages WHERE d_in = 0';
         const params = [];
-        if (body.state_id) { sql += ' AND (state_id = ? OR (state_id IS NULL AND ? = 1))'; params.push(Number(body.state_id), Number(body.state_id)); }
+        if (body.state_id) {
+            sql += ' AND (state_id = ? OR (state_id IS NULL AND ? = 1))';
+            params.push(Number(body.state_id), Number(body.state_id));
+        }
         // Handle name & columnid from marriages.component.ts:
         // columnid 1 = denomination, 2 = ministry, 3 = gender, 4 = status, 5 = caste, 6 = spiritual
         if (body.columnid && body.name) {
@@ -2236,8 +2334,18 @@ app.all(['/dashboardapi/searchmarriages', '/dashboardapi/Searchmarriages', '/das
 // Business (business_table)
 app.post(['/dashboardapi/postbusiness', '/api/postbusiness'], async (req, res) => {
     try {
-        const b = req.body;
+        const b = req.body || {};
+        b.image = extractUploadedImage(b) || (typeof b.image === 'string' ? b.image : null);
+        if (b.districtname && !b.district_id)
+            b.district_id = b.districtname;
+        if (b.constituencyname && !b.constituency_id)
+            b.constituency_id = b.constituencyname;
+        if (b.mandals && !b.mandal_id)
+            b.mandal_id = b.mandals;
+        if (b.village_name && !b.panchayat_id)
+            b.panchayat_id = b.village_name;
         b.d_in = 0;
+        b.cts = getIndianCts();
         const result = await dynamicInsert('business_table', b);
         res.json({ status: 200, message: 'Business listed successfully', insertId: result?.insertId });
     }
@@ -2250,7 +2358,10 @@ app.all(['/dashboardapi/getbusiness', '/dashboardapi/searchingbusiness', '/api/b
         const body = req.body || {};
         let sql = 'SELECT * FROM business_table WHERE d_in = 0';
         const params = [];
-        if (body.state_id) { sql += ' AND (state_id = ? OR (state_id IS NULL AND ? = 1))'; params.push(Number(body.state_id), Number(body.state_id)); }
+        if (body.state_id) {
+            sql += ' AND (state_id = ? OR (state_id IS NULL AND ? = 1))';
+            params.push(Number(body.state_id), Number(body.state_id));
+        }
         if (body.district_id) {
             sql += ' AND district_id = ?';
             params.push(body.district_id);
@@ -2294,8 +2405,20 @@ app.all(['/dashboardapi/getbusiness', '/dashboardapi/searchingbusiness', '/api/b
 // Institutes & Colleges
 app.post(['/dashboardapi/postinsututies', '/api/postinstitutes'], async (req, res) => {
     try {
-        const i = req.body;
+        const i = req.body || {};
+        i.image = extractUploadedImage(i) || (typeof i.image === 'string' ? i.image : null);
+        if (i.collegetype && !i.college_type)
+            i.college_type = i.collegetype;
+        if (i.courses && !i.course_offered)
+            i.course_offered = i.courses;
+        if (i.village_id && !i.panchayat_id)
+            i.panchayat_id = i.village_id;
+        if (i.usr_id && !i.posted_id)
+            i.posted_id = i.usr_id;
+        if (i.number && !i.postedbynumber)
+            i.postedbynumber = i.number;
         i.d_in = 0;
+        i.cts = getIndianCts();
         const result = await dynamicInsert('institutes', i);
         res.json({ status: 200, message: 'Institute registered successfully', insertId: result?.insertId });
     }
@@ -2308,7 +2431,10 @@ app.all(['/dashboardapi/getinstitutes', '/dashboardapi/Searchinstitute', '/api/i
         const body = req.body || {};
         let sql = 'SELECT * FROM institutes WHERE d_in = 0';
         const params = [];
-        if (body.state_id) { sql += ' AND (state_id = ? OR (state_id IS NULL AND ? = 1))'; params.push(Number(body.state_id), Number(body.state_id)); }
+        if (body.state_id) {
+            sql += ' AND (state_id = ? OR (state_id IS NULL AND ? = 1))';
+            params.push(Number(body.state_id), Number(body.state_id));
+        }
         if (body.district_id) {
             sql += ' AND district_id = ?';
             params.push(body.district_id);
@@ -2708,9 +2834,61 @@ app.post(['/dashboardapi/postcolleges', '/api/postcolleges'], async (req, res) =
 // Attacks / Incident Reporting
 app.post(['/dashboardapi/postattacks', '/api/postattacks'], async (req, res) => {
     try {
-        const a = req.body;
-        a.d_in = 0;
-        const result = await dynamicInsert('attacks', a);
+        const a = req.body || {};
+        const extractItem = (val) => {
+            if (!val)
+                return '';
+            if (typeof val === 'string')
+                return val.trim();
+            if (val.reviewImg || val.reviewimg)
+                return (val.reviewImg || val.reviewimg).trim();
+            if (val.url || val.src)
+                return (val.url || val.src).trim();
+            return '';
+        };
+        const imgArr = Array.isArray(a.image) ? a.image : (a.image ? [a.image] : []);
+        const docArr = Array.isArray(a.document) ? a.document : (a.document ? [a.document] : []);
+        const distVal = Number(a.district_id || 0);
+        const rawStateId = Number(a.state_id || 0);
+        const stateStr = String(a.state || '').toLowerCase();
+        const isTelangana = rawStateId === 2 || stateStr.includes('telan') || (distVal >= 31 && distVal <= 63);
+        const attackData = {
+            cts: getIndianCts(),
+            category: a.category || a.problem_category || a.prob_category || '',
+            prob_category: a.prob_category || a.category || '',
+            image1: extractItem(imgArr[0]) || a.image1 || null,
+            image2: extractItem(imgArr[1]) || a.image2 || null,
+            image3: extractItem(imgArr[2]) || a.image3 || null,
+            document1: extractItem(docArr[0]) || a.document1 || null,
+            document2: extractItem(docArr[1]) || a.document2 || null,
+            document3: extractItem(docArr[2]) || a.document3 || null,
+            youtubevideo: a.youtubevideo || a.youtubevidlink || a.youtube || null,
+            video1: extractItem(a.video1 || a.videoa) || null,
+            video2: extractItem(a.video2 || a.videob) || null,
+            address: a.address || '',
+            victimphonenum1: a.victimphonenum1 || a.victim1num || null,
+            victimphonenumber2: a.victimphonenumber2 || a.victim2num || null,
+            victimname1: a.victimname1 || a.victim1name || null,
+            victimname2: a.victimname2 || a.victim2name || null,
+            attackername1: a.attackername1 || a.attacker1name || null,
+            attackername2: a.attackername2 || a.attacker2name || null,
+            attackerphonenum1: a.attackerphonenum1 || a.attacker1num || null,
+            attackerphonenum2: a.attackerphonenum2 || a.attacker2num || null,
+            user_id: a.user_id || a.usr_id || null,
+            username: a.username || a.name || null,
+            usernumber: a.usernumber || a.mobilenumber || a.user_number || null,
+            noteincident: a.noteincident || a.noteondescription || a.description || null,
+            audiorecordonincident: extractItem(a.audiorecordonincident || a.audio) || null,
+            district_id: a.district_id || null,
+            constituency_id: a.constituency_id || null,
+            mandal_id: a.mandal_id || null,
+            panchayat_id: a.panchayat_id || a.village_id || null,
+            state_id: isTelangana ? 2 : 1,
+            state: isTelangana ? 'Telangana' : 'Andhra Pradesh',
+            d_in: 0,
+            approval_ind: 0
+        };
+        const result = await dynamicInsert('attacks', attackData);
         res.json({ status: 200, message: 'Incident report submitted successfully', insertId: result?.insertId });
     }
     catch (err) {
@@ -3023,13 +3201,12 @@ async function dynamicUpdate(tableName, whereClause, whereParams, data) {
             return null;
         const [cols] = await db.query(`SHOW COLUMNS FROM \`${tableName}\``);
         const validColNames = new Set(cols.map((c) => c.Field));
-                if (validColNames.has('state_id') && data.state_id !== undefined && data.state_id !== null && data.state_id !== '') {
+        if (validColNames.has('state_id') && data.state_id !== undefined && data.state_id !== null && data.state_id !== '') {
             data.state_id = Number(data.state_id);
             if (validColNames.has('state') && (!data.state || String(data.state).trim() === '')) {
                 data.state = data.state_id === 2 ? 'Telangana' : 'Andhra Pradesh';
             }
         }
-        
         const setChunks = [];
         const values = [];
         for (const [k, v] of entries) {
@@ -3356,7 +3533,16 @@ app.all(['/dashboardapi/getvideourl', '/api/videourl'], async (_req, res) => {
         data: [{ videourl: 'https://www.youtube.com/embed/live_stream' }]
     });
 });
-app.all(['/dashboardapi/getwebsitegallery', '/dashboardapi/getcatewebsitegallery', '/api/gallery'], async (_req, res) => {
+app.all(['/dashboardapi/getwebsitegallery', '/api/gallery_categories'], async (_req, res) => {
+    try {
+        const [rows] = await db.query('SELECT * FROM gallery_category WHERE d_in = 0 ORDER BY id DESC');
+        res.json({ status: 200, data: rows });
+    }
+    catch (err) {
+        res.status(500).json({ status: 500, error: err.message });
+    }
+});
+app.all(['/dashboardapi/getcatewebsitegallery', '/api/gallery'], async (_req, res) => {
     try {
         const [rows] = await db.query('SELECT * FROM gallery WHERE d_in = 0 ORDER BY id DESC');
         res.json({ status: 200, data: rows });

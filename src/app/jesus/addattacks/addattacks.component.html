@@ -340,7 +340,7 @@
                                                     <select class="form-control" formControlName="district_id"
                                                         [ngClass]="{'is-invalid': submitted && f['district_id'].errors }"
                                                         (change)="getconstency($event);"
-                                                        style="height:37px;width: 273px;">
+                                                        style="height:37px;width: 273px;" [disabled]="!attacksform.get('state_id')?.value">
                                                         <option value="" selected disabled>క్లిక్ చేసి జిల్లా
                                                             సెలెక్ట్ చేయండి</option>
                                                         <option value="{{item.id}}" *ngFor="let item of districts">
@@ -362,7 +362,7 @@
                                                     <select class="form-control" formControlName="constituency_id"
                                                         [ngClass]="{'is-invalid': submitted && f['constituency_id'].errors }"
                                                         (change)="getmandals($event);"
-                                                        style="height:37px;width: 273px;">
+                                                        style="height:37px;width: 273px;" [disabled]="!attacksform.get('district_id')?.value">
                                                         <option value="" selected disabled>క్లిక్ చేసి
                                                             నియోజకవర్గం సెలెక్ట్ చేయండి</option>
                                                         <option value="{{item.id}}" *ngFor="let item of constituency">
@@ -387,7 +387,7 @@
                                                     <select class="form-control" formControlName="mandal_id"
                                                         (change)="gepanchayati($event);"
                                                         style="height:37px;width: 273px;"
-                                                        [ngClass]="{'is-invalid': submitted && f['mandal_id'].errors }">
+                                                        [ngClass]="{'is-invalid': submitted && f['mandal_id'].errors }" [disabled]="!attacksform.get('constituency_id')?.value">
                                                         <option value="" selected disabled>క్లిక్ చేసి మండలంను
                                                             సెలెక్ట్ చేయండి</option>
                                                         <option value="{{item.id}}" *ngFor="let item of mandals">
@@ -407,7 +407,7 @@
                                                             style="color:red; -webkit-text-stroke-width:thick;">*</span></label>
                                                     <select class="form-control" formControlName="village_id"
                                                         [ngClass]="{'is-invalid': submitted && f['village_id'].errors }"
-                                                        style="height:37px;width: 273px;">
+                                                        style="height:37px;width: 273px;" [disabled]="!attacksform.get('mandal_id')?.value">
                                                         <option value="" selected disabled>క్లిక్ చేసి పంచాయితీ
                                                             సెలెక్ట్ చేయండి</option>
                                                         <option value="{{item.id}}" *ngFor="let item of panchayati">

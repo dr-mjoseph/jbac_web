@@ -223,7 +223,7 @@ export class AddattacksComponent {
     })
 
     this.attacksform = this.formBuilder.group({
-      state_id: ['1', [Validators.required]],
+      state_id: ['', [Validators.required]],
       image: [''],
       videoa: [''],
       videob: [''],
@@ -720,8 +720,29 @@ export class AddattacksComponent {
     }, error => {
     });
   }
+  getconstency(event: any) {
+    var id = event.target.value;
+    this.attacksform.patchValue({
+      constituency_id: '',
+      mandal_id: '',
+      village_id: ''
+    });
+    this.constituency = [];
+    this.mandals = [];
+    this.panchayati = [];
+    this.service.getconsistencys().subscribe(res => {
+      this.constituency = res.data.filter((data: any) => data.dstrct_id == id);
+    });
+  }
+
   getmandals(event: any) {
     var id = event.target.value;
+    this.attacksform.patchValue({
+      mandal_id: '',
+      village_id: ''
+    });
+    this.mandals = [];
+    this.panchayati = [];
     this.service.getmandals().subscribe(res => {
       if (res.status == 202) {
         Swal.fire(res.message);
@@ -733,15 +754,12 @@ export class AddattacksComponent {
     })
   }
 
-  getconstency(event: any) {
-    var id = event.target.value;
-    this.service.getconsistencys().subscribe(res => {
-      this.constituency = res.data.filter((data: any) => data.dstrct_id == id);
-    });
-  }
-
   gepanchayati(event: any) {
     var id = event.target.value;
+    this.attacksform.patchValue({
+      village_id: ''
+    });
+    this.panchayati = [];
     this.service.gepanchayatis().subscribe(res => {
       if (res.status == 202) {
         Swal.fire(res.message);

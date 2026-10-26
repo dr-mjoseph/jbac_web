@@ -111,7 +111,7 @@ godOptions: string[] = [
       nativeplace: [''],
       caste: [''],
       talent: [''],
-      state_id: ['1', [Validators.required]],
+      state_id: ['', [Validators.required]],
       district_id: ['', [Validators.required]],
       constituency_id: ['', [Validators.required]],
       mandal_id: ['', [Validators.required]],
@@ -467,6 +467,10 @@ geteducational() {
 
   getconstency(event: any) {
     const id = event?.target?.value !== undefined ? event.target.value?.trim() : event;
+    this.pastorform.patchValue({ constituency_id: '', mandal_id: '', panchayat_id: '' });
+    this.constituency = [];
+    this.mandals = [];
+    this.panchayati = [];
     if (!id) return;
 
     this.service.getconsistencys().subscribe({
@@ -491,6 +495,9 @@ geteducational() {
 
   getmandals(event: any) {
     const id = event?.target?.value !== undefined ? event.target.value?.trim() : event;
+    this.pastorform.patchValue({ mandal_id: '', panchayat_id: '' });
+    this.mandals = [];
+    this.panchayati = [];
     if (!id) return;
 
     this.service.getmandals().subscribe({
@@ -515,6 +522,8 @@ geteducational() {
 
   gepanchayati(event: any) {
     const id = event?.target?.value !== undefined ? event.target.value?.trim() : event;
+    this.pastorform.patchValue({ panchayat_id: '' });
+    this.panchayati = [];
     if (!id) return;
     this.service.gepanchayatis(id).subscribe({
       next: (res: any) => {

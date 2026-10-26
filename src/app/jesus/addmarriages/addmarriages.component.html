@@ -326,7 +326,7 @@
                                                     <select class="form-control" formControlName="districtname"
                                                         [ngClass]="{'is-invalid': submitted && m['districtname'].errors }"
                                                         (change)="getconstency($event);"
-                                                        style="height:37px;width: 273px;">
+                                                        style="height:37px;width: 273px;" [disabled]="!addingmarriages.get('state_id')?.value">
                                                         <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
                                                         <option value="{{item.id}}" *ngFor="let item of districts">
                                                             {{item.distrct_nm}}
@@ -347,7 +347,7 @@
                                                     <select class="form-control" formControlName="constituencyname"
                                                         [ngClass]="{'is-invalid': submitted && m['constituencyname'].errors }"
                                                         (change)="getmandals($event);"
-                                                        style="height:37px;width: 273px;">
+                                                        style="height:37px;width: 273px;" [disabled]="!addingmarriages.get('districtname')?.value">
                                                         <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
                                                         <option value="{{item.id}}" *ngFor="let item of constituency">
                                                             {{item.const_nm}}
@@ -372,7 +372,7 @@
                                                     <select class="form-control" formControlName="mandals"
                                                         [ngClass]="{'is-invalid': submitted && m['mandals'].errors }"
                                                         (change)="gepanchayati($event);"
-                                                        style="height:37px;width: 273px;">
+                                                        style="height:37px;width: 273px;" [disabled]="!addingmarriages.get('constituencyname')?.value">
                                                         <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
                                                         <option value="{{item.id}}" *ngFor="let item of mandals">
                                                             {{item.mndl_nm}}
@@ -392,7 +392,7 @@
                                                             style="color:red; -webkit-text-stroke-width:thick;">*</span></label>
                                                     <select class="form-control" formControlName="village_name"
                                                         [ngClass]="{'is-invalid': submitted && m['village_name'].errors }"
-                                                        style="height:37px;width: 273px;">
+                                                        style="height:37px;width: 273px;" [disabled]="!addingmarriages.get('mandals')?.value">
                                                         <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
                                                         <option value="{{item.id}}" *ngFor="let item of panchayati">
                                                             {{item.pnchyt_nm}}
