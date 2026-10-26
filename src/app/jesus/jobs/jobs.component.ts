@@ -20,6 +20,7 @@ export class JobsComponent {
   searchconts: any;
   jobs: any
   searchchurchingform: FormGroup;
+  get serachMeetingform(): FormGroup { return this.searchchurchingform; }
   constructor(private formBuilder: FormBuilder, private service: ServiceService, private modalService: NgbModal ,  private router: Router) {
     this.searchchurchingform = this.formBuilder.group({
       state_id: [''],
