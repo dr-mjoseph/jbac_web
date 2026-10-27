@@ -1444,7 +1444,6 @@ app.post(['/dashboardapi/postnews', '/api/postnews'], async (req, res) => {
             approval_ind: 1
         };
         const result = await dynamicInsert('post_news', newsData);
-        await dynamicInsert('news', newsData).catch((e) => console.error('insert into news table error:', e.message));
         res.json({ status: 200, message: 'News posted successfully', insertId: result?.insertId });
     }
     catch (err) {

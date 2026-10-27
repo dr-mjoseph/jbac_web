@@ -66,6 +66,9 @@ export class NewsComponent {
     }
   }
   postnews() {
+    if (this.showSpinner) {
+      return;
+    }
     this.submitted = true;
     this.showSpinner = true; // Start spinner
   
