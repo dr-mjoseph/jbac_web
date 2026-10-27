@@ -12,10 +12,10 @@ import Swal from 'sweetalert2';
 })
 export class JobsComponent {
   showSpinner: boolean = false;
-  mandals: any;
-  constituency: any;
-  panchayati: any;
-  districts: any;
+  mandals: any = [];
+  constituency: any = [];
+  panchayati: any = [];
+  districts: any = [];
   searchdist: any;
   searchconts: any;
   jobs: any
@@ -35,7 +35,6 @@ export class JobsComponent {
   }
   ngOnInit(): void {
     this.getstates();
-    this.getdistric();
     this.getjobs();
     this.getadds();
     this.getjob();
@@ -90,7 +89,6 @@ export class JobsComponent {
         }
       });
     } else {
-      this.getdistric();
       this.getjobs();
     }
   }
@@ -200,6 +198,7 @@ export class JobsComponent {
 
   reset() {
     this.searchchurchingform.reset({
+      state_id: '',
       district_id: '',
       constenncy_id: '',
       mandal_id: '',
@@ -210,6 +209,7 @@ export class JobsComponent {
     });
     this.searchdist = '';
     this.searchconts = '';
+    this.districts = [];
     this.constituency = [];
     this.mandals = [];
     this.panchayati = [];

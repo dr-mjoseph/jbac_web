@@ -25,6 +25,11 @@ def execute(sql):
             return data
     except Exception as e:
         print("Error:", e)
+        if hasattr(e, 'read'):
+            try:
+                print("Error body:", e.read().decode('utf-8'))
+            except:
+                pass
         return None
 
 if __name__ == '__main__':

@@ -93,7 +93,8 @@
                                                         <label class="form-label">మీ క్యాటగిరి ఎంచుకోండి <span
                                                                 style="color:red; -webkit-text-stroke-width:thick;">
                                                                 *</span></label>
-                                                        <select formControlName="category" class="form-control">
+                                                        <select formControlName="category" class="form-control"
+                                                            [ngClass]="{'is-invalid': submitted && f['category'].errors }">
                                                             <option value="" disabled selected>ఇక్కడ క్లిక్ చేసి
                                                                 ఎంచుకోండి </option>
                                                             <option value="విశ్వాసి">విశ్వాసి</option>
@@ -107,12 +108,9 @@
                                                             <option value="రిస్టియన్ ఆర్గనైజెషన్ / కంపెనీ">క్రిస్టియన్
                                                                 ఆర్గనైజెషన్ / కంపెనీ </option>
                                                         </select>
-                                                        <!-- <div *ngIf="submitted && r.category.errors?.required" class="invalid-feedback">
-                                                    మీ క్యాటగిరి ఎంచుకోండి
-                                                </div> -->
-                                                        <div *ngIf="submitted && r['category'].errors"
+                                                        <div *ngIf="submitted && f['category'].errors"
                                                             class="invalid-feedback">
-                                                            <div *ngIf="r['category'].errors['required']">
+                                                            <div *ngIf="f['category'].errors['required']">
                                                                 మీ క్యాటగిరి ఎంచుకోండి </div>
                                                         </div>
                                                     </div>
@@ -122,7 +120,8 @@
                                                         <label class="form-label">మీ సమస్య క్యాటగిరి ఎంచుకోండి <span
                                                                 style="color:red; -webkit-text-stroke-width:thick;">
                                                                 *</span></label>
-                                                        <select formControlName="prob_category" class="form-control">
+                                                        <select formControlName="prob_category" class="form-control"
+                                                            [ngClass]="{'is-invalid': submitted && f['prob_category'].errors }">
                                                             <option value="" disabled selected>ఇక్కడ క్లిక్ చేసి
                                                                 ఎంచుకోండి </option>
 
@@ -150,13 +149,10 @@
                                                                 లేదు</option>
                                                             <option value="ఇతర సమస్య">ఇతర సమస్య </option>
                                                         </select>
-                                                        <!-- <div *ngIf="submitted && r.category.errors?.required" class="invalid-feedback">
-                                                    మీ క్యాటగిరి ఎంచుకోండి
-                                                </div> -->
-                                                        <div *ngIf="submitted && r['category'].errors"
+                                                        <div *ngIf="submitted && f['prob_category'].errors"
                                                             class="invalid-feedback">
-                                                            <div *ngIf="r['category'].errors['required']">
-                                                                మీ క్యాటగిరి ఎంచుకోండి </div>
+                                                            <div *ngIf="f['prob_category'].errors['required']">
+                                                                మీ సమస్య క్యాటగిరి ఎంచుకోండి </div>
                                                         </div>
                                                     </div>
                                                 </div>

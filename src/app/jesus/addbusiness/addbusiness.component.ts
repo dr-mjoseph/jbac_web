@@ -31,10 +31,10 @@ export class AddbusinessComponent {
   modalReference = null;
   hello: any;
   ProofValue: any;
-  constituency: any;
-  mandals: any;
-  districts: any;
-  panchayati: any;
+  constituency: any = [];
+  mandals: any = [];
+  districts: any = [];
+  panchayati: any = [];
   usr_id: any;
   name: any;
   imagesData: any = [];
@@ -281,7 +281,6 @@ export class AddbusinessComponent {
   ngOnInit(): void {
     this.getservice();
     this.getstates();
-    this.getdistric();
     this.getchurch();
     this.personaldata();
     this.getbelivers();

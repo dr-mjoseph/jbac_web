@@ -484,10 +484,21 @@ app.get(['/api/crud/:table', '/dashboardapi/crud/:table', '/crud/:table'], async
 
         const sql = `SELECT * FROM \`${table}\` ${whereClause} ${orderClause} LIMIT ? OFFSET ?`;
         queryParams.push(limit, offset);
-        const [rows] = await db.query(sql, queryParams);
+        const [rows]: any = await db.query(sql, queryParams);
+        const sanitizedRows = (rows || []).map((row: any) => {
+            const cleanRow: any = {};
+            for (const [k, v] of Object.entries(row)) {
+                if (typeof v === 'string' && (v.startsWith('data:') || v.length > 2000)) {
+                    cleanRow[k] = v.substring(0, 100) + '... [truncated for table preview]';
+                } else {
+                    cleanRow[k] = v;
+                }
+            }
+            return cleanRow;
+        });
         const [countResult] = await db.query(`SELECT COUNT(*) as total FROM \`${table}\` ${whereClause}`, queryParams.slice(0, filters.length)).catch(() => [[{ total: rows.length }]]);
         const total = countResult && countResult[0] ? Number(countResult[0].total) : rows.length;
-        res.json({ status: 200, table, total, limit, offset, count: rows.length, data: rows });
+        res.json({ status: 200, table, total, limit, offset, count: sanitizedRows.length, data: sanitizedRows });
     } catch (err: any) {
         res.status(500).json({ status: 500, error: err.message });
     }
@@ -2652,8 +2663,19 @@ app.all(['/dashboardapi/getatt', '/api/getatt'], async (req: any, res: any) => {
             params.push(Number(stateId), Number(stateId));
         }
         sql += ' ORDER BY id DESC';
-        const [rows] = await db.query(sql, params);
-        res.json({ status: 200, data: rows });
+        const [rows]: any = await db.query(sql, params);
+        const sanitizedRows = (rows || []).map((row: any) => {
+            const cleanRow: any = {};
+            for (const [k, v] of Object.entries(row)) {
+                if (typeof v === 'string' && v.startsWith('data:') && v.length > 5000) {
+                    cleanRow[k] = v.substring(0, 100) + '... [data URI truncated]';
+                } else {
+                    cleanRow[k] = v;
+                }
+            }
+            return cleanRow;
+        });
+        res.json({ status: 200, data: sanitizedRows });
     } catch (err) {
         res.status(500).json({ status: 500, error: err.message });
     }

@@ -26,15 +26,15 @@ export class PastorassociationregisterComponent {
   denomation: any;
   pattern: any;
   states: any = [];
-  districts: any;
-  mandals: any;
-  panchayati: any = (FALLBACK_DROPDOWN_DATA as any).panchayatis || [];
+  districts: any = [];
+  mandals: any = [];
+  panchayati: any = [];
   bliversdata: any;
   studentform: FormGroup;
   pastorform: FormGroup;
   pastorsassociations: FormGroup;
   district: any;
-  constituency: any;
+  constituency: any = [];
   panchayatis: any;
   imagedata: any = []
   wings: any;
@@ -311,7 +311,6 @@ export class PastorassociationregisterComponent {
     this.getdenomations();
     this.getpatterns();
     this.getstates();
-    this.getdistric(1);
     this.getbelivers();
     // this.getchurch();
     this.getbeliver();
@@ -391,22 +390,26 @@ export class PastorassociationregisterComponent {
   }
 
   onStateChange(event: any) {
-    const stateId = event?.target?.value || event || '1';
+    const stateId = event && event.target ? event.target.value : event;
     this.pastorsassociations.patchValue({
       district_id: '',
       constituency_id: '',
       mandal_id: '',
       village_id: ''
     });
+    this.districts = [];
     this.constituency = [];
     this.mandals = [];
     this.panchayati = [];
-    this.getdistric(stateId);
+    if (stateId) {
+      this.getdistric(stateId);
+    }
   }
 
   getdistric(stateId?: any) {
     this.showSpinner = false;
-    const sid = stateId || this.pastorsassociations?.get('state_id')?.value || 1;
+    const sid = stateId || this.pastorsassociations?.get('state_id')?.value;
+    if (!sid) return;
     this.service.getdistrict(sid).subscribe({
       next: (res: any) => {
         this.showSpinner = false;

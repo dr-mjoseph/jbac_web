@@ -24,17 +24,17 @@ export class StudentregisterComponent {
     { id: 1, state_name: 'Andhra Pradesh-ఆంధ్రప్రదేశ్ (AP)', name: 'Andhra Pradesh-ఆంధ్రప్రదేశ్ (AP)', code: 'AP' },
     { id: 2, state_name: 'Telangana-తెలంగాణ (TG)', name: 'Telangana-తెలంగాణ (TG)', code: 'TG' }
   ];
-  districts: any;
-  mandals: any;
-  mandals1: any;
-  panchayati: any;
-  panchayati1: any;
+  districts: any = [];
+  mandals: any = [];
+  mandals1: any = [];
+  panchayati: any = [];
+  panchayati1: any = [];
   bliversdata: any;
   studentform: FormGroup;
 
   district: any;
-  constituency: any;
-  constituency1: any;
+  constituency: any = [];
+  constituency1: any = [];
   panchayatis: any;
   imagedata: any = []
   wings: any;
@@ -102,7 +102,6 @@ export class StudentregisterComponent {
   ngOnInit(): void {
     this.getdenomations();
     this.getstates();
-    this.getdistric(1);
     this.getwing();
     this.getpastor();
     this.getchurch();
@@ -174,36 +173,43 @@ export class StudentregisterComponent {
   }
 
   onStateChange(event: any) {
-    const stateId = event?.target?.value || '1';
+    const stateId = event && event.target ? event.target.value : event;
     this.studentform.patchValue({
       district_id: '',
       constituency_id: '',
       mandal_id: '',
       village_id: ''
     });
+    this.districts = [];
     this.constituency = [];
     this.mandals = [];
     this.panchayati = [];
-    this.getdistric(stateId);
+    if (stateId) {
+      this.getdistric(stateId);
+    }
   }
 
   onResStateChange(event: any) {
-    const stateId = event?.target?.value || '1';
+    const stateId = event && event.target ? event.target.value : event;
     this.studentform.patchValue({
       resdistricts: '',
       resconstituencyname: '',
       resmandals: '',
       respanchayati: ''
     });
+    this.districts = [];
     this.constituency1 = [];
     this.mandals1 = [];
     this.panchayati1 = [];
-    this.getdistric(stateId);
+    if (stateId) {
+      this.getdistric(stateId);
+    }
   }
 
   getdistric(stateId?: any) {
+    const sid = stateId || this.studentform.get('state_id')?.value;
+    if (!sid) return;
     this.showSpinner = true;
-    const sid = stateId || this.studentform.get('state_id')?.value || 1;
     this.service.getdistrict(sid).subscribe(
       (res: any) => {
         if (res && res.data) {

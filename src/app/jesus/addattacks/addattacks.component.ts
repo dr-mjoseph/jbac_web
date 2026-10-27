@@ -31,14 +31,14 @@ export class AddattacksComponent {
   modalReference = null;
   hello: any;
   ProofValue: any;
-  constituency: any;
-  mandals: any;
-  districts: any;
+  constituency: any = [];
+  mandals: any = [];
+  districts: any = [];
   states: any = [
     { id: 1, state_name: 'ఆంధ్రప్రదేశ్ (Andhra Pradesh)' },
     { id: 2, state_name: 'తెలంగాణ (Telangana)' }
   ];
-  panchayati: any;
+  panchayati: any = [];
   usr_id: any;
   name: any;
   imagesData: any = [];
@@ -223,6 +223,8 @@ export class AddattacksComponent {
     })
 
     this.attacksform = this.formBuilder.group({
+      category: ['', [Validators.required]],
+      prob_category: ['', [Validators.required]],
       state_id: ['', [Validators.required]],
       image: [''],
       videoa: [''],
@@ -285,7 +287,6 @@ export class AddattacksComponent {
   ngOnInit(): void {
     this.getstates();
     this.getservice();
-    this.getdistric();
     this.getchurch();
     this.personaldata();
     this.getbelivers();
@@ -697,17 +698,20 @@ export class AddattacksComponent {
   }
 
   onStateChange(event: any) {
-    const stateId = event && event.target ? event.target.value : event || '1';
+    const stateId = event && event.target ? event.target.value : event;
     this.attacksform.patchValue({
       district_id: '',
       constituency_id: '',
       mandal_id: '',
       village_id: ''
     });
+    this.districts = [];
     this.constituency = [];
     this.mandals = [];
     this.panchayati = [];
-    this.getdistric(stateId);
+    if (stateId) {
+      this.getdistric(stateId);
+    }
   }
 
   getdistric(stateId?: any) {

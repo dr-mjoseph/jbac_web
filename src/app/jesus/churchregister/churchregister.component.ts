@@ -26,15 +26,15 @@ export class ChurchregisterComponent {
   denomation: any;
   pattern: any;
   states: any = [];
-  districts: any;
-  mandals: any;
-  panchayati: any = (FALLBACK_DROPDOWN_DATA as any).panchayatis || [];
+  districts: any = [];
+  mandals: any = [];
+  panchayati: any = [];
   bliversdata: any;
   studentform: FormGroup;
   pastorform: FormGroup;
   pastorsassociations: FormGroup;
   district: any;
-  constituency: any;
+  constituency: any = [];
   panchayatis: any;
   imagedata: any = []
   wings: any;
@@ -306,7 +306,6 @@ export class ChurchregisterComponent {
     this.getdenomations();
     this.getpatterns();
     this.getstates();
-    this.getdistric(1);
     this.getbelivers();
     // this.getchurch();
     this.getbeliver();
@@ -384,6 +383,12 @@ export class ChurchregisterComponent {
 
   onStateChange(event: any) {
     const stateId = event && event.target ? event.target.value : event;
+    this.churchregsiterform.patchValue({
+      district_id: '',
+      constituency_id: '',
+      mandal_id: '',
+      village_id: ''
+    });
     this.districts = [];
     this.constituency = [];
     this.mandals = [];
@@ -394,7 +399,8 @@ export class ChurchregisterComponent {
   }
 
   getdistric(stateId?: any) {
-    const sid = stateId || 1;
+    const sid = stateId || this.churchregsiterform?.get('state_id')?.value;
+    if (!sid) return;
     this.service.getdistrict(sid).subscribe(res => {
       this.districts = res.data;
     })

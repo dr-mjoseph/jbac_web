@@ -21,9 +21,9 @@ export class BusinessComponent {
   pastor: any;
   childern: any;
   musical: any;
-  mandals: any;
-  constituency: any;
-  districts: any;
+  mandals: any = [];
+  constituency: any = [];
+  districts: any = [];
   searchevents: any;
   mettingtype: any;
   denomation: any;
@@ -58,7 +58,6 @@ export class BusinessComponent {
   ngOnInit(): void {
 
     this.getstates();
-    this.getdistric();
     this.searechevents();
     this.getadds();
     this.getdenomations();
@@ -145,7 +144,7 @@ export class BusinessComponent {
       : string;
   }
 
-  panchayati: any;
+  panchayati: any = [];
 
   type: any;
   searchchange(event: any) {
@@ -267,7 +266,6 @@ export class BusinessComponent {
         }
       });
     } else {
-      this.getdistric();
       this.searechevents();
     }
   }
@@ -275,7 +273,7 @@ export class BusinessComponent {
   onDistrictChange(event: any) {
     const id = event && event.target ? event.target.value : event;
     this.searchdist = id;
-    this.searchdenomation.patchValue({ district_id: id, constenncy_id: '', mandal_id: '', panchayati_id: '' });
+    this.serachMeetingform.patchValue({ district_id: id, constenncy_id: '', mandal_id: '', panchayati_id: '' });
     this.constituency = [];
     this.mandals = [];
     this.panchayati = [];
@@ -292,7 +290,7 @@ export class BusinessComponent {
   onConstituencyChange(event: any) {
     const id = event && event.target ? event.target.value : event;
     this.searchconts = id;
-    this.searchdenomation.patchValue({ constenncy_id: id, mandal_id: '', panchayati_id: '' });
+    this.serachMeetingform.patchValue({ constenncy_id: id, mandal_id: '', panchayati_id: '' });
     this.mandals = [];
     this.panchayati = [];
     if (id) {
@@ -307,7 +305,7 @@ export class BusinessComponent {
 
   onMandalChange(event: any) {
     const id = event && event.target ? event.target.value : event;
-    this.searchdenomation.patchValue({ mandal_id: id, panchayati_id: '' });
+    this.serachMeetingform.patchValue({ mandal_id: id, panchayati_id: '' });
     this.panchayati = [];
     if (id) {
       this.service.gepanchayatis().subscribe(res => {
@@ -321,7 +319,7 @@ export class BusinessComponent {
 
   onPanchayatiChange(event: any) {
     const id = event && event.target ? event.target.value : event;
-    this.searchdenomation.patchValue({ panchayati_id: id });
+    this.serachMeetingform.patchValue({ panchayati_id: id });
     this.applyFilter();
   }
 
@@ -334,15 +332,17 @@ export class BusinessComponent {
 
   applyFilter() {
     const vals = this.searchdenomation.value || {};
+    const geoVals = this.serachMeetingform.value || {};
     const payload = {
       type: vals.mettingtype || this.type || '',
       denomation: vals.denomation || this.searchdeno || '',
       title: vals.title || this.titles || '',
       ministry_id: vals.ministry_id || '',
-      district_id: vals.district_id || this.searchdist || '',
-      constituency_id: vals.constenncy_id || this.searchconts || '',
-      mandal_id: vals.mandal_id || '',
-      panchayati_id: vals.panchayati_id || ''
+      state_id: geoVals.state_id || '',
+      district_id: geoVals.district_id || this.searchdist || '',
+      constituency_id: geoVals.constenncy_id || this.searchconts || '',
+      mandal_id: geoVals.mandal_id || '',
+      panchayati_id: geoVals.panchayati_id || ''
     };
     this.service.searchingbusiness(payload).subscribe({
       next: (res: any) => {
@@ -378,22 +378,14 @@ export class BusinessComponent {
   }
 
   reset() {
-    this.searchdenomation.reset({
-      mettingtype: '',
-      denomation: '',
-      title: '',
-      ministry_id: '',
-      district_id: '',
-      constenncy_id: '',
-      mandal_id: '',
-      panchayati_id: ''
-    });
+    this.searchdenomation.reset();
     this.serachMeetingform.reset();
     this.searchdist = '';
     this.searchconts = '';
     this.type = '';
     this.searchdeno = '';
     this.titles = '';
+    this.districts = [];
     this.constituency = [];
     this.mandals = [];
     this.panchayati = [];

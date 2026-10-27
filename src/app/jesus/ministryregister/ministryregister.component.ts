@@ -20,12 +20,12 @@ export class MinistryregisterComponent {
   denomation: any;
   pattern: any;
   states: any = [];
-  districts: any;
-  mandals: any;
-  panchayati: any;
+  districts: any = [];
+  mandals: any = [];
+  panchayati: any = [];
   bliversdata: any;
   district: any;
-  constituency: any;
+  constituency: any = [];
   panchayatis: any;
   imagedata: any = []
   wings: any;
@@ -68,7 +68,6 @@ export class MinistryregisterComponent {
   ngOnInit(): void {
     this.getdenomations();
     this.getstates();
-    this.getdistric(1);
     const datePipe = new DatePipe('en-Us');
     this.now = datePipe.transform(new Date(), 'yyyy-MM-dd');
     this.usr_id = sessionStorage.getItem('usr_id');
@@ -98,21 +97,25 @@ export class MinistryregisterComponent {
   }
 
   onStateChange(event: any) {
-    const stateId = event?.target?.value || event || '1';
+    const stateId = event && event.target ? event.target.value : event;
     this.ministryform.patchValue({
       district_id: '',
       constituency_id: '',
       mandal_id: '',
       panchayat_id: ''
     });
+    this.districts = [];
     this.constituency = [];
     this.mandals = [];
     this.panchayati = [];
-    this.getdistric(stateId);
+    if (stateId) {
+      this.getdistric(stateId);
+    }
   }
 
   getdistric(stateId?: any) {
-    const sid = stateId || this.ministryform.get('state_id')?.value || 1;
+    const sid = stateId || this.ministryform.get('state_id')?.value;
+    if (!sid) return;
     this.service.getdistrict(sid).subscribe(res => {
       this.districts = res.data;
     })
