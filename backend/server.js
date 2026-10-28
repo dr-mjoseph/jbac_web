@@ -3815,15 +3815,18 @@ app.all(['/dashboardapi/getLeaderswebsiteData', '/dashboardapi/getLeaderswebsite
             // Fetch believers under this district (mandal/panchayat/constituency wise)
             const [believers] = await db.query(`
                 SELECT s.id, s.fname, s.lname, s.mobile_number, s.generaltype, s.leadership, s.leadertype,
+                       s.wingtype, s.wingtypes, s.wardnumber, s.subward,
                        s.approval_ind, s.district_id, s.constituency_id, s.mandal_id, s.panchayat_id,
                        s.address, s.nativeplace, s.villagename,
                        COALESCE(c.const_nm, '') as constituency_name,
                        COALESCE(m.mndl_nm, '') as mandal_name,
-                       COALESCE(p.pnchyt_nm, '') as panchayat_name
+                       COALESCE(p.pnchyt_nm, '') as panchayat_name,
+                       COALESCE(w.position, w.wing_name, '') as wing_name
                 FROM signup_form s
                 LEFT JOIN const_dtl_t c ON s.constituency_id = c.id
                 LEFT JOIN mndls_lst_t m ON s.mandal_id = m.id
                 LEFT JOIN pnchyt_lst_t p ON s.panchayat_id = p.id
+                LEFT JOIN wings w ON s.wingtype = w.id
                 WHERE s.district_id = ? 
                   AND (LOWER(COALESCE(s.leadership, '')) = 'yes' OR s.leadertype IS NOT NULL OR s.generaltype IS NOT NULL)
                   AND s.id != ?
@@ -3832,15 +3835,18 @@ app.all(['/dashboardapi/getLeaderswebsiteData', '/dashboardapi/getLeaderswebsite
             // Fetch pastors under this district (mandal/panchayat/constituency wise)
             const [pastors] = await db.query(`
                 SELECT pr.id, pr.pastorname, pr.phonenumber, pr.generaltype, pr.leadership, pr.leadertype,
+                       pr.wingtype, pr.wingtypes, pr.subward,
                        pr.approval_ind, pr.district_id, pr.constituency_id, pr.mandal_id, pr.village_id,
                        pr.address, pr.nativeplace, pr.villagename,
                        COALESCE(c.const_nm, '') as constituency_name,
                        COALESCE(m.mndl_nm, '') as mandal_name,
-                       COALESCE(p.pnchyt_nm, '') as panchayat_name
+                       COALESCE(p.pnchyt_nm, '') as panchayat_name,
+                       COALESCE(w.position, w.wing_name, '') as wing_name
                 FROM pastor_reg pr
                 LEFT JOIN const_dtl_t c ON pr.constituency_id = c.id
                 LEFT JOIN mndls_lst_t m ON pr.mandal_id = m.id
                 LEFT JOIN pnchyt_lst_t p ON pr.village_id = p.id
+                LEFT JOIN wings w ON pr.wingtype = w.id
                 WHERE pr.district_id = ? 
                   AND (LOWER(COALESCE(pr.leadership, '')) = 'yes' OR pr.leadertype IS NOT NULL OR pr.generaltype IS NOT NULL)
                   AND pr.id != ?

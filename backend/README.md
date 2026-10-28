@@ -150,7 +150,7 @@ To run without hitting network timeout errors, pass these identical key-value pa
    - `GET/POST /dashboardapi/getaddsdata` (or `/api/getadds`) - Automatically filters active ads (`d_in = 0`). Meeting ads are dynamically constrained to `enddate >= CURDATE()`; expired meetings automatically disappear from the feed, while general non-meeting ads persist until administratively stopped.
 8. **District Leader Hierarchy & Authorization (`d_in = 1`):**
    - `POST /dashboardapi/getUserMainData` - Checks if a believer or pastor general leader is designated as a District Leader (`d_in = 1`). Returns empty data if `d_in = 0`.
-   - `POST /dashboardapi/getLeaderswebsiteData` - Given `{ "district_id": ..., "usr_id": ... }`, retrieves all subordinate leaders in that district with joined constituency, mandal, and panchayat names for hierarchical management.
+   - `POST /dashboardapi/getLeaderswebsiteData` - Given `{ "district_id": ..., "usr_id": ... }`, retrieves all subordinate leaders in that district with joined constituency (`const_dtl_t`), mandal (`mndls_lst_t`), panchayat (`pnchyt_lst_t`), and wing (`wings`) table data (including `wingtype`, `wingtypes`, `wardnumber`, `subward`, `wing_name`) for detailed hierarchical management and color-coded status badges.
    - `POST /dashboardapi/updateconsis` & `POST /dashboardapi/deleteboardmember` - Confirm (`approval_ind = 1`) or reject (`approval_ind = 2`) subordinate leader applications.
 
 ---

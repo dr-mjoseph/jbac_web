@@ -2548,10 +2548,16 @@ The user established six concrete operational enhancements and features across t
        AND s.id != ?
      ORDER BY s.id DESC;
      ```
-3. **Interactive Management Interface**:
-   - In `src/app/jesus/leaders/leaders.component.html`, overhauled Believers Requests and Pastors Requests tables to display:
-     - S.No, Name, Leader Level badge (`getLevelName(generaltype)`: District / Constituency / Mandal / Village), Constituency Name, Mandal Name, Panchayat / Village Name, Phone Call link, and Confirm/Reject buttons.
+3. **Interactive Management Interface & Detailed Leader Status Badges**:
+   - In `src/app/jesus/leaders/leaders.component.ts` and `leaders.component.html`, overhauled Believers Requests and Pastors Requests tables.
+   - Replaced generic placeholder status with `getDetailedLeaderStatus(x)` and dynamic color styling `getLeaderBadgeStyle(x)`:
+     - **Wing Leaders**: Resolves wing names (e.g. `స్టూడెంట్ వింగ్ (Student Wing)`, `సాఫ్ట్ వెర్ వింగ్`, `డ్రైవర్స్ వింగ్`) and specific wing roles (`మీడియా రిపోర్టర్స్`, `సోషల్ మీడియా`, `పేపర్ మీడియా`), rendered with distinct purple badges (`#ede9fe` / `#6d28d9`).
+     - **Ward / Sub-Ward Leaders**: Renders ward and sub-ward designations (`వార్డు నెం. 1 లీడర్ (Ward Leader)`, `సబ్ వార్డు లీడర్ (Sub-Ward)`) in amber badges (`#fef3c7` / `#b45309`).
+     - **Mandal & Panchayat Leaders**: Clear Telugu and English indicators (`మండల లీడర్ (Mandal Leader)` in teal badges, `గ్రామ / పంచాయితీ లీడర్ (Panchayat Leader)` in green badges).
+     - **District & Constituency Leaders**: Blue badges (`#e0f2fe` / `#0369a1`).
    - Connected Confirm (`confirm(tableId, id)`) and Reject (`deleteAlert(tableId, id)`) actions to update `approval_ind = 1 / 2` in the database.
+4. **Backend Wing & Ward Query Integration**:
+   - In `backend/server.ts`, updated `getLeaderswebsiteData` to `LEFT JOIN wings w ON s.wingtype = w.id` and select `wingtype`, `wingtypes`, `wardnumber`, `subward`, and `COALESCE(w.position, w.wing_name, '') as wing_name`.
 
 ---
 
@@ -2559,4 +2565,4 @@ The user established six concrete operational enhancements and features across t
 - **AWS Lambda Backend (`jbac-backend-api`)**: Successfully deployed to `ap-southeast-2` with runtime Node.js 18.x.
 - **Angular Production Web Frontend**: Compiled with Node v24 into `dist/churchwebsite` and synced to S3 bucket `jbac-web-production-298363284024`.
 - **CloudFront CDN Distribution (`EOBBU8SU7H3BI`)**: Invalidated globally with paths `/*`, `/admin*`, `/public.html`.
-- **Automated Verification**: End-to-end Python test suite (`scripts/verify_all_requirements.py`) passed 100% across all 6 feature streams.
+- **Automated Verification**: End-to-end Python test suite (`scripts/verify_all_requirements.py`) passed 100% across all 6 feature streams. Live API verification for `getLeaderswebsiteData` confirmed full data resolution for student wing, software wing, and ward leaders.

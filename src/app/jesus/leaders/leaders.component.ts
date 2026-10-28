@@ -179,12 +179,131 @@ export class LeadersComponent {
   }
 
   
+  getDetailedLeaderStatus(x: any): string {
+    if (!x) return 'లీడర్ (Leader)';
+
+    // 1. Check Wing Leadership (leadertype == '2' or has wingtype / wingtypes)
+    const isWing = String(x.leadertype) === '2' || (x.wingtype && x.wingtype !== 'null' && String(x.wingtype).trim() !== '') || (x.wingtypes && x.wingtypes !== 'null' && String(x.wingtypes).trim() !== '');
+
+    let wingTitle = '';
+    if (x.wing_name && x.wing_name !== 'null' && String(x.wing_name).trim()) {
+      wingTitle = String(x.wing_name).trim();
+    } else if (String(x.wingtype) === '1') {
+      wingTitle = 'స్టూడెంట్ వింగ్ (Student Wing)';
+    }
+
+    let subWing = '';
+    if (x.wingtypes && x.wingtypes !== 'null' && String(x.wingtypes).trim()) {
+      const wt = String(x.wingtypes).trim();
+      if (wt.toLowerCase() === 'meediareporters' || wt.toLowerCase() === 'mediareporters') {
+        subWing = 'మీడియా రిపోర్టర్స్ (Media)';
+      } else if (wt.toLowerCase() === 'socialmedia') {
+        subWing = 'సోషల్ మీడియా (Social Media)';
+      } else if (wt.toLowerCase() === 'papermedia') {
+        subWing = 'పేపర్ మీడియా (Paper Media)';
+      } else if (wt.toLowerCase() === 'driver') {
+        subWing = 'డ్రైవర్స్ వింగ్ (Drivers)';
+      } else {
+        subWing = wt;
+      }
+    }
+
+    if (isWing) {
+      if (wingTitle && subWing) {
+        return `${wingTitle} - ${subWing} లీడర్`;
+      }
+      if (wingTitle) {
+        return wingTitle.includes('లీడర్') ? wingTitle : `${wingTitle} లీడర్`;
+      }
+      if (subWing) {
+        return `${subWing} లీడర్`;
+      }
+      return 'వింగ్ లీడర్ (Wing Leader)';
+    }
+
+    // 2. Check General Leadership (leadertype == '1' or generaltype or ward/subward)
+    const gType = String(x.generaltype || '');
+
+    if (gType === '1') {
+      return 'జిల్లా లీడర్ (District Leader)';
+    }
+    if (gType === '2') {
+      return 'నియోజకవర్గ లీడర్ (Constituency Leader)';
+    }
+    if (gType === '3') {
+      return 'మండల లీడర్ (Mandal Leader)';
+    }
+    if (gType === '4') {
+      return 'గ్రామ / పంచాయితీ లీడర్ (Panchayat Leader)';
+    }
+    if (gType === '5') {
+      const wardNum = x.wardnumber && x.wardnumber !== 'null' && String(x.wardnumber).trim() ? ` నెం. ${x.wardnumber}` : '';
+      return `వార్డు${wardNum} లీడర్ (Ward Leader)`;
+    }
+    if (gType === '6') {
+      const sub = x.subward && x.subward !== 'null' && String(x.subward).trim() ? ` (${x.subward})` : '';
+      return `సబ్ వార్డు${sub} లీడర్ (Sub-Ward Leader)`;
+    }
+
+    // Fallbacks if generaltype is unset but subward / wardnumber are populated
+    if (x.subward && x.subward !== 'null' && String(x.subward).trim()) {
+      return `సబ్ వార్డు (${x.subward}) లీడర్`;
+    }
+    if (x.wardnumber && x.wardnumber !== 'null' && String(x.wardnumber).trim()) {
+      return `వార్డు నెం. ${x.wardnumber} లీడర్`;
+    }
+
+    return 'జనరల్ లీడర్ (General Leader)';
+  }
+
+  getLeaderBadgeStyle(x: any): { [key: string]: string } {
+    const isWing = String(x?.leadertype) === '2' || (x?.wingtype && x.wingtype !== 'null' && String(x.wingtype).trim() !== '') || (x?.wingtypes && x.wingtypes !== 'null' && String(x.wingtypes).trim() !== '');
+    const gType = String(x?.generaltype || '');
+
+    if (isWing) {
+      return {
+        'background-color': '#ede9fe',
+        'color': '#6d28d9',
+        'border': '1px solid #c4b5fd'
+      };
+    }
+    if (gType === '1' || gType === '2') {
+      return {
+        'background-color': '#e0f2fe',
+        'color': '#0369a1',
+        'border': '1px solid #7dd3fc'
+      };
+    }
+    if (gType === '3') {
+      return {
+        'background-color': '#e0f7fa',
+        'color': '#00695c',
+        'border': '1px solid #80deea'
+      };
+    }
+    if (gType === '4') {
+      return {
+        'background-color': '#dcfce7',
+        'color': '#15803d',
+        'border': '1px solid #86efac'
+      };
+    }
+    if (gType === '5' || gType === '6') {
+      return {
+        'background-color': '#fef3c7',
+        'color': '#b45309',
+        'border': '1px solid #fcd34d'
+      };
+    }
+    return {
+      'background-color': '#f1f5f9',
+      'color': '#475569',
+      'border': '1px solid #cbd5e1'
+    };
+  }
+
   getLevelName(level: any): string {
-    if (level == '1') return 'జిల్లా లీడర్';
-    if (level == '2') return 'నియోజకవర్గ లీడర్';
-    if (level == '3') return 'మండల లీడర్';
-    if (level == '4') return 'గ్రామ / పంచాయితీ లీడర్';
-    return 'నాయకుడు (Leader)';
+    return this.getDetailedLeaderStatus({ generaltype: level });
   }
 
   conformleader(id: any, index: any) {

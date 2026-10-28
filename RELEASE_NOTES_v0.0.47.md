@@ -45,6 +45,13 @@ Version 0.0.47 delivers significant enhancements across advertisements managemen
    - Designated the `d_in = 1` database flag in `signup_form` and `pastor_reg` as the official admin authorization for District-Level Leaders.
    - When an approved district leader visits `/leaders`, all subordinate leaders within their district (at constituency, mandal, and village/panchayat levels) are displayed in organized lists under **Believers Requests** and **Pastors Requests** with one-click calling and approval/rejection controls.
 
+7. **Detailed Leader Status Badges & Wing Resolution (`https://jbac.in/leaders`)**:
+   - Upgraded the 3rd column (*"నాయకత్వ స్థాయి / Leader Status"*) from generic placeholders (`నాయకుడు (Leader)`) to high-information, color-coded badges indicating exact wing, sub-wing, and local administrative tiers:
+     - **Wing Leaders**: Resolves wing names (e.g. `స్టూడెంట్ వింగ్ (Student Wing)`, `సాఫ్ట్ వెర్ వింగ్`, `డ్రైవర్స్ వింగ్`) and specific wings roles (e.g. `మీడియా రిపోర్టర్స్ (Media)`, `సోషల్ మీడియా (Social Media)`, `పేపర్ మీడియా (Paper Media)`), e.g. `స్టూడెంట్ వింగ్ (Student Wing) - సోషల్ మీడియా లీడర్` with purple/violet badges (`#ede9fe` / `#6d28d9`).
+     - **Ward / Sub-Ward Leaders**: Detailed indicators with ward and sub-ward designations (`వార్డు నెం. 1 లీడర్ (Ward Leader)`, `సబ్ వార్డు లీడర్ (Sub-Ward)`) in amber badges (`#fef3c7` / `#b45309`).
+     - **Mandal & Panchayat Leaders**: Clear Telugu and English indicators (`మండల లీడర్ (Mandal Leader)` in teal badges, `గ్రామ / పంచాయితీ లీడర్ (Panchayat Leader)` in green badges).
+     - **Backend SQL Query Enhancement**: Joined `wings` table (`LEFT JOIN wings w ON s.wingtype = w.id`) and queried `s.wingtype`, `s.wingtypes`, `s.wardnumber`, `s.subward` across both `signup_form` and `pastor_reg`.
+
 ---
 
 ## 📝 Multi-Language Changelog Snippets
@@ -52,6 +59,7 @@ Version 0.0.47 delivers significant enhancements across advertisements managemen
 ### English (`en-US`)
 ```text
 What's new in version 0.0.47:
+• Detailed Leader Status Badges: Clear, informative badges for Student Wing, Media/Social Media, Ward, Sub-Ward, Mandal, and Panchayat leaders.
 • Automated Ad Expiration: Meeting announcements display until their scheduled end date, then disappear automatically.
 • Universal Ads Sidebar: Added right-side vertical scrolling ads across all member services pages.
 • Cross-Category Autofill: Existing student/member details automatically populate when registering for other categories.
@@ -63,6 +71,7 @@ What's new in version 0.0.47:
 ### Telugu (`te-IN`)
 ```text
 వెర్షన్ 0.0.47 నూతన విశేషాలు:
+• లీడర్ల నాయకత్వ స్థాయి పూర్తి వివరాలు: స్టూడెంట్ వింగ్, సోషల్ మీడియా, మీడియా రిపోర్టర్స్, వార్డు నెం., సబ్ వార్డు, మండల మరియు పంచాయితీ స్థాయి హోదాల స్పష్టమైన రంగుల బ్యాడ్జీలు.
 • మీటింగ్ ప్రకటనల ఆటో ఎక్స్‌పైరీ: మీటింగ్ తేదీ ముగిసిన తర్వాత ప్రకటనలు ఆటోమేటిక్‌గా అదృశ్యమవుతాయి.
 • అన్ని సర్వీసులలో ప్రకటనల సైడ్‌బార్: మ్యారేజెస్, జాబ్స్, ఆర్గనైజేషన్స్ మొదలైన పేజీలలో నిలువు ప్రకటనల స్క్రోలింగ్.
 • ఆటోమేటిక్ వివరాల సేకరణ: గతంలో స్టూడెంట్‌గా రిజిస్టర్ అయినవారు ఇతర విభాగాలలో చేరేటప్పుడు ఫోన్ నంబర్ ద్వారా వివరాలు ఆటోమేటిక్‌గా నిండుతాయి.
@@ -97,5 +106,5 @@ WHERE a.type = 'Meetings' AND a.enddate IS NULL;
 1. `POST /dashboardapi/lookup-existing-user`: Cross-category user profile lookup by 10-digit phone or WhatsApp.
 2. `GET /dashboardapi/admin-dashboard-stats`: Returns `{ believers, believers_today, pastors, pastors_today, ... }` grouped by IST calendar date.
 3. `POST /dashboardapi/getUserMainData`: Checks district leader authorization (`d_in = 1`) across `pastor_reg` and `signup_form`.
-4. `POST /dashboardapi/getLeaderswebsiteData`: Returns subordinates list with joined constituency (`const_dtl_t`), mandal (`mndls_lst_t`), and panchayat (`pnchyt_lst_t`) names.
+4. `POST /dashboardapi/getLeaderswebsiteData`: Returns subordinates list with joined constituency (`const_dtl_t`), mandal (`mndls_lst_t`), panchayat (`pnchyt_lst_t`), and wings (`wings`) table data (including `wingtype`, `wingtypes`, `wardnumber`, `subward`, `wing_name`).
 
