@@ -236,35 +236,28 @@
                 </div>
             </div>
             <div class="col-lg-4">
-                <marquee onmouseover="this.stop();" onmouseout="this.start();" direction="up"
-                    style="scroll-behavior: smooth;">
-                    <div class="container">
-                        <div style="border:solid green">
-                            <article>
-                                <div class="article-wrapper">
-                                    <div class="article-body">
-                                        <h3 style="text-align:center;color: black; padding:2%;">
-                                            Welcome To JBAC.IN
-                                        </h3>
-                                    </div>
-                                </div>
-                            </article>
-                        </div>
-                        <div *ngFor="let item of adds" style="border:solid green">
-                            <article>
-                                <div class="article-wrapper">
-                                    <div class="article-body">
-                                        <img style="height:85%;width:100%;" src="{{item.image}}"
-                                            (click)="openimg(item.image,openmodel)" alt="image" alt="images. ">
-                                        <p style="color: black; padding:2%;">
-                                            -- <b>{{item.description}}</b>
-                                        </p>
-                                    </div>
-                                </div>
-                            </article>
-                        </div>
+                <div class="news-sidebar-card shadow-sm p-3">
+                        <h5 class="fw-bold text-center text-primary mb-3 border-bottom pb-2">
+                            <i class="fa fa-bullhorn me-1"></i> ప్రకటనలు / సమాచారం
+                        </h5>
+                        <marquee onmouseover="this.stop();" onmouseout="this.start();" direction="up"
+                            style="height: 550px; scroll-behavior: smooth;">
+                            <div class="sidebar-ad-card mb-3 p-3 text-center border rounded bg-white">
+                                <h5 class="fw-bold text-success mb-1">Welcome To JBAC.IN</h5>
+                                <p class="small text-muted mb-0">ఆంధ్ర & తెలంగాణ క్రైస్తవ సేవా సమాచారం</p>
+                            </div>
+                            <div *ngFor="let item of adds" class="sidebar-ad-card mb-3 p-2 border rounded shadow-sm bg-white">
+                                <img [src]="item.image || 'assets/images/user.jpg'" (error)="$any($event.target).src = 'assets/images/user.jpg'"
+                                    (click)="openimg(item.image, openmodel)"
+                                    class="img-fluid rounded mb-2 ad-img cursor-pointer"
+                                    style="width: 100%; max-height: 220px; object-fit: cover;"
+                                    alt="Advertisement">
+                                <p class="small text-dark mb-0 fw-semibold px-1">
+                                    {{item.description}}
+                                </p>
+                            </div>
+                        </marquee>
                     </div>
-                </marquee>
             </div>
         </div>
     </div>

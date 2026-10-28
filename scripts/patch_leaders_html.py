@@ -1,0 +1,145 @@
+new_html = """<!-- Breadcrumbs -->
+<div class="top_panel_title top_panel_style_3 title_present breadcrumbs_present scheme_original">
+    <div class="top_panel_title_inner inner-bg6">
+        <div class="content_wrap">
+            <h1 class="page_title">Leaders Requests</h1>
+        </div>
+    </div>
+</div>
+<!-- /Breadcrumbs -->
+
+<br><br>
+<div class="page body_style_wide body_filled article_style_stretch scheme_original top_panel_show top_panel_above sidebar_hide">
+    <a id="toc_home" class="sc_anchor" title="Home" data-separator="yes"></a>
+
+    <h3 style="text-align: center; color: #00548F; font-weight: bold;">{{generals}} {{wingtypes}} {{leaders}}</h3>
+
+    <div class="container mt-4">
+        <div class="row justify-content-center">
+            <div class="col-lg-4 col-md-6 mb-3" style="text-align: center;">
+                <button type="button" class="btn btn-lg w-100" [style.background-color]="formshow == 1 ? '#00548F' : '#f0f4f8'" [style.color]="formshow == 1 ? '#fff' : '#00548F'" style="font-weight: 600; border: 2px solid #00548F; padding: 12px 24px; border-radius: 8px;" (click)="make(1)">
+                    👥 Believers Requests (విశ్వాసులు)
+                </button>
+            </div>
+            <div class="col-lg-4 col-md-6 mb-3" style="text-align: center;">
+                <button type="button" class="btn btn-lg w-100" [style.background-color]="formshow == 3 ? '#8b0000' : '#fcf0f0'" [style.color]="formshow == 3 ? '#fff' : '#8b0000'" style="font-weight: 600; border: 2px solid #8b0000; padding: 12px 24px; border-radius: 8px;" (click)="make(3)">
+                    ✝️ Pastors Requests (పాస్టర్లు)
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <br>
+
+    <!-- Believers Requests Table -->
+    <div *ngIf="formshow == 1">
+        <section class="contact main-blog">
+            <div class="container">
+                <h3 style="text-align: center; margin-bottom: 20px; color: #00548F;">
+                    {{general != '' ? general + ' Level Believers Requests' : 'Village Believers Requests'}} (మండల / పంచాయితీ వారిగా)
+                </h3>
+                <div class="table-responsive" style="background: #fff; box-shadow: 0 4px 12px rgba(0,0,0,0.08); border-radius: 8px; overflow: hidden;">
+                    <table class="table table-hover table-bordered mb-0" style="width: 100%; border-collapse: collapse;">
+                        <thead style="background-color: #00548F; color: #fff;">
+                            <tr>
+                                <th style="padding: 12px; text-align: center;">S No.</th>
+                                <th style="padding: 12px;">పేరు (Name)</th>
+                                <th style="padding: 12px;">నాయకత్వ స్థాయి</th>
+                                <th style="padding: 12px;">నియోజకవర్గం</th>
+                                <th style="padding: 12px;">మండలం</th>
+                                <th style="padding: 12px;">పంచాయితీ / గ్రామం</th>
+                                <th style="padding: 12px; text-align: center;">ఫోన్ కాల్</th>
+                                <th style="padding: 12px; text-align: center;">నిర్ణయం</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let x of belearr; let i = index">
+                                <td style="padding: 12px; text-align: center; font-weight: 600;">{{i + 1}}</td>
+                                <td style="padding: 12px;"><b>{{x.fname}} {{x.lname || ''}}</b></td>
+                                <td style="padding: 12px;"><span style="background: #e0f2fe; color: #0369a1; padding: 4px 8px; border-radius: 4px; font-weight: 600; font-size: 0.85rem;">{{getLevelName(x.generaltype)}}</span></td>
+                                <td style="padding: 12px;">{{x.constituency_name || x.nativeplace || '--'}}</td>
+                                <td style="padding: 12px;">{{x.mandal_name || '--'}}</td>
+                                <td style="padding: 12px;">{{x.panchayat_name || x.villagename || '--'}}</td>
+                                <td style="padding: 12px; text-align: center;">
+                                    <a href="tel:+91{{x.mobile_number}}" title="Call {{x.mobile_number}}">
+                                        <img src="assets/images/phone.png" style="width: 32px; height: 32px;">
+                                    </a>
+                                </td>
+                                <td style="padding: 12px; text-align: center;">
+                                    <button *ngIf="x.approval_ind == 0 || x.approval_ind == null" class="btn btn-sm btn-success" style="margin-right: 6px; padding: 4px 10px; border-radius: 4px;" type="button" (click)="confirm(1, x.id)">అనుమతించు</button>
+                                    <button *ngIf="x.approval_ind == 0 || x.approval_ind == null" class="btn btn-sm btn-danger" style="padding: 4px 10px; border-radius: 4px;" type="button" (click)="deleteAlert(1, x.id)">తిరస్కరించు</button>
+                                    <span *ngIf="x.approval_ind == 1" style="color: #16a34a; font-weight: bold; background: #dcfce7; padding: 4px 10px; border-radius: 4px;">✓ సెలెక్టెడ్ (Approved)</span>
+                                    <span *ngIf="x.approval_ind == 2" style="color: #dc2626; font-weight: bold; background: #fee2e2; padding: 4px 10px; border-radius: 4px;">✗ తిరస్కరించబడింది</span>
+                                </td>
+                            </tr>
+                            <tr *ngIf="!belearr || belearr.length == 0">
+                                <td colspan="8" style="text-align: center; padding: 30px; font-weight: 600; color: #64748b;">ఈ జిల్లాలో ఎటువంటి రిక్వెస్ట్‌లు లేవు / No Believers Requests</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <br>
+            </div>
+        </section>
+    </div>
+
+    <!-- Pastors Requests Table -->
+    <div *ngIf="formshow == 3">
+        <section class="contact main-blog">
+            <div class="container">
+                <h3 style="text-align: center; margin-bottom: 20px; color: #8b0000;">
+                    {{general != '' ? general + ' Level Pastors Requests' : 'Village Pastors Requests'}} (మండల / పంచాయితీ వారిగా)
+                </h3>
+                <div class="table-responsive" style="background: #fff; box-shadow: 0 4px 12px rgba(0,0,0,0.08); border-radius: 8px; overflow: hidden;">
+                    <table class="table table-hover table-bordered mb-0" style="width: 100%; border-collapse: collapse;">
+                        <thead style="background-color: #8b0000; color: #fff;">
+                            <tr>
+                                <th style="padding: 12px; text-align: center;">S No.</th>
+                                <th style="padding: 12px;">పేరు (Pastor Name)</th>
+                                <th style="padding: 12px;">నాయకత్వ స్థాయి</th>
+                                <th style="padding: 12px;">నియోజకవర్గం</th>
+                                <th style="padding: 12px;">మండలం</th>
+                                <th style="padding: 12px;">పంచాయితీ / గ్రామం</th>
+                                <th style="padding: 12px; text-align: center;">ఫోన్ కాల్</th>
+                                <th style="padding: 12px; text-align: center;">నిర్ణయం</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let x of pastorarr; let i = index">
+                                <td style="padding: 12px; text-align: center; font-weight: 600;">{{i + 1}}</td>
+                                <td style="padding: 12px;"><b>{{x.pastorname}}</b></td>
+                                <td style="padding: 12px;"><span style="background: #fef3c7; color: #92400e; padding: 4px 8px; border-radius: 4px; font-weight: 600; font-size: 0.85rem;">{{getLevelName(x.generaltype)}}</span></td>
+                                <td style="padding: 12px;">{{x.constituency_name || x.nativeplace || '--'}}</td>
+                                <td style="padding: 12px;">{{x.mandal_name || '--'}}</td>
+                                <td style="padding: 12px;">{{x.panchayat_name || x.villagename || '--'}}</td>
+                                <td style="padding: 12px; text-align: center;">
+                                    <a href="tel:+91{{x.phonenumber}}" title="Call {{x.phonenumber}}">
+                                        <img src="assets/images/phone.png" style="width: 32px; height: 32px;">
+                                    </a>
+                                </td>
+                                <td style="padding: 12px; text-align: center;">
+                                    <button *ngIf="x.approval_ind == 0 || x.approval_ind == null" class="btn btn-sm btn-success" style="margin-right: 6px; padding: 4px 10px; border-radius: 4px;" type="button" (click)="confirm(3, x.id)">అనుమతించు</button>
+                                    <button *ngIf="x.approval_ind == 0 || x.approval_ind == null" class="btn btn-sm btn-danger" style="padding: 4px 10px; border-radius: 4px;" type="button" (click)="deleteAlert(3, x.id)">తిరస్కరించు</button>
+                                    <span *ngIf="x.approval_ind == 1" style="color: #16a34a; font-weight: bold; background: #dcfce7; padding: 4px 10px; border-radius: 4px;">✓ సెలెక్టెడ్ (Approved)</span>
+                                    <span *ngIf="x.approval_ind == 2" style="color: #dc2626; font-weight: bold; background: #fee2e2; padding: 4px 10px; border-radius: 4px;">✗ తిరస్కరించబడింది</span>
+                                </td>
+                            </tr>
+                            <tr *ngIf="!pastorarr || pastorarr.length == 0">
+                                <td colspan="8" style="text-align: center; padding: 30px; font-weight: 600; color: #64748b;">ఈ జిల్లాలో ఎటువంటి రిక్వెస్ట్‌లు లేవు / No Pastors Requests</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <br>
+            </div>
+        </section>
+    </div>
+    <br><br>
+</div>
+"""
+
+with open('src/app/jesus/leaders/leaders.component.html', 'w', encoding='utf-8') as f:
+    f.write(new_html)
+
+print("Saved src/app/jesus/leaders/leaders.component.html")
+

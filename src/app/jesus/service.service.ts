@@ -596,10 +596,34 @@ postwishform(data: any) {
   getadds() {
     var data = {}
     return this.http.post<any>(this.testApi + `getaddsdata`, data).pipe(map(res => {
+      if (res && res.data && Array.isArray(res.data)) {
+        const todayStr = new Date().toISOString().substring(0, 10);
+        res.data = res.data.filter((ad: any) => {
+          // If stopped by admin
+          if (ad.d_in && ad.d_in != 0 && ad.d_in != '0') return false;
+
+          const typeStr = String(ad.type || '').toLowerCase();
+          const isMeeting = typeStr.includes('meet');
+
+          // If not a meeting, display continuously until stopped by admin
+          if (!isMeeting) return true;
+
+          // If meeting, display until end date after that it disappears
+          const endStr = ad.enddate || ad.todate;
+          if (endStr) {
+            return String(endStr).substring(0, 10) >= todayStr;
+          }
+          return true;
+        });
+      }
       return res;
     }, (error: any) => {
       return error;
     }));
+  }
+
+  lookupExistingUser(phone: string) {
+    return this.http.post<any>(this.testApi + 'lookup-existing-user', { phone });
   }
   getorganizations() {
     var data = {}

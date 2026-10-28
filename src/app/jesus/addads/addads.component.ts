@@ -199,7 +199,8 @@ export class AddadsComponent {
       image: ['', [Validators.required]],
       description: ['', [Validators.required]],
       number: ['', [Validators.required, Validators.minLength(10)]],
-      term: [true, [Validators.required]]
+      term: [true, [Validators.required]],
+      enddate: ['']
     })
 
     this.addingbusiness = this.formBuilder.group({
@@ -543,6 +544,7 @@ export class AddadsComponent {
         title: this.addsadding.value.title,
         description: this.addsadding.value.description,
         number: this.addsadding.value.number,
+        enddate: this.addsadding.value.enddate || null,
         usr_id: sessionStorage.getItem('usr_id'),
         reviewImg: this.imagesData
       }

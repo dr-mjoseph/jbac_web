@@ -314,6 +314,41 @@
       background: rgba(255,255,255,0.05);
     }
 
+    .metric-card-stat-row {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .metric-today-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 0.74rem;
+      font-weight: 600;
+      color: #38bdf8;
+      background: rgba(56, 189, 248, 0.12);
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      padding: 3px 8px;
+      border-radius: 6px;
+      letter-spacing: 0.02em;
+    }
+
+    .metric-today-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #38bdf8;
+      box-shadow: 0 0 6px #38bdf8;
+      animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+
     .metric-card-value {
       font-size: 1.85rem;
       font-weight: 800;
@@ -1096,8 +1131,11 @@
           <span>Believers Registered</span>
           <div class="metric-card-icon">👥</div>
         </div>
-        <div class="metric-card-value" id="stat-believers">--</div>
-        <div class="metric-card-footer">signup_form &bull; Click to query</div>
+        <div class="metric-card-stat-row">
+          <div class="metric-card-value" id="stat-believers">--</div>
+          <div class="metric-today-badge" title="Registered Today"><span class="metric-today-dot"></span>Today: <strong id="stat-believers-today">0</strong></div>
+        </div>
+        <div class="metric-card-footer">signup_form &bull; Total: <span id="stat-believers-total">--</span></div>
       </div>
 
       <div class="metric-card" onclick="openStateCategoryQuery('pastor_reg')">
@@ -1105,8 +1143,11 @@
           <span>Pastors Registered</span>
           <div class="metric-card-icon">✝️</div>
         </div>
-        <div class="metric-card-value" id="stat-pastors">--</div>
-        <div class="metric-card-footer">pastor_reg &bull; Click to query</div>
+        <div class="metric-card-stat-row">
+          <div class="metric-card-value" id="stat-pastors">--</div>
+          <div class="metric-today-badge" title="Registered Today"><span class="metric-today-dot"></span>Today: <strong id="stat-pastors-today">0</strong></div>
+        </div>
+        <div class="metric-card-footer">pastor_reg &bull; Total: <span id="stat-pastors-total">--</span></div>
       </div>
 
       <div class="metric-card" onclick="openStateCategoryQuery('church_reg')">
@@ -1114,8 +1155,11 @@
           <span>Churches Registered</span>
           <div class="metric-card-icon">⛪</div>
         </div>
-        <div class="metric-card-value" id="stat-churches">--</div>
-        <div class="metric-card-footer">church_reg &bull; Click to query</div>
+        <div class="metric-card-stat-row">
+          <div class="metric-card-value" id="stat-churches">--</div>
+          <div class="metric-today-badge" title="Registered Today"><span class="metric-today-dot"></span>Today: <strong id="stat-churches-today">0</strong></div>
+        </div>
+        <div class="metric-card-footer">church_reg &bull; Total: <span id="stat-churches-total">--</span></div>
       </div>
 
       <div class="metric-card" onclick="openStateCategoryQuery('student_reg')">
@@ -1123,8 +1167,11 @@
           <span>Students Registered</span>
           <div class="metric-card-icon">🎓</div>
         </div>
-        <div class="metric-card-value" id="stat-students">--</div>
-        <div class="metric-card-footer">student_reg &bull; Click to query</div>
+        <div class="metric-card-stat-row">
+          <div class="metric-card-value" id="stat-students">--</div>
+          <div class="metric-today-badge" title="Registered Today"><span class="metric-today-dot"></span>Today: <strong id="stat-students-today">0</strong></div>
+        </div>
+        <div class="metric-card-footer">student_reg &bull; Total: <span id="stat-students-total">--</span></div>
       </div>
 
       <div class="metric-card" onclick="openStateCategoryQuery('ministry_signup')">
@@ -1132,8 +1179,11 @@
           <span>Ministries Registered</span>
           <div class="metric-card-icon">🕊️</div>
         </div>
-        <div class="metric-card-value" id="stat-ministries">--</div>
-        <div class="metric-card-footer">ministry_signup &bull; Click to query</div>
+        <div class="metric-card-stat-row">
+          <div class="metric-card-value" id="stat-ministries">--</div>
+          <div class="metric-today-badge" title="Registered Today"><span class="metric-today-dot"></span>Today: <strong id="stat-ministries-today">0</strong></div>
+        </div>
+        <div class="metric-card-footer">ministry_signup &bull; Total: <span id="stat-ministries-total">--</span></div>
       </div>
 
       <div class="metric-card" onclick="openStateCategoryQuery('independentorganisation_reg')">
@@ -1141,8 +1191,11 @@
           <span>Organizations Registered</span>
           <div class="metric-card-icon">🏛️</div>
         </div>
-        <div class="metric-card-value" id="stat-orgs">--</div>
-        <div class="metric-card-footer">independentorganisation_reg &bull; Click to query</div>
+        <div class="metric-card-stat-row">
+          <div class="metric-card-value" id="stat-orgs">--</div>
+          <div class="metric-today-badge" title="Registered Today"><span class="metric-today-dot"></span>Today: <strong id="stat-orgs-today">0</strong></div>
+        </div>
+        <div class="metric-card-footer">independentorganisation_reg &bull; Total: <span id="stat-orgs-total">--</span></div>
       </div>
 
       <div class="metric-card" onclick="openStateCategoryQuery('events')">
@@ -1150,7 +1203,10 @@
           <span>Active Events</span>
           <div class="metric-card-icon">📅</div>
         </div>
-        <div class="metric-card-value" id="stat-events">--</div>
+        <div class="metric-card-stat-row">
+          <div class="metric-card-value" id="stat-events">--</div>
+          <div class="metric-today-badge" title="Events Today"><span class="metric-today-dot"></span>Today: <strong id="stat-events-today">0</strong></div>
+        </div>
         <div class="metric-card-footer" id="stat-events-total">Loading total...</div>
       </div>
 
@@ -1159,8 +1215,11 @@
           <span>Total Portal Accounts</span>
           <div class="metric-card-icon">🔐</div>
         </div>
-        <div class="metric-card-value" id="stat-users">--</div>
-        <div class="metric-card-footer">users table &bull; Click to query</div>
+        <div class="metric-card-stat-row">
+          <div class="metric-card-value" id="stat-users">--</div>
+          <div class="metric-today-badge" title="Registered Today"><span class="metric-today-dot"></span>Today: <strong id="stat-users-today">0</strong></div>
+        </div>
+        <div class="metric-card-footer">users table &bull; Total: <span id="stat-users-total">--</span></div>
       </div>
     </div>
 
@@ -1808,15 +1867,26 @@
         if (res.ok) {
           const json = await res.json();
           const s = json.stats || {};
-          document.getElementById('stat-believers').textContent = Number(s.believers || 0).toLocaleString();
-          document.getElementById('stat-pastors').textContent = Number(s.pastors || 0).toLocaleString();
-          document.getElementById('stat-churches').textContent = Number(s.churches || 0).toLocaleString();
-          document.getElementById('stat-students').textContent = Number(s.students || 0).toLocaleString();
-          document.getElementById('stat-ministries').textContent = Number(s.ministries || 0).toLocaleString();
-          document.getElementById('stat-orgs').textContent = Number(s.organisations || 0).toLocaleString();
-          document.getElementById('stat-events').textContent = Number(s.events_active || 0).toLocaleString();
-          document.getElementById('stat-events-total').textContent = `${Number(s.events_total || 0).toLocaleString()} total meetings`;
-          document.getElementById('stat-users').textContent = Number(s.users || 0).toLocaleString();
+          const setStat = (id, total, today) => {
+            const el = document.getElementById(id);
+            if (el) el.textContent = Number(total || 0).toLocaleString();
+            const elToday = document.getElementById(id + '-today');
+            if (elToday) elToday.textContent = Number(today || 0).toLocaleString();
+            const elTotal = document.getElementById(id + '-total');
+            if (elTotal) elTotal.textContent = Number(total || 0).toLocaleString();
+          };
+
+          setStat('stat-believers', s.believers, s.believers_today);
+          setStat('stat-pastors', s.pastors, s.pastors_today);
+          setStat('stat-churches', s.churches, s.churches_today);
+          setStat('stat-students', s.students, s.students_today);
+          setStat('stat-ministries', s.ministries, s.ministries_today);
+          setStat('stat-orgs', s.organisations, s.organisations_today);
+          setStat('stat-events', s.events_active, s.events_today);
+          setStat('stat-users', s.users, s.users_today);
+          if (document.getElementById('stat-events-total')) {
+            document.getElementById('stat-events-total').textContent = `${Number(s.events_total || 0).toLocaleString()} total meetings`;
+          }
         }
       } catch (err) {
         console.warn('Dashboard stats fallback:', err);

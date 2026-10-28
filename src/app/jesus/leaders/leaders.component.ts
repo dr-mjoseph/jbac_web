@@ -178,6 +178,15 @@ export class LeadersComponent {
     })
   }
 
+  
+  getLevelName(level: any): string {
+    if (level == '1') return 'జిల్లా లీడర్';
+    if (level == '2') return 'నియోజకవర్గ లీడర్';
+    if (level == '3') return 'మండల లీడర్';
+    if (level == '4') return 'గ్రామ / పంచాయితీ లీడర్';
+    return 'నాయకుడు (Leader)';
+  }
+
   conformleader(id: any, index: any) {
     var data = {
       tableid: id,
