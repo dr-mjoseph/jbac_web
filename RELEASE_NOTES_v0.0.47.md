@@ -98,3 +98,4 @@ WHERE a.type = 'Meetings' AND a.enddate IS NULL;
 2. `GET /dashboardapi/admin-dashboard-stats`: Returns `{ believers, believers_today, pastors, pastors_today, ... }` grouped by IST calendar date.
 3. `POST /dashboardapi/getUserMainData`: Checks district leader authorization (`d_in = 1`) across `pastor_reg` and `signup_form`.
 4. `POST /dashboardapi/getLeaderswebsiteData`: Returns subordinates list with joined constituency (`const_dtl_t`), mandal (`mndls_lst_t`), and panchayat (`pnchyt_lst_t`) names.
+
