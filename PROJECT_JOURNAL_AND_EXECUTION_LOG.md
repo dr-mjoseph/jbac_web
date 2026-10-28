@@ -2429,3 +2429,134 @@ The user established four critical requirements across the JBAC ecosystem (Web P
   - `jbacApp-0.0.46.aab` (Signed Release App Bundle)
   - `appreleasesigned.aab` (Google Play Console Release Bundle)
 
+
+
+---
+
+## 28. Milestone 18: Meeting Ads Lifecycle & Expiration Engine, Login Experience Cleanup, Universal Vertical Ads Sidebars, Cross-Category Registration Autofill, Admin Cockpit Real-Time Daily Registration KPIs, and District Leader Hierarchy Management (`d_in = 1`)
+
+### 1. Scope & Core Requirements
+The user established six concrete operational enhancements and features across the JBAC ecosystem:
+1. **News Page (`https://jbac.in/news`)**:
+   - Integrated full-page loading spinner active until all news articles have completely loaded.
+   - Right-side vertical marquee displaying active ads under "ప్రకటనలు / సమాచారం".
+   - Condition: Meeting ads must only be displayed until their scheduled `enddate`, after which they automatically disappear; non-meeting ads continue displaying until administratively stopped (`d_in != 0`).
+2. **Login Page (`https://jbac.in/login`)**:
+   - Permanent removal of the "Quick Demo Login" box ("త్వరిత డెమో ఖాతాలు / Quick Demo Login:") shown underneath the password field in the user-provided screenshot.
+3. **Services Pages Universal Ads Sidebars**:
+   - Across all 6 authenticated post-login service views:
+     - Christian Organizations (`/institute`)
+     - Christian Marriages (`/marriages`)
+     - Christian Jobs (`/jobs`)
+     - For Help (`/help`)
+     - Search Business & House Rent (`/business`)
+     - Search Organizations (`/organization`)
+   - Present active ads in a vertical auto-scrolling sidebar with the exact same meeting expiration condition.
+4. **Cross-Category Registration Autofill**:
+   - If a person registered under one category (such as Student), and subsequently seeks to register under another category (such as Believer, Pastor, or Ministry), entering their 10-digit mobile number must automatically retrieve and prefill their personal details, caste, education, and geographic locations (State, District, Constituency, Mandal, Panchayat) with cascading dropdowns fully loaded.
+   - Preserves prefilled information across category tab changes.
+5. **Admin Database Cockpit Real-Time Daily Registration KPIs (`https://jbac.in/admin`)**:
+   - Inside every registered user metric card box (Believers, Pastors, Churches, Students, Ministries, Organizations, and Portal Accounts), display the count registered on that particular day alongside the cumulative total in the same box (`Today: X | Total: Y`).
+   - For every new day, the daily count must reflect that day's registrations, while the previous day's daily count rolls off.
+6. **Leaders Hierarchy & District-Level Approvals (`https://jbac.in/leaders`)**:
+   - If a believer or pastor registered and selected leadership in the general category for a specific state and district: admin decides whether the user is registered as a district-level leader by setting `d_in = 1` in the database table (`signup_form` or `pastor_reg`).
+   - When this approved district leader logs in and visits `/leaders`, all other leaders under their district (at constituency, mandal, and village/panchayat levels) must be listed under "Believers requests" and "Pastors requests" with contact details, direct calling, and approval/rejection actions.
+
+---
+
+### 2. Deep Root-Cause Analysis & Engineering Solutions
+
+#### A. Meeting Ad Expiration & Schema Migration
+1. **Database Schema Limitation**:
+   - *Diagnosis*: The `adds_data` table previously lacked an `enddate` or `event_id` column. When meetings were created in `events`, a duplicate row was pushed into `adds_data` without an expiration boundary, causing old meetings to remain in the active ads rotation indefinitely.
+   - *Solution*: Executed schema migration on RDS MySQL:
+     ```sql
+     ALTER TABLE `adds_data` ADD COLUMN `enddate` VARCHAR(255) DEFAULT NULL;
+     ALTER TABLE `adds_data` ADD COLUMN `event_id` INT DEFAULT NULL;
+     ```
+   - Backfilled existing 23 meeting entries in `adds_data` by matching against `events.id`, `events.orgname`, or phone numbers.
+2. **Backend Lifecycle Enforcement**:
+   - In `backend/server.ts`, updated `/dashboardapi/getaddsdata` and `/api/getadds` to query:
+     ```sql
+     SELECT * FROM adds_data 
+     WHERE d_in = 0 
+       AND (
+         LOWER(COALESCE(type, '')) NOT LIKE '%meet%'
+         OR (enddate IS NOT NULL AND enddate != '' AND enddate >= ?)
+         OR ((enddate IS NULL OR enddate = '') AND (cts IS NULL OR LEFT(cts, 10) >= ?))
+       )
+     ORDER BY id DESC;
+     ```
+   - Updated `/dashboardapi/postmeetings` and `/dashboardapi/postadds` to store `enddate` and `event_id` upon creation.
+   - In `src/app/jesus/service.service.ts`, added client-side date filtering guards in `getadds()` as an additional safeguard.
+
+#### B. Cleaned Login Experience
+- In `src/app/jesus/login/login.component.html`, excised the entire `<div style="background: rgba(255,255,255,0.2); ...">` block containing the demo credentials shortcuts.
+
+#### C. Universal Vertical Ads Sidebars across Services Pages
+- Implemented uniform right-side column marquees in `institute.component.html`, `marriages.component.html`, `jobs.component.html`, `help.component.html`, `business.component.html`, and `organization.component.html`:
+  - Enclosed inside responsive `<div class="col-12 col-lg-3">` containers.
+  - Header: `<h5><i class="fa fa-bullhorn me-2"></i> ప్రకటనలు / సమాచారం</h5>`.
+  - Body: `<marquee onmouseover="this.stop();" onmouseout="this.start();" direction="up" style="height: 550px; scroll-behavior: smooth;">`.
+  - Content: Card-based rendering with image thumbnail, title, phone call link, and date badge.
+
+#### D. Cross-Category Registration Autofill Architecture
+1. **Backend Discovery API (`/dashboardapi/lookup-existing-user`)**:
+   - Takes a 10-digit phone number.
+   - Performs cascading checks across `student_reg`, `signup_form`, and `pastor_reg`.
+   - Returns normalized payload containing: `name`, `fathername`, `mobile_number`, `whatsapp`, `gender`, `dob`, `caste`, `subcaste`, `education`, `state_id`, `district_id`, `constituency_id`, `mandal_id`, `panchayat_id`, `nativeplace`, `talent`, `hobbies`, `lifegoal`, and leadership fields.
+2. **Frontend Dynamic Autofill**:
+   - Bound `(input)="checkExistingUser($event)"` and `(blur)="checkExistingUser($event)"` on phone inputs in `signup.component.html`, `believerregister.component.html`, and `pastorregister.component.html`.
+   - On 10-digit match, automatically calls `lookupExistingUser(digits)`.
+   - Triggers `loadCascadingData(districtId, constId, mandalId)` to fetch child geographic collections asynchronously before form patching.
+   - In `formshow(id)` inside `signup.component.ts`, saved user data is retained in `existingUserData` and re-applied whenever switching category tabs.
+
+#### E. Admin Cockpit Real-Time Daily Registration Metrics
+1. **Timezone-Aware IST Filtering**:
+   - In `backend/server.ts`, `/dashboardapi/admin-dashboard-stats` computes today's date in Indian Standard Time (`getIndianCts().substring(0, 10)`).
+   - Concurrently executes `COUNT(*)` for total users and `COUNT(*)` where `cts LIKE 'YYYY-MM-DD%'` for today's registrations.
+   - At midnight IST, the query automatically shifts to the new day, naturally rolling off yesterday's count.
+2. **Card Box UI Modernization**:
+   - In `public.html`, `backend/public.html`, `src/public.html`, and `src/assets/public.html`:
+   - Updated each metric card (`signup_form`, `pastor_reg`, `church_reg`, `student_reg`, `ministry_signup`, `independentorganisation_reg`, `users`):
+     ```html
+     <div class="metric-card-stat-row">
+       <div class="metric-card-value" id="stat-believers">--</div>
+       <div class="metric-today-badge" title="Registered Today"><span class="metric-today-dot"></span>Today: <strong id="stat-believers-today">0</strong></div>
+     </div>
+     <div class="metric-card-footer">signup_form &bull; Total: <span id="stat-believers-total">--</span></div>
+     ```
+
+#### F. Leaders Hierarchy & District-Level Approvals (`d_in = 1`)
+1. **District Leader Qualification Rule**:
+   - In `backend/server.ts`, `/dashboardapi/getUserMainData` inspects `pastor_reg` and `signup_form`.
+   - The user is qualified as a District Leader if and only if `d_in == 1`.
+2. **Subordinate Hierarchy Aggregation**:
+   - `/dashboardapi/getLeaderswebsiteData` queries all subordinate leaders in that district:
+     ```sql
+     SELECT s.id, s.fname, s.lname, s.mobile_number, s.generaltype, s.leadership, s.leadertype,
+            s.approval_ind, s.district_id, s.constituency_id, s.mandal_id, s.panchayat_id,
+            COALESCE(c.const_nm, '') as constituency_name,
+            COALESCE(m.mndl_nm, '') as mandal_name,
+            COALESCE(p.pnchyt_nm, '') as panchayat_name
+     FROM signup_form s
+     LEFT JOIN const_dtl_t c ON s.constituency_id = c.id
+     LEFT JOIN mndls_lst_t m ON s.mandal_id = m.id
+     LEFT JOIN pnchyt_lst_t p ON s.panchayat_id = p.id
+     WHERE s.district_id = ? 
+       AND (LOWER(COALESCE(s.leadership, '')) = 'yes' OR s.leadertype IS NOT NULL OR s.generaltype IS NOT NULL)
+       AND s.id != ?
+     ORDER BY s.id DESC;
+     ```
+3. **Interactive Management Interface**:
+   - In `src/app/jesus/leaders/leaders.component.html`, overhauled Believers Requests and Pastors Requests tables to display:
+     - S.No, Name, Leader Level badge (`getLevelName(generaltype)`: District / Constituency / Mandal / Village), Constituency Name, Mandal Name, Panchayat / Village Name, Phone Call link, and Confirm/Reject buttons.
+   - Connected Confirm (`confirm(tableId, id)`) and Reject (`deleteAlert(tableId, id)`) actions to update `approval_ind = 1 / 2` in the database.
+
+---
+
+### 3. Verification & Deployment Deliverables
+- **AWS Lambda Backend (`jbac-backend-api`)**: Successfully deployed to `ap-southeast-2` with runtime Node.js 18.x.
+- **Angular Production Web Frontend**: Compiled with Node v24 into `dist/churchwebsite` and synced to S3 bucket `jbac-web-production-298363284024`.
+- **CloudFront CDN Distribution (`EOBBU8SU7H3BI`)**: Invalidated globally with paths `/*`, `/admin*`, `/public.html`.
+- **Automated Verification**: End-to-end Python test suite (`scripts/verify_all_requirements.py`) passed 100% across all 6 feature streams.

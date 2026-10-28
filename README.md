@@ -73,11 +73,24 @@ Welcome to the **Jesus Believers Association Council (JBAC)** unified ecosystem 
      - Child dropdowns remain safely disabled with descriptive Telugu placeholders until their immediate parent is selected.
      - Changing any parent level immediately resets and clears child selections to prevent invalid combinations.
      - Automatically persists `state_id` (`1` for AP, `2` for TG) and `state` (`'AP'` / `'TG'`) into the `events` table.
-5. **Native Android Application (`jbac_app`)**:
-   - Android app compliant with Google Play Store standards (`targetSdkVersion 34`, `minSdkVersion 24`, release version `0.0.38` / `versionCode 38`).
+5. **Cross-Category Registration Autofill**:
+   - Automated profile discovery across `student_reg`, `signup_form`, and `pastor_reg` via `/dashboardapi/lookup-existing-user`. Entering a registered phone number in any registration form automatically pre-populates name, father's name, gender, DOB, caste, education, talents, leadership preferences, and geographic selections (State ➔ District ➔ Constituency ➔ Mandal ➔ Panchayat) with active cascading dropdowns.
+   - Preserves prefilled data across category tab switches.
+6. **Automated Ads & Meeting Lifecycle Engine**:
+   - Integrated `adds_data` lifecycle engine linked with `events.enddate`. Meeting advertisements automatically disappear upon completion without manual intervention, while non-meeting announcements display continuously until stopped by admin (`d_in != 0`).
+   - Universal vertical scrolling ads sidebars (`direction="up"`, `height: 550px`, hover-pause) across all 6 member service views (`/institute`, `/marriages`, `/jobs`, `/help`, `/business`, `/organization`).
+   - Full-page loading spinner on `/news` preventing layout shift until news entries load.
+7. **Admin Database Cockpit Real-Time Daily KPIs (`/admin`)**:
+   - Dual-metric cards displaying both cumulative **Total** and **Today's Registrations** in the exact same card box (`Today: X | Total: Y`) across all categories (Believers, Pastors, Churches, Students, Ministries, Organizations, Portal Accounts).
+   - Timezone-aware IST date matching (`cts LIKE 'YYYY-MM-DD%'`) that automatically resets at midnight every day.
+8. **District Leader Hierarchy & Subordinate Management (`/leaders`)**:
+   - Secure authorization model where admins designate District-Level Leaders by setting `d_in = 1` in `signup_form` or `pastor_reg`.
+   - Authorized district leaders viewing `/leaders` see subordinate mandal and panchayat leaders under **Believers Requests** and **Pastors Requests**, complete with level badges, contact numbers, direct phone call triggers, and one-click confirm/reject decisions (`approval_ind`).
+9. **Native Android Application (`jbac_app`)**:
+   - Android app compliant with Google Play Store standards (`targetSdkVersion 36`, `minSdkVersion 24`, release version `0.0.46` / `versionCode 46`).
    - Official production release signing via `Jbac.keystore`.
-   - Full State (`రాష్ట్రం / State`) selection and cascading district loading across search modules and all 9 registration forms.
-   - Includes real-time Telugu wait spinner alerts, immediate session persistence, and seamless login navigation.
+   - Full State (`రాష్ట్రం / State`) selection and cascading district loading across search modules and all registration forms.
+   - Optimized navigation touch targets, zero click delay, and hardware back button handling.
 
 ---
 
