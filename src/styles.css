@@ -11,12 +11,26 @@ body {
 }
 
 /* ==========================================================================
-   1. REMOVE TOP BANNER / HERO BANNER / HEADER IMAGE ON ALL PAGES
+   0. MAIN NAVIGATION HEADER & MENU (PRESERVED & ALWAYS VISIBLE)
    ========================================================================== */
+header.top_panel_wrap,
+.top_panel_wrap,
+.top_panel_wrap_inner,
+.top_panel_middle,
+.menu_main_wrap,
+.menu_main_nav_area {
+  display: block !important;
+  visibility: visible !important;
+  height: auto !important;
+  opacity: 1 !important;
+}
+
+/* ==========================================================================
+   1. REMOVE TOP PANEL IMAGE BANNER ONLY ACROSS ALL PAGES
+   ========================================================================== */
+div.top_panel_title,
 .top_panel_title,
-.top_panel_title_inner,
-.breadcrumbs_present.scheme_original.top_panel_title,
-.top_panel_style_3 {
+.top_panel_title_inner {
   display: none !important;
   height: 0 !important;
   min-height: 0 !important;
