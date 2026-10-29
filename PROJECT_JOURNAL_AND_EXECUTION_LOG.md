@@ -2566,3 +2566,34 @@ The user established six concrete operational enhancements and features across t
 - **Angular Production Web Frontend**: Compiled with Node v24 into `dist/churchwebsite` and synced to S3 bucket `jbac-web-production-298363284024`.
 - **CloudFront CDN Distribution (`EOBBU8SU7H3BI`)**: Invalidated globally with paths `/*`, `/admin*`, `/public.html`.
 - **Automated Verification**: End-to-end Python test suite (`scripts/verify_all_requirements.py`) passed 100% across all 6 feature streams. Live API verification for `getLeaderswebsiteData` confirmed full data resolution for student wing, software wing, and ward leaders.
+
+
+---
+
+## 29. Leadership Hierarchy Delegation, Hero Banner Removal & Form Beautification (October 29, 2026)
+
+### 1. Architectural Objectives & Requirements
+1. **Strict Leadership Hierarchy in `https://jbac.in/leaders`**:
+   - Approved District Leader (`generaltype = 1` or `d_in = 1`): sees Constituency Leaders only (`generaltype = 2`) within their district.
+   - Approved Constituency Leader (`generaltype = 2`): sees Mandal Leaders only (`generaltype = 3`) within their constituency.
+   - Approved Mandal Leader (`generaltype = 3`): sees Village/Panchayat and Ward Leaders (`generaltype IN (4, 5, 6)`) within their mandal.
+   - Rejection Visibility: When any leader rejects a subordinate (`approval_ind = 2`), the applicant disappears immediately from the list; only approved (`approval_ind = 1`) and unapproved (`approval_ind = 0` / `NULL`) leaders are visible.
+2. **Global Removal of The Top Banner (Hero Banner / Header Image)**:
+   - Eliminate the large graphic image featuring laptops, hands, and breadcrumbs (`.top_panel_title`) across all pages.
+3. **Redesign of The Scrolling Updates Bar (Horizontal Marquee / Announcement Bar)**:
+   - Modernized styling with dark slate/navy gradient (`#0b192c` to `#1e3e62`), crimson red `📢 UPDATES` pill badge, and smooth horizontal scrolling with gold link highlights.
+4. **Beautification of Filter Tables, Registration Tables, and Login Form**:
+   - Overhauled Jobs search card into responsive 12-column grid, eliminating fixed 273px widths and overlapping selects.
+   - Upgraded login view with modern card header (`🔐 LOGIN HERE`), sleek inputs, and full-width gradient button.
+   - Standardized universal input heights, focus rings, and card elevations across all registration and search views.
+
+### 2. Implementation Summary
+- **Backend API (`backend/server.ts`)**:
+  - In `getUserMainData`: Enabled resolution of approved Constituency and Mandal leaders in addition to District leaders.
+  - In `getLeaderswebsiteData`: Implemented one-level-down hierarchy filtering and excluded rejected applicants (`COALESCE(approval_ind, 0) != 2`).
+  - Compiled and deployed updated `backend-deploy.zip` to AWS Lambda `jbac-backend-api` in `ap-southeast-2`.
+- **Frontend Components & Templates**:
+  - In `src/app/jesus/leaders/leaders.component.ts` & `.html`: Added `getSubordinateSubtitle()` and client-side rejection filter.
+  - In `src/styles.css`: Added global removal of `.top_panel_title`, announcement bar marquee styling, and universal card/input enhancements.
+  - In `src/app/jesus/jobs/jobs.component.html`: Restructured filter card into responsive Bootstrap grid.
+  - In `src/app/jesus/login/login.component.html`: Replaced burlywood container with modern card styling.

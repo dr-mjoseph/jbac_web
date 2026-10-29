@@ -34,99 +34,74 @@
         <div class="container py-5 h-100">
             <div class="row justify-content-center align-items-center h-100">
                 <div class="col-12 col-lg-9 col-xl-7">
-                    <div class="card shadow-2-strong card-registration" style="border-radius: 15px;">
-                        <div class="card-body p-4 p-md-5" style="background-color: burlywood;border-radius: 15px;">
-                            <h3 class="mb-4 pb-2 pb-md-0 mb-md-5" style="text-align: center;">LOGIN HERE
-                            </h3>
-                            <form [formGroup]="passwordform">
-                                <div class="row">
-                                    <div class="col-md-3 mb-4"> <label><b>లాగిన్ క్యాటగిరి</b></label></div>
-                                    <div class="col-md-8 mb-4">
-                                        <div class="form-outline">
-                                            <select formControlName="category" class="form-control"
-                                                [ngClass]="{'is-invalid': Submitlogindata && f['category'].errors }">
-                                                <option value="" disabled selected>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి
-                                                </option>
-                                                <option value="1">విశ్వాసి</option>
-                                                <option value="4">పాస్టర్</option>
-                                                <option value="2">విద్యార్థి</option>
-                                                <option value="7">పాస్టర్ల అసోసియేషన్</option>
-                                                <option value="3">మినిస్ట్రీస్</option>
-                                                <option value="5">చర్చి</option>
-                                                <option value="6">క్రిస్టియన్ ఆర్గనైజెషన్ / కంపెనీ</option>
-                                                <option value="8">డాక్టర్ / కౌన్సిలర్ (Doctor / Counsellor)</option>
-                                            </select>
-                                            <div *ngIf="Submitlogindata && f['category'].errors"
-                                                class="invalid-feedback">
-                                                <div *ngIf="f['category'].errors['required']">Category
-                                                    is required</div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-1 mb-4"></div>
+                    <div class="card shadow-lg" style="border-radius: 16px; border: 1px solid #e2e8f0; overflow: hidden; box-shadow: 0 12px 36px rgba(0, 84, 143, 0.12);">
+                    <div class="card-header text-center py-4" style="background: linear-gradient(135deg, #00548F 0%, #003366 100%); color: #fff;">
+                        <h3 class="mb-1" style="font-weight: 700; color: #fff; letter-spacing: 0.5px;">🔐 LOGIN HERE</h3>
+                        <p class="mb-0" style="color: #cbd5e1; font-size: 14px;">Jesus Believers Association Council</p>
+                    </div>
+                    <div class="card-body p-4 p-md-5" style="background: #ffffff;">
+                        <form [formGroup]="passwordform">
+                            <div class="mb-3">
+                                <label class="form-label" style="font-weight: 600; color: #1e293b;"><b>లాగిన్ క్యాటగిరి / Login Category</b></label>
+                                <select formControlName="category" class="form-control"
+                                    [ngClass]="{'is-invalid': Submitlogindata && f['category'].errors }">
+                                    <option value="" disabled selected>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి (Select Category)</option>
+                                    <option value="1">విశ్వాసి (Believer)</option>
+                                    <option value="4">పాస్టర్ (Pastor)</option>
+                                    <option value="2">విద్యార్థి (Student)</option>
+                                    <option value="7">పాస్టర్ల అసోసియేషన్ (Pastors Association)</option>
+                                    <option value="3">మినిస్ట్రీస్ (Ministries)</option>
+                                    <option value="5">చర్చి (Church)</option>
+                                    <option value="6">క్రిస్టియన్ ఆర్గనైజెషన్ / కంపెనీ (Christian Organization)</option>
+                                    <option value="8">డాక్టర్ / కౌన్సిలర్ (Doctor / Counsellor)</option>
+                                </select>
+                                <div *ngIf="Submitlogindata && f['category'].errors" class="invalid-feedback">
+                                    <div *ngIf="f['category'].errors['required']">Category is required</div>
                                 </div>
-                                <br>
-                                <div class="row">
-                                    <div class="col-md-3 mb-4"><label><b>Mobile Number</b></label></div>
-                                    <div class="col-md-8 mb-4">
-                                        <div class="form-outline">
-                                            <input formControlName="mobile_number" class="form-control" type="text"
-                                                [ngClass]="{'is-invalid': Submitlogindata && f['mobile_number'].errors }"
-                                                maxlength="10" minlength="10" (keypress)="numericOnly($event)"
-                                                placeholder="Enter Number ...">
-                                            <div *ngIf="Submitlogindata && f['mobile_number'].errors"
-                                                class="invalid-feedback">
-                                                <div *ngIf="f['mobile_number'].errors['required']">Mobile
-                                                    Number is
-                                                    required</div>
-                                                <div *ngIf="f['mobile_number'].errors['minlength']">Less
-                                                    than 10
-                                                    digits</div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-1 mb-4"></div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label" style="font-weight: 600; color: #1e293b;"><b>Mobile Number / మొబైల్ నంబర్</b></label>
+                                <input formControlName="mobile_number" class="form-control" type="text"
+                                    [ngClass]="{'is-invalid': Submitlogindata && f['mobile_number'].errors }"
+                                    maxlength="10" minlength="10" (keypress)="numericOnly($event)"
+                                    placeholder="Enter 10-digit Mobile Number...">
+                                <div *ngIf="Submitlogindata && f['mobile_number'].errors" class="invalid-feedback">
+                                    <div *ngIf="f['mobile_number'].errors['required']">Mobile Number is required</div>
+                                    <div *ngIf="f['mobile_number'].errors['minlength']">Less than 10 digits</div>
                                 </div>
-                                <br>
-                                <div class="row">
-                                    <div class="col-md-3 mb-4"><label><b>Password</b></label></div>
-                                    <div class="col-md-8 mb-4">
-                                        <input formControlName="password" class="form-control" type="password"
-                                            [ngClass]="{'is-invalid': Submitlogindata && f['password'].errors }"
-                                            maxlength="16" minlength="6" placeholder="Enter Password ...">
-                                        <div *ngIf="Submitlogindata && f['password'].errors" class="invalid-feedback">
-                                            <div *ngIf="f['password'].errors['required']">Password required
-                                            </div>
-                                            <div *ngIf="f['password'].errors['minlength']">Password between
-                                                6 to 16
-                                                Characters / Digits / Specialchracters</div>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-1 mb-4"></div>
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="form-label" style="font-weight: 600; color: #1e293b;"><b>Password / పాస్‌వర్డ్</b></label>
+                                <input formControlName="password" class="form-control" type="password"
+                                    [ngClass]="{'is-invalid': Submitlogindata && f['password'].errors }"
+                                    maxlength="16" minlength="6" placeholder="Enter Password...">
+                                <div *ngIf="Submitlogindata && f['password'].errors" class="invalid-feedback">
+                                    <div *ngIf="f['password'].errors['required']">Password required</div>
+                                    <div *ngIf="f['password'].errors['minlength']">Password between 6 to 16 Characters / Digits</div>
                                 </div>
-                                <div class="row">
-                                    <div class="col-md-4 mb-4 pb-2"> </div>
-                                    <div class="col-md-2 mb-4 pb-2">
-                                        <button type="button" class="default-btn user-all-btn"
-                                            [disabled]="showSpinner"
-                                            (click)="passlogin()">
-                                            <span *ngIf="showSpinner"><i class="fa fa-spinner fa-spin me-1"></i> దయచేసి వేచి ఉండండి, ప్రాసెస్ అవుతోంది...</span>
-                                            <span *ngIf="!showSpinner">Login</span>
-                                        </button>
-                                    </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <button type="button" class="default-btn user-all-btn w-100 py-2"
+                                    [disabled]="showSpinner"
+                                    (click)="passlogin()"
+                                    style="font-size: 16px; font-weight: 600; border-radius: 8px;">
+                                    <span *ngIf="showSpinner"><i class="fa fa-spinner fa-spin me-1"></i> దయచేసి వేచి ఉండండి, ప్రాసెస్ అవుతోంది...</span>
+                                    <span *ngIf="!showSpinner">Login</span>
+                                </button>
+                            </div>
+                        </form>
+
+                        <div class="mt-4 pt-3 border-top" style="cursor: pointer;">
+                            <div class="row align-items-center">
+                                <div class="col-md-7 mb-2 mb-md-0" style="text-align: left;">
+                                    <p class="mb-1" style="font-size: 14px;">New Account? <a href="/signup" class="text-decoration-none"><strong style="color: #00548F;">Sign-Up</strong></a></p>
+                                    <p class="mb-0" style="font-size: 14px;"><i class="fa fa-user-md text-primary me-1"></i> డాక్టర్ / కౌన్సిలర్? <a routerLink="/doctorregister" class="text-decoration-none"><strong style="color: #00548F;">Doctor Registration</strong></a></p>
                                 </div>
-                            </form>
-                            <br>
-                            <div style="text-align:right;cursor: pointer;">
-                                <div class="row">
-                                    <div style="text-align: left;" class="col-md-6 mb-4 pb-2">
-                                        <p class="mb-1">New Account? <a href="/signup" class="a2"><b style="color:#4a0a0a">Sign-Up</b></a></p>
-                                        <p class="mb-0"><i class="fa fa-user-md text-primary me-1"></i> డాక్టర్ / కౌన్సిలర్ రిజిస్ట్రేషన్? <a routerLink="/doctorregister" class="a2"><b style="color:#00548F">Doctor Registration</b></a></p>
-                                    </div>
-                                    <div style="text-align: right;" class="col-md-6 mb-4 pb-2">
-                                        <p (click)="forgetpassword(forget)"><b><u>Forgot Password</u>?</b>
-                                        </p>
-                                    </div>
+                                <div class="col-md-5 text-md-end" style="text-align: right;">
+                                    <p class="mb-0" (click)="forgetpassword(forget)" style="font-size: 14px;"><strong style="color: #64748b;"><u>Forgot Password</u>?</strong></p>
                                 </div>
                             </div>
                         </div>
@@ -134,7 +109,8 @@
                 </div>
             </div>
         </div>
-    </section>
+    </div>
+</section>
     <br>
 </div>
 

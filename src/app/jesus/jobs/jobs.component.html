@@ -47,19 +47,15 @@
 
     </div>
 
-    <div id="tribe-events-content" class="tribe-events-list">
-        <marquee style="color: rgb(38, 18, 151); font-size: larger; text-align: justify;">Jobs</marquee>
-    </div>
-    <div class="container mt-3" style="padding-bottom: 28px;">
-        <h3>Jobs Searching</h3>
-        <div class="row" class="card">
+        <div class="container mt-3" style="padding-bottom: 28px;">
+        <h3 class="filter-title"><i class="fa fa-briefcase text-primary me-2"></i> Jobs Searching (ఉద్యోగాల అన్వేషణ)</h3>
+        <div class="card filter-card p-4 shadow-sm mb-4">
             <form [formGroup]="searchchurchingform">
                 <div class="row">
-                    <div class="col-md-4 mb-4 pb-2">
+                    <div class="col-lg-4 col-md-4 col-sm-12 mb-3">
                         <div class="form-outline">
-                            <label class="form-label">Job Title </label>
-                            <select class="form-control" formControlName="jobtile" style="height:37px;width: 273px;"
-                                (change)="searchjobswise($event,1);">
+                            <label class="form-label">Job Title / ఉద్యోగ శీర్షిక</label>
+                            <select class="form-control" formControlName="jobtile" (change)="searchjobswise($event,1);">
                                 <option value="" selected disabled>Select Title</option>
                                 <option value="{{item.jobtitle}}" *ngFor="let item of jobswe">
                                     {{item.jobtitle}}
@@ -67,11 +63,10 @@
                             </select>
                         </div>
                     </div>
-                    <div class="col-md-4 mb-4 pb-2">
+                    <div class="col-lg-4 col-md-4 col-sm-12 mb-3">
                         <div class="form-outline">
-                            <label class="form-label">Qualification</label>
-                            <select class="form-control" formControlName="qual" style="height:37px;width: 273px;"
-                                (change)="searchjobswise($event,2);">
+                            <label class="form-label">Qualification / అర్హత</label>
+                            <select class="form-control" formControlName="qual" (change)="searchjobswise($event,2);">
                                 <option value="" selected disabled>Select Qualification</option>
                                 <option value="{{item.qualification}}" *ngFor="let item of jobswe">
                                     {{item.qualification}}
@@ -79,38 +74,36 @@
                             </select>
                         </div>
                     </div>
-                    <div class="col-md-4 mb-4 pb-2">
+                    <div class="col-lg-4 col-md-4 col-sm-12 mb-3">
                         <div class="form-outline">
-                            <label class="form-label">Experience </label>
-                            <select class="form-control" formControlName="experience"
-                                (change)="searchjobswise($event,3);" style="height:37px;width: 273px;">
+                            <label class="form-label">Experience / అనుభవం</label>
+                            <select class="form-control" formControlName="experience" (change)="searchjobswise($event,3);">
                                 <option value="" selected disabled>Select Your Experience </option>
                                 <option value="fresher">Fresher</option>
-                                <option value="1-2">1-2</option>
-                                <option value="2-3">2-3</option>
-                                <option value="3-5">3-5</option>
-                                <option value="Above 5YEARS">Above 5 YEARS</option>
+                                <option value="1-2">1-2 Years</option>
+                                <option value="2-3">2-3 Years</option>
+                                <option value="3-5">3-5 Years</option>
+                                <option value="Above 5YEARS">Above 5 Years</option>
                             </select>
                         </div>
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-md-3 mb-4 pb-2">
+                    <div class="col-lg-3 col-md-6 col-sm-12 mb-3">
                         <div class="form-outline">
-                            <label class="form-label">రాష్ట్రం / State </label>
-                            <select class="form-control" formControlName="state_id"
-                                (change)="onStateChange($event);" style="height:37px;width: 273px;">
+                            <label class="form-label">రాష్ట్రం / State</label>
+                            <select class="form-control" formControlName="state_id" (change)="onStateChange($event);">
                                 <option value="">అన్నీ (All States)</option>
                                 <option value="1">ఆంధ్రప్రదేశ్ (AP)</option>
                                 <option value="2">తెలంగాణ (TG)</option>
                             </select>
                         </div>
                     </div>
-                    <div class="col-md-3 mb-4 pb-2">
+                    <div class="col-lg-3 col-md-6 col-sm-12 mb-3">
                         <div class="form-outline">
-                            <label class="form-label">Select Districts </label>
+                            <label class="form-label">జిల్లా / District</label>
                             <select class="form-control" formControlName="district_id" (change)="onDistrictChange($event);"
-                                style="height:37px;width: 273px;" [disabled]="!searchchurchingform.get('state_id')?.value">
+                                [disabled]="!searchchurchingform.get('state_id')?.value">
                                 <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
                                 <option value="{{item.id}}" *ngFor="let item of districts">
                                     {{item.distrct_nm}}
@@ -118,11 +111,11 @@
                             </select>
                         </div>
                     </div>
-                    <div class="col-md-2 mb-4 pb-2">
+                    <div class="col-lg-2 col-md-4 col-sm-12 mb-3">
                         <div class="form-outline">
-                            <label class="form-label">నియోజకవర్గం ఎంచుకోండి </label>
+                            <label class="form-label">నియోజకవర్గం / Constituency</label>
                             <select class="form-control" formControlName="constenncy_id" (change)="onConstituencyChange($event);"
-                                style="height:37px;width: 273px;" [disabled]="!searchchurchingform.get('district_id')?.value">
+                                [disabled]="!searchchurchingform.get('district_id')?.value">
                                 <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
                                 <option value="{{item.id}}" *ngFor="let item of constituency">
                                     {{item.const_nm}}
@@ -130,12 +123,11 @@
                             </select>
                         </div>
                     </div>
-                    <br>
-                    <div class="col-md-2 mb-4 pb-2">
+                    <div class="col-lg-2 col-md-4 col-sm-12 mb-3">
                         <div class="form-outline">
-                            <label class="form-label">మండలం ఎంచుకోండి </label>
+                            <label class="form-label">మండలం / Mandal</label>
                             <select class="form-control" formControlName="mandal_id" (change)="onMandalChange($event);"
-                                style="height:37px;width: 273px;" [disabled]="!searchchurchingform.get('constenncy_id')?.value">
+                                [disabled]="!searchchurchingform.get('constenncy_id')?.value">
                                 <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
                                 <option value="{{item.id}}" *ngFor="let item of mandals">
                                     {{item.mndl_nm}}
@@ -143,11 +135,11 @@
                             </select>
                         </div>
                     </div>
-                    <div class="col-md-2 mb-4 pb-2">
+                    <div class="col-lg-2 col-md-4 col-sm-12 mb-3">
                         <div class="form-outline">
-                            <label class="form-label">పంచాయతీ ఎంచుకోండి </label>
+                            <label class="form-label">పంచాయతీ / Panchayat</label>
                             <select class="form-control" formControlName="panchayati_id" (change)="onPanchayatiChange($event);"
-                                style="height:37px;width: 273px;" [disabled]="!searchchurchingform.get('mandal_id')?.value">
+                                [disabled]="!searchchurchingform.get('mandal_id')?.value">
                                 <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
                                 <option value="{{item.id}}" *ngFor="let item of panchayati">
                                     {{item.pnchyt_nm}}
@@ -155,12 +147,14 @@
                             </select>
                         </div>
                     </div>
-                    <div class="col-md-3 mb-4 pb-2">
-                        <br>
-                        <button type="submit" (click)="search()" class="default-btn user-all-btn">Search
+                </div>
+                <div class="row">
+                    <div class="col-12 mt-2 d-flex gap-2 justify-content-end">
+                        <button type="submit" (click)="search()" class="default-btn user-all-btn">
+                            <i class="fa fa-search me-1"></i> Search
                         </button>
-                        &nbsp;&nbsp;
-                        <button type="button" (click)="reset()" class="default-btn user-all-btn" style="background-color: #6c757d;">Reset
+                        <button type="button" (click)="reset()" class="default-btn user-all-btn" style="background: linear-gradient(135deg, #64748b 0%, #475569 100%) !important;">
+                            <i class="fa fa-refresh me-1"></i> Reset
                         </button>
                     </div>
                 </div>

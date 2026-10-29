@@ -3563,10 +3563,62 @@ app.all(['/dashboardapi/getLeaderswebsiteData', '/dashboardapi/getLeaderswebsite
     try {
         const b = req.body || req.query || {};
         const districtId = b.district_id || b.districtId || null;
+        const constituencyId = b.constituency_id || b.constituencyId || null;
+        const mandalId = b.mandal_id || b.mandalId || null;
+        const genType = Number(b.generaltype || b.generalType || 1);
         const currentUserId = b.usr_id || b.user_id || -1;
 
-        if (districtId) {
-            // Fetch believers under this district (mandal/panchayat/constituency wise)
+        if (districtId || constituencyId || mandalId) {
+            let bWhere = '';
+            let pWhere = '';
+            let queryParams: any[] = [];
+
+            // Hierarchy Rules:
+            // 1. District Leader (genType == 1):
+            //    Visible subordinate: Constituency Leaders ONLY (generaltype == '2') within this district.
+            // 2. Constituency Leader (genType == 2):
+            //    Visible subordinate: Mandal Leaders ONLY (generaltype == '3') within this constituency.
+            // 3. Mandal Leader (genType == 3):
+            //    Visible subordinate: Panchayat & Ward Leaders (generaltype IN ('4', '5', '6') or ward/subward) within this mandal.
+            // In all cases: Rejected leaders (approval_ind == 2) must disappear from the list (only approved == 1 and unapproved == 0/null visible).
+            if (genType === 1 && districtId) {
+                bWhere = 's.district_id = ? AND s.generaltype = "2"';
+                pWhere = 'pr.district_id = ? AND pr.generaltype = "2"';
+                queryParams = [districtId];
+            } else if (genType === 2 && (constituencyId || districtId)) {
+                if (constituencyId) {
+                    bWhere = 's.constituency_id = ? AND s.generaltype = "3"';
+                    pWhere = 'pr.constituency_id = ? AND pr.generaltype = "3"';
+                    queryParams = [constituencyId];
+                } else {
+                    bWhere = 's.district_id = ? AND s.generaltype = "3"';
+                    pWhere = 'pr.district_id = ? AND pr.generaltype = "3"';
+                    queryParams = [districtId];
+                }
+            } else if (genType === 3 && (mandalId || constituencyId || districtId)) {
+                if (mandalId) {
+                    bWhere = 's.mandal_id = ? AND (s.generaltype IN ("4", "5", "6") OR s.wardnumber IS NOT NULL OR s.subward IS NOT NULL)';
+                    pWhere = 'pr.mandal_id = ? AND (pr.generaltype IN ("4", "5", "6") OR pr.subward IS NOT NULL)';
+                    queryParams = [mandalId];
+                } else if (constituencyId) {
+                    bWhere = 's.constituency_id = ? AND (s.generaltype IN ("4", "5", "6") OR s.wardnumber IS NOT NULL OR s.subward IS NOT NULL)';
+                    pWhere = 'pr.constituency_id = ? AND (pr.generaltype IN ("4", "5", "6") OR pr.subward IS NOT NULL)';
+                    queryParams = [constituencyId];
+                } else {
+                    bWhere = 's.district_id = ? AND (s.generaltype IN ("4", "5", "6") OR s.wardnumber IS NOT NULL OR s.subward IS NOT NULL)';
+                    pWhere = 'pr.district_id = ? AND (pr.generaltype IN ("4", "5", "6") OR pr.subward IS NOT NULL)';
+                    queryParams = [districtId];
+                }
+            } else if (districtId) {
+                bWhere = 's.district_id = ?';
+                pWhere = 'pr.district_id = ?';
+                queryParams = [districtId];
+            }
+
+            // Exclude rejected leaders (approval_ind == 2) and exclude current logged in leader themselves
+            const bFullWhere = `${bWhere} AND COALESCE(s.approval_ind, 0) != 2 AND s.id != ?`;
+            const pFullWhere = `${pWhere} AND COALESCE(pr.approval_ind, 0) != 2 AND pr.id != ?`;
+
             const [believers]: any = await db.query(`
                 SELECT s.id, s.fname, s.lname, s.mobile_number, s.generaltype, s.leadership, s.leadertype,
                        s.wingtype, s.wingtypes, s.wardnumber, s.subward,
@@ -3581,13 +3633,10 @@ app.all(['/dashboardapi/getLeaderswebsiteData', '/dashboardapi/getLeaderswebsite
                 LEFT JOIN mndls_lst_t m ON s.mandal_id = m.id
                 LEFT JOIN pnchyt_lst_t p ON s.panchayat_id = p.id
                 LEFT JOIN wings w ON s.wingtype = w.id
-                WHERE s.district_id = ? 
-                  AND (LOWER(COALESCE(s.leadership, '')) = 'yes' OR s.leadertype IS NOT NULL OR s.generaltype IS NOT NULL)
-                  AND s.id != ?
+                WHERE ${bFullWhere}
                 ORDER BY s.id DESC
-            `, [districtId, currentUserId]);
+            `, [...queryParams, currentUserId]);
 
-            // Fetch pastors under this district (mandal/panchayat/constituency wise)
             const [pastors]: any = await db.query(`
                 SELECT pr.id, pr.pastorname, pr.phonenumber, pr.generaltype, pr.leadership, pr.leadertype,
                        pr.wingtype, pr.wingtypes, pr.subward,
@@ -3602,14 +3651,12 @@ app.all(['/dashboardapi/getLeaderswebsiteData', '/dashboardapi/getLeaderswebsite
                 LEFT JOIN mndls_lst_t m ON pr.mandal_id = m.id
                 LEFT JOIN pnchyt_lst_t p ON pr.village_id = p.id
                 LEFT JOIN wings w ON pr.wingtype = w.id
-                WHERE pr.district_id = ? 
-                  AND (LOWER(COALESCE(pr.leadership, '')) = 'yes' OR pr.leadertype IS NOT NULL OR pr.generaltype IS NOT NULL)
-                  AND pr.id != ?
+                WHERE ${pFullWhere}
                 ORDER BY pr.id DESC
-            `, [districtId, currentUserId]);
+            `, [...queryParams, currentUserId]);
 
             // Fetch constituencies for this district
-            const [constituencies]: any = await db.query('SELECT id, const_nm FROM const_dtl_t WHERE dstrct_id = ? AND d_in = 0', [districtId]);
+            const [constituencies]: any = await db.query('SELECT id, const_nm FROM const_dtl_t WHERE dstrct_id = ? AND d_in = 0', [districtId || 0]);
 
             return res.json({ status: 200, data: [believers, constituencies, pastors] });
         }
@@ -3742,57 +3789,52 @@ app.all(['/dashboardapi/getUserMainData', '/dashboardapi/getUserMainData/:id', '
 
         let matchedLeader: any = null;
 
+        const resolveLeader = (u: any, role: string) => {
+            if (!u) return null;
+            let genType = Number(u.generaltype) || 0;
+            if (u.d_in == 1 && (!genType || genType === 1)) {
+                genType = 1;
+            }
+            // An approved leader has d_in == 1 OR approval_ind == 1
+            const isApproved = (u.d_in == 1) || (Number(u.approval_ind) === 1);
+            if (isApproved && (genType === 1 || genType === 2 || genType === 3)) {
+                return {
+                    id: u.id,
+                    leadertype: Number(u.leadertype) || 1,
+                    generaltype: genType,
+                    state_id: u.state_id || 1,
+                    district_id: u.district_id,
+                    constituency_id: u.constituency_id,
+                    mandal_id: u.mandal_id,
+                    village_id: u.village_id,
+                    fname: u.name,
+                    d_in: u.d_in,
+                    approval_ind: u.approval_ind,
+                    role: role
+                };
+            }
+            return null;
+        };
+
         // 1. Search in pastor_reg (Pastor)
         if (cat === '4' || !matchedLeader) {
             const [pRows]: any = await db.query(
-                'SELECT id, pastorname as name, phonenumber as mobile_number, leadership, leadertype, generaltype, wingtype, district_id, constituency_id, mandal_id, village_id, state_id, d_in FROM pastor_reg WHERE (id = ? OR phonenumber = ?) LIMIT 1',
+                'SELECT id, pastorname as name, phonenumber as mobile_number, leadership, leadertype, generaltype, wingtype, district_id, constituency_id, mandal_id, village_id, state_id, d_in, approval_ind FROM pastor_reg WHERE (id = ? OR phonenumber = ?) LIMIT 1',
                 [usrId || -1, phone || '']
             );
             if (pRows && pRows.length > 0) {
-                const u = pRows[0];
-                // Admin decides if user is registered as district level leader by setting d_in = 1 in db
-                if (u.d_in == 1) {
-                    matchedLeader = {
-                        id: u.id,
-                        leadertype: 1, // General leader
-                        generaltype: 1, // District level leader
-                        state_id: u.state_id || 1,
-                        district_id: u.district_id,
-                        constituency_id: u.constituency_id,
-                        mandal_id: u.mandal_id,
-                        village_id: u.village_id,
-                        fname: u.name,
-                        d_in: 1,
-                        role: 'pastor'
-                    };
-                }
+                matchedLeader = resolveLeader(pRows[0], 'pastor');
             }
         }
 
         // 2. Search in signup_form (Believer)
         if (!matchedLeader && (cat === '1' || !cat)) {
             const [bRows]: any = await db.query(
-                'SELECT id, CONCAT(fname, " ", COALESCE(lname, "")) as name, mobile_number, leadership, leadertype, generaltype, wingtype, district_id, constituency_id, mandal_id, panchayat_id as village_id, state_id, d_in FROM signup_form WHERE (id = ? OR mobile_number = ?) LIMIT 1',
+                'SELECT id, CONCAT(fname, " ", COALESCE(lname, "")) as name, mobile_number, leadership, leadertype, generaltype, wingtype, district_id, constituency_id, mandal_id, panchayat_id as village_id, state_id, d_in, approval_ind FROM signup_form WHERE (id = ? OR mobile_number = ?) LIMIT 1',
                 [usrId || -1, phone || '']
             );
             if (bRows && bRows.length > 0) {
-                const u = bRows[0];
-                // Admin decides if user is registered as district level leader by setting d_in = 1 in db
-                if (u.d_in == 1) {
-                    matchedLeader = {
-                        id: u.id,
-                        leadertype: 1, // General leader
-                        generaltype: 1, // District level leader
-                        state_id: u.state_id || 1,
-                        district_id: u.district_id,
-                        constituency_id: u.constituency_id,
-                        mandal_id: u.mandal_id,
-                        village_id: u.village_id,
-                        fname: u.name,
-                        d_in: 1,
-                        role: 'believer'
-                    };
-                }
+                matchedLeader = resolveLeader(bRows[0], 'believer');
             }
         }
 
@@ -3808,7 +3850,7 @@ app.all(['/dashboardapi/getUserMainData', '/dashboardapi/getUserMainData/:id', '
             return res.json({ status: 200, data: [matchedLeader] });
         }
 
-        // Not approved as district leader (d_in != 1)
+        // Not approved as a leader
         res.json({ status: 200, data: [] });
     } catch (err: any) {
         res.status(500).json({ status: 500, error: err.message });

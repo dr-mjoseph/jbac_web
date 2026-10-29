@@ -85,8 +85,10 @@ Welcome to the **Jesus Believers Association Council (JBAC)** unified ecosystem 
    - Timezone-aware IST date matching (`cts LIKE 'YYYY-MM-DD%'`) that automatically resets at midnight every day.
 8. **District Leader Hierarchy & Subordinate Management (`/leaders`)**:
    - Secure authorization model where admins designate District-Level Leaders by setting `d_in = 1` in `signup_form` or `pastor_reg`.
-   - Authorized district leaders viewing `/leaders` see subordinate mandal and panchayat leaders under **Believers Requests** and **Pastors Requests**, complete with level badges, contact numbers, direct phone call triggers, and one-click confirm/reject decisions (`approval_ind`).
+   - **Strict One-Level-Down Delegation**: District leaders view constituency leaders; constituency leaders view mandal leaders; mandal leaders view ward and panchayat leaders.
+   - **Rejection Visibility**: Rejected leader requests (`approval_ind = 2`) disappear immediately from the list; only approved (`approval_ind = 1`) and pending (`approval_ind = 0`) remain visible.
    - **Detailed Leadership Status Badges**: If a leader is from a specific wing (e.g. Student Wing, Software Wing, Drivers Wing, Media Reporters, Social Media), the exact wing name and role are displayed (e.g. `స్టూడెంట్ వింగ్ (Student Wing) - సోషల్ మీడియా లీడర్`). If from panchayat, ward, or sub-ward, detailed designations (`వార్డు నెం. 1 లీడర్`, `సబ్ వార్డు లీడర్`) and distinct color-coded badges are rendered.
+   - **Clean Modern Interface**: Top graphic hero banners removed across all pages, horizontal announcement marquee bar modernized, and search filter cards enhanced with responsive Bootstrap grids.
 9. **Native Android Application (`jbac_app`)**:
    - Android app compliant with Google Play Store standards (`targetSdkVersion 36`, `minSdkVersion 24`, release version `0.0.46` / `versionCode 46`).
    - Official production release signing via `Jbac.keystore`.

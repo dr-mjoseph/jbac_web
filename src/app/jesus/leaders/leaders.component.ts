@@ -81,15 +81,13 @@ export class LeadersComponent {
             panchayat_id: res.data[0].village_id
           }
           this.service.getLeaderswebsiteD(data).subscribe((result: any) => {
-            this.belearr = result.data[0];
+            const rawBelievers = result.data[0] || [];
+            const rawPastors = result.data[2] || [];
+            // Keep only approved (1) and unapproved (0 / null); hide rejected (2)
+            this.belearr = rawBelievers.filter((x: any) => Number(x?.approval_ind) !== 2);
             this.contituencyname = result.data[1];
-            // this.studentarr = result.data[1];
-            this.pastorarr = result.data[2];
-         //   this.contituencynamebel = result.data[3];
-          // console.log(this.pastorarr);
-
+            this.pastorarr = rawPastors.filter((x: any) => Number(x?.approval_ind) !== 2);
             console.log(this.belearr, this.contituencyname, this.pastorarr, 'leader')
-
           })
         } else if (res.data[0].leadertype == 2) {
           this.wingtypes = res.data[0].wingtypes
@@ -179,6 +177,17 @@ export class LeadersComponent {
   }
 
   
+    getSubordinateSubtitle(): string {
+    if (this.myresdata == 1) {
+      return 'నియోజకవర్గాల వారిగా (Constituency-wise)';
+    } else if (this.myresdata == 2) {
+      return 'మండలాల వారిగా (Mandal-wise)';
+    } else if (this.myresdata == 3) {
+      return 'గ్రామ / వార్డు వారిగా (Village / Ward-wise)';
+    }
+    return 'మండల / పంచాయితీ వారిగా';
+  }
+
   getDetailedLeaderStatus(x: any): string {
     if (!x) return 'లీడర్ (Leader)';
 
