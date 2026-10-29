@@ -47,3 +47,4 @@ try:
             print("   - Student:", s.get("fname"), "wing_name:", s.get("wing_name"))
 except Exception as e:
     print("Test 2 error:", e)
+

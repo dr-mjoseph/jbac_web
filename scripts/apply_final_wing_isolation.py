@@ -367,3 +367,4 @@ def update_backend(file_path):
 
 update_backend('backend/server.js')
 update_backend('backend/server.ts')
+
