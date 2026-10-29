@@ -76,6 +76,8 @@ export class LeadersComponent {
           var data = {
             "usr_id": sessionStorage.getItem("usr_id"),
             "category_id": sessionStorage.getItem("category_id"),
+            "leadertype": res.data[0].leadertype,
+            "wingtypes": res.data[0].wingtypes,
             "generaltype": res.data[0].generaltype,
             state_id: res.data[0].state_id || 1,
             district_id: res.data[0].district_id,
@@ -95,7 +97,7 @@ export class LeadersComponent {
             console.log(this.belearr, this.contituencyname, this.pastorarr, this.studentarr, 'leader')
           })
         } else if (res.data[0].leadertype == 2) {
-          this.wingtypes = res.data[0].wingtypes
+          this.wingtypes = res.data[0].wing_name || res.data[0].wingtypes || "";
           if (res.data[0].generaltype == 0) {
             this.generals = "State";
             this.general = "District";
@@ -115,6 +117,8 @@ export class LeadersComponent {
           var data4 = {
             "usr_id": sessionStorage.getItem("usr_id"),
             "category_id": sessionStorage.getItem("category_id"),
+            "leadertype": res.data[0].leadertype,
+            "wingtypes": res.data[0].wingtypes,
             "generaltype": res.data[0].generaltype,
             wingtype: res.data[0].wingtype,
             state_id: res.data[0].state_id || 1,
