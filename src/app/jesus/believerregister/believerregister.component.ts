@@ -90,6 +90,7 @@ export class BelieverregisterComponent {
     this.getstates();
     this.getdenomations();
     this.getwing();
+    this.getleaderlevels();
     const datePipe = new DatePipe('en-Us');
     this.now = datePipe.transform(new Date(), 'yyyy-MM-dd');
     this.usr_id = sessionStorage.getItem('usr_id');
@@ -357,6 +358,14 @@ export class BelieverregisterComponent {
     }, error => {
 
     })
+  }
+  leaderlevel: any = [];
+  getleaderlevels() {
+    this.service.getleaderlevel().subscribe((res: any) => {
+      this.leaderlevel = res && res.data ? res.data : [];
+    }, error => {
+      this.leaderlevel = [];
+    });
   }
   getwing() {
     this.service.getwing().subscribe((res: any) => {

@@ -832,7 +832,12 @@ app.get(['/dashboardapi/admin-dashboard-stats', '/api/admin-dashboard-stats', '/
                 const [r]: any = await db.query(`SELECT COUNT(*) as cnt FROM \`${tbl}\` ${where}`);
                 return r && r[0] ? Number(r[0].cnt) : 0;
             } catch (_) {
-                return 0;
+                try {
+                    const [r2]: any = await db.query(`SELECT COUNT(*) as cnt FROM \`${tbl}\` ${baseWhere ? baseWhere.trim() : ''}`);
+                    return r2 && r2[0] ? Number(r2[0].cnt) : 0;
+                } catch (e2) {
+                    return 0;
+                }
             }
         }
 
@@ -854,7 +859,17 @@ app.get(['/dashboardapi/admin-dashboard-stats', '/api/admin-dashboard-stats', '/
                 const [r]: any = await db.query(`SELECT COUNT(*) as cnt FROM \`${tbl}\` ${where}`);
                 return r && r[0] ? Number(r[0].cnt) : 0;
             } catch (_) {
-                return 0;
+                try {
+                    let dateCondition = `(cts LIKE '${todayDate}%' OR (cts IS NULL AND i_ts LIKE '${todayDate}%'))`;
+                    if (tbl === 'events') {
+                        dateCondition = `(cts LIKE '${todayDate}%' OR startdate = '${todayDate}')`;
+                    }
+                    let fallbackWhere = baseWhere ? `${baseWhere.trim()} AND ${dateCondition}` : `WHERE ${dateCondition}`;
+                    const [r2]: any = await db.query(`SELECT COUNT(*) as cnt FROM \`${tbl}\` ${fallbackWhere}`);
+                    return r2 && r2[0] ? Number(r2[0].cnt) : 0;
+                } catch (e2) {
+                    return 0;
+                }
             }
         }
 

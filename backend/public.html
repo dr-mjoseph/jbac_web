@@ -1198,6 +1198,18 @@
         <div class="metric-card-footer">independentorganisation_reg &bull; Total: <span id="stat-orgs-total">--</span></div>
       </div>
 
+      <div class="metric-card" onclick="openStateCategoryQuery('pastors_associations')">
+        <div class="metric-card-header">
+          <span>Pastor Associations</span>
+          <div class="metric-card-icon">🤝</div>
+        </div>
+        <div class="metric-card-stat-row">
+          <div class="metric-card-value" id="stat-pastor-associations">--</div>
+          <div class="metric-today-badge" title="Registered Today"><span class="metric-today-dot"></span>Today: <strong id="stat-pastor-associations-today">0</strong></div>
+        </div>
+        <div class="metric-card-footer">pastors_associations &bull; Total: <span id="stat-pastor-associations-total">--</span></div>
+      </div>
+
       <div class="metric-card" onclick="openStateCategoryQuery('events')">
         <div class="metric-card-header">
           <span>Active Events</span>
@@ -1882,6 +1894,7 @@
           setStat('stat-students', s.students, s.students_today);
           setStat('stat-ministries', s.ministries, s.ministries_today);
           setStat('stat-orgs', s.organisations, s.organisations_today);
+          setStat('stat-pastor-associations', s.pastor_associations, s.pastor_associations_today);
           setStat('stat-events', s.events_active, s.events_today);
           setStat('stat-users', s.users, s.users_today);
           if (document.getElementById('stat-events-total')) {

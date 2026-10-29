@@ -16,14 +16,19 @@
 
     <div class="container mt-4">
         <div class="row justify-content-center">
-            <div class="col-lg-4 col-md-6 mb-3" style="text-align: center;">
+            <div class="col-lg-4 col-md-4 mb-3" style="text-align: center;">
                 <button type="button" class="btn btn-lg w-100" [style.background-color]="formshow == 1 ? '#00548F' : '#f0f4f8'" [style.color]="formshow == 1 ? '#fff' : '#00548F'" style="font-weight: 600; border: 2px solid #00548F; padding: 12px 24px; border-radius: 8px;" (click)="make(1)">
                     👥 Believers Requests (విశ్వాసులు)
                 </button>
             </div>
-            <div class="col-lg-4 col-md-6 mb-3" style="text-align: center;">
+            <div class="col-lg-4 col-md-4 mb-3" style="text-align: center;">
                 <button type="button" class="btn btn-lg w-100" [style.background-color]="formshow == 3 ? '#8b0000' : '#fcf0f0'" [style.color]="formshow == 3 ? '#fff' : '#8b0000'" style="font-weight: 600; border: 2px solid #8b0000; padding: 12px 24px; border-radius: 8px;" (click)="make(3)">
                     ✝️ Pastors Requests (పాస్టర్లు)
+                </button>
+            </div>
+            <div class="col-lg-4 col-md-4 mb-3" style="text-align: center;">
+                <button type="button" class="btn btn-lg w-100" [style.background-color]="formshow == 2 ? '#1e7e34' : '#f0fdf4'" [style.color]="formshow == 2 ? '#fff' : '#1e7e34'" style="font-weight: 600; border: 2px solid #1e7e34; padding: 12px 24px; border-radius: 8px;" (click)="make(2)">
+                    🎓 Students Requests (విద్యార్థులు)
                 </button>
             </div>
         </div>
@@ -135,4 +140,69 @@
         </section>
     </div>
     <br><br>
+
+    <!-- Students Requests Table -->
+    <div *ngIf="formshow == 2">
+        <section class="contact main-blog">
+            <div class="container">
+                <h3 style="text-align: center; margin-bottom: 20px; color: #1e7e34;">
+                    {{general != '' ? general + ' Level Student Leaders Requests' : 'Student Leaders Requests'}} ({{getSubordinateSubtitle()}})
+                </h3>
+                <div class="table-responsive" style="background: #fff; box-shadow: 0 4px 12px rgba(0,0,0,0.08); border-radius: 8px; overflow: hidden;">
+                    <table class="table table-hover table-bordered mb-0" style="width: 100%; border-collapse: collapse;">
+                        <thead style="background-color: #1e7e34; color: #fff;">
+                            <tr>
+                                <th style="padding: 12px; text-align: center; width: 60px;">S No.</th>
+                                <th style="padding: 12px;">పేరు (Name)</th>
+                                <th style="padding: 12px;">నాయకత్వ స్థాయి</th>
+                                <th style="padding: 12px;">నియోజకవర్గం</th>
+                                <th style="padding: 12px;">మండలం</th>
+                                <th style="padding: 12px;">పంచాయితీ / గ్రామం</th>
+                                <th style="padding: 12px; text-align: center;">ఫోన్ కాల్</th>
+                                <th style="padding: 12px; text-align: center; width: 140px;">నిర్ణయం</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let x of studentarr; let i = index">
+                                <td style="text-align: center; vertical-align: middle; font-weight: 600;">{{i+1}}</td>
+                                <td style="vertical-align: middle; font-weight: 600;">{{x.fname}} {{x.lname || ''}}</td>
+                                <td style="vertical-align: middle;">
+                                    <span style="display: inline-block; padding: 5px 12px; border-radius: 6px; font-weight: 600; font-size: 13px; background-color: #e8f5e9; color: #1e7e34; border: 1px solid #c8e6c9;">
+                                        {{getDetailedLeaderStatus(x)}}
+                                    </span>
+                                </td>
+                                <td style="vertical-align: middle;">{{x.constituency_name || 'N/A'}}</td>
+                                <td style="vertical-align: middle;">{{x.mandal_name || 'N/A'}}</td>
+                                <td style="vertical-align: middle;">{{x.panchayat_name || x.nativeplace || 'N/A'}}</td>
+                                <td style="text-align: center; vertical-align: middle;">
+                                    <a *ngIf="x.mobile_number" href="tel:{{x.mobile_number}}" style="color: #28a745; font-size: 18px;" title="Call {{x.mobile_number}}">
+                                        📞
+                                    </a>
+                                </td>
+                                <td style="text-align: center; vertical-align: middle;">
+                                    <div *ngIf="x.approval_ind == 1" style="color: #1e7e34; font-weight: bold; font-size: 13px;">
+                                        ✓ Approved
+                                    </div>
+                                    <div *ngIf="x.approval_ind != 1" style="display: flex; flex-direction: column; gap: 6px; align-items: center;">
+                                        <button class="btn btn-sm" style="background-color: #1e7e34; color: #fff; font-size: 12px; padding: 4px 12px; border-radius: 4px; border: none; width: 90px;" (click)="confirm(2, x.id)">
+                                            అనుమతించు
+                                        </button>
+                                        <button class="btn btn-sm" style="background-color: #8b0000; color: #fff; font-size: 12px; padding: 4px 12px; border-radius: 4px; border: none; width: 90px;" (click)="deleteAlert(2, x.id)">
+                                            తిరస్కరించు
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr *ngIf="!studentarr || studentarr.length == 0">
+                                <td colspan="8" style="text-align: center; padding: 30px; font-weight: 600; color: #64748b;">
+                                    ℹ️ ఎటువంటి విద్యార్థి అభ్యర్థనలు లేవు / No Student Requests
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <br>
+            </div>
+        </section>
+    </div>
 </div>

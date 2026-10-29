@@ -12,7 +12,16 @@ export class HeaderComponent {
 
   name: any;
   usr_id: any;
-  logincon: boolean = false
+  logincon: boolean = false;
+  mobileMenuOpen: boolean = false;
+
+  toggleMobileMenu(): void {
+    this.mobileMenuOpen = !this.mobileMenuOpen;
+  }
+
+  closeMobileMenu(): void {
+    this.mobileMenuOpen = false;
+  }
 
   constructor(private service: ServiceService, private router: Router) { }
 
