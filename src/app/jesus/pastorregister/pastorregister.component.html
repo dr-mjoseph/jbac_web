@@ -323,8 +323,7 @@
                                                     <label class="form-label">రాష్ట్రం / State <span
                                                             style="color:red; -webkit-text-stroke-width:thick;">*</span></label>
                                                     <select class="form-control" formControlName="state_id"
-                                                        (change)="onStateChange($event);"
-                                                        style="height:37px;width: 273px;">
+                                                        (change)="onStateChange($event);">
                                                         <option value="1">ఆంధ్రప్రదేశ్ (Andhra Pradesh - AP)</option>
                                                         <option value="2">తెలంగాణ (Telangana - TG)</option>
                                                     </select>
@@ -337,7 +336,6 @@
                                                     </label>
                                                     <select class="form-control" formControlName="district_id"
                                                         (change)="getconstency($event);"
-                                                        style="height:37px;width: 273px;"
                                                         [ngClass]="{'is-invalid': submitted && o['district_id'].errors }" [disabled]="!pastorform.get('state_id')?.value">
                                                         <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి
                                                         </option>
@@ -351,14 +349,16 @@
                                                             తప్పనిసరిగా సెలెక్ట్ చేయాలి </div>
                                                     </div>
                                                 </div>
-
                                             </div>
+                                        </div>
+
+                                        <div class="row">
                                             <div class="col-md-6 mb-4 pb-2">
                                                 <div class="form-outline">
                                                     <label class="form-label">నియోజకవర్గం ఎంచుకోండి <span
                                                             style="color:red; -webkit-text-stroke-width:thick;">*</span></label>
                                                     <select class="form-control" formControlName="constituency_id"
-                                                        (change)="getmandals($event);" style="height:37px;width: 273px;"
+                                                        (change)="getmandals($event);"
                                                         [ngClass]="{'is-invalid': submitted && o['constituency_id'].errors }" [disabled]="!pastorform.get('district_id')?.value">
                                                         <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి
                                                         </option>
@@ -373,10 +373,6 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                        </div>
-                                        <br>
-
-                                        <div class="row">
                                             <div class="col-md-6 mb-4 pb-2">
                                                 <div class="form-outline">
                                                     <label class="form-label">మండలం ఎంచుకోండి<span
@@ -384,7 +380,6 @@
                                                     </label>
                                                     <select class="form-control" formControlName="mandal_id"
                                                         (change)="gepanchayati($event);"
-                                                        style="height:37px;width: 273px;"
                                                         [ngClass]="{'is-invalid': submitted && o['mandal_id'].errors }" [disabled]="!pastorform.get('constituency_id')?.value">
                                                         <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి
                                                         </option>
@@ -399,6 +394,9 @@
                                                     </div>
                                                 </div>
                                             </div>
+                                        </div>
+
+                                        <div class="row">
                                             <div class="col-md-6 mb-4 pb-2">
                                                 <div class="form-outline">
                                                     <label class="form-label">పంచాయతీ ఎంచుకోండి<span
@@ -407,7 +405,6 @@
                                                     <select class="form-control" formControlName="panchayat_id"
                                                         (click)="onPanchayatClick()"
                                                         (focus)="onPanchayatClick()"
-                                                        style="height:37px;width: 273px;"
                                                         [ngClass]="{'is-invalid': submitted && o['panchayat_id'].errors }" [disabled]="!pastorform.get('mandal_id')?.value">
                                                         <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి
                                                         </option>
@@ -421,11 +418,7 @@
                                                             తప్పనిసరిగా సెలెక్ట్ చేయాలి </div>
                                                     </div>
                                                 </div>
-
                                             </div>
-                                        </div>
-                                        <br>
-                                        <div class="row">
                                             <div class="col-md-6 mb-4 pb-2">
                                                 <div class="form-outline">
                                                     <label class="form-label">గ్రామం పేరు / స్ట్రీట్ పేరు<span
@@ -441,18 +434,18 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div class="col-md-6 mb-4 pb-2">
+                                        </div>
+
+                                        <div class="row">
+                                            <div class="col-12 mb-4 pb-2">
                                                 <div class="form-outline">
                                                     <label class="form-label">ఇంటి నెంబర్ & ఇంకా ఏమైనా అడ్రస్ కి
                                                         సంబంధించి ఉంటే</label>
                                                     <textarea formControlName="ward" class="form-control"
-                                                        placeholder="ఇక్కడ క్లిక్ చేసి నమోదు చేయండి"
-                                                        style="width: 280px;"></textarea>
-
+                                                        placeholder="ఇక్కడ క్లిక్ చేసి నమోదు చేయండి"></textarea>
                                                 </div>
                                             </div>
                                         </div>
-                                        <br>
                                     </div>
                                     <br>
                                     <div class="row">

@@ -11,18 +11,46 @@ body {
 }
 
 /* ==========================================================================
-   0. MAIN NAVIGATION HEADER & MENU (PRESERVED & ALWAYS VISIBLE)
+   0. MAIN NAVIGATION HEADER & MENU (RESPONSIVE SEPARATION)
    ========================================================================== */
-header.top_panel_wrap,
-.top_panel_wrap,
-.top_panel_wrap_inner,
-.top_panel_middle,
-.menu_main_wrap,
-.menu_main_nav_area {
-  display: block !important;
-  visibility: visible !important;
-  height: auto !important;
-  opacity: 1 !important;
+/* Desktop Header (>= 1024px) */
+@media (min-width: 1024px) {
+  header.top_panel_wrap,
+  .top_panel_wrap,
+  .top_panel_wrap_inner,
+  .top_panel_middle,
+  .menu_main_wrap,
+  .menu_main_nav_area {
+    display: block !important;
+    visibility: visible !important;
+    height: auto !important;
+    opacity: 1 !important;
+  }
+  .header_mobile {
+    display: none !important;
+    visibility: hidden !important;
+    height: 0 !important;
+    overflow: hidden !important;
+  }
+}
+
+/* Mobile Header (< 1024px) */
+@media (max-width: 1023px) {
+  header.top_panel_wrap,
+  .top_panel_wrap,
+  .top_panel_wrap_inner,
+  .top_panel_middle,
+  .menu_main_wrap,
+  .menu_main_nav_area {
+    display: none !important;
+    visibility: hidden !important;
+    height: 0 !important;
+    overflow: hidden !important;
+  }
+  .header_mobile {
+    display: block !important;
+    visibility: visible !important;
+  }
 }
 
 /* ==========================================================================
@@ -165,7 +193,9 @@ h3.filter-title {
 /* Form outlines & groups */
 .form-outline,
 .form-group {
-  margin-bottom: 14px !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+  margin-bottom: 16px !important;
 }
 
 .form-outline .form-label,
@@ -177,6 +207,7 @@ h3.filter-title {
   margin-bottom: 6px !important;
   display: inline-block !important;
   letter-spacing: 0.2px !important;
+  width: 100% !important;
 }
 
 /* Universal Form Controls - Responsive and Attractive */
@@ -185,11 +216,23 @@ h3.filter-title {
 .card input.form-control,
 .card textarea.form-control,
 .filter-card .form-control,
+.filter-card select.form-control,
+.filter-card input.form-control,
 .form-outline .form-control,
+.form-outline select.form-control,
+.form-outline input.form-control,
 .form-group .form-control,
-.card-registration .form-control {
+.form-group select.form-control,
+.form-group input.form-control,
+.card-registration .form-control,
+.card-registration select.form-control,
+.card-registration input.form-control,
+select.form-control,
+input.form-control,
+textarea.form-control {
   width: 100% !important;
   max-width: 100% !important;
+  box-sizing: border-box !important;
   height: 42px !important;
   min-height: 42px !important;
   border-radius: 8px !important;
@@ -202,15 +245,36 @@ h3.filter-title {
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04) !important;
 }
 
+/* Allow textareas to expand naturally */
+.card textarea.form-control,
+.card-registration textarea.form-control,
+textarea.form-control {
+  height: auto !important;
+  min-height: 70px !important;
+  resize: vertical !important;
+}
+
+/* Select Dropdown - Single Clean Crisp Chevron (Appearance None to prevent double arrow) */
+select.form-control,
 .card select.form-control,
 .filter-card select.form-control,
-.card-registration select.form-control {
+.card-registration select.form-control,
+.form-outline select.form-control,
+.form-group select.form-control {
   cursor: pointer !important;
-  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e") !important;
+  -webkit-appearance: none !important;
+  -moz-appearance: none !important;
+  appearance: none !important;
+  background-color: #ffffff !important;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23334155' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e") !important;
   background-repeat: no-repeat !important;
-  background-position: right 0.75rem center !important;
-  background-size: 14px 10px !important;
-  padding-right: 2rem !important;
+  background-position: right 14px center !important;
+  background-size: 12px 8px !important;
+  padding-right: 36px !important;
+}
+
+select.form-control::-ms-expand {
+  display: none !important;
 }
 
 .card .form-control:focus,
@@ -226,7 +290,8 @@ h3.filter-title {
 
 .card .form-control:disabled,
 .card select.form-control:disabled,
-.form-outline select.form-control:disabled {
+.form-outline select.form-control:disabled,
+.card-registration select.form-control:disabled {
   background-color: #f1f5f9 !important;
   color: #94a3b8 !important;
   cursor: not-allowed !important;
@@ -255,6 +320,49 @@ h3.filter-title {
   border-bottom: 2px solid #e2e8f0 !important;
   padding-bottom: 10px !important;
   margin-bottom: 24px !important;
+}
+
+/* Inner Nested Cards (like Address / చిరునామా) */
+.card-registration .card,
+.card-registration .card-registration,
+.card .card {
+  padding: 24px 22px !important;
+  margin-top: 20px !important;
+  margin-bottom: 24px !important;
+  border: 1.5px solid #e2e8f0 !important;
+  border-radius: 14px !important;
+  background-color: #f8fafc !important;
+  box-shadow: 0 2px 8px rgba(0, 84, 143, 0.04) !important;
+  box-sizing: border-box !important;
+  overflow: visible !important;
+}
+
+.card-registration .card > p,
+.card-registration .card-registration > p {
+  font-weight: 700 !important;
+  font-size: 16px !important;
+  color: #00548F !important;
+  margin-bottom: 18px !important;
+  border-bottom: 1.5px solid #cbd5e1 !important;
+  padding-bottom: 8px !important;
+  display: block !important;
+  width: 100% !important;
+}
+
+/* Prevent Row Overflow and Misalignment Inside Cards */
+.card .row,
+.card-registration .row,
+.filter-card .row {
+  margin-left: -10px !important;
+  margin-right: -10px !important;
+}
+
+.card .row > [class*="col-"],
+.card-registration .row > [class*="col-"],
+.filter-card .row > [class*="col-"] {
+  padding-left: 10px !important;
+  padding-right: 10px !important;
+  box-sizing: border-box !important;
 }
 
 /* Buttons */
