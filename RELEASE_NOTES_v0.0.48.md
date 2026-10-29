@@ -92,3 +92,4 @@ SELECT ... FROM signup_form s
 WHERE s.mandal_id = ? AND (s.generaltype IN ('4', '5', '6') OR s.wardnumber IS NOT NULL OR s.subward IS NOT NULL)
   AND COALESCE(s.approval_ind, 0) != 2 AND s.id != ?;
 ```
+
