@@ -159,9 +159,9 @@
                                                         placeholder="ఇక్కడ క్లిక్ చేసి ఎంటర్ చేయండి"
                                                         maxlength="10" minlength="10"
                                                         (keypress)="numericOnly($event)"
-                                                        [ngClass]="{'is-invalid': submitted && r['whatsapp']?.errors }" />
-                                                    <div *ngIf="submitted && r['whatsapp']?.errors" class="invalid-feedback">
-                                                        <div *ngIf="r['whatsapp']?.errors?.['minlength'] || r['whatsapp']?.errors?.['maxlength']">
+                                                        [ngClass]="{'is-invalid': submitted && r['whatsapp'].errors }" />
+                                                    <div *ngIf="submitted && r['whatsapp'].errors" class="invalid-feedback">
+                                                        <div *ngIf="r['whatsapp'].errors && (r['whatsapp'].errors['minlength'] || r['whatsapp'].errors['maxlength'])">
                                                             10 అంకెలు వాట్సాప్ నంబర్ మాత్రమే ఎంటర్ చేయండి
                                                         </div>
                                                     </div>

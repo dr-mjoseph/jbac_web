@@ -41,6 +41,7 @@ export class NewsComponent {
 
   }
   ngOnInit(): void {
+    this.showSpinner = true;
     this.getnews();
     this.getadds();
   }
@@ -66,6 +67,9 @@ export class NewsComponent {
     }
   }
   postnews() {
+    if (this.showSpinner) {
+      return;
+    }
     this.submitted = true;
     this.showSpinner = true; // Start spinner
   
@@ -78,6 +82,7 @@ export class NewsComponent {
     const data = {
       description: this.addingnews.value.description,
       news: this.addingnews.value.news,
+      image: (this.imagesData && this.imagesData[0]) ? this.imagesData[0].reviewimg : '',
       reviewImg: this.imagesData
     };
   
@@ -200,18 +205,23 @@ export class NewsComponent {
 
 
   getnews() {
-    this.service.getupdatenews().subscribe(res => {
-      console.log(res.data);
-      if (res.status == 202) {
-        Swal.fire(res.message);
-      } else if (res.status == 200) {
-        this.searchnews = res.data;
-        console.log(res.data);
+    this.showSpinner = true;
+    this.service.getupdatenews().subscribe({
+      next: (res: any) => {
+        if (res.status == 202) {
+          Swal.fire(res.message);
+        } else if (res.status == 200) {
+          this.searchnews = res.data;
+        }
+      },
+      error: (err: any) => {
+        console.error('Error loading news:', err);
+        this.showSpinner = false;
+      },
+      complete: () => {
+        this.showSpinner = false;
       }
-    }, error => {
-
-    })
-
+    });
   }
 
   adds: any;

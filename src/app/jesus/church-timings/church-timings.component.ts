@@ -11,10 +11,10 @@ import Swal from 'sweetalert2';
   styleUrls: ['./church-timings.component.css']
 })
 export class ChurchTimingsComponent {
-  mandals: any;
-  constituency: any;
-  panchayati: any;
-  districts: any;
+  mandals: any = [];
+  constituency: any = [];
+  panchayati: any = [];
+  districts: any = [];
   church: any;
   searchdist: any;
   searchconts: any;
@@ -43,7 +43,6 @@ export class ChurchTimingsComponent {
       this.router.navigate(['/']);
     }
     this.getstates();
-    this.getdistric();
     this.churchtimings();
     this.getdenomations();
     this.getbeliver();
@@ -150,7 +149,6 @@ export class ChurchTimingsComponent {
         }
       });
     } else {
-      this.getdistric();
       this.churchtimings();
     }
   }
@@ -205,6 +203,7 @@ export class ChurchTimingsComponent {
 
   reset() {
     this.searchchurchingform.reset({
+      state_id: '',
       district_id: '',
       constenncy_id: '',
       mandal_id: '',
@@ -216,6 +215,7 @@ export class ChurchTimingsComponent {
     });
     this.searchdist = '';
     this.searchconts = '';
+    this.districts = [];
     this.constituency = [];
     this.mandals = [];
     this.panchayati = [];

@@ -309,12 +309,17 @@
                                                             style="color:red; -webkit-text-stroke-width:thick;">*</span></label>
                                                     <select class="form-control" formControlName="state_id"
                                                         (change)="onStateChange($event);"
+                                                        [ngClass]="{'is-invalid': submitted && t['state_id'].errors }"
                                                         style="height:37px;width: 273px;">
-                                                        <option value="" selected disabled>సెలెక్ట్ రాష్ట్రం</option>
+                                                        <option value="" selected disabled>సెలెక్ట్ రాష్ట్రం / Select State</option>
                                                         <option value="{{item.id}}" *ngFor="let item of states">
                                                             {{item.state_name}}
                                                         </option>
                                                     </select>
+                                                    <div *ngIf="submitted && t['state_id'].errors"
+                                                        class="invalid-feedback">
+                                                        <div *ngIf="t['state_id'].errors && t['state_id'].errors['required']">సెలెక్ట్ రాష్ట్రం / Select State</div>
+                                                    </div>
                                                 </div>
                                             </div>
                                             <div class="col-md-6 mb-4 pb-2">
@@ -323,9 +328,10 @@
                                                             style="color:red; -webkit-text-stroke-width:thick;">*</span></label>
                                                     <select class="form-control" formControlName="districtname"
                                                         (change)="getconstency($event);"
+                                                        [disabled]="!addingmeetings.value.state_id || districts.length === 0"
                                                         [ngClass]="{'is-invalid': submitted && t['districtname'].errors }"
                                                         style="height:37px;width: 273px;">
-                                                        <option value="" selected disabled>సెలెక్ట్ జిల్లా</option>
+                                                        <option value="" selected disabled>{{ !addingmeetings.value.state_id ? 'దయచేసి మొదట రాష్ట్రాన్ని ఎంచుకోండి' : 'సెలెక్ట్ జిల్లా' }}</option>
                                                         <option value="{{item.id}}" *ngFor="let item of districts">
                                                             {{item.distrct_nm}}
                                                         </option>
@@ -339,13 +345,14 @@
                                             </div>
                                             <div class="col-md-6 mb-4 pb-2">
                                                 <div class="form-outline">
-                                                    <label class="form-label">2). సెలెక్ట్ నియోజకవర్గం <span
+                                                    <label class="form-label">3). సెలెక్ట్ నియోజకవర్గం <span
                                                             style="color:red; -webkit-text-stroke-width:thick;">*</span>
                                                     </label>
                                                     <select class="form-control" formControlName="constituencyname"
                                                         (change)="getmandals($event);" style="height:37px;width: 273px;"
+                                                        [disabled]="!addingmeetings.value.districtname || constituency.length === 0"
                                                         [ngClass]="{'is-invalid': submitted && t['constituencyname'].errors }">
-                                                        <option value="" selected disabled>సెలెక్ట్ నియోజకవర్గం</option>
+                                                        <option value="" selected disabled>{{ !addingmeetings.value.districtname ? 'దయచేసి మొదట జిల్లాను ఎంచుకోండి' : 'సెలెక్ట్ నియోజకవర్గం' }}</option>
                                                         <option value="{{item.id}}" *ngFor="let item of constituency">
                                                             {{item.const_nm}}
                                                         </option>
@@ -363,15 +370,16 @@
                                         <div class="row">
                                             <div class="col-md-6 mb-4 pb-2">
                                                 <div class="form-outline">
-                                                    <label class="form-label">3). సెలెక్ట్ మండలం / మున్సిపాలిటీ
+                                                    <label class="form-label">4). సెలెక్ట్ మండలం / మున్సిపాలిటీ
                                                         <span
                                                             style="color:red; -webkit-text-stroke-width:thick;">*</span>
                                                     </label>
                                                     <select class="form-control" formControlName="mandals"
                                                         (change)="gepanchayati($event);"
                                                         style="height:37px;width: 273px;"
+                                                        [disabled]="!addingmeetings.value.constituencyname || mandals.length === 0"
                                                         [ngClass]="{'is-invalid': submitted && t['mandals'].errors }">
-                                                        <option value="" selected disabled>సెలెక్ట్ మండలం / మున్సిపాలిటీ
+                                                        <option value="" selected disabled>{{ !addingmeetings.value.constituencyname ? 'దయచేసి మొదట నియోజకవర్గాన్ని ఎంచుకోండి' : 'సెలెక్ట్ మండలం / మున్సిపాలిటీ' }}
                                                         </option>
                                                         <option value="{{item.id}}" *ngFor="let item of mandals">
                                                             {{item.mndl_nm}}
@@ -386,12 +394,13 @@
                                             </div>
                                             <div class="col-md-6 mb-4 pb-2">
                                                 <div class="form-outline">
-                                                    <label class="form-label">4). సెలెక్ట్ పంచాయతీ/వార్డు <span
+                                                    <label class="form-label">5). సెలెక్ట్ పంచాయతీ/వార్డు <span
                                                             style="color:red; -webkit-text-stroke-width:thick;">*</span></label>
                                                     <select class="form-control" formControlName="village_name"
-                                                        [ngClass]="{'is-invalid': submitted && t['mandals'].errors }"
+                                                        [disabled]="!addingmeetings.value.mandals || panchayati.length === 0"
+                                                        [ngClass]="{'is-invalid': submitted && t['village_name'].errors }"
                                                         style="height:37px;width: 273px;">
-                                                        <option value="" selected disabled>సెలెక్ట్ పంచాయతీ/వార్డు
+                                                        <option value="" selected disabled>{{ !addingmeetings.value.mandals ? 'దయచేసి మొదట మండలాన్ని ఎంచుకోండి' : 'సెలెక్ట్ పంచాయతీ/వార్డు' }}
                                                         </option>
                                                         <option value="{{item.id}}" *ngFor="let item of panchayati">
                                                             {{item.pnchyt_nm}}

@@ -1,0 +1,6 @@
+{
+  "gradle.autoDetect": "off",
+  "gradle.nestedProjects": false,
+  "java.import.gradle.enabled": false,
+  "gradle.javaDebug.clean": false
+}

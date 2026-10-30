@@ -24,17 +24,17 @@ export class StudentregisterComponent {
     { id: 1, state_name: 'Andhra Pradesh-ఆంధ్రప్రదేశ్ (AP)', name: 'Andhra Pradesh-ఆంధ్రప్రదేశ్ (AP)', code: 'AP' },
     { id: 2, state_name: 'Telangana-తెలంగాణ (TG)', name: 'Telangana-తెలంగాణ (TG)', code: 'TG' }
   ];
-  districts: any;
-  mandals: any;
-  mandals1: any;
-  panchayati: any;
-  panchayati1: any;
+  districts: any = [];
+  mandals: any = [];
+  mandals1: any = [];
+  panchayati: any = [];
+  panchayati1: any = [];
   bliversdata: any;
   studentform: FormGroup;
 
   district: any;
-  constituency: any;
-  constituency1: any;
+  constituency: any = [];
+  constituency1: any = [];
   panchayatis: any;
   imagedata: any = []
   wings: any;
@@ -59,7 +59,7 @@ export class StudentregisterComponent {
       passexam: [''],
       tmarks: ['', [Validators.required]],
       mmarks: ['', [Validators.required]],
-      state_id: ['1'],
+      state_id: ['', [Validators.required]],
       district_id: [''],
       constituency_id: [''],
       mandal_id: [''],
@@ -82,7 +82,7 @@ export class StudentregisterComponent {
       respanchayati: ['', [Validators.required]],
       resmandals: ['', [Validators.required]],
       resconstituencyname: ['', [Validators.required]],
-      res_state_id: ['1'],
+      res_state_id: ['', [Validators.required]],
       resdistricts: ['', [Validators.required]],
       god: [''],
       term: [true],
@@ -102,7 +102,6 @@ export class StudentregisterComponent {
   ngOnInit(): void {
     this.getdenomations();
     this.getstates();
-    this.getdistric(1);
     this.getwing();
     this.getpastor();
     this.getchurch();
@@ -174,36 +173,43 @@ export class StudentregisterComponent {
   }
 
   onStateChange(event: any) {
-    const stateId = event?.target?.value || '1';
+    const stateId = event && event.target ? event.target.value : event;
     this.studentform.patchValue({
       district_id: '',
       constituency_id: '',
       mandal_id: '',
       village_id: ''
     });
+    this.districts = [];
     this.constituency = [];
     this.mandals = [];
     this.panchayati = [];
-    this.getdistric(stateId);
+    if (stateId) {
+      this.getdistric(stateId);
+    }
   }
 
   onResStateChange(event: any) {
-    const stateId = event?.target?.value || '1';
+    const stateId = event && event.target ? event.target.value : event;
     this.studentform.patchValue({
       resdistricts: '',
       resconstituencyname: '',
       resmandals: '',
       respanchayati: ''
     });
+    this.districts = [];
     this.constituency1 = [];
     this.mandals1 = [];
     this.panchayati1 = [];
-    this.getdistric(stateId);
+    if (stateId) {
+      this.getdistric(stateId);
+    }
   }
 
   getdistric(stateId?: any) {
+    const sid = stateId || this.studentform.get('state_id')?.value;
+    if (!sid) return;
     this.showSpinner = true;
-    const sid = stateId || this.studentform.get('state_id')?.value || 1;
     this.service.getdistrict(sid).subscribe(
       (res: any) => {
         if (res && res.data) {
@@ -237,7 +243,11 @@ export class StudentregisterComponent {
   //   })
   // }
   getconstency(event: any) {
-    const id = event.target.value?.trim(); // Ensure valid ID
+    const id = event.target.value?.trim();
+    this.studentform.patchValue({ constituency_id: '', mandal_id: '', village_id: '' });
+    this.constituency = [];
+    this.mandals = [];
+    this.panchayati = []; // Ensure valid ID
 
     if (!id) {
       Swal.fire({
@@ -290,7 +300,11 @@ export class StudentregisterComponent {
   //   })
   // }
   getconstency1(event: any) {
-    const id = event.target.value?.trim(); // Ensure valid ID
+    const id = event.target.value?.trim();
+    this.studentform.patchValue({ resconstituencyname: '', resmandals: '', respanchayati: '' });
+    this.constituency1 = [];
+    this.mandals1 = [];
+    this.panchayati1 = []; // Ensure valid ID
 
     if (!id) {
       Swal.fire({
@@ -343,7 +357,10 @@ export class StudentregisterComponent {
   //   })
   // }
   getmandals(event: any) {
-    const id = event.target.value?.trim(); // Ensure ID is valid
+    const id = event.target.value?.trim();
+    this.studentform.patchValue({ mandal_id: '', village_id: '' });
+    this.mandals = [];
+    this.panchayati = []; // Ensure ID is valid
 
     if (!id) {
       Swal.fire({
@@ -407,7 +424,10 @@ export class StudentregisterComponent {
   //   })
   // }
   getmandals1(event: any) {
-    const id = event.target.value?.trim(); // Ensure ID is valid
+    const id = event.target.value?.trim();
+    this.studentform.patchValue({ resmandals: '', respanchayati: '' });
+    this.mandals1 = [];
+    this.panchayati1 = []; // Ensure ID is valid
 
     if (!id) {
       Swal.fire({
@@ -455,7 +475,9 @@ export class StudentregisterComponent {
   }
 
   gepanchayati(event: any) {
-    const id = event.target.value?.trim(); // Ensure valid ID
+    const id = event.target.value?.trim();
+    this.studentform.patchValue({ village_id: '' });
+    this.panchayati = []; // Ensure valid ID
 
     if (!id) {
       Swal.fire({
@@ -512,7 +534,9 @@ export class StudentregisterComponent {
   //   })
   // }
   gepanchayati1(event: any) {
-    const id = event.target.value?.trim(); // Ensure valid ID
+    const id = event.target.value?.trim();
+    this.studentform.patchValue({ respanchayati: '' });
+    this.panchayati1 = []; // Ensure valid ID
 
     if (!id) {
       Swal.fire({

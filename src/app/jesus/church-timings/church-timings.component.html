@@ -144,7 +144,7 @@
                                 <div class="form-outline">
                                     <label class="form-label">Select Districts <span
                                             style="color:red; -webkit-text-stroke-width:thick;">*</span> </label>
-                                    <select class="form-control" formControlName="district_id"
+                                    <select class="form-control" formControlName="district_id" [disabled]="!searchchurchingform.get('state_id')?.value"
                                         (change)="getconstency($event);" style="height:37px;width: 273px;"
                                         [ngClass]="{'is-invalid': submitted && h['district_id'].errors }">
                                         <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
@@ -162,7 +162,7 @@
                                 <div class="form-outline">
                                     <label class="form-label">నియోజకవర్గం ఎంచుకోండి <span
                                             style="color:red; -webkit-text-stroke-width:thick;">*</span> </label>
-                                    <select class="form-control" formControlName="constenncy_id"
+                                    <select class="form-control" formControlName="constenncy_id" [disabled]="!searchchurchingform.get('district_id')?.value"
                                         (change)="getmandals($event);" style="height:37px;width: 273px;"
                                         [ngClass]="{'is-invalid': submitted && h['constenncy_id'].errors }">
                                         <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
@@ -181,7 +181,7 @@
                                 <div class="form-outline">
                                     <label class="form-label">మండలం ఎంచుకోండి <span
                                             style="color:red; -webkit-text-stroke-width:thick;">*</span> </label>
-                                    <select class="form-control" formControlName="mandal_id"
+                                    <select class="form-control" formControlName="mandal_id" [disabled]="!searchchurchingform.get('constenncy_id')?.value"
                                         (change)="gepanchayati($event);" style="height:37px;width: 273px;"
                                         [ngClass]="{'is-invalid': submitted && h['mandal_id'].errors }">
                                         <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>

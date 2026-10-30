@@ -31,10 +31,10 @@ export class AddchurchtimingsComponent {
   modalReference = null;
   hello: any;
   ProofValue: any;
-  constituency: any;
-  mandals: any;
-  districts: any;
-  panchayati: any;
+  constituency: any = [];
+  mandals: any = [];
+  districts: any = [];
+  panchayati: any = [];
   usr_id: any;
   name: any;
   imagesData: any = [];
@@ -77,7 +77,7 @@ export class AddchurchtimingsComponent {
       time_end: ['', [Validators.required]],
       description: ['', [Validators.required]],
       church: ['', [Validators.required]],
-      state_id: ['1', [Validators.required]],
+      state_id: ['', [Validators.required]],
       district_id: ['', [Validators.required]],
       constituency_id: ['', [Validators.required]],
       mandal_id: ['', [Validators.required]],
@@ -281,7 +281,6 @@ export class AddchurchtimingsComponent {
   ngOnInit(): void {
     this.getservice();
     this.getstates();
-    this.getdistric();
     this.getchurch();
     this.personaldata();
     this.getbelivers();
@@ -401,7 +400,10 @@ export class AddchurchtimingsComponent {
     if (this.addingchurchtimimngs.invalid) {
       Swal.fire('* ఉన్న తప్పనిసరి  ఫీల్డ్స్ ఎంటర్ చేయండి');
     } else {
+      const sId = Number(this.addingchurchtimimngs.value.state_id) || (Number(this.addingchurchtimimngs.value.district_id) >= 31 && Number(this.addingchurchtimimngs.value.district_id) <= 63 ? 2 : 1);
       var data = {
+        state_id: sId,
+        state: sId === 2 ? 'Telangana' : 'Andhra Pradesh',
         service_name: this.addingchurchtimimngs.value.service_name,
         day: this.addingchurchtimimngs.value.day,
         time_start: this.addingchurchtimimngs.value.time_start,
@@ -721,6 +723,8 @@ export class AddchurchtimingsComponent {
   }
   getmandals(event: any) {
     var id = event.target.value;
+    this.addingchurchtimimngs.patchValue({ mandal_id: '', church: '' });
+    this.mandals = [];
     this.service.getmandals().subscribe(res => {
       if (res.status == 202) {
         Swal.fire(res.message);
@@ -734,6 +738,9 @@ export class AddchurchtimingsComponent {
 
   getconstency(event: any) {
     var id = event.target.value;
+    this.addingchurchtimimngs.patchValue({ constituency_id: '', mandal_id: '', church: '' });
+    this.constituency = [];
+    this.mandals = [];
     this.service.getconsistencys().subscribe(res => {
       this.constituency = res.data.filter((data: any) => data.dstrct_id == id);
     });

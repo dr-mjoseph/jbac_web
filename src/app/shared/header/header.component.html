@@ -348,15 +348,15 @@
 
 <div class="header_mobile" >
     <div class="content_wrap">
-        <div class="menu_button icon-menu"></div>
+        <div class="menu_button icon-menu" (click)="toggleMobileMenu()" title="Open Navigation"></div>
         <div class="logo">
             <a href="index.html">
                 <img src="assets/images/App-view-Logo-header.png" class="logo_main" alt="">
             </a>
         </div>
     </div>
-    <div class="side_wrap" >
-        <div class="close">Close</div>
+    <div class="side_wrap" [class.open]="mobileMenuOpen">
+        <div class="close" (click)="closeMobileMenu()">✕ Close</div>
         <div class="panel_top">
          <!--   <nav class="menu_main_nav_area">
                 <ul id="menu_main_mobile" class="menu_main_nav">
@@ -368,52 +368,52 @@
                                     [routerLinkActiveOptions]="{exact: true}">About Us</a>
                             </li> 
                             <li class="menu-item">
-                                <a routerLink="/about" routerLinkActive="active"
+                                <a (click)="closeMobileMenu()" routerLink="/about" routerLinkActive="active"
                                     [routerLinkActiveOptions]="{exact: true}">నా గురుంచి</a>
                             </li> 
                             <li class="menu-item">
-                                <a routerLink="/newspage" routerLinkActive="active"
+                                <a (click)="closeMobileMenu()" routerLink="/newspage" routerLinkActive="active"
                                     [routerLinkActiveOptions]="{exact: true}">వార్తా పత్రికలలో జోసెఫ్ గారి అభిప్రాయాలు</a>
                             </li>
                             <li class="menu-item">
-                                <a routerLink="/josephview" routerLinkActive="active"
+                                <a (click)="closeMobileMenu()" routerLink="/josephview" routerLinkActive="active"
                                     [routerLinkActiveOptions]="{exact: true}">ప్రభుత్వం మీద జోసెఫ్ గారి అభిప్రాయం </a>
                             </li>
                             <li class="menu-item">
-                                <a routerLink="/survey-news" routerLinkActive="active"
+                                <a (click)="closeMobileMenu()" routerLink="/survey-news" routerLinkActive="active"
                                     [routerLinkActiveOptions]="{exact: true}">క్రైస్తవులకి ప్రభుత్వం సేవలు మీద సర్వే</a>
                             </li>
                             <li class="menu-item" >
-                                <a routerLink="/videospage" routerLinkActive="active"
+                                <a (click)="closeMobileMenu()" routerLink="/videospage" routerLinkActive="active"
                                     [routerLinkActiveOptions]="{exact: true}">క్రైస్తవుల మేలుకొల్పు వీడియో గేలరీ </a>
                             </li>
                             <li class="menu-item" >
-                                <a routerLink="/addattacks" routerLinkActive="active"
+                                <a (click)="closeMobileMenu()" routerLink="/addattacks" routerLinkActive="active"
                                     [routerLinkActiveOptions]="{exact: true}">క్రైస్తవులపై దాడుల నమోదు </a>
                             </li> 
                             
                             <li class="menu-item">
-                                <a routerLink="/church-pastor-search" routerLinkActive="active"
+                                <a (click)="closeMobileMenu()" routerLink="/church-pastor-search" routerLinkActive="active"
                                     [routerLinkActiveOptions]="{exact: true}">Name-Search </a>
                             </li> 
                             <li class="menu-item">
-                                <a routerLink="/webhelp" routerLinkActive="active"
+                                <a (click)="closeMobileMenu()" routerLink="/webhelp" routerLinkActive="active"
                                     [routerLinkActiveOptions]="{exact: true}">వెబ్ సైట్ ఎలా ఉపయోగించాలి</a>
                             </li>
                             <li class="menu-item">
-                                <a routerLink="/techsol" routerLinkActive="active"
+                                <a (click)="closeMobileMenu()" routerLink="/techsol" routerLinkActive="active"
                                     [routerLinkActiveOptions]="{exact: true}">మీ చర్చికి మా టెక్నికల్ సొల్లుషన్స్</a>
                             </li> 
                              <li class="menu-item">
-                                <a routerLink="/gallery" routerLinkActive="active"
+                                <a (click)="closeMobileMenu()" routerLink="/gallery" routerLinkActive="active"
                                     [routerLinkActiveOptions]="{exact: true}">ఫోటో గేలరీ</a>
                             </li> 
                             <li class="menu-item">
-                                <a routerLink="/contactus" routerLinkActive="active"
+                                <a (click)="closeMobileMenu()" routerLink="/contactus" routerLinkActive="active"
                                     [routerLinkActiveOptions]="{exact: true}">Contact Us</a>
                             </li>
                             <li class="menu-item">
-                                <a routerLink="/" routerLinkActive="active"
+                                <a (click)="closeMobileMenu()" routerLink="/" routerLinkActive="active"
                                     [routerLinkActiveOptions]="{exact: true}">Home </a>
                             </li>
                             
@@ -483,7 +483,7 @@
                                     [routerLinkActiveOptions]="{exact: true}">Marriages</a>
                             </li>
                             <li class="menu-item" *ngIf="notlogin">
-                                <a routerLink="/family-councelling" routerLinkActive="active"
+                                <a (click)="closeMobileMenu()" routerLink="/family-councelling" routerLinkActive="active"
                                     [routerLinkActiveOptions]="{exact: true}">Family Counselling</a>
                             </li>
                             <li class="menu-item" *ngIf="notlogin">
@@ -603,50 +603,50 @@
                     <a routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">మా గురుంచి</a>
                     <ul class="sub-menu" >
                         <li class="menu-item">
-                            <a routerLink="/about" routerLinkActive="active"
+                            <a (click)="closeMobileMenu()" routerLink="/about" routerLinkActive="active"
                                 [routerLinkActiveOptions]="{exact: true}">నా గురుంచి</a>
                         </li>
                         <li class="menu-item" >
-                            <a routerLink="/ourhelp" routerLinkActive="active"
+                            <a (click)="closeMobileMenu()" routerLink="/ourhelp" routerLinkActive="active"
                                 [routerLinkActiveOptions]="{exact: true}">మీకు మా సహాయం</a>
                         </li> 
                         <li class="menu-item" >
-                            <a routerLink="/churchgo" routerLinkActive="active"
+                            <a (click)="closeMobileMenu()" routerLink="/churchgo" routerLinkActive="active"
                                 [routerLinkActiveOptions]="{exact: true}">చర్చి పర్మిషన్ గవర్నమెంట్ ఆర్డర్స్</a>
                         </li>
                         <!-- <li class="menu-item" >
-                            <a routerLink="/newspage" routerLinkActive="active"
+                            <a (click)="closeMobileMenu()" routerLink="/newspage" routerLinkActive="active"
                                 [routerLinkActiveOptions]="{exact: true}">ఆంధ్రరాష్ట్ర  క్రైస్తవ  కాన్ఫరెన్స్</a>
                         </li>  -->
                         
                         <li class="menu-item">
-                            <a routerLink="/webhelp" routerLinkActive="active"
+                            <a (click)="closeMobileMenu()" routerLink="/webhelp" routerLinkActive="active"
                                 [routerLinkActiveOptions]="{exact: true}">వెబ్ సైట్ ఎలా ఉపయోగించాలి</a>
                         </li>
                         <li class="menu-item">
-                            <a routerLink="/techsol" routerLinkActive="active"
+                            <a (click)="closeMobileMenu()" routerLink="/techsol" routerLinkActive="active"
                                 [routerLinkActiveOptions]="{exact: true}">మీ చర్చికి మా టెక్నికల్ సొల్లుషన్స్</a>
                         </li> 
                          <li class="menu-item">
-                            <a routerLink="/gallery" routerLinkActive="active"
+                            <a (click)="closeMobileMenu()" routerLink="/gallery" routerLinkActive="active"
                                 [routerLinkActiveOptions]="{exact: true}">ఫోటో గేలరీ</a>
                         </li> 
                         <li class="menu-item" >
-                            <a routerLink="/news" routerLinkActive="active"
+                            <a (click)="closeMobileMenu()" routerLink="/news" routerLinkActive="active"
                                 [routerLinkActiveOptions]="{exact: true}">క్రైస్తవులకు సంబందించిన వార్తలు పెట్టండి
                             </a>
                         </li>
                         <li class="menu-item">
-                            <a routerLink="/addattacks" routerLinkActive="active"
+                            <a (click)="closeMobileMenu()" routerLink="/addattacks" routerLinkActive="active"
                                 [routerLinkActiveOptions]="{exact: true}">క్రైస్తవులపై దాడుల నమోదు </a>
                         </li>
                         
                         <li class="menu-item">
-                            <a routerLink="/contactus" routerLinkActive="active"
+                            <a (click)="closeMobileMenu()" routerLink="/contactus" routerLinkActive="active"
                                 [routerLinkActiveOptions]="{exact: true}">Contact Us</a>
                         </li>
                         <li class="menu-item">
-                            <a routerLink="/" routerLinkActive="active"
+                            <a (click)="closeMobileMenu()" routerLink="/" routerLinkActive="active"
                                 [routerLinkActiveOptions]="{exact: true}">Home </a>
                         </li>
                     </ul>
@@ -655,11 +655,11 @@
                 </li>
                 
                 <!-- <li class="menu-item" >
-                    <a routerLink="/newspage" routerLinkActive="active"
+                    <a (click)="closeMobileMenu()" routerLink="/newspage" routerLinkActive="active"
                         [routerLinkActiveOptions]="{exact: true}">ఆంధ్ర క్రైస్తవ  కాన్ఫరెన్స్</a>
                 </li> -->
                 <!-- <li class="menu-item">
-                    <a routerLink="/apchristianpolitics" routerLinkActive="active"
+                    <a (click)="closeMobileMenu()" routerLink="/apchristianpolitics" routerLinkActive="active"
                     [routerLinkActiveOptions]="{exact: true}">ఆంధ్ర క్రైస్తవుల ఓట్ ఎవరికీ / క్రైస్తవులకి అన్యాయం</a>
                 </li> -->
                 
@@ -669,29 +669,29 @@
                         
                         
                        <li class="menu-item">
-                            <a routerLink="/newspage" routerLinkActive="active"
+                            <a (click)="closeMobileMenu()" routerLink="/newspage" routerLinkActive="active"
                                 [routerLinkActiveOptions]="{exact: true}">వార్తా పత్రికలలో జోసెఫ్ గారి అభిప్రాయాలు</a>
                         </li>
                         <li class="menu-item">
-                            <a routerLink="/josephview" routerLinkActive="active"
+                            <a (click)="closeMobileMenu()" routerLink="/josephview" routerLinkActive="active"
                                 [routerLinkActiveOptions]="{exact: true}">ప్రభుత్వం మీద జోసెఫ్ గారి అభిప్రాయం </a>
                         </li>
                         <li class="menu-item">
-                            <a routerLink="/survey-news" routerLinkActive="active"
+                            <a (click)="closeMobileMenu()" routerLink="/survey-news" routerLinkActive="active"
                                 [routerLinkActiveOptions]="{exact: true}">క్రైస్తవులకి ప్రభుత్వం సేవలు మీద సర్వే</a>
                         </li>
                         <li class="menu-item" >
-                            <a routerLink="/videospage" routerLinkActive="active"
+                            <a (click)="closeMobileMenu()" routerLink="/videospage" routerLinkActive="active"
                                 [routerLinkActiveOptions]="{exact: true}">క్రైస్తవుల మేలుకొల్పు వీడియో గేలరీ </a>
                         </li>
                         
                         <li class="menu-item">
-                            <a routerLink="/injustice" routerLinkActive="active"
+                            <a (click)="closeMobileMenu()" routerLink="/injustice" routerLinkActive="active"
                                 [routerLinkActiveOptions]="{exact: true}">జగన్ గారి ద్వారా  క్రైస్తవ సమాజానికి అన్యాయం</a>
                         </li>  -->
                                     
                          <!-- <li class="menu-item">
-                            <a routerLink="/church-pastor-search" routerLinkActive="active"
+                            <a (click)="closeMobileMenu()" routerLink="/church-pastor-search" routerLinkActive="active"
                                 [routerLinkActiveOptions]="{exact: true}">Name-Search </a>
                         </li>   
                     </ul>  -->
@@ -704,11 +704,11 @@
                     <ul class="sub-menu">
 
                    <li class="menu-item" >
-                    <a routerLink="/addmeetings" routerLinkActive="active"
+                    <a (click)="closeMobileMenu()" routerLink="/addmeetings" routerLinkActive="active"
                         [routerLinkActiveOptions]="{exact: true}">సబ్మిట్ చేయుటకు</a>
                 </li>
                    <li class="menu-item" >
-                    <a routerLink="/events" routerLinkActive="active"
+                    <a (click)="closeMobileMenu()" routerLink="/events" routerLinkActive="active"
                         [routerLinkActiveOptions]="{exact: true}">మీటింగ్స్ చూచుటకు</a>
                 </li>
                 </ul>
@@ -716,7 +716,7 @@
                     <a (click)="alert()">మీటింగ్స్</a>
                 </li>
                 <li class="menu-item" *ngIf="notlogin">
-                    <a routerLink="/events" routerLinkActive="active"
+                    <a (click)="closeMobileMenu()" routerLink="/events" routerLinkActive="active"
                         [routerLinkActiveOptions]="{exact: true}">మీటింగ్స్</a>
                 </li> -->
 
@@ -725,7 +725,7 @@
                     <a (click)="alert()">చర్చి సర్వీసెస్</a>
                 </li>
                 <li class="menu-item" *ngIf="notlogin">
-                    <a routerLink="/church_timings" routerLinkActive="active"
+                    <a (click)="closeMobileMenu()" routerLink="/church_timings" routerLinkActive="active"
                         [routerLinkActiveOptions]="{exact: true}">చర్చి సర్వీసెస్</a>
                 </li> -->
 
@@ -733,31 +733,31 @@
                     <a routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">రిజిస్ట్రేషన్స్</a>
                     <ul class="sub-menu">
                         <li class="menu-item">
-                            <a routerLink="/believerregister" routerLinkActive="active"
+                            <a (click)="closeMobileMenu()" routerLink="/believerregister" routerLinkActive="active"
                                 [routerLinkActiveOptions]="{exact: true}">BELIEVER REGISTER</a>
                         </li>
                         <li class="menu-item">
-                            <a routerLink="/studentregister" routerLinkActive="active"
+                            <a (click)="closeMobileMenu()" routerLink="/studentregister" routerLinkActive="active"
                                 [routerLinkActiveOptions]="{exact: true}">STUDENT REGISTER</a>
                         </li>
                         <li class="menu-item">
-                            <a routerLink="/ministryregister" routerLinkActive="active"
+                            <a (click)="closeMobileMenu()" routerLink="/ministryregister" routerLinkActive="active"
                                 [routerLinkActiveOptions]="{exact: true}">MINISTRY REGISTER</a>
                         </li>
                         <li class="menu-item">
-                            <a routerLink="/pastorregister" routerLinkActive="active"
+                            <a (click)="closeMobileMenu()" routerLink="/pastorregister" routerLinkActive="active"
                                 [routerLinkActiveOptions]="{exact: true}">PASTOR REGISTER</a>
                         </li>
                         <li class="menu-item">
-                            <a routerLink="/churchregister" routerLinkActive="active"
+                            <a (click)="closeMobileMenu()" routerLink="/churchregister" routerLinkActive="active"
                                 [routerLinkActiveOptions]="{exact: true}">CHURCH REGISTER</a>
                         </li>
                         <li class="menu-item">
-                            <a routerLink="/organisationregister" routerLinkActive="active"
+                            <a (click)="closeMobileMenu()" routerLink="/organisationregister" routerLinkActive="active"
                                 [routerLinkActiveOptions]="{exact: true}">ORGANISATION</a>
                         </li>
                         <li class="menu-item">
-                            <a routerLink="/pastorassociationregister" routerLinkActive="active"
+                            <a (click)="closeMobileMenu()" routerLink="/pastorassociationregister" routerLinkActive="active"
                                 [routerLinkActiveOptions]="{exact: true}">PASTOR
                                 ASSOCIATION</a>
                         </li>
@@ -768,35 +768,35 @@
                     <a routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">సేవలు (Services)</a>
                     <ul class="sub-menu">
                         <li class="menu-item">
-                            <a routerLink="/marriages" routerLinkActive="active"
+                            <a (click)="closeMobileMenu()" routerLink="/marriages" routerLinkActive="active"
                                 [routerLinkActiveOptions]="{exact: true}">💍 వివాహాలు (Marriage Alliances)</a>
                         </li>
                         <li class="menu-item">
-                            <a routerLink="/family-councelling" routerLinkActive="active"
+                            <a (click)="closeMobileMenu()" routerLink="/family-councelling" routerLinkActive="active"
                                 [routerLinkActiveOptions]="{exact: true}">❤️ ఫ్యామిలీ కౌన్సిలింగ్ (Marriage & Family Counselling)</a>
                         </li>
                         <li class="menu-item">
-                            <a routerLink="/institute" routerLinkActive="active"
+                            <a (click)="closeMobileMenu()" routerLink="/institute" routerLinkActive="active"
                                 [routerLinkActiveOptions]="{exact: true}">క్రైస్తవ సంస్థలు</a>
                         </li>
                         <li class="menu-item">
-                            <a routerLink="/jobs" routerLinkActive="active"
+                            <a (click)="closeMobileMenu()" routerLink="/jobs" routerLinkActive="active"
                                 [routerLinkActiveOptions]="{exact: true}">ఉద్యోగాలు</a>
                         </li>
                         <li class="menu-item">
-                            <a routerLink="/help" routerLinkActive="active"
+                            <a (click)="closeMobileMenu()" routerLink="/help" routerLinkActive="active"
                                 [routerLinkActiveOptions]="{exact: true}">సహాయం కొరకు</a>
                         </li>
                         <li class="menu-item">
-                            <a routerLink="/business" routerLinkActive="active"
+                            <a (click)="closeMobileMenu()" routerLink="/business" routerLinkActive="active"
                                 [routerLinkActiveOptions]="{exact: true}"> Search Bussiness / House Rent</a>
                         </li>
                         <li class="menu-item">
-                            <a routerLink="/wings" routerLinkActive="active"
+                            <a (click)="closeMobileMenu()" routerLink="/wings" routerLinkActive="active"
                                 [routerLinkActiveOptions]="{exact: true}">JBAC Wings Information </a>
                         </li>
                         <li class="menu-item">
-                            <a routerLink="/organization" routerLinkActive="active"
+                            <a (click)="closeMobileMenu()" routerLink="/organization" routerLinkActive="active"
                                 [routerLinkActiveOptions]="{exact: true}">Search Organisations </a>
                         </li>
                     </ul>
@@ -808,58 +808,58 @@
                     <a routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">అకౌంట్</a>
                     <ul class="sub-menu">
                         <li class="menu-item" *ngIf="notlogin">
-                            <a routerLink="/addchurchtimings" routerLinkActive="active"
+                            <a (click)="closeMobileMenu()" routerLink="/addchurchtimings" routerLinkActive="active"
                                 [routerLinkActiveOptions]="{exact: true}">Adding Church Timings</a>
                         </li>
                         <li class="menu-item" *ngIf="notlogin">
-                            <a routerLink="/addinstitute" routerLinkActive="active"
+                            <a (click)="closeMobileMenu()" routerLink="/addinstitute" routerLinkActive="active"
                                 [routerLinkActiveOptions]="{exact: true}">Adding Institutes Under
                                 Ministry</a>
                         </li>
                         <li class="menu-item" *ngIf="notlogin">
-                            <a routerLink="/addmeetings" routerLinkActive="active"
+                            <a (click)="closeMobileMenu()" routerLink="/addmeetings" routerLinkActive="active"
                                 [routerLinkActiveOptions]="{exact: true}">Submit Meetings Information</a>
                         </li> 
                         <li class="menu-item" *ngIf="notlogin">
-                            <a routerLink="/addbusiness" routerLinkActive="active"
+                            <a (click)="closeMobileMenu()" routerLink="/addbusiness" routerLinkActive="active"
                                 [routerLinkActiveOptions]="{exact: true}">Submit Your Business
                                 Information</a>
                         </li>
                         <li class="menu-item" *ngIf="notlogin">
-                            <a routerLink="/addmarriages" routerLinkActive="active"
+                            <a (click)="closeMobileMenu()" routerLink="/addmarriages" routerLinkActive="active"
                                 [routerLinkActiveOptions]="{exact: true}">Register for Marriage Aliance</a>
                         </li>
                          <!-- <li class="menu-item" *ngIf="notlogin">
-                            <a routerLink="/addattacks" routerLinkActive="active"
+                            <a (click)="closeMobileMenu()" routerLink="/addattacks" routerLinkActive="active"
                                 [routerLinkActiveOptions]="{exact: true}">Submit information about Attacks
                                 on Christians </a>
                         </li>  -->
                         <li class="menu-item" *ngIf="notlogin">
-                            <a routerLink="/addjobs" routerLinkActive="active"
+                            <a (click)="closeMobileMenu()" routerLink="/addjobs" routerLinkActive="active"
                                 [routerLinkActiveOptions]="{exact: true}"> Submit Employment Requirement</a>
                         </li>
                         <li class="menu-item" *ngIf="notlogin">
-                            <a routerLink="/addads" routerLinkActive="active"
+                            <a (click)="closeMobileMenu()" routerLink="/addads" routerLinkActive="active"
                                 [routerLinkActiveOptions]="{exact: true}">Submit Ads Information</a>
                         </li>
 
                         <li class="menu-item" *ngIf="notlogin">
-                            <a routerLink="/update" routerLinkActive="active"
+                            <a (click)="closeMobileMenu()" routerLink="/update" routerLinkActive="active"
                                 [routerLinkActiveOptions]="{exact: true}">Edit Your Profile</a>
                         </li>
                         <li class="menu-item" *ngIf="notlogin">
-                            <a routerLink="/leaders" routerLinkActive="active"
+                            <a (click)="closeMobileMenu()" routerLink="/leaders" routerLinkActive="active"
                                 [routerLinkActiveOptions]="{exact: true}">If you opted as a Leader</a>
                         </li>
                         <li class="menu-item" *ngIf="notlogin">
-                            <a routerLink="/downloads" routerLinkActive="active"
+                            <a (click)="closeMobileMenu()" routerLink="/downloads" routerLinkActive="active"
                                 [routerLinkActiveOptions]="{exact: true}">Downloads</a>
                         </li>
                     </ul>
                 </li>
                 <li class="menu-item">
                     <div class="nav-add-btn" *ngIf="login">
-                        <a routerLink="/login" style="color: rgb(255, 255, 255); font-weight: bold;"
+                        <a (click)="closeMobileMenu()" routerLink="/login" style="color: rgb(255, 255, 255); font-weight: bold;"
                             routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">Login </a>
                     </div>
                 </li>
@@ -872,7 +872,7 @@
                             <a>Username : {{name}}</a>
                         </li>
                         <li class="menu-item" *ngIf="notlogin">
-                            <a routerLink="/update" routerLinkActive="active">Edit Profile (ఎడిట్ ప్రొఫైల్)</a>
+                            <a (click)="closeMobileMenu()" routerLink="/update" routerLinkActive="active">Edit Profile (ఎడిట్ ప్రొఫైల్)</a>
                         </li>
                         <li class="menu-item" *ngIf="notlogin">
                             <a (click)="logout()">Logout</a>
@@ -884,5 +884,5 @@
         </nav>    
     </div>
     </div>
-    <div class="mask"></div>
+    <div class="mask" [class.show]="mobileMenuOpen" (click)="closeMobileMenu()"></div>
 </div>

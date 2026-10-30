@@ -31,10 +31,10 @@ export class AddbusinessComponent {
   modalReference = null;
   hello: any;
   ProofValue: any;
-  constituency: any;
-  mandals: any;
-  districts: any;
-  panchayati: any;
+  constituency: any = [];
+  mandals: any = [];
+  districts: any = [];
+  panchayati: any = [];
   usr_id: any;
   name: any;
   imagesData: any = [];
@@ -204,6 +204,7 @@ export class AddbusinessComponent {
     })
 
     this.addingbusiness = this.formBuilder.group({
+      state_id: ['', [Validators.required]],
       title: ['', [Validators.required]],
       type: ['', [Validators.required]],
       image: ['', [Validators.required]],
@@ -280,7 +281,6 @@ export class AddbusinessComponent {
   ngOnInit(): void {
     this.getservice();
     this.getstates();
-    this.getdistric();
     this.getchurch();
     this.personaldata();
     this.getbelivers();
@@ -570,7 +570,10 @@ export class AddbusinessComponent {
     if (this.addingbusiness.invalid) {
       Swal.fire('* ఉన్న తప్పనిసరి  ఫీల్డ్స్ ఎంటర్ చేయండి');
     } else {
+      const sId = Number(this.addingbusiness.value.state_id) || (Number(this.addingbusiness.value.districtname) >= 31 && Number(this.addingbusiness.value.districtname) <= 63 ? 2 : 1);
       var data = {
+        state_id: sId,
+        state: sId === 2 ? 'Telangana' : 'Andhra Pradesh',
         type: this.addingbusiness.value.type,
         title: this.addingbusiness.value.title,
         description: this.addingbusiness.value.description,
@@ -721,6 +724,9 @@ export class AddbusinessComponent {
   }
   getmandals(event: any) {
     var id = event.target.value;
+    this.addingbusiness.patchValue({ mandals: '', village_name: '' });
+    this.mandals = [];
+    this.panchayati = [];
     this.service.getmandals().subscribe(res => {
       if (res.status == 202) {
         Swal.fire(res.message);
@@ -734,6 +740,10 @@ export class AddbusinessComponent {
 
   getconstency(event: any) {
     var id = event.target.value;
+    this.addingbusiness.patchValue({ constituencyname: '', mandals: '', village_name: '' });
+    this.constituency = [];
+    this.mandals = [];
+    this.panchayati = [];
     this.service.getconsistencys().subscribe(res => {
       this.constituency = res.data.filter((data: any) => data.dstrct_id == id);
     });
@@ -741,6 +751,8 @@ export class AddbusinessComponent {
 
   gepanchayati(event: any) {
     var id = event.target.value;
+    this.addingbusiness.patchValue({ village_name: '' });
+    this.panchayati = [];
     this.service.gepanchayatis(id).subscribe(res => {
       if (res.status == 202) {
         Swal.fire(res.message);

@@ -12,10 +12,10 @@ import Swal from 'sweetalert2';
 })
 export class InstituteComponent {
   serachMeetingform: any
-  districts: any;
-  constituency: any;
-  panchayati: any;
-  mandals: any;
+  districts: any = [];
+  constituency: any = [];
+  panchayati: any = [];
+  mandals: any = [];
   searchdist: any;
   institutedata: any;
   searchconts: any;
@@ -49,7 +49,6 @@ export class InstituteComponent {
 
 
     this.getstates();
-    this.getdistric();
     // this.defaultdata();
     this.getdenomations();
     this.getbeliver();
@@ -138,7 +137,6 @@ export class InstituteComponent {
         }
       });
     } else {
-      this.getdistric();
       this.getinstitutes();
     }
   }
@@ -264,6 +262,7 @@ export class InstituteComponent {
   }
   reset() {
     this.serachMeetingform.reset({
+      state_id: '',
       district_id: '',
       constenncy_id: '',
       mandal_id: '',
@@ -276,6 +275,7 @@ export class InstituteComponent {
     this.searchdist = '';
     this.searchconts = '';
     this.searchmand = '';
+    this.districts = [];
     this.constituency = [];
     this.mandals = [];
     this.panchayati = [];

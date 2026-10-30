@@ -26,15 +26,15 @@ export class OrganisationregisterComponent {
   denomation: any;
   pattern: any;
   states: any = [];
-  districts: any;
-  mandals: any;
-  panchayati: any = (FALLBACK_DROPDOWN_DATA as any).panchayatis || [];
+  districts: any = [];
+  mandals: any = [];
+  panchayati: any = [];
   bliversdata: any;
   studentform: FormGroup;
   pastorform: FormGroup;
   pastorsassociations: FormGroup;
   district: any;
-  constituency: any;
+  constituency: any = [];
   panchayatis: any;
   imagedata: any = []
   wings: any;
@@ -62,7 +62,7 @@ export class OrganisationregisterComponent {
       education: ['', [Validators.required]],
       designation: ['', [Validators.required]],
       dpartment: ['', [Validators.required]],
-      state_id: ['1', [Validators.required]],
+      state_id: ['', [Validators.required]],
       districts: ['', [Validators.required]],
       mandals: ['', [Validators.required]],
       panchayati: ['', [Validators.required]],
@@ -241,7 +241,7 @@ export class OrganisationregisterComponent {
       ministry_id: [''],
       password: ['', [Validators.required, Validators.minLength(6)]],
       retypepassword: ['', [Validators.required, Validators.minLength(6)]],
-      state_id: ['1', [Validators.required]],
+      state_id: ['', [Validators.required]],
       districts: ['', [Validators.required]],
       constituencyname: ['', [Validators.required]],
       mandals: ['', [Validators.required]],
@@ -307,7 +307,6 @@ export class OrganisationregisterComponent {
     this.getdenomations();
     this.getpatterns();
     this.getstates();
-    this.getdistric(1);
     this.getbelivers();
     // this.getchurch();
     this.getbeliver();
@@ -385,6 +384,12 @@ export class OrganisationregisterComponent {
 
   onStateChange(event: any) {
     const stateId = event && event.target ? event.target.value : event;
+    this.independentorgainsationform.patchValue({
+      districts: '',
+      constituencyname: '',
+      mandals: '',
+      panchayati: ''
+    });
     this.districts = [];
     this.constituency = [];
     this.mandals = [];
@@ -395,7 +400,8 @@ export class OrganisationregisterComponent {
   }
 
   getdistric(stateId?: any) {
-    const sid = stateId || 1;
+    const sid = stateId || this.independentorgainsationform?.get('state_id')?.value;
+    if (!sid) return;
     this.service.getdistrict(sid).subscribe(res => {
       this.districts = res.data;
     })
@@ -403,6 +409,9 @@ export class OrganisationregisterComponent {
 
   getmandals(event: any) {
     var id = event.target.value;
+    this.independentorgainsationform.patchValue({ mandals: '', panchayati: '' });
+    this.mandals = [];
+    this.panchayati = [];
     this.service.getmandals().subscribe(res => {
       this.mandals = res.data.filter((data: any) => data.const_id == id);
     })
@@ -410,6 +419,10 @@ export class OrganisationregisterComponent {
 
   getconstency(event: any) {
     var id = event.target.value;
+    this.independentorgainsationform.patchValue({ constituencyname: '', mandals: '', panchayati: '' });
+    this.constituency = [];
+    this.mandals = [];
+    this.panchayati = [];
     this.service.getconsistencys().subscribe(res => {
       this.constituency = res.data.filter((data: any) => data.dstrct_id == id);
     })
@@ -417,6 +430,8 @@ export class OrganisationregisterComponent {
 
   gepanchayati(event: any) {
     const id = event?.target?.value !== undefined ? event.target.value : event;
+    this.independentorgainsationform.patchValue({ panchayati: '' });
+    this.panchayati = [];
     if (!id) return;
     this.service.gepanchayatis(id).subscribe(
       (res: any) => {

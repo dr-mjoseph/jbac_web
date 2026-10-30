@@ -57,43 +57,51 @@ export class LeadersComponent {
         }
         this.myresdata = res.data[0].generaltype
         if (res.data[0].leadertype == 1) {
-          if (res.data[0].generaltype == 1) {
-            this.generals = "District"
-            this.general = "Constituency "
+          if (res.data[0].generaltype == 0) {
+            this.generals = "State";
+            this.general = "District ";
+          } else if (res.data[0].generaltype == 1) {
+            this.generals = "District";
+            this.general = "Constituency ";
           } else if (res.data[0].generaltype == 2) {
-            this.generals = "Constituency"
-            this.general = "Mandal "
+            this.generals = "Constituency";
+            this.general = "Mandal ";
           } else if (res.data[0].generaltype == 3) {
-            this.generals = "Mandal "
-            this.general = "Village "
+            this.generals = "Mandal ";
+            this.general = "Village ";
           } else if (res.data[0].generaltype == 4) {
-            this.generals = "Village "
-            this.general = ""
+            this.generals = "Village ";
+            this.general = "";
           }
           var data = {
             "usr_id": sessionStorage.getItem("usr_id"),
             "category_id": sessionStorage.getItem("category_id"),
+            "leadertype": res.data[0].leadertype,
+            "wingtypes": res.data[0].wingtypes,
             "generaltype": res.data[0].generaltype,
+            state_id: res.data[0].state_id || 1,
             district_id: res.data[0].district_id,
             constituency_id: res.data[0].constituency_id,
-           
             mandal_id: res.data[0].mandal_id,
             panchayat_id: res.data[0].village_id
           }
           this.service.getLeaderswebsiteD(data).subscribe((result: any) => {
-            this.belearr = result.data[0];
+            const rawBelievers = result.data[0] || [];
             this.contituencyname = result.data[1];
-            // this.studentarr = result.data[1];
-            this.pastorarr = result.data[2];
-         //   this.contituencynamebel = result.data[3];
-          // console.log(this.pastorarr);
-
-            console.log(this.belearr, this.contituencyname, this.pastorarr, 'leader')
-
+            const rawPastors = result.data[2] || [];
+            const rawStudents = result.data[3] || [];
+            // Keep only approved (1) and unapproved (0 / null); hide rejected (2)
+            this.belearr = rawBelievers.filter((x: any) => Number(x?.approval_ind) !== 2);
+            this.pastorarr = rawPastors.filter((x: any) => Number(x?.approval_ind) !== 2);
+            this.studentarr = rawStudents.filter((x: any) => Number(x?.approval_ind) !== 2);
+            console.log(this.belearr, this.contituencyname, this.pastorarr, this.studentarr, 'leader')
           })
         } else if (res.data[0].leadertype == 2) {
-          this.wingtypes = res.data[0].wingtypes
-          if (res.data[0].generaltype == 1) {
+          this.wingtypes = res.data[0].wing_name || res.data[0].wingtypes || "";
+          if (res.data[0].generaltype == 0) {
+            this.generals = "State";
+            this.general = "District";
+          } else if (res.data[0].generaltype == 1) {
             this.generals = "District";
             this.general = "Constituency";
           } else if (res.data[0].generaltype == 2) {
@@ -109,20 +117,24 @@ export class LeadersComponent {
           var data4 = {
             "usr_id": sessionStorage.getItem("usr_id"),
             "category_id": sessionStorage.getItem("category_id"),
+            "leadertype": res.data[0].leadertype,
+            "wingtypes": res.data[0].wingtypes,
             "generaltype": res.data[0].generaltype,
             wingtype: res.data[0].wingtype,
+            state_id: res.data[0].state_id || 1,
             district_id: res.data[0].district_id,
             constituency_id: res.data[0].constituency_id,
             mandal_id: res.data[0].mandal_id,
             panchayat_id: res.data[0].village_id
           }
           this.service.getLeaderswebsitewing(data4).subscribe((result: any) => {
-            this.belearr = result.data[0];
-            this.studentarr = result.data[1];
-            this.pastorarr = result.data[2];
-
-            console.log(this.belearr, this.studentarr, this.pastorarr, 'leader')
-
+            const rawBelievers = result.data[0] || [];
+            const rawStudents = result.data[1] || [];
+            const rawPastors = result.data[2] || [];
+            this.belearr = rawBelievers.filter((x: any) => Number(x?.approval_ind) !== 2);
+            this.studentarr = rawStudents.filter((x: any) => Number(x?.approval_ind) !== 2);
+            this.pastorarr = rawPastors.filter((x: any) => Number(x?.approval_ind) !== 2);
+            console.log(this.belearr, this.studentarr, this.pastorarr, 'wing leader')
           })
         }
       }
@@ -176,6 +188,171 @@ export class LeadersComponent {
         this.conformleader(id, index);
       }
     })
+  }
+
+  
+    getSubordinateSubtitle(): string {
+    if (this.myresdata == 0) {
+      return 'జిల్లాల వారిగా (District-wise)';
+    } else if (this.myresdata == 1) {
+      return 'నియోజకవర్గాల వారిగా (Constituency-wise)';
+    } else if (this.myresdata == 2) {
+      return 'మండలాల వారిగా (Mandal-wise)';
+    } else if (this.myresdata == 3) {
+      return 'గ్రామ / వార్డు వారిగా (Village / Ward-wise)';
+    }
+    return 'మండల / పంచాయితీ వారిగా';
+  }
+
+  getDetailedLeaderStatus(x: any): string {
+    if (!x) return 'లీడర్ (Leader)';
+
+    // 1. Check Wing Leadership (leadertype == '2' or has wingtype / wingtypes)
+    const isWing = String(x.leadertype) === '2' || (x.wingtype && x.wingtype !== 'null' && String(x.wingtype).trim() !== '') || (x.wingtypes && x.wingtypes !== 'null' && String(x.wingtypes).trim() !== '');
+
+    let wingTitle = '';
+    if (x.wing_name && x.wing_name !== 'null' && String(x.wing_name).trim()) {
+      wingTitle = String(x.wing_name).trim();
+    } else if (String(x.wingtype) === '1') {
+      wingTitle = 'స్టూడెంట్ వింగ్ (Student Wing)';
+    }
+
+    let subWing = '';
+    if (x.wingtypes && x.wingtypes !== 'null' && String(x.wingtypes).trim()) {
+      const wt = String(x.wingtypes).trim();
+      if (wt.toLowerCase() === 'meediareporters' || wt.toLowerCase() === 'mediareporters') {
+        subWing = 'మీడియా రిపోర్టర్స్ (Media)';
+      } else if (wt.toLowerCase() === 'socialmedia') {
+        subWing = 'సోషల్ మీడియా (Social Media)';
+      } else if (wt.toLowerCase() === 'papermedia') {
+        subWing = 'పేపర్ మీడియా (Paper Media)';
+      } else if (wt.toLowerCase() === 'driver') {
+        subWing = 'డ్రైవర్స్ వింగ్ (Drivers)';
+      } else {
+        subWing = wt;
+      }
+    }
+
+    if (isWing) {
+      if (wingTitle && subWing) {
+        return `${wingTitle} - ${subWing} లీడర్`;
+      }
+      if (wingTitle) {
+        return wingTitle.includes('లీడర్') ? wingTitle : `${wingTitle} లీడర్`;
+      }
+      if (subWing) {
+        return `${subWing} లీడర్`;
+      }
+      return 'వింగ్ లీడర్ (Wing Leader)';
+    }
+
+    // 2. Check General Leadership (leadertype == '1' or generaltype or ward/subward)
+    const gType = String(x.generaltype || '').trim();
+
+    if (gType === '0' || gType.toLowerCase().includes('state')) {
+      return 'రాష్ట్ర లీడర్ (State Leader)';
+    }
+    if (gType === '1' || gType.toLowerCase().includes('dist')) {
+      return 'జిల్లా లీడర్ (District Leader)';
+    }
+    if (gType === '2' || gType.toLowerCase().includes('const')) {
+      return 'నియోజకవర్గ లీడర్ (Constituency Leader)';
+    }
+    if (gType === '3' || gType.toLowerCase().includes('mandal') || gType.toLowerCase().includes('municip')) {
+      return 'మండల లీడర్ (Mandal Leader)';
+    }
+    if (gType === '4' || gType.toLowerCase().includes('panchayat') || gType.toLowerCase().includes('village')) {
+      return 'గ్రామ / పంచాయితీ లీడర్ (Panchayat Leader)';
+    }
+    if (gType === 'College Level') {
+      return 'కాలేజ్ లీడర్ (College Leader)';
+    }
+    if (gType === 'Church Level') {
+      return 'చర్చి లీడర్ (Church Leader)';
+    }
+    if (gType === 'Branch Level') {
+      return 'బ్రాంచ్ లీడర్ (Branch Leader)';
+    }
+    if (gType === 'Section / Class Level') {
+      return 'సెక్షన్ / క్లాస్ లీడర్ (Class Leader)';
+    }
+    if (gType === '2') {
+      return 'నియోజకవర్గ లీడర్ (Constituency Leader)';
+    }
+    if (gType === '3') {
+      return 'మండల లీడర్ (Mandal Leader)';
+    }
+    if (gType === '4') {
+      return 'గ్రామ / పంచాయితీ లీడర్ (Panchayat Leader)';
+    }
+    if (gType === '5') {
+      const wardNum = x.wardnumber && x.wardnumber !== 'null' && String(x.wardnumber).trim() ? ` నెం. ${x.wardnumber}` : '';
+      return `వార్డు${wardNum} లీడర్ (Ward Leader)`;
+    }
+    if (gType === '6') {
+      const sub = x.subward && x.subward !== 'null' && String(x.subward).trim() ? ` (${x.subward})` : '';
+      return `సబ్ వార్డు${sub} లీడర్ (Sub-Ward Leader)`;
+    }
+
+    // Fallbacks if generaltype is unset but subward / wardnumber are populated
+    if (x.subward && x.subward !== 'null' && String(x.subward).trim()) {
+      return `సబ్ వార్డు (${x.subward}) లీడర్`;
+    }
+    if (x.wardnumber && x.wardnumber !== 'null' && String(x.wardnumber).trim()) {
+      return `వార్డు నెం. ${x.wardnumber} లీడర్`;
+    }
+
+    return 'జనరల్ లీడర్ (General Leader)';
+  }
+
+  getLeaderBadgeStyle(x: any): { [key: string]: string } {
+    const isWing = String(x?.leadertype) === '2' || (x?.wingtype && x.wingtype !== 'null' && String(x.wingtype).trim() !== '') || (x?.wingtypes && x.wingtypes !== 'null' && String(x.wingtypes).trim() !== '');
+    const gType = String(x?.generaltype || '');
+
+    if (isWing) {
+      return {
+        'background-color': '#ede9fe',
+        'color': '#6d28d9',
+        'border': '1px solid #c4b5fd'
+      };
+    }
+    if (gType === '1' || gType === '2') {
+      return {
+        'background-color': '#e0f2fe',
+        'color': '#0369a1',
+        'border': '1px solid #7dd3fc'
+      };
+    }
+    if (gType === '3') {
+      return {
+        'background-color': '#e0f7fa',
+        'color': '#00695c',
+        'border': '1px solid #80deea'
+      };
+    }
+    if (gType === '4') {
+      return {
+        'background-color': '#dcfce7',
+        'color': '#15803d',
+        'border': '1px solid #86efac'
+      };
+    }
+    if (gType === '5' || gType === '6') {
+      return {
+        'background-color': '#fef3c7',
+        'color': '#b45309',
+        'border': '1px solid #fcd34d'
+      };
+    }
+    return {
+      'background-color': '#f1f5f9',
+      'color': '#475569',
+      'border': '1px solid #cbd5e1'
+    };
+  }
+
+  getLevelName(level: any): string {
+    return this.getDetailedLeaderStatus({ generaltype: level });
   }
 
   conformleader(id: any, index: any) {

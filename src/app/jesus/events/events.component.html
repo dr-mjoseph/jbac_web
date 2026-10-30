@@ -58,7 +58,7 @@
                     <form [formGroup]="searchdenomation">
                         <div class="row g-3">
                             <div class="col-lg-2 col-md-4 col-sm-6 col-12">
-                                <label class="form-label fw-bold">సెలెక్ట్ రాష్ట్రం / State</label>
+                                <label class="form-label fw-bold">1). సెలెక్ట్ రాష్ట్రం / State</label>
                                 <select class="form-control form-select" formControlName="state_id"
                                     (change)="onStateChange($event);">
                                     <option value="" selected>అన్ని రాష్ట్రాలు (All States)</option>
@@ -68,40 +68,44 @@
                                 </select>
                             </div>
                             <div class="col-lg-2 col-md-4 col-sm-6 col-12">
-                                <label class="form-label fw-bold">సెలెక్ట్ జిల్లా</label>
+                                <label class="form-label fw-bold">2). సెలెక్ట్ జిల్లా</label>
                                 <select class="form-control form-select" formControlName="district_id"
-                                    (change)="onDistrictChange($event);">
-                                    <option value="" selected disabled>సెలెక్ట్ జిల్లా</option>
+                                    (change)="onDistrictChange($event);"
+                                    [disabled]="!searchdenomation.value.state_id || districts.length === 0">
+                                    <option value="" selected>{{ !searchdenomation.value.state_id ? 'మొదట రాష్ట్రాన్ని ఎంచుకోండి' : 'అన్ని జిల్లాలు (All Districts)' }}</option>
                                     <option value="{{item.id}}" *ngFor="let item of districts">
                                         {{item.distrct_nm}}
                                     </option>
                                 </select>
                             </div>
                             <div class="col-lg-2 col-md-4 col-sm-6 col-12">
-                                <label class="form-label fw-bold">సెలెక్ట్ నియోజకవర్గం</label>
+                                <label class="form-label fw-bold">3). సెలెక్ట్ నియోజకవర్గం</label>
                                 <select class="form-control form-select" formControlName="constenncy_id"
-                                    (change)="onConstituencyChange($event);">
-                                    <option value="" selected disabled>సెలెక్ట్ నియోజకవర్గం</option>
+                                    (change)="onConstituencyChange($event);"
+                                    [disabled]="!searchdenomation.value.district_id || constituency.length === 0">
+                                    <option value="" selected>{{ !searchdenomation.value.district_id ? 'మొదట జిల్లాను ఎంచుకోండి' : 'అన్ని నియోజకవర్గాలు' }}</option>
                                     <option value="{{item.id}}" *ngFor="let item of constituency">
                                         {{item.const_nm}}
                                     </option>
                                 </select>
                             </div>
                             <div class="col-lg-2 col-md-4 col-sm-6 col-12">
-                                <label class="form-label fw-bold">మండలం/మున్సిపాలిటీ</label>
+                                <label class="form-label fw-bold">4). మండలం/మున్సిపాలిటీ</label>
                                 <select class="form-control form-select" formControlName="mandal_id"
-                                    (change)="onMandalChange($event);">
-                                    <option value="" selected disabled>సెలెక్ట్ మండలం / మున్సిపాలిటీ</option>
+                                    (change)="onMandalChange($event);"
+                                    [disabled]="!searchdenomation.value.constenncy_id || mandals.length === 0">
+                                    <option value="" selected>{{ !searchdenomation.value.constenncy_id ? 'మొదట నియోజకవర్గాన్ని ఎంచుకోండి' : 'అన్ని మండలాలు / మున్సిపాలిటీ' }}</option>
                                     <option value="{{item.id}}" *ngFor="let item of mandals">
                                         {{item.mndl_nm}}
                                     </option>
                                 </select>
                             </div>
                             <div class="col-lg-2 col-md-4 col-sm-6 col-12">
-                                <label class="form-label fw-bold">సెలెక్ట్ పంచాయతీ/వార్డు</label>
+                                <label class="form-label fw-bold">5). సెలెక్ట్ పంచాయతీ/వార్డు</label>
                                 <select class="form-control form-select" formControlName="panchayati_id"
-                                    (change)="onPanchayatiChange($event);">
-                                    <option value="" selected disabled>సెలెక్ట్ పంచాయతీ/వార్డు</option>
+                                    (change)="onPanchayatiChange($event);"
+                                    [disabled]="!searchdenomation.value.mandal_id || panchayati.length === 0">
+                                    <option value="" selected>{{ !searchdenomation.value.mandal_id ? 'మొదట మండలాన్ని ఎంచుకోండి' : 'అన్ని పంచాయతీలు / వార్డులు' }}</option>
                                     <option value="{{item.id}}" *ngFor="let item of panchayati">
                                         {{item.pnchyt_nm}}
                                     </option>
@@ -156,7 +160,7 @@
                 <div class="row">
                     <!-- Loading / Fetching State -->
                     <div class="col-12 text-center py-5" *ngIf="showSpinner">
-                        <div class="d-inline-flex flex-column align-items-center justify-content-center p-4 bg-white rounded shadow-sm border">
+                        <div class="inline-loader-card d-inline-flex flex-column align-items-center justify-content-center p-4 bg-white rounded shadow-sm border" style="min-width: 320px; max-width: 90%;">
                             <div class="cusloader mb-3"></div>
                             <h5 class="fw-bold mb-1" style="color: #802f3e;">దయచేసి వేచి ఉండండి, మీటింగ్ వివరాలు లోడ్ అవుతున్నాయి...</h5>
                             <p class="text-muted mb-0 small">Please wait, fetching meeting details...</p>
@@ -172,77 +176,80 @@
                     </div>
 
                     <!-- Meeting Cards -->
-                    <div class="col-12 col-md-6 col-lg-4 mb-4 d-flex align-items-stretch" *ngFor="let item of searchevents">
-                        <div class="card meeting-card h-100 w-100 shadow-sm border-0">
-                            <div class="meeting-card-header position-relative">
-                                <div class="card_image" (click)="openimg(getSafeImageUrl(item.image), openmodel)">
-                                    <img [src]="getSafeImageUrl(item.image)" (error)="onImageError($event)"
-                                        class="meeting-poster-img"
-                                        alt="Church Meeting Poster">
-                                </div>
-                                <span class="poster-click-hint" (click)="openimg(getSafeImageUrl(item.image), openmodel)" title="పోస్టర్ పెద్దదిగా చూచుటకు క్లిక్ చేయండి">
-                                    <i class="fa fa-search-plus"></i> జూమ్
-                                </span>
-                            </div>
-
-                            <div class="card-body d-flex flex-column">
-                                <div class="meeting-dates mb-2">
-                                    <span class="badge bg-light text-dark border">
-                                        <i class="fa fa-calendar-check-o text-success me-1"></i>
-                                        <strong>ప్రారంభం:</strong> {{item.startdate | date:'mediumDate'}}
-                                    </span>
-                                    <span class="badge bg-light text-dark border ms-1" *ngIf="item.enddate">
-                                        <i class="fa fa-calendar-times-o text-danger me-1"></i>
-                                        <strong>ముగింపు:</strong> {{item.enddate | date:'mediumDate'}}
+                    <ng-container *ngIf="!showSpinner">
+                        <div class="col-12 col-md-6 col-lg-4 mb-4 d-flex align-items-stretch" *ngFor="let item of searchevents">
+                            <div class="card meeting-card h-100 w-100 shadow-sm border-0">
+                                <div class="meeting-card-header position-relative">
+                                    <div class="card_image" (click)="openimg(getSafeImageUrl(item.image), openmodel)">
+                                        <img [src]="getSafeImageUrl(item.image)" (error)="onImageError($event)"
+                                            class="meeting-poster-img"
+                                            loading="lazy"
+                                            alt="Church Meeting Poster">
+                                    </div>
+                                    <span class="poster-click-hint" (click)="openimg(getSafeImageUrl(item.image), openmodel)" title="పోస్టర్ పెద్దదిగా చూచుటకు క్లిక్ చేయండి">
+                                        <i class="fa fa-search-plus"></i> జూమ్
                                     </span>
                                 </div>
 
-                                <h5 class="meeting-title mt-1 mb-2">
-                                    <b>{{item.eventname}}</b>
-                                </h5>
-
-                                <p class="poster-click-text text-muted small mb-2">
-                                    <i class="fa fa-hand-o-up text-primary me-1"></i>
-                                    పోస్టర్ పెద్దదిగా చూచుటకు పోస్టర్ మీద క్లిక్ చేయండి
-                                </p>
-
-                                <div class="meeting-action-bar d-flex align-items-center gap-2 my-2">
-                                    <a *ngIf="item.location" [href]="item.location" target="_blank" rel="noopener noreferrer" class="action-btn location-btn" title="ప్రదేశం మ్యాప్">
-                                        <img src="assets/images/marker.png" alt="Location" width="34" height="34">
-                                    </a>
-                                    <a *ngIf="item.youtube" [href]="item.youtube" target="_blank" rel="noopener noreferrer" class="action-btn yt-btn" title="యూట్యూబ్ లైవ్">
-                                        <img src="assets/images/newicon.png" alt="YouTube" width="34" height="34">
-                                    </a>
-                                    <a *ngIf="item.facebook" [href]="item.facebook" target="_blank" rel="noopener noreferrer" class="action-btn fb-btn" title="ఫేస్‌బుక్">
-                                        <img src="assets/images/Facebook.png" alt="Facebook" width="34" height="34">
-                                    </a>
-                                    <a *ngIf="item.eventcontactnumber" [href]="'tel:+91' + item.eventcontactnumber" class="action-btn phone-btn" title="కాల్ చేయండి">
-                                        <img src="assets/images/phone.png" alt="Phone" width="34" height="34">
-                                    </a>
-                                </div>
-
-                                <div class="mt-auto pt-2">
-                                    <div *ngIf="item.showMore" class="meeting-more-details p-2 mb-2 rounded bg-light border">
-                                        <p class="mb-1" *ngIf="item.description">
-                                            <strong>సమయం &amp; ఇతర సమాచారం:</strong> {{item.description}}
-                                        </p>
-                                        <p class="mb-0" *ngIf="item.address">
-                                            <strong>కూటములు జరిగే స్థలం:</strong> {{item.address}}
-                                        </p>
+                                <div class="card-body d-flex flex-column">
+                                    <div class="meeting-dates mb-2">
+                                        <span class="badge bg-light text-dark border">
+                                            <i class="fa fa-calendar-check-o text-success me-1"></i>
+                                            <strong>ప్రారంభం:</strong> {{item.startdate | date:'mediumDate'}}
+                                        </span>
+                                        <span class="badge bg-light text-dark border ms-1" *ngIf="item.enddate">
+                                            <i class="fa fa-calendar-times-o text-danger me-1"></i>
+                                            <strong>ముగింపు:</strong> {{item.enddate | date:'mediumDate'}}
+                                        </span>
                                     </div>
 
-                                    <a href="javascript:void(0)" (click)="item.showMore = !item.showMore" class="show-more-link text-decoration-none">
-                                        <span *ngIf="!item.showMore" class="text-danger fw-bold">
-                                            ఎక్కువ సమాచారం చూపించు <i class="fa fa-angle-down"></i>
-                                        </span>
-                                        <span *ngIf="item.showMore" class="text-danger fw-bold">
-                                            తక్కువ చూపించు <i class="fa fa-angle-up"></i>
-                                        </span>
-                                    </a>
+                                    <h5 class="meeting-title mt-1 mb-2">
+                                        <b>{{item.eventname}}</b>
+                                    </h5>
+
+                                    <p class="poster-click-text text-muted small mb-2">
+                                        <i class="fa fa-hand-o-up text-primary me-1"></i>
+                                        పోస్టర్ పెద్దదిగా చూచుటకు పోస్టర్ మీద క్లిక్ చేయండి
+                                    </p>
+
+                                    <div class="meeting-action-bar d-flex align-items-center gap-2 my-2">
+                                        <a *ngIf="item.location" [href]="item.location" target="_blank" rel="noopener noreferrer" class="action-btn location-btn" title="ప్రదేశం మ్యాప్">
+                                            <img src="assets/images/marker.png" alt="Location" width="34" height="34">
+                                        </a>
+                                        <a *ngIf="item.youtube" [href]="item.youtube" target="_blank" rel="noopener noreferrer" class="action-btn yt-btn" title="యూట్యూబ్ లైవ్">
+                                            <img src="assets/images/newicon.png" alt="YouTube" width="34" height="34">
+                                        </a>
+                                        <a *ngIf="item.facebook" [href]="item.facebook" target="_blank" rel="noopener noreferrer" class="action-btn fb-btn" title="ఫేస్‌బుక్">
+                                            <img src="assets/images/Facebook.png" alt="Facebook" width="34" height="34">
+                                        </a>
+                                        <a *ngIf="item.eventcontactnumber" [href]="'tel:+91' + item.eventcontactnumber" class="action-btn phone-btn" title="కాల్ చేయండి">
+                                            <img src="assets/images/phone.png" alt="Phone" width="34" height="34">
+                                        </a>
+                                    </div>
+
+                                    <div class="mt-auto pt-2">
+                                        <div *ngIf="item.showMore" class="meeting-more-details p-2 mb-2 rounded bg-light border">
+                                            <p class="mb-1" *ngIf="item.description">
+                                                <strong>సమయం &amp; ఇతర సమాచారం:</strong> {{item.description}}
+                                            </p>
+                                            <p class="mb-0" *ngIf="item.address">
+                                                <strong>కూటములు జరిగే స్థలం:</strong> {{item.address}}
+                                            </p>
+                                        </div>
+
+                                        <a href="javascript:void(0)" (click)="item.showMore = !item.showMore" class="show-more-link text-decoration-none">
+                                            <span *ngIf="!item.showMore" class="text-danger fw-bold">
+                                                ఎక్కువ సమాచారం చూపించు <i class="fa fa-angle-down"></i>
+                                            </span>
+                                            <span *ngIf="item.showMore" class="text-danger fw-bold">
+                                                తక్కువ చూపించు <i class="fa fa-angle-up"></i>
+                                            </span>
+                                        </a>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    </ng-container>
                 </div>
             </div>
         </div>
@@ -263,7 +270,8 @@
 <!-- Spinner -->
 <div class="my-overlay" *ngIf="showSpinner">
     <div class="cusloader"></div>
-    <h5 style="color: white;">Please Wait...</h5>
+    <h5 class="text-white fw-bold mb-1" style="font-size: 1.15rem; letter-spacing: 0.3px;">దయచేసి వేచి ఉండండి, మీటింగ్ వివరాలు లోడ్ అవుతున్నాయి...</h5>
+    <p class="text-white-50 mb-0 small">Please wait, fetching meeting details...</p>
 </div>
 
 <ng-template #optionTemplate let-item="districts" let-config="config">

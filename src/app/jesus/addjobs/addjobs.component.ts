@@ -30,10 +30,10 @@ export class AddjobsComponent {
   modalReference = null;
   hello: any;
   ProofValue: any;
-  constituency: any;
-  mandals: any;
-  districts: any;
-  panchayati: any;
+  constituency: any = [];
+  mandals: any = [];
+  districts: any = [];
+  panchayati: any = [];
   usr_id: any;
   name: any;
   imagesData: any = [];
@@ -174,6 +174,7 @@ export class AddjobsComponent {
     })
 
     this.jobsadding = this.formBuilder.group({
+      state_id: ['', [Validators.required]],
       jobname: ['', [Validators.required]],
 
       experience_t: [''],
@@ -278,7 +279,6 @@ export class AddjobsComponent {
   ngOnInit(): void {
     this.getservice();
     this.getstates();
-    this.getdistric();
     this.getchurch();
     this.personaldata();
     this.getbelivers();
@@ -508,7 +508,10 @@ export class AddjobsComponent {
     }
 
     const val = this.jobsadding.value;
+    const sId = Number(val.state_id) || (Number(val.districtname) >= 31 && Number(val.districtname) <= 63 ? 2 : 1);
     const data = {
+      state_id: sId,
+      state: sId === 2 ? 'Telangana' : 'Andhra Pradesh',
       jobname: val.jobname,
       jobtitle: val.jobname,
       qualification: val.qualification || '',

@@ -26,15 +26,15 @@ export class PastorassociationregisterComponent {
   denomation: any;
   pattern: any;
   states: any = [];
-  districts: any;
-  mandals: any;
-  panchayati: any = (FALLBACK_DROPDOWN_DATA as any).panchayatis || [];
+  districts: any = [];
+  mandals: any = [];
+  panchayati: any = [];
   bliversdata: any;
   studentform: FormGroup;
   pastorform: FormGroup;
   pastorsassociations: FormGroup;
   district: any;
-  constituency: any;
+  constituency: any = [];
   panchayatis: any;
   imagedata: any = []
   wings: any;
@@ -100,7 +100,7 @@ export class PastorassociationregisterComponent {
       nativeplace: [''],
       caste: [''],
       talent: [''],
-      state_id: ['1', [Validators.required]],
+      state_id: ['', [Validators.required]],
       district_id: ['', [Validators.required]],
       constituency_id: ['', [Validators.required]],
       mandal_id: ['', [Validators.required]],
@@ -311,7 +311,6 @@ export class PastorassociationregisterComponent {
     this.getdenomations();
     this.getpatterns();
     this.getstates();
-    this.getdistric(1);
     this.getbelivers();
     // this.getchurch();
     this.getbeliver();
@@ -391,22 +390,26 @@ export class PastorassociationregisterComponent {
   }
 
   onStateChange(event: any) {
-    const stateId = event?.target?.value || event || '1';
+    const stateId = event && event.target ? event.target.value : event;
     this.pastorsassociations.patchValue({
       district_id: '',
       constituency_id: '',
       mandal_id: '',
       village_id: ''
     });
+    this.districts = [];
     this.constituency = [];
     this.mandals = [];
     this.panchayati = [];
-    this.getdistric(stateId);
+    if (stateId) {
+      this.getdistric(stateId);
+    }
   }
 
   getdistric(stateId?: any) {
     this.showSpinner = false;
-    const sid = stateId || this.pastorsassociations?.get('state_id')?.value || 1;
+    const sid = stateId || this.pastorsassociations?.get('state_id')?.value;
+    if (!sid) return;
     this.service.getdistrict(sid).subscribe({
       next: (res: any) => {
         this.showSpinner = false;
@@ -426,6 +429,9 @@ export class PastorassociationregisterComponent {
 
   getmandals(event: any) {
     const id = event?.target?.value !== undefined ? event.target.value?.trim() : event;
+    this.pastorsassociations.patchValue({ mandal_id: '', village_id: '' });
+    this.mandals = [];
+    this.panchayati = [];
     if (!id) return;
 
     this.service.getmandals().subscribe({
@@ -450,6 +456,10 @@ export class PastorassociationregisterComponent {
 
   getconstency(event: any) {
     const id = event?.target?.value !== undefined ? event.target.value?.trim() : event;
+    this.pastorsassociations.patchValue({ constituency_id: '', mandal_id: '', village_id: '' });
+    this.constituency = [];
+    this.mandals = [];
+    this.panchayati = [];
     if (!id) return;
 
     this.service.getconsistencys().subscribe({
@@ -474,6 +484,8 @@ export class PastorassociationregisterComponent {
 
   gepanchayati(event: any) {
     const id = event?.target?.value !== undefined ? event.target.value?.trim() : event;
+    this.pastorsassociations.patchValue({ village_id: '' });
+    this.panchayati = [];
     if (!id) return;
     this.service.gepanchayatis(id).subscribe({
       next: (res: any) => {
@@ -801,8 +813,11 @@ export class PastorassociationregisterComponent {
 
     this.showSpinner = true;
     const formVal = this.pastorsassociations.value;
+    const sId = Number(formVal.state_id) || (Number(formVal.district_id) >= 31 && Number(formVal.district_id) <= 63 ? 2 : 1);
     const payload = {
       ...formVal,
+      state_id: sId,
+      state: sId === 2 ? 'Telangana' : 'Andhra Pradesh',
       paname: formVal.pa_name || formVal.paname,
       headname: formVal.headname,
       phonenumber: formVal.phonenumber,

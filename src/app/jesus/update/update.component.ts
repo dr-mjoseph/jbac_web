@@ -75,6 +75,7 @@ export class UpdateComponent {
       constituency_id: [''],
       mandal_id: [''],
       panchayat_id: [''],
+      village_id: [''],
       ward: [''],
       youtubechanel: [''],
       password: [''],
@@ -276,6 +277,7 @@ export class UpdateComponent {
     })
 
     this.ministryform = this.formBuilder.group({
+      state_id: ['1'],
       ministryname: [''],
       denomation_id: [''],
       headname: [''],
@@ -826,6 +828,24 @@ export class UpdateComponent {
       const mandalId = this.details.mandal_id || this.details.mandals || this.details.resmandals;
       const panchId = this.details.panchayat_id || this.details.panchayati || this.details.village_id;
 
+      const stateId = this.details.state_id ? String(this.details.state_id) : (distId && Number(distId) >= 31 ? '2' : '1');
+      if (stateId) {
+        this.service.getdistrict(stateId).subscribe((res: any) => {
+          if (res && res.status == 200) {
+            this.districts = res.data;
+          }
+        });
+        this.beliverform.patchValue({ state_id: stateId });
+        this.studentform.patchValue({ state_id: stateId });
+        this.pastorform.patchValue({ state_id: stateId });
+        this.churchregsiterform.patchValue({ state_id: stateId });
+        this.updateprofileministry.patchValue({ state_id: stateId });
+        this.independentorgainsationform.patchValue({ state_id: stateId });
+        this.pastorsassociations.patchValue({ state_id: stateId });
+        this.ministryform.patchValue({ state_id: stateId });
+        this.entryform.patchValue({ state_id: stateId });
+      }
+
       if (distId) {
         this.service.getconsistencys().subscribe((cRes: any) => {
           this.constituency = cRes.data ? cRes.data.filter((d: any) => d.dstrct_id == distId) : [];
@@ -834,6 +854,7 @@ export class UpdateComponent {
             this.pastorform.patchValue({ constituency_id: constId });
             this.churchregsiterform.patchValue({ constituency_id: constId });
             this.updateprofileministry.patchValue({ constituency_id: constId });
+            this.ministryform.patchValue({ constituency_id: constId });
             this.studentform.patchValue({ constituency_id: constId });
             this.independentorgainsationform.patchValue({ constituencyname: constId });
             this.pastorsassociations.patchValue({ constituency_id: constId });
@@ -849,6 +870,7 @@ export class UpdateComponent {
             this.pastorform.patchValue({ mandal_id: mandalId });
             this.churchregsiterform.patchValue({ mandal_id: mandalId });
             this.updateprofileministry.patchValue({ mandal_id: mandalId });
+            this.ministryform.patchValue({ mandal_id: mandalId });
             this.studentform.patchValue({ mandal_id: mandalId });
             this.independentorgainsationform.patchValue({ mandals: mandalId });
             this.pastorsassociations.patchValue({ mandal_id: mandalId });
@@ -864,6 +886,7 @@ export class UpdateComponent {
             this.pastorform.patchValue({ panchayat_id: panchId });
             this.churchregsiterform.patchValue({ village_id: panchId });
             this.updateprofileministry.patchValue({ panchayat_id: panchId });
+            this.ministryform.patchValue({ panchayat_id: panchId });
             this.studentform.patchValue({ village_id: panchId });
             this.independentorgainsationform.patchValue({ panchayati: panchId });
             this.pastorsassociations.patchValue({ village_id: panchId });

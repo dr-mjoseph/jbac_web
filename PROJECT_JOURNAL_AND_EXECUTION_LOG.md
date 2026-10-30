@@ -2043,5 +2043,637 @@ The repository contains two query execution engines:
 - **Standard Upload Bundle**: `C:\Users\rajes\StudioProjects\jbac_app\appreleasesigned.aab` *(115.81 MB)*
 - **Release Notes File**: `RELEASE_NOTES_v0.0.39.md`.
 
+---
+
+## 37. Meeting State-Wise Filtering (AP & TG), Strict Cascading Submission Order, and VS Code Gradle Server Fix
+
+### 1. Objectives & Requirements
+The user submitted three key requirements:
+1. **Fix VS Code Notification**: Resolve the persistent popup warning: *"No connection to gradle server. Try restarting the server. Source: Gradle for Java"*.
+2. **View Meetings (`/events`) State-Wise Filtering**: Implement state filtering ("filter state wise"). The existing filter supported District, Constituency, Mandal, Panchayat, and Date. Now add state selection such that selecting **TG** filters meetings in Telangana, and selecting **AP** filters meetings in Andhra Pradesh.
+3. **Submit Meetings (`/addmeetings` & `/profile`) Sequential Cascading Order**: Enforce a strict dependency order: if and only if State is selected, then fetch **1. District ➔ 2. Constituency ➔ 3. Mandal ➔ 4. Panchayat**. Child dropdowns must be disabled until their parent is selected, and changing any parent must reset all downstream selections.
+
+---
+
+### 2. VS Code Gradle Server Error Resolution
+- **Root Cause**: The VS Code `"Gradle for Java"` extension automatically attempted to start its background Gradle Language Server for Java projects. Because the environment only has OpenJDK 1.8.0 installed (while the extension requires Java 17+) and this repository is an Angular 15 web application without any `build.gradle` or Gradle wrapper, the server crashed on startup and displayed repeated modal warnings.
+- **Resolution**:
+  - Configured workspace settings in [`.vscode/settings.json`](.vscode/settings.json):
+    ```json
+    {
+        "gradle.autoDetect": "off",
+        "gradle.nestedProjects": false,
+        "java.import.gradle.enabled": false,
+        "gradle.javaDebug.clean": false
+    }
+    ```
+  - Permanently prevented the Gradle Language Server from initializing within this workspace.
+
+---
+
+### 3. Backend Implementation & State Mapping
+- **Files Modified**: [`backend/server.ts`](backend/server.ts) and [`backend/server.js`](backend/server.js)
+- **Database Context**:
+  - `dstrct` table defines districts with `state_id = 1` for Andhra Pradesh (districts 1–26) and `state_id = 2` for Telangana (districts 31+).
+  - Legacy rows in `events` had `state_id = NULL`.
+- **Architectural Enhancements**:
+  1. **Resilient State Projection & Joins**:
+     - Updated `/api/events`, `/dashboardapi/getevents`, `/dashboardapi/getupdateevents`, and `/dashboardapi/getribbonevents` with:
+       ```sql
+       LEFT JOIN dstrct d ON e.district_id = d.id
+       COALESCE(e.state_id, d.state_id, CASE WHEN e.district_id >= 31 THEN 2 ELSE 1 END) AS state_id
+       ```
+     - Added query filtering: when `state_id` query/body parameter is provided, it filters exclusively by that state.
+  2. **Search API (`/dashboardapi/searchingdata` / `searchMeetingsHandler`)**:
+     - Added `LEFT JOIN dstrct d` and projected `COALESCE(e.state_id, d.state_id, CASE WHEN e.district_id >= 31 THEN 2 ELSE 1 END) AS state_id`.
+     - Filtered by `body.state_id` using the computed expression.
+  3. **District Fetching by State (`/dashboardapi/getdistricts`)**:
+     - Updated `getdistricts` endpoint to accept `state_id`:
+       - `state_id = 1` filters AP districts (`state_id = 1 OR (state_id IS NULL AND id < 31)`).
+       - `state_id = 2` filters TG districts (`state_id = 2 OR (state_id IS NULL AND id >= 31)`).
+  4. **State Persistence on Meeting Creation (`/dashboardapi/postmeetings`)**:
+     - Updated `postmeetings` handler to store `state_id` (`1` or `2`) and `state` (`'AP'` or `'TG'`) directly into the `events` table upon submission.
+
+---
+
+### 4. Frontend Implementation & Cascading Flows
+
+#### A. View Meetings Filter (`/events`)
+- **Files Modified**: [`src/app/jesus/events/events.component.ts`](src/app/jesus/events/events.component.ts), [`src/app/jesus/events/events.component.html`](src/app/jesus/events/events.component.html)
+- **Implementation**:
+  - Configured state options:
+    - ID 1: `ఆంధ్రప్రదేశ్ - Andhra Pradesh (AP)`
+    - ID 2: `తెలంగాణ - Telangana (TG)`
+  - Added `onStateChange(event)` handler:
+    - Updates `searchdenomation` state control.
+    - Clears downstream filter controls (`district_id`, `constenncy_id`, `mandal_id`, `panchayati_id`).
+    - Fetches only the selected state's districts via `service.getdistrict(stateId)`.
+    - Automatically executes `applyCombinedFilter()`.
+  - Updated `applyClientSideFilter()`:
+    - Matches items using `item.state_id || (item.district_id >= 31 ? 2 : 1) === targetState`.
+    - Removed premature returns in date comparison logic to allow full multi-attribute filtering.
+
+#### B. Submit Meetings Cascading Order (`/addmeetings` & `/profile`)
+- **Files Modified**:
+  - [`src/app/jesus/addmeetings/addmeetings.component.ts`](src/app/jesus/addmeetings/addmeetings.component.ts)
+  - [`src/app/jesus/addmeetings/addmeetings.component.html`](src/app/jesus/addmeetings/addmeetings.component.html)
+  - [`src/app/jesus/profile/profile.component.ts`](src/app/jesus/profile/profile.component.ts)
+  - [`src/app/jesus/profile/profile.component.html`](src/app/jesus/profile/profile.component.html)
+- **Implementation**:
+  - Removed initial district prefetching (`this.getdistric()` was removed from `ngOnInit`), ensuring districts are never loaded without state selection.
+  - Initialized `state_id: ['', [Validators.required]]` and reset child collections to empty arrays `[]`.
+  - **Sequential Cascading Handlers**:
+    - `onStateChange`: Clears district, constituency, mandal, and panchayat. Fetches districts for selected state.
+    - `getconstency`: Clears constituency, mandal, and panchayat. Fetches constituencies for selected district.
+    - `getmandals`: Clears mandal and panchayat. Fetches mandals for selected constituency.
+    - `gepanchayati`: Clears panchayat. Fetches panchayats for selected mandal.
+  - **Form Template Enforcement**:
+    - **1). సెలెక్ట్ రాష్ట్రం / State**: AP / TG options.
+    - **2). సెలెక్ట్ జిల్లా / Select District**: `[disabled]="!form.value.state_id || districts.length === 0"`.
+    - **3). సెలెక్ట్ నియోజకవర్గం / Select Constituency**: `[disabled]="!form.value.districtname || constituency.length === 0"`.
+    - **4). సెలెక్ట్ మండలం / మున్సిపాలిటీ**: `[disabled]="!form.value.constituencyname || mandals.length === 0"`.
+    - **5). సెలెక్ట్ పంచాయతీ/వార్డు**: `[disabled]="!form.value.mandals || panchayati.length === 0"`.
+    - Corrected validation feedback bindings for `village_name`.
+  - **Submission Payload**:
+    - Explicitly passes `state_id` and `state` (`'AP'` / `'TG'`) in `data` payload sent to `service.postsmeetings(data)`.
+
+---
+
+### 5. Verification Checklist
+- [x] VS Code settings suppress Gradle Language Server errors.
+- [x] Events API (`/api/events`, `/dashboardapi/getevents`, `/dashboardapi/getupdateevents`, `/dashboardapi/getribbonevents`) filters accurately by `state_id=1` (AP) and `state_id=2` (TG).
+- [x] Multi-tier meeting search (`/dashboardapi/searchingdata`) accurately maps legacy rows via `dstrct` join and filters by `state_id`.
+- [x] District endpoint (`/dashboardapi/getdistricts`) returns state-isolated district lists.
+- [x] View Meetings UI (`/events`) features dual-state dropdown and instant filtered results.
+- [x] Add Meetings UI (`/addmeetings`) and Profile UI (`/profile`) enforce 1. State ➔ 2. District ➔ 3. Constituency ➔ 4. Mandal ➔ 5. Panchayat with disabled child controls until parent selection.
+- [x] Changing state or district resets downstream controls preventing invalid geographic combinations.
+- [x] `postmeetings` persists `state_id` and `state` into MySQL `events` table.
+
+---
+
+## 23. Milestone 13: View Meetings State-Only Filtering Fix, SQL Ternary Syntax Correction, Database State Alignment, and Lambda Deployment
+
+### 1. Problem Statement & Root Cause Diagnosis
+1. **Broken State-Only Filter**:
+   - In `/events` (View Meetings), selecting all other filters (District, Constituency, Mandal, Panchayat, Date) functioned as expected.
+   - However, when the user selected **only the State** (`TG` / Telangana or `AP` / Andhra Pradesh) without selecting any district or child parameters, the filter failed to display meetings for that state.
+2. **Backend SQL Syntax Error (HTTP 500)**:
+   - Investigation of `/dashboardapi/searchingdata`, `/dashboardapi/getevents`, and `/dashboardapi/getribbonevents` revealed an invalid JavaScript ternary expression embedded directly inside the raw SQL string:
+     `(? = 2 ? e.district_id >= 31 : (e.district_id < 31 OR e.district_id IS NULL))`
+   - MySQL rejected this query with `HTTP 500: You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '? e.district_id >= 31 : ...'`.
+3. **Database State Inconsistency on Legacy Rows**:
+   - Existing event rows in the RDS database (e.g. event ID 178 in Medchal-Malkajgiri with `district_id = 47`) historically contained `state_id = 1` and `state = 'Andhra Pradesh'` hardcoded during legacy insert operations.
+   - Because `COALESCE(e.state_id, d.state_id, ...)` gave precedence to `e.state_id`, event 178 was treated as Andhra Pradesh instead of Telangana, causing client-side fallback filtering to omit it when `TG` was selected.
+
+---
+
+### 2. Implementation & Technical Fixes
+
+#### A. Backend SQL Query Hardening (`backend/server.ts` & `backend/server.js`)
+- Replaced the broken ternary syntax with valid SQL conditional blocks:
+  ```typescript
+  if (stateId && stateId !== 'all') {
+      const sid = Number(stateId);
+      if (sid === 2) {
+          sql += ' AND (d.state_id = 2 OR e.district_id >= 31 OR (e.state_id = 2 AND (e.district_id IS NULL OR e.district_id = 0)))';
+      } else if (sid === 1) {
+          sql += ' AND (d.state_id = 1 OR (e.district_id IS NOT NULL AND e.district_id < 31) OR (e.state_id = 1 AND (e.district_id IS NULL OR e.district_id = 0)) OR (e.district_id IS NULL AND e.state_id IS NULL))';
+      } else {
+          sql += ' AND (e.state_id = ? OR d.state_id = ?)';
+          params.push(sid, sid);
+      }
+  }
+  ```
+- Updated `SELECT` projections across `getevents`, `getribbonevents`, and `searchingdata` to guarantee that `d.state_id` and `district_id >= 31` take authority over legacy `e.state_id`:
+  ```sql
+  CASE 
+      WHEN d.state_id = 2 OR e.district_id >= 31 THEN 2 
+      WHEN d.state_id = 1 OR (e.district_id IS NOT NULL AND e.district_id < 31) THEN 1 
+      ELSE COALESCE(e.state_id, 1) 
+  END AS state_id, 
+  CASE 
+      WHEN d.state_id = 2 OR e.district_id >= 31 THEN 'Telangana' 
+      WHEN d.state_id = 1 OR (e.district_id IS NOT NULL AND e.district_id < 31) THEN 'Andhra Pradesh' 
+      WHEN COALESCE(e.state_id, 1) = 2 THEN 'Telangana' 
+      ELSE 'Andhra Pradesh' 
+  END AS state
+  ```
+- Repackaged `backend-deploy.zip` and deployed to AWS Lambda `jbac-backend-api` in `ap-southeast-2`.
+
+#### B. Database Data Harmonization
+- Executed database update to synchronize legacy rows:
+  ```sql
+  UPDATE events SET state_id = 2, state = 'Telangana' WHERE district_id >= 31;
+  ```
+  Verified row 178 now correctly reflects `state_id: 2, state: 'Telangana'`.
+
+#### C. Frontend State & Cascading Filter Logic (`src/app/jesus/events/`)
+- **`events.component.ts`**:
+  - In `applyClientSideFilter`, prioritized district-based state resolution:
+    ```typescript
+    if (payload.state_id) {
+      const targetState = Number(payload.state_id);
+      filtered = filtered.filter(item => {
+        const did = item.district_id ? Number(item.district_id) : (item.distrct_id ? Number(item.distrct_id) : null);
+        let itemState = Number(item.state_id);
+        if (did) {
+          itemState = did >= 31 ? 2 : 1;
+        } else if (!itemState) {
+          itemState = 1;
+        }
+        return itemState === targetState;
+      });
+    }
+    ```
+- **`events.component.html`**:
+  - Removed `disabled` attribute from default options (`అన్ని జిల్లాలు`, `అన్ని నియోజకవర్గాలు`, `అన్ని మండలాలు`, `అన్ని పంచాయతీలు`), allowing users to freely clear downstream filters or switch between state-wide view and district drill-downs.
+
+---
+
+### 3. Verification & Live API Testing
+- **Live Backend Tests**:
+  - `POST /dashboardapi/searchingdata` with `{ state_id: '2' }`: HTTP 200, returned all Telangana meetings across all districts.
+  - `POST /dashboardapi/searchingdata` with `{ state_id: '1' }`: HTTP 200, returned all Andhra Pradesh meetings across all districts.
+  - `POST /dashboardapi/searchingdata` with `{ state_id: '2', district_id: '47' }`: HTTP 200, successfully narrowed from state to district 47.
+  - `GET /dashboardapi/getevents?state_id=2`: HTTP 200.
+  - `GET /dashboardapi/getevents?state_id=1`: HTTP 200.
+- **Production Build**:
+  - Executed `ng build --configuration production` with Node 24: Generated all bundles (`main.674b7f71531b58d1.js`) with zero compile errors.
+
+---
+
+## 24. Milestone 14: View Meetings Strict Sequential Order Filtering (`State ➔ District ➔ Constituency ➔ Mandal ➔ Panchayat`)
+
+### 1. Requirement & Condition
+- When a user selects a state (TG / AP), all meetings in that state are displayed across all districts, constituencies, mandals, and panchayats.
+- If the user wants to filter further into geographic subdivisions (`District ➔ Constituency ➔ Mandal ➔ Panchayat`), the user **must select State first**.
+- Strict cascading hierarchy:
+  - **District** is disabled until **State** is selected.
+  - **Constituency** is disabled until **District** is selected.
+  - **Mandal** is disabled until **Constituency** is selected.
+  - **Panchayat** is disabled until **Mandal** is selected.
+
+### 2. Implementation
+1. **`src/app/jesus/events/events.component.html`**:
+   - Numbered labels:
+     - `1). సెలెక్ట్ రాష్ట్రం / State`
+     - `2). సెలెక్ట్ జిల్లా` (`[disabled]="!searchdenomation.value.state_id || districts.length === 0"`)
+     - `3). సెలెక్ట్ నియోజకవర్గం` (`[disabled]="!searchdenomation.value.district_id || constituency.length === 0"`)
+     - `4). మండలం/మున్సిపాలిటీ` (`[disabled]="!searchdenomation.value.constenncy_id || mandals.length === 0"`)
+     - `5). సెలెక్ట్ పంచాయతీ/వార్డు` (`[disabled]="!searchdenomation.value.mandal_id || panchayati.length === 0"`)
+   - Intuitive placeholder text explaining what parent selection is needed:
+     - District placeholder: `{{ !searchdenomation.value.state_id ? 'మొదట రాష్ట్రాన్ని ఎంచుకోండి' : 'అన్ని జిల్లాలు (All Districts)' }}`
+     - Constituency placeholder: `{{ !searchdenomation.value.district_id ? 'మొదట జిల్లాను ఎంచుకోండి' : 'అన్ని నియోజకవర్గాలు' }}`
+     - Mandal placeholder: `{{ !searchdenomation.value.constenncy_id ? 'మొదట నియోజకవర్గాన్ని ఎంచుకోండి' : 'అన్ని మండలాలు / మున్సిపాలిటీ' }}`
+     - Panchayat placeholder: `{{ !searchdenomation.value.mandal_id ? 'మొదట మండలాన్ని ఎంచుకోండి' : 'అన్ని పంచాయతీలు / వార్డులు' }}`
+2. **`src/app/jesus/events/events.component.ts`**:
+   - `ngOnInit`: Removed pre-fetching of all districts (`this.getdistric()`), initializing `districts = []`, `constituency = []`, `mandals = []`, `panchayati = []`.
+   - `getdistric`: Returns empty array if no `stateId` is passed, preventing accidental unconstrained district loading.
+   - `onStateChange`: Resets downstream collections and controls (`district_id`, `constenncy_id`, `mandal_id`, `panchayati_id`), then fetches districts only for the selected state.
+   - `onDistrictChange`, `onConstituencyChange`, `onMandalChange`: Cascades resets downstream and enables only the next immediate tier upon selection.
+   - `reset`: Resets all geographic collections to empty arrays so downstream selects return to their disabled state until State is chosen.
+   - `applyCombinedFilter`: Uses `getRawValue()` to ensure clean value extraction even when downstream controls are disabled.
+
+### 3. Verification
+- `ng build --configuration production` succeeded with zero errors (`Hash: ded9e4a05ad4b6d5`).
+
+---
+
+## 25. Milestone 15: Android Mobile App Comprehensive Bug Fixes, Strict Geographic Cascading Everywhere, and v0.0.40 Release Package Generation (.apk & .aab)
+
+### 1. Scope & User Requirements
+The user identified 16 key issues in the Android mobile application, demanding full cross-screen compatibility, universal strict geographic cascading (`State ➔ District ➔ Constituency ➔ Mandal ➔ Panchayat`), and production release artifact generation:
+1. Submit Meetings (`addmeetings`): Camera/gallery picker not responding/opening; missing "Select State" field.
+2. View News (`news-view`): Category dropdown selection not loading news items.
+3. Submit News (`news`): Upload news gallery/camera not responding.
+4. Photo Gallery (`gallery`, `sub-gallery`): Images broken / not displaying.
+5. Church Timings (`church-timings`): Add "Select State" filter for Telangana and Andhra Pradesh.
+6. Church Permission (`churchgo`): YouTube link error, missing navigation buttons, broken local routes.
+7. Christian Organizations & For Help: Add "Select State" filter, fix camera/gallery upload.
+8. Other Services Register (`account`): Unresponsive taps on Ministry Related Institutes, Business Info, Marriages, Job Needs, News/Ads; missing state selectors.
+9. Register of Attacks (`addattacks`): Add "Select State", fix form non-responsiveness and image upload.
+10. Profile Photo / Information: Continuous buffering "Wait, it is processing" (`ప్రాసెస్ అవుతుంది దయచేసి ఆగండి`).
+11. Home Page Banners: Replace banners 1, 3, 7 with new assets; delete banners 2 and 8.
+12. Student Registration (`student`): Add "Select State" for Home Address section with strict cascading.
+13. Ministry Registration: Card tap non-responsiveness and validation syntax typo.
+14. Mobile Compatibility & Card Tap Bubbling: Resolving unclickable card headers on mobile digitizers.
+15. Strict Geographic Cascading Everywhere: `State` ➔ `District` ➔ `Constituency` ➔ `Mandal` ➔ `Panchayat`.
+16. Production Release Generation: Generate signed release `.apk` and `.aab` packages.
+
+### 2. Architecture, Diagnostics & Root Cause Analysis
+- **Camera/Gallery Picker Non-responsiveness**: ActionSheet buttons configured with restrictive handler patterns and deprecated Android storage permission checks failed silently on Android 13+ (API 33+). Solved by integrating direct camera invocation alongside hidden HTML file inputs (`#fileInput`) triggered via native events.
+- **Form Opening Non-responsiveness**: Several component constructors (`AddjobsPage`, `AddattacksPage`, `AddinstitutePage`, `AddbussinessPage`, `AddmarriagePage`, `AddadsPage`, `StudentPage`) invoked `this.form.reset()` prior to form group initialization, resetting controls into an invalid state and throwing unhandled Angular exceptions. Removed all premature `reset()` calls.
+- **Card Header Event Bubbling**: In `forms.html` and `account.html`, click handlers were bound to `<ion-card>` but not `<ion-card-header>`, preventing taps on mobile header surfaces from bubbling to the navigation controller. Added `tappable (click)="gotopage(X)"` to headers.
+- **Infinite Profile Buffering**: `ProfilePage.prototype.gepanchayati` presented a modal `LoadingController` spinner without an unconditional dismiss handler in error/empty branches. Removed the blocking overlay.
+- **Gradle & Toolchain Compatibility**: Cordova Android 8 project with AGP 3.3.0 required Gradle 4.10.3 and Java 8 (`jdk-8.0.504.1-hotspot`). Fixed JFrog/Bintray repository deprecations by commenting out inactive publishing plugins in `CordovaLib/build.gradle` and routing dependencies through Google and Maven Central.
+
+### 3. Build & Signing Execution
+- **Web Compilation**: `npm run build` completed cleanly in 11.17s.
+- **Gradle Release Build**: Executed `clean assembleRelease bundleRelease -PcdvBuildToolsVersion=30.0.3` producing:
+  - Raw APK: `app-release-unsigned.apk` (121.13 MB)
+  - Raw AAB: `app.aab` (118.39 MB)
+- **Zipalign & Apksigner**: Aligned to 4-byte boundaries and signed with `Jbac.keystore` (v2 & v3 schemes enabled).
+- **Jarsigner**: Signed Android App Bundle with `SHA256withRSA` and verified signature integrity.
+- **Final Deliverables**:
+  - `jbacApp-0.0.40.apk`: 127,096,725 bytes (121.2 MB)
+  - `jbacApp-0.0.40.aab`: 124,231,393 bytes (118.5 MB)
+  - `appreleasesigned.aab`: 124,231,393 bytes (118.5 MB)
+
+---
+
+## 26. Milestone 16: Mobile App Final Bug Fixes, Native File Upload Overhaul (`div.imgerdt`), and v0.0.44 Release Generation
+
+### 1. Scope & Resolved Issues
+1. **Unified Native File Chooser & Camera/Gallery Container**:
+   - Replaced `<ion-item>` nested file containers with dedicated `<div class="imgerdt">` elements across:
+     - `Submit Institutes` (`addinstitute.html`)
+     - `Submit Your Business` (`addbussiness.html`)
+     - `Submit for Marriages` (`addmarriage.html`)
+     - `For Jobs` (`addjobs.html`)
+     - `For Adds` (`addads.html`)
+     - `Submit Meeting Poster` (`addmeetings.html`)
+     - `Record News` (`news.html`)
+     - `For Our Help` (`help.html`)
+   - Avoids Chromium WebView asynchronous gesture blocking and Ionic `.item-inner` flex collapse, ensuring native "Choose File" and Camera/Gallery picker always display and work.
+2. **Strict Sequential Geographic Cascading**:
+   - Enforced prerequisite State selection across Marriage Services (`marriage`), View Meetings (`meeting`), Christian Services (`institute`), Jobs (`jobs`), and Search Business/Rent (`searchhouse`).
+3. **About Me Channel Integration**:
+   - Added direct YouTube channel link and subscription button pointing to `https://www.youtube.com/@DrJOSEPHPRAKASHMOSIGANTI7/featured`.
+4. **Android 12+ Package Parse Manifest Fix**:
+   - Enforced `android:exported="true"` on `MainActivity` for target SDK 36.
+   - Dual-signed with v1 (JAR) and v2/v3 (APK) schemes.
+
+### 2. Deliverables
+- `jbacApp-0.0.44.apk`
+- `jbacApp-0.0.44.aab`
+- `appreleasesigned.aab`
+
+---
+
+## 27. Milestone 17: Universal Strict Cascading Geographic Architecture (`State ➔ District ➔ Constituency ➔ Mandal ➔ Panchayat`), Edit Profile Cross-Platform Parity, Mobile Navigation Responsiveness Overhaul, and Release v0.0.46 Build (Target SDK 36)
+
+### 1. Scope & Core Requirements
+The user established four critical requirements across the JBAC ecosystem (Web Portal & Android Mobile App):
+1. **Activation Form (`EntryFormPage` & `update.component`)**:
+   - Filter `District`, `Constituency`, `Mandal`, and `Panchayat` in strict sequential order if and only if `State` is selected.
+   - Child dropdowns must be disabled until their immediate parent is selected.
+   - Fixed header and back navigation styling.
+2. **User Edit Profile (`ProfilePage` & `update.component`)**:
+   - Universal `Select State` (`రాష్ట్రం / State`) dropdown added wherever applicable across all 7 registration categories:
+     - Believer (`signup_form`)
+     - Student (`student_reg` - both College Address and Home/Residential Address)
+     - Ministry (`ministry_signup`)
+     - Pastor (`pastor_reg`)
+     - Church (`church_reg`)
+     - Independent Organisation (`independentorganisation_reg`)
+     - Pastor Association (`pastors_associations`)
+   - Strict sequential cascading order: `State ➔ District ➔ Constituency ➔ Mandal ➔ Panchayat` if and only if `State` is selected.
+   - Non-destructive profile details pre-population (`geteditdtails`), ensuring existing district, constituency, mandal, and panchayat values are cleanly loaded and preserved without premature cascading resets.
+3. **Mobile Navigation Responsiveness & Touch Latency Overhaul**:
+   - Diagnose and resolve sluggish/unresponsive "go back" arrow symbol in the mobile application when navigating back after selecting items.
+   - Diagnose Ionic 3 framework overlay interaction blocking, touch targets, and hardware back button handling.
+4. **Target SDK 36 Production Release Packages**:
+   - Build and dual-sign new version `.apk` and `.aab` packages targeting Android API level 36 (`targetSdkVersion='36'`, `versionCode='46'`, `versionName='0.0.46'`).
+   - Push all verified commits to GitHub (`origin main`).
+
+---
+
+### 2. Deep Root-Cause Analysis & Engineering Solutions
+
+#### A. Mobile Go-Back Navigation Sluggishness & Touch Unresponsiveness
+1. **Ionic 3 Click-Block Overlay (`.click-block-active`)**:
+   - *Diagnosis*: In Ionic 3, whenever an `<ion-select>` action sheet, alert popover, or modal dismisses, the Ionic gesture engine injects an invisible viewport-covering overlay `<div class="click-block click-block-active">` at `z-index: 9999` with a hardcoded 330ms timeout to swallow phantom tap events.
+   - *Problem*: Because the top-left navigation header and back button had standard stacking contexts, this invisible full-screen overlay sat directly above the back button for 330ms+ upon closing selects. Tapping the back button immediately after selecting a dropdown option resulted in the tap being swallowed, creating a perceptibly sluggish or broken "double tap needed" experience.
+   - *Solution*:
+     - In `src/app/app.scss`, constrained `.click-block` and `.click-block-active` with `top: 56px !important`, `z-index: 999 !important`, and `pointer-events: none !important`.
+     - Elevated `ion-header`, `ion-navbar`, and `.toolbar-background` to `z-index: 100000 !important`.
+     - Expanded `.back-button` to a comfortable touch target (minimum 48x48px) with `z-index: 100002 !important`, `touch-action: manipulation !important`, `pointer-events: auto !important`, and zero 300ms click delay.
+     - Set `pointer-events: none` on the centered `.toolbar-title` container so title text boxes never overlap or intercept back button touch vectors.
+2. **Hardware Back Button Navigation Handling**:
+   - *Diagnosis*: Unregistered or default Cordova back-button behaviors left open menus, loading overlays, or active modals lingering on pop.
+   - *Solution*: In `src/app/app.component.ts`, registered `platform.registerBackButtonAction()` with priority handling:
+     1. Closes open side menus if active.
+     2. Dismisses active overlays (loading indicators, alert dialogs, modals).
+     3. Pops the active navigation stack smoothly if `nav.canGoBack()`.
+     4. Prompts to exit cleanly when reaching root `HomePage`.
+
+#### B. Strict Sequential Cascading Architecture (`State ➔ District ➔ Constituency ➔ Mandal ➔ Panchayat`)
+1. **Activation Form (`EntryFormPage` & `update.component`)**:
+   - Initialized with empty child collections (`districts = []`, `constituency = []`, `mandals = []`, `panchayati = []`).
+   - Removed blocking `LoadingController` spinners from geographic fetching methods (`getdistrict`, `getconstituency`, `getmandal`, `getpanchayati`), replacing them with smooth non-blocking asynchronous fetching.
+   - Disabled child controls via `[disabled]` bindings until immediate parent has a valid selection.
+   - Added sequential reset handlers: selecting a State resets District, Constituency, Mandal, and Panchayat; selecting a District resets Constituency, Mandal, and Panchayat; selecting a Constituency resets Mandal and Panchayat; selecting a Mandal resets Panchayat.
+2. **User Edit Profile (`ProfilePage` & `update.component`)**:
+   - Integrated `state_id` across all 7 profile categories in Web and Mobile.
+   - Added student residential state (`res_state_id`) with dedicated residential geographic collections (`res_districts`, `res_constituency`, `res_mandals`, `res_panchayati`).
+   - Hardened `geteditdtails()` with a non-destructive sequential pre-population sequence:
+     - Loads states first.
+     - Fetches districts for user's assigned state.
+     - Fetches constituencies, mandals, and panchayats before setting form values, avoiding premature cascading wipeouts during data hydration.
+
+#### C. Android SDK Platform Schema Compatibility (AGP 3.3.0 & API 36/37)
+1. **Schema Validation Errors**:
+   - *Diagnosis*: AGP 3.3.0 repository parser rejected `<extension-level>` elements placed before `<layoutlib>` in newer Android SDK platform `package.xml` files (`android-33`, `android-35`, `android-36`, `android-37.0`), failing with `cvc-complex-type.2.4.a`.
+   - *Diagnosis 2*: Android preview platform 37 contained `<api-level>37.0</api-level>` in `platforms/android-37.0/package.xml` and `sources/android-37.0/package.xml`. The older JAXB unmarshaller parses `xs:integer` as integer, failing with `java.lang.NumberFormatException: Not a number: 37.0`.
+   - *Solution*: Sanitized `<extension-level>` and normalized `<api-level>37.0</api-level>` to integer `37` across SDK platforms and sources.
+
+---
+
+### 3. Verification & Release Deliverables
+- **Android Target SDK**: `36` (Android 15+ compatible)
+- **Version Code**: `46`
+- **Version Name**: `0.0.46`
+- **Signing**: Dual-signed with v1 (JAR Signature) and v2/v3 (APK Full Signature) schemes using `Jbac.keystore`.
+- **Output Artifacts**:
+  - `jbacApp-0.0.46.apk` (Signed Release APK)
+  - `jbacApp-0.0.46.aab` (Signed Release App Bundle)
+  - `appreleasesigned.aab` (Google Play Console Release Bundle)
 
 
+
+---
+
+## 28. Milestone 18: Meeting Ads Lifecycle & Expiration Engine, Login Experience Cleanup, Universal Vertical Ads Sidebars, Cross-Category Registration Autofill, Admin Cockpit Real-Time Daily Registration KPIs, and District Leader Hierarchy Management (`d_in = 1`)
+
+### 1. Scope & Core Requirements
+The user established six concrete operational enhancements and features across the JBAC ecosystem:
+1. **News Page (`https://jbac.in/news`)**:
+   - Integrated full-page loading spinner active until all news articles have completely loaded.
+   - Right-side vertical marquee displaying active ads under "ప్రకటనలు / సమాచారం".
+   - Condition: Meeting ads must only be displayed until their scheduled `enddate`, after which they automatically disappear; non-meeting ads continue displaying until administratively stopped (`d_in != 0`).
+2. **Login Page (`https://jbac.in/login`)**:
+   - Permanent removal of the "Quick Demo Login" box ("త్వరిత డెమో ఖాతాలు / Quick Demo Login:") shown underneath the password field in the user-provided screenshot.
+3. **Services Pages Universal Ads Sidebars**:
+   - Across all 6 authenticated post-login service views:
+     - Christian Organizations (`/institute`)
+     - Christian Marriages (`/marriages`)
+     - Christian Jobs (`/jobs`)
+     - For Help (`/help`)
+     - Search Business & House Rent (`/business`)
+     - Search Organizations (`/organization`)
+   - Present active ads in a vertical auto-scrolling sidebar with the exact same meeting expiration condition.
+4. **Cross-Category Registration Autofill**:
+   - If a person registered under one category (such as Student), and subsequently seeks to register under another category (such as Believer, Pastor, or Ministry), entering their 10-digit mobile number must automatically retrieve and prefill their personal details, caste, education, and geographic locations (State, District, Constituency, Mandal, Panchayat) with cascading dropdowns fully loaded.
+   - Preserves prefilled information across category tab changes.
+5. **Admin Database Cockpit Real-Time Daily Registration KPIs (`https://jbac.in/admin`)**:
+   - Inside every registered user metric card box (Believers, Pastors, Churches, Students, Ministries, Organizations, and Portal Accounts), display the count registered on that particular day alongside the cumulative total in the same box (`Today: X | Total: Y`).
+   - For every new day, the daily count must reflect that day's registrations, while the previous day's daily count rolls off.
+6. **Leaders Hierarchy & District-Level Approvals (`https://jbac.in/leaders`)**:
+   - If a believer or pastor registered and selected leadership in the general category for a specific state and district: admin decides whether the user is registered as a district-level leader by setting `d_in = 1` in the database table (`signup_form` or `pastor_reg`).
+   - When this approved district leader logs in and visits `/leaders`, all other leaders under their district (at constituency, mandal, and village/panchayat levels) must be listed under "Believers requests" and "Pastors requests" with contact details, direct calling, and approval/rejection actions.
+
+---
+
+### 2. Deep Root-Cause Analysis & Engineering Solutions
+
+#### A. Meeting Ad Expiration & Schema Migration
+1. **Database Schema Limitation**:
+   - *Diagnosis*: The `adds_data` table previously lacked an `enddate` or `event_id` column. When meetings were created in `events`, a duplicate row was pushed into `adds_data` without an expiration boundary, causing old meetings to remain in the active ads rotation indefinitely.
+   - *Solution*: Executed schema migration on RDS MySQL:
+     ```sql
+     ALTER TABLE `adds_data` ADD COLUMN `enddate` VARCHAR(255) DEFAULT NULL;
+     ALTER TABLE `adds_data` ADD COLUMN `event_id` INT DEFAULT NULL;
+     ```
+   - Backfilled existing 23 meeting entries in `adds_data` by matching against `events.id`, `events.orgname`, or phone numbers.
+2. **Backend Lifecycle Enforcement**:
+   - In `backend/server.ts`, updated `/dashboardapi/getaddsdata` and `/api/getadds` to query:
+     ```sql
+     SELECT * FROM adds_data 
+     WHERE d_in = 0 
+       AND (
+         LOWER(COALESCE(type, '')) NOT LIKE '%meet%'
+         OR (enddate IS NOT NULL AND enddate != '' AND enddate >= ?)
+         OR ((enddate IS NULL OR enddate = '') AND (cts IS NULL OR LEFT(cts, 10) >= ?))
+       )
+     ORDER BY id DESC;
+     ```
+   - Updated `/dashboardapi/postmeetings` and `/dashboardapi/postadds` to store `enddate` and `event_id` upon creation.
+   - In `src/app/jesus/service.service.ts`, added client-side date filtering guards in `getadds()` as an additional safeguard.
+
+#### B. Cleaned Login Experience
+- In `src/app/jesus/login/login.component.html`, excised the entire `<div style="background: rgba(255,255,255,0.2); ...">` block containing the demo credentials shortcuts.
+
+#### C. Universal Vertical Ads Sidebars across Services Pages
+- Implemented uniform right-side column marquees in `institute.component.html`, `marriages.component.html`, `jobs.component.html`, `help.component.html`, `business.component.html`, and `organization.component.html`:
+  - Enclosed inside responsive `<div class="col-12 col-lg-3">` containers.
+  - Header: `<h5><i class="fa fa-bullhorn me-2"></i> ప్రకటనలు / సమాచారం</h5>`.
+  - Body: `<marquee onmouseover="this.stop();" onmouseout="this.start();" direction="up" style="height: 550px; scroll-behavior: smooth;">`.
+  - Content: Card-based rendering with image thumbnail, title, phone call link, and date badge.
+
+#### D. Cross-Category Registration Autofill Architecture
+1. **Backend Discovery API (`/dashboardapi/lookup-existing-user`)**:
+   - Takes a 10-digit phone number.
+   - Performs cascading checks across `student_reg`, `signup_form`, and `pastor_reg`.
+   - Returns normalized payload containing: `name`, `fathername`, `mobile_number`, `whatsapp`, `gender`, `dob`, `caste`, `subcaste`, `education`, `state_id`, `district_id`, `constituency_id`, `mandal_id`, `panchayat_id`, `nativeplace`, `talent`, `hobbies`, `lifegoal`, and leadership fields.
+2. **Frontend Dynamic Autofill**:
+   - Bound `(input)="checkExistingUser($event)"` and `(blur)="checkExistingUser($event)"` on phone inputs in `signup.component.html`, `believerregister.component.html`, and `pastorregister.component.html`.
+   - On 10-digit match, automatically calls `lookupExistingUser(digits)`.
+   - Triggers `loadCascadingData(districtId, constId, mandalId)` to fetch child geographic collections asynchronously before form patching.
+   - In `formshow(id)` inside `signup.component.ts`, saved user data is retained in `existingUserData` and re-applied whenever switching category tabs.
+
+#### E. Admin Cockpit Real-Time Daily Registration Metrics
+1. **Timezone-Aware IST Filtering**:
+   - In `backend/server.ts`, `/dashboardapi/admin-dashboard-stats` computes today's date in Indian Standard Time (`getIndianCts().substring(0, 10)`).
+   - Concurrently executes `COUNT(*)` for total users and `COUNT(*)` where `cts LIKE 'YYYY-MM-DD%'` for today's registrations.
+   - At midnight IST, the query automatically shifts to the new day, naturally rolling off yesterday's count.
+2. **Card Box UI Modernization**:
+   - In `public.html`, `backend/public.html`, `src/public.html`, and `src/assets/public.html`:
+   - Updated each metric card (`signup_form`, `pastor_reg`, `church_reg`, `student_reg`, `ministry_signup`, `independentorganisation_reg`, `users`):
+     ```html
+     <div class="metric-card-stat-row">
+       <div class="metric-card-value" id="stat-believers">--</div>
+       <div class="metric-today-badge" title="Registered Today"><span class="metric-today-dot"></span>Today: <strong id="stat-believers-today">0</strong></div>
+     </div>
+     <div class="metric-card-footer">signup_form &bull; Total: <span id="stat-believers-total">--</span></div>
+     ```
+
+#### F. Leaders Hierarchy & District-Level Approvals (`d_in = 1`)
+1. **District Leader Qualification Rule**:
+   - In `backend/server.ts`, `/dashboardapi/getUserMainData` inspects `pastor_reg` and `signup_form`.
+   - The user is qualified as a District Leader if and only if `d_in == 1`.
+2. **Subordinate Hierarchy Aggregation**:
+   - `/dashboardapi/getLeaderswebsiteData` queries all subordinate leaders in that district:
+     ```sql
+     SELECT s.id, s.fname, s.lname, s.mobile_number, s.generaltype, s.leadership, s.leadertype,
+            s.approval_ind, s.district_id, s.constituency_id, s.mandal_id, s.panchayat_id,
+            COALESCE(c.const_nm, '') as constituency_name,
+            COALESCE(m.mndl_nm, '') as mandal_name,
+            COALESCE(p.pnchyt_nm, '') as panchayat_name
+     FROM signup_form s
+     LEFT JOIN const_dtl_t c ON s.constituency_id = c.id
+     LEFT JOIN mndls_lst_t m ON s.mandal_id = m.id
+     LEFT JOIN pnchyt_lst_t p ON s.panchayat_id = p.id
+     WHERE s.district_id = ? 
+       AND (LOWER(COALESCE(s.leadership, '')) = 'yes' OR s.leadertype IS NOT NULL OR s.generaltype IS NOT NULL)
+       AND s.id != ?
+     ORDER BY s.id DESC;
+     ```
+3. **Interactive Management Interface & Detailed Leader Status Badges**:
+   - In `src/app/jesus/leaders/leaders.component.ts` and `leaders.component.html`, overhauled Believers Requests and Pastors Requests tables.
+   - Replaced generic placeholder status with `getDetailedLeaderStatus(x)` and dynamic color styling `getLeaderBadgeStyle(x)`:
+     - **Wing Leaders**: Resolves wing names (e.g. `స్టూడెంట్ వింగ్ (Student Wing)`, `సాఫ్ట్ వెర్ వింగ్`, `డ్రైవర్స్ వింగ్`) and specific wing roles (`మీడియా రిపోర్టర్స్`, `సోషల్ మీడియా`, `పేపర్ మీడియా`), rendered with distinct purple badges (`#ede9fe` / `#6d28d9`).
+     - **Ward / Sub-Ward Leaders**: Renders ward and sub-ward designations (`వార్డు నెం. 1 లీడర్ (Ward Leader)`, `సబ్ వార్డు లీడర్ (Sub-Ward)`) in amber badges (`#fef3c7` / `#b45309`).
+     - **Mandal & Panchayat Leaders**: Clear Telugu and English indicators (`మండల లీడర్ (Mandal Leader)` in teal badges, `గ్రామ / పంచాయితీ లీడర్ (Panchayat Leader)` in green badges).
+     - **District & Constituency Leaders**: Blue badges (`#e0f2fe` / `#0369a1`).
+   - Connected Confirm (`confirm(tableId, id)`) and Reject (`deleteAlert(tableId, id)`) actions to update `approval_ind = 1 / 2` in the database.
+4. **Backend Wing & Ward Query Integration**:
+   - In `backend/server.ts`, updated `getLeaderswebsiteData` to `LEFT JOIN wings w ON s.wingtype = w.id` and select `wingtype`, `wingtypes`, `wardnumber`, `subward`, and `COALESCE(w.position, w.wing_name, '') as wing_name`.
+
+---
+
+### 3. Verification & Deployment Deliverables
+- **AWS Lambda Backend (`jbac-backend-api`)**: Successfully deployed to `ap-southeast-2` with runtime Node.js 18.x.
+- **Angular Production Web Frontend**: Compiled with Node v24 into `dist/churchwebsite` and synced to S3 bucket `jbac-web-production-298363284024`.
+- **CloudFront CDN Distribution (`EOBBU8SU7H3BI`)**: Invalidated globally with paths `/*`, `/admin*`, `/public.html`.
+- **Automated Verification**: End-to-end Python test suite (`scripts/verify_all_requirements.py`) passed 100% across all 6 feature streams. Live API verification for `getLeaderswebsiteData` confirmed full data resolution for student wing, software wing, and ward leaders.
+
+
+---
+
+## 29. Leadership Hierarchy Delegation, Hero Banner Removal & Form Beautification (October 29, 2026)
+
+### 1. Architectural Objectives & Requirements
+1. **Strict Leadership Hierarchy in `https://jbac.in/leaders`**:
+   - Approved District Leader (`generaltype = 1` or `d_in = 1`): sees Constituency Leaders only (`generaltype = 2`) within their district.
+   - Approved Constituency Leader (`generaltype = 2`): sees Mandal Leaders only (`generaltype = 3`) within their constituency.
+   - Approved Mandal Leader (`generaltype = 3`): sees Village/Panchayat and Ward Leaders (`generaltype IN (4, 5, 6)`) within their mandal.
+   - Rejection Visibility: When any leader rejects a subordinate (`approval_ind = 2`), the applicant disappears immediately from the list; only approved (`approval_ind = 1`) and unapproved (`approval_ind = 0` / `NULL`) leaders are visible.
+2. **Global Removal of The Top Banner (Hero Banner / Header Image)**:
+   - Eliminate the large graphic image featuring laptops, hands, and breadcrumbs (`.top_panel_title`) across all pages.
+3. **Redesign of The Scrolling Updates Bar (Horizontal Marquee / Announcement Bar)**:
+   - Modernized styling with dark slate/navy gradient (`#0b192c` to `#1e3e62`), crimson red `📢 UPDATES` pill badge, and smooth horizontal scrolling with gold link highlights.
+4. **Beautification of Filter Tables, Registration Tables, and Login Form**:
+   - Overhauled Jobs search card into responsive 12-column grid, eliminating fixed 273px widths and overlapping selects.
+   - Upgraded login view with modern card header (`🔐 LOGIN HERE`), sleek inputs, and full-width gradient button.
+   - Standardized universal input heights, focus rings, and card elevations across all registration and search views.
+
+### 2. Implementation Summary
+- **Backend API (`backend/server.ts`)**:
+  - In `getUserMainData`: Enabled resolution of approved Constituency and Mandal leaders in addition to District leaders.
+  - In `getLeaderswebsiteData`: Implemented one-level-down hierarchy filtering and excluded rejected applicants (`COALESCE(approval_ind, 0) != 2`).
+  - Compiled and deployed updated `backend-deploy.zip` to AWS Lambda `jbac-backend-api` in `ap-southeast-2`.
+- **Frontend Components & Templates**:
+  - In `src/app/jesus/leaders/leaders.component.ts` & `.html`: Added `getSubordinateSubtitle()` and client-side rejection filter.
+  - In `src/styles.css`: Added global removal of `.top_panel_title`, announcement bar marquee styling, and universal card/input enhancements.
+  - In `src/app/jesus/jobs/jobs.component.html`: Restructured filter card into responsive Bootstrap grid.
+  - In `src/app/jesus/login/login.component.html`: Replaced burlywood container with modern card styling.
+
+
+---
+
+## 🚀 Update Log (2026-10-29): Admin Pastor Associations, Mobile Hamburger Menu, Student Leadership Hierarchy, & Believer Wing Leadership
+
+### 1. Admin Panel - Pastor Associations Section (`public.html` & Backend)
+- **Database Metrics & Real-Time Stats**: Added `pastor_associations` and `pastor_associations_today` to `GET /dashboardapi/admin-dashboard-stats` in `backend/server.js` and `backend/server.ts`, querying the `pastors_associations` table for live counts.
+- **Admin Dashboard KPI Card**: Added the interactive **Pastor Associations** card (`stat-pastor-associations`, `stat-pastor-associations-today`, `stat-pastor-associations-total`) to `public.html`, `src/public.html`, and `backend/public.html`. Clicking it immediately launches `SELECT * FROM pastors_associations ORDER BY id DESC LIMIT 50;` in the SQL Query Console.
+
+### 2. Mobile Responsive Hamburger Menu Fix (`header.component.ts`, `header.component.html`, & `styles.css`)
+- **Native Angular State & Handlers**: Added `mobileMenuOpen: boolean` with `toggleMobileMenu()` and `closeMobileMenu()` methods in `HeaderComponent`.
+- **Responsive Hamburger Icon**: Bound `(click)="toggleMobileMenu()"` to `.menu_button`, `[class.open]="mobileMenuOpen"` to `.side_wrap`, and `[class.show]="mobileMenuOpen"` to `.mask`.
+- **CSS Isolation**: Prevented `@media (max-width: 1023px)` from hiding `.menu_main_nav_area` inside `.side_wrap` (by scoping desktop nav hiding to `.top_panel_wrap .menu_main_nav_area`). Styled the hamburger icon with `content: "☰"` and provided a high z-index overlay (`z-index: 100005`) for immediate responsiveness on iPhone and Android mobile browsers.
+
+### 3. Student Leader Hierarchy & Dashboard Requests (`studentregister`, `leaders`, & Backend)
+- **Student Register Form Fix**: Fixed `src/app/jesus/studentregister/studentregister.component.html` option values for "Select Leadership Level you want" so State, District, Constituency, Mandal, Ward/Panchayat, and institution levels submit accurate values rather than duplicate strings.
+- **Backend Leader Resolution (`/dashboardapi/getUserMainData`)**: Enabled resolution of student leaders (`student_reg`, category `2`). Normalized string and numeric leadership levels (`State Level` -> 0, `District Level` -> 1, `Constituency Level` -> 2, `Mandal Level` -> 3, `Ward / Panchayati Level` -> 4).
+- **One-Level-Down Hierarchy**:
+  - State Leaders (`generaltype == 0`): view District leaders (`generaltype == 1`) in that state.
+  - District Leaders (`generaltype == 1`): view Constituency leaders (`generaltype == 2`) in that district.
+  - Constituency Leaders (`generaltype == 2`): view Mandal leaders (`generaltype == 3`) in that constituency.
+  - Mandal Leaders (`generaltype == 3`): view Panchayat/Ward leaders in that mandal.
+- **Student Requests Tab & Actions**: Added the **🎓 Students Requests (విద్యార్థులు)** tab and table in `leaders.component.html`, with Confirm (`confirm(2, x.id)`) and Reject (`deleteAlert(2, x.id)`).
+- **Instant Rejection Disappearance**: Filtered all queries with `COALESCE(approval_ind, 0) != 2` so rejected leaders disappear immediately from all dashboards.
+
+### 4. Believer Registration Wing Leadership Level (`believerregister` & Backend)
+- **Form Controls & Dynamic Binding**: Added the "మీరు చేయగలిగిన వింగ్ లీడర్ షిప్ లెవెల్ ఎంచుకోండి" (`wingtype`) dropdown to `believerregister.component.html` populated dynamically from `this.service.getleaderlevel()`, matching `pastorregister`. Kept "వింగ్ లీడర్ కేటగిరి" (`wingtypes`) populated from `this.service.getwing()`.
+- **Wing Leader Hierarchy**: When any pastor or believer registers as a Wing Leader and selects a leadership level (with admin setting `d_in = 1`), they access the hierarchical subordinates of the next level down (District &rarr; Constituency &rarr; Mandal &rarr; Village/Ward) across all wing categories.
+
+### 5. Production Build & Cloud Deployment
+- **AWS Lambda**: Updated package `backend-deploy.zip` with new `server.js` and `public.html`, and deployed to AWS Lambda function `jbac-backend-api` (region `ap-southeast-2`).
+- **Angular Production Build**: Generated optimized chunks (`main.50cf944bb900db77.js`, `styles.db5f96a266671e53.css`).
+- **AWS S3 & CloudFront**: Synchronized `dist/churchwebsite` to S3 bucket `jbac-web-production-298363284024` and created CloudFront cache invalidation (`EOBBU8SU7H3BI`).
+
+
+---
+
+## [2026-10-29 20:56:11] Strict Wing Category Isolation & Hierarchical Subordinate Filtering
+
+### 1. Functional Overview
+Rewrote and hardened the leadership dashboard hierarchy and subordinate filtering logic for Believer and Pastor registrations:
+- **Strict Wing Category Isolation**:
+  - Admin-elected or approved District-level leaders of a specific wing (e.g., Student Wing, Advocate Wing, Medical Wing, etc.) can **ONLY** see the list of users registered for that **exact same wing category** in that district's constituencies.
+  - If a user resides in the same district/constituency but registered under a different wing category, they are **strictly excluded** from the dashboard.
+  - Similarly, a Constituency-level leader of a specific wing can only see Mandal-level users of the same wing.
+  - Similarly, a Mandal-level leader of a specific wing can only see Village / Panchayat / Ward users of the same wing.
+- **Hierarchical Scoping (One Level Down)**:
+  - State Leader (`generaltype = 0`) $\rightarrow$ sees District Leaders (`generaltype = 1`).
+  - District Leader (`generaltype = 1`, `d_in = 1`) $\rightarrow$ sees Constituency Leaders (`generaltype = 2`).
+  - Constituency Leader (`generaltype = 2`) $\rightarrow$ sees Mandal Leaders (`generaltype = 3`).
+  - Mandal Leader (`generaltype = 3`) $\rightarrow$ sees Village / Panchayat / Ward Leaders (`generaltype IN (4, 5, 6)` or `wardnumber`/`subward`).
+- **Rejection & Self-Exclusion Shielding**:
+  - Rejected leaders (`approval_ind = 2`) are completely removed from all subordinate lists (`COALESCE(approval_ind, 0) != 2`).
+  - The logged-in leader themselves is excluded (`s.id != currentUserId`, `pr.id != currentUserId`, `st.id != currentUserId`).
+
+### 2. Backend Implementation (`backend/server.js` & `backend/server.ts`)
+- **Canonical Wing Catalog (`WING_CATALOG`)**: Defined all 23 official wings with canonical Telugu titles, English descriptors, and token sets.
+- **Canonical Wing Resolver (`resolveWingCategory`)**: Converts numeric IDs (`1` to `23`), Telugu strings (`'అడ్వకేట్ వింగ్'`, `'స్టూడెంట్ వింగ్'`), and English terms (`'advocate'`, `'student'`) into unified canonical wing objects.
+- **SQL Condition Builder (`getWingMatchSql`)**: Cross-checks both `wingtypes` and `wingtype` columns against wing IDs, Telugu names, and keywords.
+- **Top-Level Helper (`parseLeadershipLevel`)**: Normalized leadership parsing across State (`0`), District (`1`), Constituency (`2`), Mandal (`3`), and Ward/Village (`4`) in both English and Telugu (`జిల్లా`, `నియోజకవర్గ`, `మండల`, `పంచాయతి`, `వార్డు`).
+- **Endpoints Updated**:
+  - `/dashboardapi/getLeaderswebsiteData` and `/dashboardapi/getLeaderswebsitewing`: Dynamic SQL matching with wing category filtering and one-level-down hierarchy.
+  - `/dashboardapi/getUserMainData`: Resolves `wing_name` and `wing_english` for the authenticated leader to display the exact title in the frontend header.
+
+### 3. Frontend Implementation (`src/app/jesus/leaders/leaders.component.ts`)
+- **Title Rendering**: Sets `this.wingtypes = res.data[0].wing_name || res.data[0].wingtypes;` so the header displays the exact Telugu title (`District అడ్వకేట్ వింగ్ Leader`, `District స్టూడెంట్ వింగ్ Leader`).
+- **Payload Enrichment**: Transmits `leadertype`, `wingtypes`, and `generaltype` in both `data` and `data4` requests to ensure seamless backend resolution.
+
+### 4. Verification on Live AWS Infrastructure
+- **District 17 Test**:
+  - Advocate Wing Leader query $\rightarrow$ returned 0 students (student records shielded).
+  - Student Wing Leader query $\rightarrow$ returned 2 students (Chukka Divya Darshitha, Vinukonda samyuktha).
+- **District 20 Test**:
+  - Advocate Wing Leader query $\rightarrow$ returned Pastor 1261 (Rajesh chadamala, registered as Advocate Wing).
+  - Student Wing Leader query $\rightarrow$ returned 0 pastors (cross-wing pastor shielded).
+- **Production Deployment**:
+  - AWS Lambda function `jbac-backend-api` updated in `ap-southeast-2`.
+  - Angular production build compiled (`main.c8b61a671568b0b1.js`, `styles.db5f96a266671e53.css`).
+  - Synced to S3 bucket `jbac-web-production-298363284024` and CloudFront cache invalidated (`EOBBU8SU7H3BI`).

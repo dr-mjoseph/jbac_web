@@ -1,7 +1,525 @@
 /* You can add global styles to this file, and also import other style files */
 
-html, body { height: 100%; }
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
-/* input[type="tel"] {
-  font-family: 'Roboto', sans-serif;
-} */
+html, body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+  background-color: #f8fafc;
+}
+
+/* ==========================================================================
+   0. MAIN NAVIGATION HEADER & MENU (RESPONSIVE SEPARATION)
+   ========================================================================== */
+/* Desktop Header (>= 1024px) */
+@media (min-width: 1024px) {
+  header.top_panel_wrap,
+  .top_panel_wrap,
+  .top_panel_wrap_inner,
+  .top_panel_middle,
+  .menu_main_wrap,
+  .top_panel_wrap .menu_main_nav_area {
+    display: block !important;
+    visibility: visible !important;
+    height: auto !important;
+    opacity: 1 !important;
+  }
+  .header_mobile {
+    display: none !important;
+    visibility: hidden !important;
+    height: 0 !important;
+    overflow: hidden !important;
+  }
+}
+
+/* Mobile Header (< 1024px) */
+@media (max-width: 1023px) {
+  header.top_panel_wrap,
+  .top_panel_wrap,
+  .top_panel_wrap_inner,
+  .top_panel_middle,
+  .menu_main_wrap,
+  .top_panel_wrap .menu_main_nav_area {
+    display: none !important;
+    visibility: hidden !important;
+    height: 0 !important;
+    overflow: hidden !important;
+  }
+  .header_mobile {
+    display: block !important;
+    visibility: visible !important;
+    position: relative !important;
+    width: 100% !important;
+    background: #ffffff !important;
+    z-index: 9999 !important;
+  }
+  .header_mobile .content_wrap {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    padding: 10px 18px !important;
+    position: relative !important;
+    background: #ffffff !important;
+    border-bottom: 1px solid #e2e8f0 !important;
+  }
+  .header_mobile .menu_button {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 44px !important;
+    height: 44px !important;
+    font-size: 26px !important;
+    cursor: pointer !important;
+    color: #00548F !important;
+    background-color: transparent !important;
+    z-index: 10002 !important;
+    position: static !important;
+    margin: 0 !important;
+    user-select: none !important;
+    -webkit-tap-highlight-color: transparent !important;
+  }
+  .header_mobile .menu_button:before {
+    content: "☰" !important;
+    font-family: inherit !important;
+    font-weight: bold !important;
+  }
+  .header_mobile .side_wrap {
+    display: block !important;
+    position: fixed !important;
+    top: 0 !important;
+    left: -330px !important;
+    width: 310px !important;
+    max-width: 86vw !important;
+    height: 100vh !important;
+    bottom: 0 !important;
+    overflow-y: auto !important;
+    z-index: 100005 !important;
+    background: #00548F !important;
+    box-shadow: 4px 0 24px rgba(0, 0, 0, 0.45) !important;
+    transition: left 0.3s ease-in-out !important;
+    padding: 0 !important;
+  }
+  .header_mobile .side_wrap.open {
+    left: 0 !important;
+  }
+  .header_mobile .side_wrap .close {
+    display: block !important;
+    position: absolute !important;
+    top: 14px !important;
+    right: 14px !important;
+    color: #ffffff !important;
+    font-size: 15px !important;
+    font-weight: 700 !important;
+    cursor: pointer !important;
+    z-index: 100006 !important;
+    background: rgba(0, 0, 0, 0.25) !important;
+    padding: 6px 12px !important;
+    border-radius: 6px !important;
+    letter-spacing: 0.5px !important;
+  }
+  .header_mobile .side_wrap .close:hover {
+    background: rgba(255, 0, 0, 0.5) !important;
+  }
+  .header_mobile .side_wrap .menu_main_nav_area {
+    display: block !important;
+    visibility: visible !important;
+    height: auto !important;
+    opacity: 1 !important;
+    padding-top: 55px !important;
+    padding-bottom: 30px !important;
+  }
+  .header_mobile .mask {
+    display: none !important;
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    background: rgba(0, 0, 0, 0.6) !important;
+    z-index: 100004 !important;
+    cursor: pointer !important;
+  }
+  .header_mobile .mask.show {
+    display: block !important;
+  }
+}
+
+/* ==========================================================================
+   1. REMOVE TOP PANEL IMAGE BANNER ONLY ACROSS ALL PAGES
+   ========================================================================== */
+div.top_panel_title,
+.top_panel_title,
+.top_panel_title_inner {
+  display: none !important;
+  height: 0 !important;
+  min-height: 0 !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  overflow: hidden !important;
+  visibility: hidden !important;
+}
+
+/* ==========================================================================
+   2. SCROLLING ANNOUNCEMENT BAR (HORIZONTAL MARQUEE / UPDATES BAR)
+   ========================================================================== */
+.latest-news-block {
+  background: linear-gradient(135deg, #0b192c 0%, #1e3e62 100%) !important;
+  border-top: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-bottom: 2px solid #00548F !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12) !important;
+  padding: 8px 0 !important;
+  color: #f8fafc !important;
+  font-family: 'Ramabhadra', 'Segoe UI', Roboto, sans-serif !important;
+  margin-top: 0 !important;
+  margin-bottom: 18px !important;
+  position: relative !important;
+  z-index: 10 !important;
+}
+
+.latest-news-block-hightlight {
+  width: 100% !important;
+  max-width: 1320px !important;
+  margin: 0 auto !important;
+  padding: 0 16px !important;
+}
+
+.latest-update-block {
+  display: flex !important;
+  align-items: center !important;
+  width: 100% !important;
+  gap: 12px !important;
+}
+
+.latest-update-block .block-2 {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 6px !important;
+  background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%) !important;
+  color: #ffffff !important;
+  font-weight: 700 !important;
+  font-size: 13px !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.8px !important;
+  padding: 5px 16px !important;
+  border-radius: 20px !important;
+  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.45) !important;
+  flex-shrink: 0 !important;
+  white-space: nowrap !important;
+}
+
+.latest-update-block .block-2::before {
+  content: "📢";
+  font-size: 14px !important;
+}
+
+.latest-news-block marquee {
+  display: flex !important;
+  align-items: center !important;
+  height: 32px !important;
+  line-height: 32px !important;
+  font-size: 14.5px !important;
+  color: #f1f5f9 !important;
+}
+
+.latest-news-block .tickercontainer {
+  display: inline-flex !important;
+  align-items: center !important;
+  white-space: nowrap !important;
+}
+
+.latest-news-block .tickercontainer span.ad-blk,
+.latest-news-block .tickercontainer span.photo_gallery-icon {
+  color: #94a3b8 !important;
+  font-weight: 600 !important;
+  margin-left: 24px !important;
+  margin-right: 8px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+}
+
+.latest-news-block .tickercontainer a {
+  color: #38bdf8 !important;
+  text-decoration: none !important;
+  font-weight: 600 !important;
+  padding: 2px 6px !important;
+  border-radius: 4px !important;
+  transition: all 0.2s ease-in-out !important;
+}
+
+.latest-news-block .tickercontainer a:hover {
+  color: #fbbf24 !important;
+  background: rgba(251, 191, 36, 0.1) !important;
+  text-decoration: underline !important;
+}
+
+/* ==========================================================================
+   3. ATTRACTIVE FILTER TABLES & SEARCH CARDS ACROSS ALL PAGES
+   ========================================================================== */
+.container h3,
+h3.filter-title {
+  color: #00548F !important;
+  font-weight: 700 !important;
+  font-size: 1.5rem !important;
+  letter-spacing: 0.3px !important;
+  margin-bottom: 18px !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+}
+
+/* Card container for search and filtering */
+.container > .card,
+.container > .row.card,
+.filter-card {
+  background: #ffffff !important;
+  border: 1px solid #e2e8f0 !important;
+  border-radius: 16px !important;
+  box-shadow: 0 10px 25px -5px rgba(0, 84, 143, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.04) !important;
+  padding: 24px 28px !important;
+  margin-bottom: 30px !important;
+  transition: transform 0.2s ease, box-shadow 0.2s ease !important;
+}
+
+/* Form outlines & groups */
+.form-outline,
+.form-group {
+  width: 100% !important;
+  box-sizing: border-box !important;
+  margin-bottom: 16px !important;
+}
+
+.form-outline .form-label,
+.form-group label,
+.card label {
+  font-weight: 600 !important;
+  color: #1e293b !important;
+  font-size: 13.5px !important;
+  margin-bottom: 6px !important;
+  display: inline-block !important;
+  letter-spacing: 0.2px !important;
+  width: 100% !important;
+}
+
+/* Universal Form Controls - Responsive and Attractive */
+.card .form-control,
+.card select.form-control,
+.card input.form-control,
+.card textarea.form-control,
+.filter-card .form-control,
+.filter-card select.form-control,
+.filter-card input.form-control,
+.form-outline .form-control,
+.form-outline select.form-control,
+.form-outline input.form-control,
+.form-group .form-control,
+.form-group select.form-control,
+.form-group input.form-control,
+.card-registration .form-control,
+.card-registration select.form-control,
+.card-registration input.form-control,
+select.form-control,
+input.form-control,
+textarea.form-control {
+  width: 100% !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+  height: 42px !important;
+  min-height: 42px !important;
+  border-radius: 8px !important;
+  border: 1.5px solid #cbd5e1 !important;
+  padding: 7px 14px !important;
+  font-size: 14.5px !important;
+  background-color: #ffffff !important;
+  color: #1e293b !important;
+  transition: all 0.2s ease-in-out !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04) !important;
+}
+
+/* Allow textareas to expand naturally */
+.card textarea.form-control,
+.card-registration textarea.form-control,
+textarea.form-control {
+  height: auto !important;
+  min-height: 70px !important;
+  resize: vertical !important;
+}
+
+/* Select Dropdown - Single Clean Crisp Chevron (Appearance None to prevent double arrow) */
+select.form-control,
+.card select.form-control,
+.filter-card select.form-control,
+.card-registration select.form-control,
+.form-outline select.form-control,
+.form-group select.form-control {
+  cursor: pointer !important;
+  -webkit-appearance: none !important;
+  -moz-appearance: none !important;
+  appearance: none !important;
+  background-color: #ffffff !important;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23334155' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e") !important;
+  background-repeat: no-repeat !important;
+  background-position: right 14px center !important;
+  background-size: 12px 8px !important;
+  padding-right: 36px !important;
+}
+
+select.form-control::-ms-expand {
+  display: none !important;
+}
+
+.card .form-control:focus,
+.card select.form-control:focus,
+.filter-card .form-control:focus,
+.form-outline .form-control:focus,
+.card-registration .form-control:focus {
+  border-color: #00548F !important;
+  box-shadow: 0 0 0 3.5px rgba(0, 84, 143, 0.18) !important;
+  outline: none !important;
+  background-color: #ffffff !important;
+}
+
+.card .form-control:disabled,
+.card select.form-control:disabled,
+.form-outline select.form-control:disabled,
+.card-registration select.form-control:disabled {
+  background-color: #f1f5f9 !important;
+  color: #94a3b8 !important;
+  cursor: not-allowed !important;
+  border-color: #e2e8f0 !important;
+}
+
+/* ==========================================================================
+   4. ATTRACTIVE REGISTRATION TABLES & FORMS ACROSS ALL PAGES
+   ========================================================================== */
+.card-registration {
+  border: 1px solid #e2e8f0 !important;
+  border-radius: 16px !important;
+  box-shadow: 0 10px 30px rgba(0, 84, 143, 0.08) !important;
+  background: #ffffff !important;
+  overflow: hidden !important;
+}
+
+.card-registration .card-body {
+  padding: 30px 36px !important;
+}
+
+.card-registration h3,
+.card-registration h4 {
+  color: #00548F !important;
+  font-weight: 700 !important;
+  border-bottom: 2px solid #e2e8f0 !important;
+  padding-bottom: 10px !important;
+  margin-bottom: 24px !important;
+}
+
+/* Inner Nested Cards (like Address / చిరునామా) */
+.card-registration .card,
+.card-registration .card-registration,
+.card .card {
+  padding: 24px 22px !important;
+  margin-top: 20px !important;
+  margin-bottom: 24px !important;
+  border: 1.5px solid #e2e8f0 !important;
+  border-radius: 14px !important;
+  background-color: #f8fafc !important;
+  box-shadow: 0 2px 8px rgba(0, 84, 143, 0.04) !important;
+  box-sizing: border-box !important;
+  overflow: visible !important;
+}
+
+.card-registration .card > p,
+.card-registration .card-registration > p {
+  font-weight: 700 !important;
+  font-size: 16px !important;
+  color: #00548F !important;
+  margin-bottom: 18px !important;
+  border-bottom: 1.5px solid #cbd5e1 !important;
+  padding-bottom: 8px !important;
+  display: block !important;
+  width: 100% !important;
+}
+
+/* Prevent Row Overflow and Misalignment Inside Cards */
+.card .row,
+.card-registration .row,
+.filter-card .row {
+  margin-left: -10px !important;
+  margin-right: -10px !important;
+}
+
+.card .row > [class*="col-"],
+.card-registration .row > [class*="col-"],
+.filter-card .row > [class*="col-"] {
+  padding-left: 10px !important;
+  padding-right: 10px !important;
+  box-sizing: border-box !important;
+}
+
+/* Buttons */
+.default-btn.user-all-btn,
+.btn-primary.user-all-btn,
+button.default-btn {
+  background: linear-gradient(135deg, #00548F 0%, #003366 100%) !important;
+  color: #ffffff !important;
+  border: none !important;
+  border-radius: 8px !important;
+  font-weight: 600 !important;
+  font-size: 15px !important;
+  padding: 10px 28px !important;
+  box-shadow: 0 4px 12px rgba(0, 84, 143, 0.25) !important;
+  transition: all 0.25s ease !important;
+  cursor: pointer !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.default-btn.user-all-btn:hover,
+button.default-btn:hover {
+  background: linear-gradient(135deg, #003e6b 0%, #002244 100%) !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 6px 16px rgba(0, 84, 143, 0.35) !important;
+  color: #ffffff !important;
+}
+
+/* Tables Styling */
+.table-responsive {
+  border-radius: 12px !important;
+  border: 1px solid #e2e8f0 !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05) !important;
+  background: #ffffff !important;
+  overflow-x: auto !important;
+}
+
+table.table thead th {
+  background: linear-gradient(135deg, #00548F 0%, #003e6b 100%) !important;
+  color: #ffffff !important;
+  font-weight: 600 !important;
+  font-size: 14px !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.5px !important;
+  padding: 14px 16px !important;
+  border: none !important;
+  vertical-align: middle !important;
+}
+
+table.table tbody tr {
+  transition: background-color 0.15s ease !important;
+}
+
+table.table tbody tr:hover {
+  background-color: #f8fafc !important;
+}
+
+table.table tbody td {
+  padding: 12px 16px !important;
+  vertical-align: middle !important;
+  font-size: 14px !important;
+  color: #334155 !important;
+  border-top: 1px solid #f1f5f9 !important;
+}

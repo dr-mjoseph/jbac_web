@@ -20,12 +20,12 @@ export class MinistryregisterComponent {
   denomation: any;
   pattern: any;
   states: any = [];
-  districts: any;
-  mandals: any;
-  panchayati: any;
+  districts: any = [];
+  mandals: any = [];
+  panchayati: any = [];
   bliversdata: any;
   district: any;
-  constituency: any;
+  constituency: any = [];
   panchayatis: any;
   imagedata: any = []
   wings: any;
@@ -45,7 +45,7 @@ export class MinistryregisterComponent {
       headnmber: ['', [Validators.required, Validators.maxLength(10)]],
       number_ofchurches: ['', [Validators.required]],
       number_ofmembers: ['', [Validators.required]],
-      state_id: ['1', [Validators.required]],
+      state_id: ['', [Validators.required]],
       district_id: ['', [Validators.required]],
       constituency_id: ['', [Validators.required]],
       mandal_id: ['', [Validators.required]],
@@ -68,7 +68,6 @@ export class MinistryregisterComponent {
   ngOnInit(): void {
     this.getdenomations();
     this.getstates();
-    this.getdistric(1);
     const datePipe = new DatePipe('en-Us');
     this.now = datePipe.transform(new Date(), 'yyyy-MM-dd');
     this.usr_id = sessionStorage.getItem('usr_id');
@@ -98,21 +97,25 @@ export class MinistryregisterComponent {
   }
 
   onStateChange(event: any) {
-    const stateId = event?.target?.value || event || '1';
+    const stateId = event && event.target ? event.target.value : event;
     this.ministryform.patchValue({
       district_id: '',
       constituency_id: '',
       mandal_id: '',
       panchayat_id: ''
     });
+    this.districts = [];
     this.constituency = [];
     this.mandals = [];
     this.panchayati = [];
-    this.getdistric(stateId);
+    if (stateId) {
+      this.getdistric(stateId);
+    }
   }
 
   getdistric(stateId?: any) {
-    const sid = stateId || this.ministryform.get('state_id')?.value || 1;
+    const sid = stateId || this.ministryform.get('state_id')?.value;
+    if (!sid) return;
     this.service.getdistrict(sid).subscribe(res => {
       this.districts = res.data;
     })
@@ -120,6 +123,9 @@ export class MinistryregisterComponent {
 
   getmandals(event: any) {
     var id = event.target.value;
+    this.ministryform.patchValue({ mandal_id: '', panchayat_id: '' });
+    this.mandals = [];
+    this.panchayati = [];
     this.service.getmandals().subscribe(res => {
       this.mandals = res.data.filter((data: any) => data.const_id == id);
     })
@@ -127,6 +133,10 @@ export class MinistryregisterComponent {
 
   getconstency(event: any) {
     var id = event.target.value;
+    this.ministryform.patchValue({ constituency_id: '', mandal_id: '', panchayat_id: '' });
+    this.constituency = [];
+    this.mandals = [];
+    this.panchayati = [];
     this.service.getconsistencys().subscribe(res => {
       this.constituency = res.data.filter((data: any) => data.dstrct_id == id);
     })
@@ -134,6 +144,8 @@ export class MinistryregisterComponent {
 
   gepanchayati(event: any) {
     var id = event.target.value;
+    this.ministryform.patchValue({ panchayat_id: '' });
+    this.panchayati = [];
     this.service.gepanchayatis(id).subscribe(res => {
       this.panchayati = res.data ? res.data.filter((data: any) => !id || data.mndl_id == id) : [];
       console.log(this.panchayati, 'hhh');

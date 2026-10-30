@@ -31,14 +31,14 @@ export class AddmeetingsComponent {
   modalReference = null;
   hello: any;
   ProofValue: any;
-  constituency: any;
-  mandals: any;
-  districts: any;
+  constituency: any = [];
+  mandals: any = [];
+  districts: any = [];
   states: any = [
-    { id: 1, state_name: 'ఆంధ్రప్రదేశ్ (Andhra Pradesh)' },
-    { id: 2, state_name: 'తెలంగాణ (Telangana)' }
+    { id: 1, state_name: 'ఆంధ్రప్రదేశ్ - Andhra Pradesh (AP)' },
+    { id: 2, state_name: 'తెలంగాణ - Telangana (TG)' }
   ];
-  panchayati: any;
+  panchayati: any = [];
   usr_id: any;
   name: any;
   imagesData: any = [];
@@ -100,7 +100,7 @@ export class AddmeetingsComponent {
     })
     
     this.addingmeetings = this.formBuilder.group({
-      state_id: ['1', [Validators.required]],
+      state_id: ['', [Validators.required]],
       mettingtype: ['', [Validators.required]],
       speakerone: [''],
       // pastor_id:[''],
@@ -302,7 +302,6 @@ export class AddmeetingsComponent {
   ngOnInit(): void {
     this.getstates();
     this.getservice();
-    this.getdistric();
     this.getchurch();
     this.personaldata();
     this.getbelivers();
@@ -1016,9 +1015,45 @@ console.log(data);
   }
 
   onStateChange(event: any) {
-    const stateId = event && event.target ? event.target.value : event || '1';
+    const stateId = event && event.target ? event.target.value : event;
     this.addingmeetings.patchValue({
+      state_id: stateId || '',
       districtname: '',
+      constituencyname: '',
+      mandals: '',
+      village_name: ''
+    });
+    this.districts = [];
+    this.constituency = [];
+    this.mandals = [];
+    this.panchayati = [];
+    if (stateId) {
+      this.getdistric(stateId);
+    }
+  }
+
+  getdistric(stateId?: any) {
+    if (!stateId) {
+      this.districts = [];
+      return;
+    }
+    this.showSpinner = true;
+    this.service.getdistrict(stateId).subscribe(res => {
+      this.showSpinner = false;
+      if (res.status == 202) {
+        Swal.fire(res.message);
+      } else if (res.status == 200 && res.data) {
+        this.districts = res.data;
+      }
+    }, error => {
+      this.showSpinner = false;
+    });
+  }
+
+  getconstency(event: any) {
+    const id = event && event.target ? event.target.value : event;
+    this.addingmeetings.patchValue({
+      districtname: id || '',
       constituencyname: '',
       mandals: '',
       village_name: ''
@@ -1026,58 +1061,63 @@ console.log(data);
     this.constituency = [];
     this.mandals = [];
     this.panchayati = [];
-    this.getdistric(stateId);
+    if (id) {
+      this.showSpinner = true;
+      this.service.getconsistencys().subscribe(res => {
+        this.showSpinner = false;
+        if (res && res.data) {
+          this.constituency = res.data.filter((data: any) => data.dstrct_id == id);
+        }
+      }, () => {
+        this.showSpinner = false;
+      });
+    }
   }
 
-  getdistric(stateId?: any) {
-    this.service.getdistrict(stateId).subscribe(res => {
-      if (res.status == 202) {
-        Swal.fire(res.message);
-      } else if (res.status == 200) {
-        this.districts = res.data;
-      }
-    }, error => {
-    });
-  }
   getmandals(event: any) {
-    this.showSpinner = true;
-    var id = event.target.value;
-    this.service.getmandals().subscribe(res => {
-      if (res.status == 202) {
-        Swal.fire(res.message);
-        this.showSpinner = false;
-      } else if (res.status == 200) {
-        this.mandals = res.data.filter((data: any) => data.const_id == id);
-        this.showSpinner = false;
-      }
-    }, error => {
-      this.showSpinner = false;
-    })
-  }
-
-  getconstency(event: any) {
-    this.showSpinner = true;
-    var id = event.target.value;
-    this.service.getconsistencys().subscribe(res => {
-      this.constituency = res.data.filter((data: any) => data.dstrct_id == id);
-      this.showSpinner = false;
+    const id = event && event.target ? event.target.value : event;
+    this.addingmeetings.patchValue({
+      constituencyname: id || '',
+      mandals: '',
+      village_name: ''
     });
+    this.mandals = [];
+    this.panchayati = [];
+    if (id) {
+      this.showSpinner = true;
+      this.service.getmandals().subscribe(res => {
+        this.showSpinner = false;
+        if (res.status == 202) {
+          Swal.fire(res.message);
+        } else if (res.status == 200 && res.data) {
+          this.mandals = res.data.filter((data: any) => data.const_id == id);
+        }
+      }, error => {
+        this.showSpinner = false;
+      });
+    }
   }
 
   gepanchayati(event: any) {
-     this.showSpinner = true;
-    var id = event.target.value;
-    this.service.gepanchayatis(id).subscribe(res => {
-      if (res.status == 202) {
-        Swal.fire(res.message);
+    const id = event && event.target ? event.target.value : event;
+    this.addingmeetings.patchValue({
+      mandals: id || '',
+      village_name: ''
+    });
+    this.panchayati = [];
+    if (id) {
+      this.showSpinner = true;
+      this.service.gepanchayatis(id).subscribe(res => {
         this.showSpinner = false;
-      } else if (res.status == 200 && res.data) {
-        this.panchayati = res.data.filter((data: any) => !id || data.mndl_id == id);
+        if (res.status == 202) {
+          Swal.fire(res.message);
+        } else if (res.status == 200 && res.data) {
+          this.panchayati = res.data.filter((data: any) => !id || data.mndl_id == id);
+        }
+      }, error => {
         this.showSpinner = false;
-      }
-    }, error => {
-       this.showSpinner = false;
-    })
+      });
+    }
   }
 
   church: any;

@@ -263,13 +263,33 @@
                                         <div class="row">
                                             <div class="col-md-6 mb-4 pb-2">
                                                 <div class="form-outline">
-                                                    <label class="form-label">Select Districts <span
+                                                    <label class="form-label">1). సెలెక్ట్ రాష్ట్రం / State <span
+                                                            style="color:red; -webkit-text-stroke-width:thick;">*</span></label>
+                                                    <select class="form-control" formControlName="state_id"
+                                                        (change)="onMeetingStateChange($event);"
+                                                        [ngClass]="{'is-invalid': submitted && t['state_id'].errors }"
+                                                        style="height:37px;width: 273px;">
+                                                        <option value="" selected disabled>సెలెక్ట్ రాష్ట్రం / Select State</option>
+                                                        <option value="{{item.id}}" *ngFor="let item of states">
+                                                            {{item.state_name}}
+                                                        </option>
+                                                    </select>
+                                                    <div *ngIf="submitted && t['state_id'].errors"
+                                                        class="invalid-feedback">
+                                                        <div *ngIf="t['state_id'].errors && t['state_id'].errors['required']">రాష్ట్రం ఎంచుకోండి / State is required</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6 mb-4 pb-2">
+                                                <div class="form-outline">
+                                                    <label class="form-label">2). Select Districts <span
                                                             style="color:red; -webkit-text-stroke-width:thick;">*</span></label>
                                                     <select class="form-control" formControlName="districtname"
                                                         (change)="getconstency($event);"
+                                                        [disabled]="!addingmeetings.value.state_id || districts?.length === 0"
                                                         [ngClass]="{'is-invalid': submitted && t['districtname'].errors }"
                                                         style="height:37px;width: 273px;">
-                                                        <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
+                                                        <option value="" selected disabled>{{ !addingmeetings.value.state_id ? 'దయచేసి మొదట రాష్ట్రాన్ని ఎంచుకోండి' : 'ఇక్కడ క్లిక్ చేసి ఎంచుకోండి' }}</option>
                                                         <option value="{{item.id}}" *ngFor="let item of districts">
                                                             {{item.distrct_nm}}
                                                         </option>
@@ -281,15 +301,20 @@
                                                     </div>
                                                 </div>
                                             </div>
+                                        </div>
+                                        <br>
+
+                                        <div class="row">
                                             <div class="col-md-6 mb-4 pb-2">
                                                 <div class="form-outline">
-                                                    <label class="form-label">నియోజకవర్గం ఎంచుకోండి <span
+                                                    <label class="form-label">3). నియోజకవర్గం ఎంచుకోండి <span
                                                             style="color:red; -webkit-text-stroke-width:thick;">*</span>
                                                     </label>
                                                     <select class="form-control" formControlName="constituencyname"
                                                         (change)="getmandals($event);" style="height:37px;width: 273px;"
+                                                        [disabled]="!addingmeetings.value.districtname || constituency?.length === 0"
                                                         [ngClass]="{'is-invalid': submitted && t['constituencyname'].errors }">
-                                                        <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
+                                                        <option value="" selected disabled>{{ !addingmeetings.value.districtname ? 'దయచేసి మొదట జిల్లాను ఎంచుకోండి' : 'ఇక్కడ క్లిక్ చేసి ఎంచుకోండి' }}</option>
                                                         <option value="{{item.id}}" *ngFor="let item of constituency">
                                                             {{item.const_nm}}
                                                         </option>
@@ -301,22 +326,17 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                        </div>
-                                        <br>
-
-
-
-                                        <div class="row">
                                             <div class="col-md-6 mb-4 pb-2">
                                                 <div class="form-outline">
-                                                    <label class="form-label">మండలం ఎంచుకోండి <span
+                                                    <label class="form-label">4). మండలం ఎంచుకోండి <span
                                                             style="color:red; -webkit-text-stroke-width:thick;">*</span>
                                                     </label>
                                                     <select class="form-control" formControlName="mandals"
                                                         (change)="gepanchayati($event);"
                                                         style="height:37px;width: 273px;"
+                                                        [disabled]="!addingmeetings.value.constituencyname || mandals?.length === 0"
                                                         [ngClass]="{'is-invalid': submitted && t['mandals'].errors }">
-                                                        <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
+                                                        <option value="" selected disabled>{{ !addingmeetings.value.constituencyname ? 'దయచేసి మొదట నియోజకవర్గాన్ని ఎంచుకోండి' : 'ఇక్కడ క్లిక్ చేసి ఎంచుకోండి' }}</option>
                                                         <option value="{{item.id}}" *ngFor="let item of mandals">
                                                             {{item.mndl_nm}}
                                                         </option>
@@ -328,14 +348,19 @@
                                                     </div>
                                                 </div>
                                             </div>
+                                        </div>
+                                        <br>
+
+                                        <div class="row">
                                             <div class="col-md-6 mb-4 pb-2">
                                                 <div class="form-outline">
-                                                    <label class="form-label">పంచాయతీ ఎంచుకోండి <span
+                                                    <label class="form-label">5). పంచాయతీ ఎంచుకోండి <span
                                                             style="color:red; -webkit-text-stroke-width:thick;">*</span></label>
                                                     <select class="form-control" formControlName="village_name"
-                                                        [ngClass]="{'is-invalid': submitted && t['mandals'].errors }"
+                                                        [disabled]="!addingmeetings.value.mandals || panchayati?.length === 0"
+                                                        [ngClass]="{'is-invalid': submitted && t['village_name'].errors }"
                                                         style="height:37px;width: 273px;">
-                                                        <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
+                                                        <option value="" selected disabled>{{ !addingmeetings.value.mandals ? 'దయచేసి మొదట మండలాన్ని ఎంచుకోండి' : 'ఇక్కడ క్లిక్ చేసి ఎంచుకోండి' }}</option>
                                                         <option value="{{item.id}}" *ngFor="let item of panchayati">
                                                             {{item.pnchyt_nm}}
                                                         </option>

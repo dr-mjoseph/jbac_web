@@ -17,7 +17,7 @@ export class EventsComponent {
   form_ind: any;
   youth: any;
   revival: any;
-  showSpinner: boolean = false;
+  showSpinner: boolean = true;
   women: any;
   pastor: any;
   childern: any;
@@ -26,8 +26,8 @@ export class EventsComponent {
   constituency: any = [];
   districts: any = [];
   states: any = [
-    { id: 1, state_name: 'ఆంధ్రప్రదేశ్ (Andhra Pradesh)' },
-    { id: 2, state_name: 'తెలంగాణ (Telangana)' }
+    { id: 1, state_name: 'ఆంధ్రప్రదేశ్ - Andhra Pradesh (AP)', code: 'AP' },
+    { id: 2, state_name: 'తెలంగాణ - Telangana (TG)', code: 'TG' }
   ];
   searchevents: any = [];
   allEvents: any[] = [];
@@ -66,19 +66,16 @@ export class EventsComponent {
   ngOnInit(): void {
     const datePipe = new DatePipe('en-US');
     this.now = datePipe.transform(new Date(), 'yyyy-MM-dd') || this.now;
+    this.showSpinner = true;
     this.getstates();
     this.getpastors();
-    this.getyouth();
-    this.getrevival();
-    this.getwomen();
-    this.getpastor();
-    this.getchildern();
-    this.getmusical();
-    this.getdistric();
-    this.searechevents();
-    this.getRibbonEvents();
+    this.districts = [];
+    this.constituency = [];
+    this.mandals = [];
+    this.panchayati = [];
     this.getdenomations();
-    this.getbeliver();
+    this.getRibbonEvents();
+    this.searechevents();
   }
   get h() { return this.searchdenomation.controls; }
 
@@ -91,6 +88,10 @@ export class EventsComponent {
   }
 
   getdistric(stateId?: any) {
+    if (!stateId || stateId === 'all') {
+      this.districts = [];
+      return;
+    }
     this.service.getdistrict(stateId).subscribe(res => {
       if (res.status == 202) {
         Swal.fire(res.message);
@@ -124,18 +125,15 @@ export class EventsComponent {
   }
 
   getyouth() {
-    this.showSpinner = true;
     this.service.getyouth().subscribe(res => {
       if (res.status == 202) {
         Swal.fire(res.message);
       } else if (res.status == 200) {
-        this.showSpinner = false;
         this.youth = res.data;
       }
     }, error => {
-      this.showSpinner = false;
-    })
-
+      console.error(error);
+    });
   }
   image: any;
   openimg(image: any, openmodel: any) {
@@ -144,70 +142,56 @@ export class EventsComponent {
   }
 
   proofmodalDismis() {
-    this.modalService.dismissAll()
+    this.modalService.dismissAll();
   }
 
   getrevival() {
-    this.showSpinner = true;
     this.service.getrevival().subscribe(res => {
       if (res.status == 202) {
         Swal.fire(res.message);
       } else if (res.status == 200) {
-        this.showSpinner = false;
         this.revival = res.data;
       }
     }, error => {
-      this.showSpinner = false;
-    })
-
+      console.error(error);
+    });
   }
 
 
   getwomen() {
-    this.showSpinner = true;
     this.service.getwomen().subscribe(res => {
       if (res.status == 202) {
         Swal.fire(res.message);
       } else if (res.status == 200) {
-        this.showSpinner = false;
         this.women = res.data;
       }
     }, error => {
-      this.showSpinner = false;
-    })
-
+      console.error(error);
+    });
   }
 
   getpastor() {
-    this.showSpinner = true;
     this.service.getpastormeeting().subscribe(res => {
-      console.log(res.data, 'hii');
-
       if (res.status == 202) {
         Swal.fire(res.message);
       } else if (res.status == 200) {
-        this.showSpinner = false;
         this.pastor = res.data;
       }
     }, error => {
-      this.showSpinner = false;
-    })
-
+      console.error(error);
+    });
   }
 
   getchildern() {
-    this.showSpinner = true;
     this.service.getchildern().subscribe(res => {
       if (res.status == 202) {
         Swal.fire(res.message);
       } else if (res.status == 200) {
-        this.showSpinner = false;
         this.childern = res.data;
       }
     }, error => {
-      this.showSpinner = false;
-    })
-
+      console.error(error);
+    });
   }
   getdenomations() {
     this.service.getdenomation().subscribe(res => {
@@ -218,17 +202,15 @@ export class EventsComponent {
   }
 
   getmusical() {
-    this.showSpinner = true;
     this.service.getmusicals().subscribe(res => {
       if (res.status == 202) {
         Swal.fire(res.message);
       } else if (res.status == 200) {
-        this.showSpinner = false;
         this.musical = res.data;
       }
     }, error => {
-      this.showSpinner = false;
-    })
+      console.error(error);
+    });
   }
 
   ribbonEvents: any[] = [];
@@ -438,7 +420,9 @@ export class EventsComponent {
     this.constituency = [];
     this.mandals = [];
     this.panchayati = [];
-    this.getdistric(id);
+    if (id && id !== 'all') {
+      this.getdistric(id);
+    }
     this.applyCombinedFilter();
   }
 
@@ -446,6 +430,7 @@ export class EventsComponent {
     const id = event && event.target ? event.target.value : event;
     this.searchdist = id;
     this.searchdenomation.patchValue({ district_id: id, constenncy_id: '', mandal_id: '', panchayati_id: '' });
+    this.searchconts = '';
     this.constituency = [];
     this.mandals = [];
     this.panchayati = [];
@@ -542,7 +527,7 @@ export class EventsComponent {
   searchmandals(event: any) { this.onMandalChange(event); }
 
   applyCombinedFilter() {
-    const formVals = this.searchdenomation.value || {};
+    const formVals = this.searchdenomation.getRawValue ? this.searchdenomation.getRawValue() : (this.searchdenomation.value || {});
     const queryPayload: any = {
       state_id: formVals.state_id || this.searchstate || '',
       district_id: formVals.district_id || this.searchdist || '',
@@ -564,8 +549,10 @@ export class EventsComponent {
       return;
     }
 
+    this.showSpinner = true;
     this.service.searchingdata(queryPayload).subscribe({
       next: (res: any) => {
+        this.showSpinner = false;
         if (res && res.status == 200 && Array.isArray(res.data)) {
           const results = res.data
             .filter((item: any) => !this.isOldMeeting(item))
@@ -576,15 +563,27 @@ export class EventsComponent {
         }
       },
       error: () => {
+        this.showSpinner = false;
         this.applyClientSideFilter(queryPayload);
       }
     });
   }
 
   applyClientSideFilter(payload: any) {
+    this.showSpinner = false;
     let filtered = this.allEvents.filter(item => !this.isOldMeeting(item));
     if (payload.state_id) {
-      filtered = filtered.filter(item => item.state_id == payload.state_id || (!item.state_id && payload.state_id == 1));
+      const targetState = Number(payload.state_id);
+      filtered = filtered.filter(item => {
+        const did = item.district_id ? Number(item.district_id) : (item.distrct_id ? Number(item.distrct_id) : null);
+        let itemState = Number(item.state_id);
+        if (did) {
+          itemState = did >= 31 ? 2 : 1;
+        } else if (!itemState) {
+          itemState = 1;
+        }
+        return itemState === targetState;
+      });
     }
     if (payload.district_id) {
       filtered = filtered.filter(item => item.district_id == payload.district_id || item.distrct_id == payload.district_id);
@@ -608,8 +607,6 @@ export class EventsComponent {
         }
         return itemStart === payload.startdate;
       });
-      this.displayEvents(filtered);
-      return;
     }
     if (payload.mettingtype) {
       filtered = filtered.filter(item => item.mettingtype == payload.mettingtype);
@@ -668,12 +665,13 @@ export class EventsComponent {
     this.startdate = '';
     this.searchdist = '';
     this.searchconts = '';
-    this.getdistric();
+    this.districts = [];
     this.constituency = [];
     this.mandals = [];
     this.panchayati = [];
     this.activeTab = 'today';
     this.submitted = false;
+    this.showSpinner = true;
     this.searechevents();
   }
 
