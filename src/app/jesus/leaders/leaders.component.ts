@@ -68,9 +68,12 @@ export class LeadersComponent {
             this.general = "Mandal ";
           } else if (res.data[0].generaltype == 3) {
             this.generals = "Mandal ";
-            this.general = "Village ";
+            this.general = "Panchayat ";
           } else if (res.data[0].generaltype == 4) {
-            this.generals = "Village ";
+            this.generals = "Panchayat ";
+            this.general = "Ward ";
+          } else if (res.data[0].generaltype == 5 || res.data[0].generaltype == 6) {
+            this.generals = "Ward ";
             this.general = "";
           }
           var data = {
@@ -109,9 +112,12 @@ export class LeadersComponent {
             this.general = "Mandal";
           } else if (res.data[0].generaltype == 3) {
             this.generals = "Mandal";
-            this.general = "Village";
+            this.general = "Panchayat";
           } else if (res.data[0].generaltype == 4) {
-            this.generals = "Village";
+            this.generals = "Panchayat";
+            this.general = "Ward";
+          } else if (res.data[0].generaltype == 5 || res.data[0].generaltype == 6) {
+            this.generals = "Ward";
             this.general = "";
           }
           var data4 = {
@@ -199,9 +205,11 @@ export class LeadersComponent {
     } else if (this.myresdata == 2) {
       return 'మండలాల వారిగా (Mandal-wise)';
     } else if (this.myresdata == 3) {
-      return 'గ్రామ / వార్డు వారిగా (Village / Ward-wise)';
+      return 'పంచాయితీల వారిగా (Panchayat-wise)';
+    } else if (this.myresdata == 4) {
+      return 'వార్డుల వారిగా (Ward-wise)';
     }
-    return 'మండల / పంచాయితీ వారిగా';
+    return 'సబార్డినేట్స్ వారిగా';
   }
 
   getDetailedLeaderStatus(x: any): string {

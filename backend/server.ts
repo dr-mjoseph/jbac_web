@@ -3648,150 +3648,242 @@ function getWingMatchSql(prefix, wing) {
     return `(${conds.join(' OR ')})`;
 }
 
-function parseLeadershipLevel(val) {
+// -------------------------------------------------------------------------
+// CANONICAL 6-TIER LEADERSHIP HIERARCHY & UNIVERSAL QUERY HELPERS
+// Doc Level 1: రాష్ట్ర నాయకుడు (State Leader)
+// Doc Level 2: జిల్లా నాయకుడు (District Leader)
+// Doc Level 3: నియోజకవర్గం నాయకుడు (Constituency Leader)
+// Doc Level 4: మండల నాయకుడు (Mandal Leader)
+// Doc Level 5: పంచాయతి నాయకుడు (Panchayat Leader)
+// Doc Level 6: వార్డు నాయకుడు (Ward Leader)
+// -------------------------------------------------------------------------
+function getCanonicalLevel(val) {
     if (val === null || val === undefined || val === '') return null;
     const str = String(val).trim().toLowerCase();
-    if (str === '0' || str.includes('state') || str.includes('రాష్ట్ర')) return 0;
-    if (str === '1' || str.includes('dist') || str.includes('జిల్లా')) return 1;
-    if (str === '2' || str.includes('const') || str.includes('నియోజకవర్గ')) return 2;
-    if (str === '3' || str.includes('mandal') || str.includes('municip') || str.includes('మండల')) return 3;
-    if (str === '4' || str === '5' || str === '6' || str.includes('panchayat') || str.includes('ward') || str.includes('village') || str.includes('పంచాయతి') || str.includes('వార్డు') || str.includes('గ్రామ')) return 4;
+    if (str === '0' || str.includes('state') || str.includes('రాష్ట్ర')) return 1;
+    if (str.includes('dist') || str.includes('జిల్లా')) return 2;
+    if (str.includes('const') || str.includes('నియోజకవర్గ')) return 3;
+    if (str.includes('mandal') || str.includes('municip') || str.includes('మండల')) return 4;
+    if (str.includes('panchayat') || str.includes('village') || str.includes('పంచాయతి') || str.includes('గ్రామ')) return 5;
+    if (str.includes('ward') || str.includes('వార్డు')) return 6;
+    const num = Number(val);
+    if (!isNaN(num)) {
+        if (num === 0) return 1;
+        if (num === 1) return 2;
+        if (num === 2) return 3;
+        if (num === 3) return 4;
+        if (num === 4) return 5;
+        if (num === 5 || num === 6) return 6;
+    }
     return null;
+}
+
+function parseLeadershipLevel(val) {
+    const canonical = getCanonicalLevel(val);
+    if (canonical === null) return null;
+    // Map canonical (1-6) to internal 0-indexed representation for client compatibility:
+    // State: 0, District: 1, Constituency: 2, Mandal: 3, Panchayat: 4, Ward: 5
+    return canonical === 1 ? 0 : canonical - 1;
+}
+
+function getLevelSql(prefix, targetLvl) {
+    if (targetLvl === 2) {
+        // District Leader
+        return `((${prefix}generaltype IN ('1', 'District Level') OR ${prefix}generaltype LIKE '%జిల్లా%') OR (${prefix}leadertype = 2 AND (${prefix}wingtype IN ('1', 'District Level') OR ${prefix}wingtype LIKE '%జిల్లా%')))`;
+    }
+    if (targetLvl === 3) {
+        // Constituency Leader
+        return `((${prefix}generaltype IN ('2', 'Constituency Level') OR ${prefix}generaltype LIKE '%నియోజకవర్గ%') OR (${prefix}leadertype = 2 AND (${prefix}wingtype IN ('2', 'Constituency Level') OR ${prefix}wingtype LIKE '%నియోజకవర్గ%')))`;
+    }
+    if (targetLvl === 4) {
+        // Mandal Leader
+        return `((${prefix}generaltype IN ('3', 'Municipality / Mandal Level', 'Mandal') OR ${prefix}generaltype LIKE '%మండల%') OR (${prefix}leadertype = 2 AND (${prefix}wingtype IN ('3', 'Municipality / Mandal Level', 'Mandal') OR ${prefix}wingtype LIKE '%మండల%')))`;
+    }
+    if (targetLvl === 5) {
+        // Panchayat Leader
+        return `((${prefix}generaltype IN ('4', 'Ward / Panchayati Level', 'Village') OR ${prefix}generaltype LIKE '%పంచాయతి%' OR ${prefix}generaltype LIKE '%గ్రామ%') OR (${prefix}leadertype = 2 AND (${prefix}wingtype IN ('4', 'Ward / Panchayati Level') OR ${prefix}wingtype LIKE '%పంచాయతి%')))`;
+    }
+    if (targetLvl === 6) {
+        // Ward Leader
+        return `((${prefix}generaltype IN ('5', '6', 'Ward', 'Sub Ward') OR ${prefix}generaltype LIKE '%వార్డు%') OR (${prefix}leadertype = 2 AND (${prefix}wingtype IN ('5', '6') OR ${prefix}wingtype LIKE '%వార్డు%')) OR ${prefix}subward IS NOT NULL ${prefix.startsWith('s.') ? `OR ${prefix}wardnumber IS NOT NULL` : ''})`;
+    }
+    return '1=0';
+}
+
+function getStudentLevelSql(prefix, targetLvl) {
+    if (targetLvl === 2) return `(${prefix}generaltype IN ('District Level', '1') OR ${prefix}generaltype LIKE '%జిల్లా%')`;
+    if (targetLvl === 3) return `(${prefix}generaltype IN ('Constituency Level', 'Constituency level', '2') OR ${prefix}generaltype LIKE '%నియోజకవర్గ%')`;
+    if (targetLvl === 4) return `(${prefix}generaltype IN ('Municipality / Mandal Level', 'Muncipality / Mandal Level', '3') OR ${prefix}generaltype LIKE '%మండల%')`;
+    if (targetLvl === 5) return `(${prefix}generaltype IN ('Ward / Panchayati Level', 'Ward / Panchaithi Level', '4') OR ${prefix}generaltype LIKE '%పంచాయతి%' OR ${prefix}generaltype LIKE '%గ్రామ%')`;
+    if (targetLvl === 6) return `(${prefix}generaltype IN ('Ward', '5', '6') OR ${prefix}generaltype LIKE '%వార్డు%')`;
+    return '1=0';
 }
 
 app.all(['/dashboardapi/getLeaderswebsiteData', '/dashboardapi/getLeaderswebsitewing', '/api/leaders', '/api/getLeaderswebsiteData'], async (req: any, res: any) => {
     try {
         const b = req.body || req.query || {};
-        const stateId = b.state_id || b.stateId || 1;
+        let stateId = b.state_id || b.stateId || 1;
         let districtId = b.district_id || b.districtId || null;
         let constituencyId = b.constituency_id || b.constituencyId || null;
         let mandalId = b.mandal_id || b.mandalId || null;
-        let genType = Number(b.generaltype !== undefined ? b.generaltype : (b.generalType !== undefined ? b.generalType : 1));
+        let panchayatId = b.panchayat_id || b.panchayatId || b.village_id || null;
         const currentUserId = b.usr_id || b.user_id || -1;
         let isWingRequest = req.path.includes('wing') || String(b.leadertype) === '2' || Boolean(b.wingtype) || Boolean(b.wingtypes);
 
+        let loggedInLeaderType = isWingRequest ? 'wing' : 'general';
+        let loggedInCanonicalLevel = null;
         let leaderWing = null;
 
-        // 1. If currentUserId is available, inspect the authenticated leader in DB to resolve their exact wing category & level
+        // 1. Session Parameter Binding: Fetch authoritative leader level & locations directly from DB
         if (currentUserId && currentUserId !== -1) {
-            const [p]: any = await db.query('SELECT id, leadertype, generaltype, wingtype, wingtypes, district_id, constituency_id, mandal_id, state_id, d_in, approval_ind FROM pastor_reg WHERE id = ?', [currentUserId]);
+            const [p]: any = await db.query('SELECT id, leadertype, generaltype, wingtype, wingtypes, district_id, constituency_id, mandal_id, village_id, state_id, d_in, approval_ind FROM pastor_reg WHERE id = ?', [currentUserId]);
             if (p && p[0]) {
                 const pWing = resolveWingCategory(p[0].wingtypes) || resolveWingCategory(p[0].wingtype);
                 if (String(p[0].leadertype) === '2' || pWing) {
+                    loggedInLeaderType = 'wing';
                     isWingRequest = true;
                     leaderWing = pWing;
-                    const parsedLvl = parseLeadershipLevel(p[0].wingtype) ?? parseLeadershipLevel(p[0].generaltype);
-                    if (parsedLvl !== null) genType = parsedLvl;
+                    loggedInCanonicalLevel = getCanonicalLevel(p[0].wingtype) ?? getCanonicalLevel(p[0].generaltype);
+                } else {
+                    loggedInLeaderType = 'general';
+                    loggedInCanonicalLevel = getCanonicalLevel(p[0].generaltype);
                 }
-                if (p[0].d_in == 1 && (!genType || genType > 3)) genType = 1;
-                if (p[0].district_id && !districtId) districtId = p[0].district_id;
-                if (p[0].constituency_id && !constituencyId) constituencyId = p[0].constituency_id;
-                if (p[0].mandal_id && !mandalId) mandalId = p[0].mandal_id;
+                if (p[0].d_in == 1 && (!loggedInCanonicalLevel || loggedInCanonicalLevel > 4)) loggedInCanonicalLevel = 2; // District Leader
+                if (p[0].district_id) districtId = p[0].district_id;
+                if (p[0].constituency_id) constituencyId = p[0].constituency_id;
+                if (p[0].mandal_id) mandalId = p[0].mandal_id;
+                if (p[0].village_id) panchayatId = p[0].village_id;
+                if (p[0].state_id) stateId = p[0].state_id;
             } else {
-                const [s]: any = await db.query('SELECT id, leadertype, generaltype, wingtype, wingtypes, district_id, constituency_id, mandal_id, state_id, d_in, approval_ind FROM signup_form WHERE id = ?', [currentUserId]);
+                const [s]: any = await db.query('SELECT id, leadertype, generaltype, wingtype, wingtypes, district_id, constituency_id, mandal_id, panchayat_id, state_id, d_in, approval_ind FROM signup_form WHERE id = ?', [currentUserId]);
                 if (s && s[0]) {
                     const sWing = resolveWingCategory(s[0].wingtypes) || resolveWingCategory(s[0].wingtype);
                     if (String(s[0].leadertype) === '2' || sWing) {
+                        loggedInLeaderType = 'wing';
                         isWingRequest = true;
                         leaderWing = sWing;
-                        const parsedLvl = parseLeadershipLevel(s[0].generaltype);
-                        if (parsedLvl !== null) genType = parsedLvl;
+                        loggedInCanonicalLevel = getCanonicalLevel(s[0].generaltype) ?? getCanonicalLevel(s[0].wingtype);
+                    } else {
+                        loggedInLeaderType = 'general';
+                        loggedInCanonicalLevel = getCanonicalLevel(s[0].generaltype);
                     }
-                    if (s[0].d_in == 1 && (!genType || genType > 3)) genType = 1;
-                    if (s[0].district_id && !districtId) districtId = s[0].district_id;
-                    if (s[0].constituency_id && !constituencyId) constituencyId = s[0].constituency_id;
-                    if (s[0].mandal_id && !mandalId) mandalId = s[0].mandal_id;
+                    if (s[0].d_in == 1 && (!loggedInCanonicalLevel || loggedInCanonicalLevel > 4)) loggedInCanonicalLevel = 2; // District Leader
+                    if (s[0].district_id) districtId = s[0].district_id;
+                    if (s[0].constituency_id) constituencyId = s[0].constituency_id;
+                    if (s[0].mandal_id) mandalId = s[0].mandal_id;
+                    if (s[0].panchayat_id) panchayatId = s[0].panchayat_id;
+                    if (s[0].state_id) stateId = s[0].state_id;
                 } else {
-                    const [st]: any = await db.query('SELECT id, leadership, leadertype, generaltype, wingtype, district_id, constituency_id, mandal_id, state_id, d_in, approval_ind FROM student_reg WHERE id = ?', [currentUserId]);
+                    const [st]: any = await db.query('SELECT id, leadership, leadertype, generaltype, wingtype, district_id, constituency_id, mandal_id, village_id, state_id, d_in, approval_ind FROM student_reg WHERE id = ?', [currentUserId]);
                     if (st && st[0]) {
+                        loggedInLeaderType = 'wing';
                         isWingRequest = true;
                         leaderWing = resolveWingCategory(1); // Student Wing
-                        const parsedLvl = parseLeadershipLevel(st[0].generaltype) ?? parseLeadershipLevel(st[0].wingtype);
-                        if (parsedLvl !== null) genType = parsedLvl;
-                        if (st[0].d_in == 1 && (!genType || genType > 3)) genType = 1;
-                        if (st[0].district_id && !districtId) districtId = st[0].district_id;
-                        if (st[0].constituency_id && !constituencyId) constituencyId = st[0].constituency_id;
-                        if (st[0].mandal_id && !mandalId) mandalId = st[0].mandal_id;
+                        loggedInCanonicalLevel = getCanonicalLevel(st[0].generaltype) ?? getCanonicalLevel(st[0].wingtype);
+                        if (st[0].d_in == 1 && (!loggedInCanonicalLevel || loggedInCanonicalLevel > 4)) loggedInCanonicalLevel = 2; // District Leader
+                        if (st[0].district_id) districtId = st[0].district_id;
+                        if (st[0].constituency_id) constituencyId = st[0].constituency_id;
+                        if (st[0].mandal_id) mandalId = st[0].mandal_id;
+                        if (st[0].village_id) panchayatId = st[0].village_id;
+                        if (st[0].state_id) stateId = st[0].state_id;
                     }
                 }
             }
         }
 
         // If not resolved from DB, check request body
-        if (!leaderWing && (b.wingtypes || b.wingtype)) {
-            leaderWing = resolveWingCategory(b.wingtypes) || resolveWingCategory(b.wingtype);
-            if (leaderWing) isWingRequest = true;
-        }
-
-        let bWhere = '';
-        let pWhere = '';
-        let sWhere = '';
-        let queryParams: any[] = [];
-
-        // HIERARCHICAL LEVEL FILTERING (STRICTLY ONE LEVEL DOWN):
-        if (genType === 0) {
-            // State Leader -> Sees District Leaders (Level 1)
-            bWhere = '(s.state_id = ? OR s.state_id IS NULL) AND (s.generaltype = "1" OR s.generaltype = "District Level" OR s.generaltype LIKE "%జిల్లా%" OR s.wingtype = "1" OR s.wingtype = "District Level" OR s.wingtype LIKE "%జిల్లా%" OR (s.district_id IS NOT NULL AND s.district_id != "" AND s.district_id != "0"))';
-            pWhere = '(pr.state_id = ? OR pr.state_id IS NULL) AND (pr.generaltype = "1" OR pr.generaltype = "District Level" OR pr.generaltype LIKE "%జిల్లా%" OR pr.wingtype = "1" OR pr.wingtype = "District Level" OR pr.wingtype LIKE "%జిల్లా%" OR (pr.district_id IS NOT NULL AND pr.district_id != "" AND pr.district_id != "0"))';
-            sWhere = '(st.state_id = ? OR st.state_id IS NULL) AND (st.generaltype = "1" OR st.generaltype = "District Level" OR st.generaltype LIKE "%జిల్లా%" OR st.generaltype = 1 OR st.wingtype = "1" OR st.wingtype = 1 OR (st.district_id IS NOT NULL AND st.district_id != "" AND st.district_id != "0"))';
-            queryParams = [stateId];
-        } else if (genType === 1 && districtId) {
-            // District Leader -> Sees Constituency Leaders/Users ONLY (Level 2) within this district
-            bWhere = 's.district_id = ? AND (s.generaltype IN ("2", "Constituency Level") OR s.generaltype LIKE "%నియోజకవర్గ%" OR s.wingtype IN ("2", "Constituency Level") OR s.wingtype LIKE "%నియోజకవర్గ%" OR (s.constituency_id IS NOT NULL AND s.constituency_id != "" AND s.constituency_id != "0"))';
-            pWhere = 'pr.district_id = ? AND (pr.generaltype IN ("2", "Constituency Level") OR pr.generaltype LIKE "%నియోజకవర్గ%" OR pr.wingtype IN ("2", "Constituency Level") OR pr.wingtype LIKE "%నియోజకవర్గ%" OR (pr.constituency_id IS NOT NULL AND pr.constituency_id != "" AND pr.constituency_id != "0"))';
-            sWhere = 'st.district_id = ? AND (st.generaltype IN ("2", "Constituency Level", 2) OR st.wingtype IN ("2", "Constituency Level", 2) OR (st.constituency_id IS NOT NULL AND st.constituency_id != "" AND st.constituency_id != "0"))';
-            queryParams = [districtId];
-        } else if (genType === 2 && (constituencyId || districtId)) {
-            // Constituency Leader -> Sees Mandal Leaders/Users ONLY (Level 3) within this constituency
-            const targetId = constituencyId || districtId;
-            const targetCol = constituencyId ? 'constituency_id' : 'district_id';
-            bWhere = `s.${targetCol} = ? AND (s.generaltype IN ("3", "Municipality / Mandal Level") OR s.generaltype LIKE "%మండల%" OR s.wingtype IN ("3", "Municipality / Mandal Level") OR s.wingtype LIKE "%మండల%" OR (s.mandal_id IS NOT NULL AND s.mandal_id != "" AND s.mandal_id != "0"))`;
-            pWhere = `pr.${targetCol} = ? AND (pr.generaltype IN ("3", "Municipality / Mandal Level") OR pr.generaltype LIKE "%మండల%" OR pr.wingtype IN ("3", "Municipality / Mandal Level") OR pr.wingtype LIKE "%మండల%" OR (pr.mandal_id IS NOT NULL AND pr.mandal_id != "" AND pr.mandal_id != "0"))`;
-            sWhere = `st.${targetCol} = ? AND (st.generaltype IN ("3", "Municipality / Mandal Level", 3) OR st.wingtype IN ("3", "Municipality / Mandal Level", 3) OR (st.mandal_id IS NOT NULL AND st.mandal_id != "" AND st.mandal_id != "0"))`;
-            queryParams = [targetId];
-        } else if (genType === 3 && (mandalId || constituencyId || districtId)) {
-            // Mandal Leader -> Sees Panchayat/Ward Leaders/Users ONLY (Level 4, 5, 6) within this mandal
-            const targetId = mandalId || constituencyId || districtId;
-            const targetCol = mandalId ? 'mandal_id' : (constituencyId ? 'constituency_id' : 'district_id');
-            bWhere = `s.${targetCol} = ? AND (s.generaltype IN ("4", "5", "6", "Ward / Panchayati Level") OR s.generaltype LIKE "%పంచాయతి%" OR s.generaltype LIKE "%వార్డు%" OR s.generaltype LIKE "%గ్రామ%" OR s.wingtype IN ("4", "5", "6") OR s.wardnumber IS NOT NULL OR s.subward IS NOT NULL OR (s.panchayat_id IS NOT NULL AND s.panchayat_id != "" AND s.panchayat_id != "0"))`;
-            pWhere = `pr.${targetCol} = ? AND (pr.generaltype IN ("4", "5", "6", "Ward / Panchayati Level") OR pr.generaltype LIKE "%పంచాయతి%" OR pr.generaltype LIKE "%వార్డు%" OR pr.generaltype LIKE "%గ్రామ%" OR pr.wingtype IN ("4", "5", "6") OR pr.subward IS NOT NULL OR (pr.village_id IS NOT NULL AND pr.village_id != "" AND pr.village_id != "0"))`;
-            sWhere = `st.${targetCol} = ? AND (st.generaltype IN ("4", "5", "6", "Ward / Panchayati Level", 4) OR st.wingtype IN ("4", "5", "6", 4) OR (st.village_id IS NOT NULL AND st.village_id != "" AND st.village_id != "0"))`;
-            queryParams = [targetId];
-        } else if (districtId) {
-            bWhere = 's.district_id = ?';
-            pWhere = 'pr.district_id = ?';
-            sWhere = 'st.district_id = ?';
-            queryParams = [districtId];
-        } else {
-            bWhere = '1=1';
-            pWhere = '1=1';
-            sWhere = '1=1';
-            queryParams = [];
-        }
-
-        // STRICT WING CATEGORY ISOLATION:
-        // When leader is elected/approved for a particular wing category (e.g. Student Wing, Advocate Wing, etc.):
-        // ONLY subordinates of that EXACT SAME wing category can be displayed!
-        // If subordinate is from the same location but wing is different, they are excluded.
-        if (leaderWing) {
-            const bWingSql = getWingMatchSql('s.', leaderWing);
-            const pWingSql = getWingMatchSql('pr.', leaderWing);
-            bWhere += ` AND ${bWingSql}`;
-            pWhere += ` AND ${pWingSql}`;
-
-            // student_reg is inherently Student Wing (id === 1)
-            if (leaderWing.id === 1) {
-                // Students match
+        if (loggedInCanonicalLevel === null) {
+            if (b.logged_in_level_id !== undefined) {
+                loggedInCanonicalLevel = Number(b.logged_in_level_id);
+            } else if (b.generaltype !== undefined || b.generalType !== undefined) {
+                loggedInCanonicalLevel = getCanonicalLevel(b.generaltype !== undefined ? b.generaltype : b.generalType);
             } else {
-                // If leader is Advocate Wing, Medical Wing, etc., student_reg records must NOT display
-                sWhere = '1=0';
+                loggedInCanonicalLevel = 2; // Default to District level
             }
         }
 
+        if (!leaderWing && (b.wingtypes || b.wingtype)) {
+            leaderWing = resolveWingCategory(b.wingtypes) || resolveWingCategory(b.wingtype);
+            if (leaderWing) {
+                loggedInLeaderType = 'wing';
+                isWingRequest = true;
+            }
+        }
+
+        // 2. UNIVERSAL SQL QUERY: Targets the immediate level below (:logged_in_level_id + 1)
+        const targetLevel = loggedInCanonicalLevel + 1;
+
+        // 3. LEADER TYPE ISOLATION (general vs wing)
+        let bLeaderTypeSql = '';
+        let pLeaderTypeSql = '';
+        let sLeaderTypeSql = '';
+
+        if (loggedInLeaderType === 'general') {
+            // General leader only sees general records (wingtype/wingtypes null, leadertype != 2)
+            bLeaderTypeSql = `(COALESCE(s.leadertype, '1') != '2' AND (s.wingtypes IS NULL OR s.wingtypes IN ('', 'null', 'undefined')))`;
+            pLeaderTypeSql = `(COALESCE(pr.leadertype, '1') != '2' AND (pr.wingtypes IS NULL OR pr.wingtypes IN ('', 'null', 'undefined')))`;
+            sLeaderTypeSql = `1=1`;
+        } else {
+            // Wing leader only sees wing records of the EXACT SAME wing category
+            const bWingSql = getWingMatchSql('s.', leaderWing);
+            const pWingSql = getWingMatchSql('pr.', leaderWing);
+            bLeaderTypeSql = `(s.leadertype = '2' OR s.leadertype = 2) AND ${bWingSql}`;
+            pLeaderTypeSql = `(pr.leadertype = '2' OR pr.leadertype = 2) AND ${pWingSql}`;
+            sLeaderTypeSql = (leaderWing && leaderWing.id === 1) ? `1=1` : `1=0`;
+        }
+
+        // 4. LEVEL & GEOGRAPHIC SCOPING (Universal Query across all 6 tiers)
+        let bGeoSql = '';
+        let pGeoSql = '';
+        let sGeoSql = '';
+        let queryParams: any[] = [];
+
+        if (loggedInCanonicalLevel === 1) {
+            // Level 1 (రాష్ట్ర నాయకుడు) viewing Level 2 (జిల్లా నాయకుడు)
+            bGeoSql = `(s.state_id = ? OR s.state_id IS NULL)`;
+            pGeoSql = `(pr.state_id = ? OR pr.state_id IS NULL)`;
+            sGeoSql = `(st.state_id = ? OR st.state_id IS NULL)`;
+            queryParams = [stateId];
+        } else if (loggedInCanonicalLevel === 2) {
+            // Level 2 (జిల్లా నాయకుడు) viewing Level 3 (నియోజకవర్గం నాయకుడు)
+            bGeoSql = `s.district_id = ?`;
+            pGeoSql = `pr.district_id = ?`;
+            sGeoSql = `st.district_id = ?`;
+            queryParams = [districtId];
+        } else if (loggedInCanonicalLevel === 3) {
+            // Level 3 (నియోజకవర్గం నాయకుడు) viewing Level 4 (మండల నాయకుడు)
+            bGeoSql = `s.constituency_id = ? AND (s.district_id = ? OR ? IS NULL)`;
+            pGeoSql = `pr.constituency_id = ? AND (pr.district_id = ? OR ? IS NULL)`;
+            sGeoSql = `st.constituency_id = ? AND (st.district_id = ? OR ? IS NULL)`;
+            queryParams = [constituencyId, districtId, districtId];
+        } else if (loggedInCanonicalLevel === 4) {
+            // Level 4 (మండల నాయకుడు) viewing Level 5 (పంచాయతి నాయకుడు)
+            bGeoSql = `s.mandal_id = ? AND (s.constituency_id = ? OR ? IS NULL)`;
+            pGeoSql = `pr.mandal_id = ? AND (pr.constituency_id = ? OR ? IS NULL)`;
+            sGeoSql = `st.mandal_id = ? AND (st.constituency_id = ? OR ? IS NULL)`;
+            queryParams = [mandalId, constituencyId, constituencyId];
+        } else if (loggedInCanonicalLevel === 5) {
+            // Level 5 (పంచాయతి నాయకుడు) viewing Level 6 (వార్డు నాయకుడు)
+            bGeoSql = `s.panchayat_id = ? AND (s.mandal_id = ? OR ? IS NULL)`;
+            pGeoSql = `pr.village_id = ? AND (pr.mandal_id = ? OR ? IS NULL)`;
+            sGeoSql = `st.village_id = ? AND (st.mandal_id = ? OR ? IS NULL)`;
+            queryParams = [panchayatId, mandalId, mandalId];
+        } else {
+            // Level 6 (వార్డు నాయకుడు) - no tier below
+            bGeoSql = `1=0`;
+            pGeoSql = `1=0`;
+            sGeoSql = `1=0`;
+            queryParams = [];
+        }
+
+        const bLevelSql = getLevelSql('s.', targetLevel);
+        const pLevelSql = getLevelSql('pr.', targetLevel);
+        const sLevelSql = getStudentLevelSql('st.', targetLevel);
+
         // Exclude rejected leaders (approval_ind == 2) and exclude current logged in leader themselves
-        const bFullWhere = `${bWhere} AND COALESCE(s.approval_ind, 0) != 2 AND s.id != ?`;
-        const pFullWhere = `${pWhere} AND COALESCE(pr.approval_ind, 0) != 2 AND pr.id != ?`;
-        const sFullWhere = `${sWhere} AND COALESCE(st.approval_ind, 0) != 2 AND st.id != ?`;
+        const bFullWhere = `${bGeoSql} AND ${bLevelSql} AND ${bLeaderTypeSql} AND COALESCE(s.approval_ind, 0) != 2 AND s.id != ?`;
+        const pFullWhere = `${pGeoSql} AND ${pLevelSql} AND ${pLeaderTypeSql} AND COALESCE(pr.approval_ind, 0) != 2 AND pr.id != ?`;
+        const sFullWhere = `${sGeoSql} AND ${sLevelSql} AND ${sLeaderTypeSql} AND COALESCE(st.approval_ind, 0) != 2 AND st.id != ?`;
 
         const [believers]: any = await db.query(`
             SELECT s.id, s.fname, s.lname, s.mobile_number, s.generaltype, s.leadership, s.leadertype,
@@ -3806,8 +3898,9 @@ app.all(['/dashboardapi/getLeaderswebsiteData', '/dashboardapi/getLeaderswebsite
             LEFT JOIN const_dtl_t c ON s.constituency_id = c.id
             LEFT JOIN mndls_lst_t m ON s.mandal_id = m.id
             LEFT JOIN pnchyt_lst_t p ON s.panchayat_id = p.id
-            LEFT JOIN wings w ON s.wingtype = w.id OR s.wingtypes = w.id
+            LEFT JOIN wings w ON w.id = COALESCE(NULLIF(s.wingtypes, ''), s.wingtype)
             WHERE ${bFullWhere}
+            GROUP BY s.id
             ORDER BY s.id DESC
         `, [...queryParams, currentUserId]);
 
@@ -3824,13 +3917,14 @@ app.all(['/dashboardapi/getLeaderswebsiteData', '/dashboardapi/getLeaderswebsite
             LEFT JOIN const_dtl_t c ON pr.constituency_id = c.id
             LEFT JOIN mndls_lst_t m ON pr.mandal_id = m.id
             LEFT JOIN pnchyt_lst_t p ON pr.village_id = p.id
-            LEFT JOIN wings w ON pr.wingtype = w.id OR pr.wingtypes = w.id
+            LEFT JOIN wings w ON w.id = COALESCE(NULLIF(pr.wingtypes, ''), pr.wingtype)
             WHERE ${pFullWhere}
+            GROUP BY pr.id
             ORDER BY pr.id DESC
         `, [...queryParams, currentUserId]);
 
         let students: any = [];
-        if (!leaderWing || leaderWing.id === 1) {
+        if (loggedInLeaderType === 'general' || (leaderWing && leaderWing.id === 1)) {
             const [stRows]: any = await db.query(`
                 SELECT st.id, st.studentname as fname, '' as lname, st.number as mobile_number, st.generaltype, st.leadership, st.leadertype,
                        st.wingtype, st.wingtype as wingtypes,
@@ -3984,28 +4078,31 @@ app.all(['/dashboardapi/getUserMainData', '/dashboardapi/getUserMainData/:id', '
 
         const resolveLeader = (u: any, role: string) => {
             if (!u) return null;
-            const isWingLeader = String(u.leadertype) === '2' || Boolean(u.wingtypes && u.wingtypes !== 'null') || (role === 'pastor' && Boolean(u.wingtype && u.wingtype !== 'null'));
-            let genType = null;
+            const isWingLeader = String(u.leadertype) === '2' || Boolean(u.wingtypes && u.wingtypes !== 'null' && u.wingtypes !== 'undefined') || (role === 'pastor' && Boolean(u.wingtype && u.wingtype !== 'null' && String(u.wingtype).trim() !== '' && String(u.leadertype) === '2'));
+            let canonicalLvl = null;
             if (role === 'pastor') {
-                genType = parseLeadershipLevel(u.wingtype) ?? parseLeadershipLevel(u.generaltype);
+                canonicalLvl = getCanonicalLevel(u.wingtype) ?? getCanonicalLevel(u.generaltype);
             } else if (role === 'student') {
-                genType = parseLeadershipLevel(u.generaltype) ?? parseLeadershipLevel(u.wingtype);
+                canonicalLvl = getCanonicalLevel(u.generaltype) ?? getCanonicalLevel(u.wingtype);
             } else {
-                genType = parseLeadershipLevel(u.generaltype);
+                canonicalLvl = getCanonicalLevel(u.generaltype);
             }
 
-            if (u.d_in == 1 && (genType === null || genType === undefined || genType > 3)) {
-                genType = 1; // Default to District incharge
+            if (u.d_in == 1 && (canonicalLvl === null || canonicalLvl === undefined || canonicalLvl > 4)) {
+                canonicalLvl = 2; // Default to District incharge
             }
 
             // An approved leader has d_in == 1 OR approval_ind == 1
             const isApproved = (u.d_in == 1) || (Number(u.approval_ind) === 1);
-            if (isApproved && (genType === 0 || genType === 1 || genType === 2 || genType === 3 || genType === 4)) {
+            if (isApproved && canonicalLvl !== null) {
                 const resolvedWing = resolveWingCategory(u.wingtypes) || resolveWingCategory(u.wingtype) || (role === 'student' ? resolveWingCategory(1) : null);
+                // Return internal 0-indexed genType for client compatibility (0=State, 1=District, 2=Constituency, 3=Mandal, 4=Panchayat, 5=Ward)
+                const clientGenType = canonicalLvl === 1 ? 0 : canonicalLvl - 1;
                 return {
                     id: u.id,
                     leadertype: (isWingLeader || resolvedWing) ? 2 : (Number(u.leadertype) || 1),
-                    generaltype: genType,
+                    generaltype: clientGenType,
+                    canonical_level: canonicalLvl,
                     wingtype: u.wingtype,
                     wingtypes: u.wingtypes,
                     wing_name: resolvedWing ? resolvedWing.telugu : '',
@@ -4014,7 +4111,7 @@ app.all(['/dashboardapi/getUserMainData', '/dashboardapi/getUserMainData/:id', '
                     district_id: u.district_id,
                     constituency_id: u.constituency_id,
                     mandal_id: u.mandal_id,
-                    village_id: u.village_id,
+                    village_id: u.village_id || u.panchayat_id,
                     fname: u.name,
                     d_in: u.d_in,
                     approval_ind: u.approval_ind,

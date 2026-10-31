@@ -1,0 +1,108 @@
+﻿Level ID                                                                              type of level
+6
+	వార్డు నాయకుడు
+	5
+	పంచాయతి నాయకుడు
+	4
+	మండల నాయకుడు
+	3
+	నియోజకవర్గం నాయకుడు
+	2
+	జిల్లా నాయకుడు
+	1
+	రాష్ట్ర నాయకుడు
+	
+
+leader types: general and wing:
+
+
+all 6 levels and isolates records based on the user's geographical scope and leader type (general or wing).
+Assuming your table is named leaders and includes columns like level_id, leader_type, district_id, constituency_id, mandal_id, panchayat_id, and ward_id, you can use this unified query:
+Universal SQL Query (Handles All Levels 1 to 6)
+
+
+SELECT * 
+FROM leaders 
+WHERE level_id = :logged_in_level_id + 1   -- Automatically targets the exact level below
+  AND leader_type = :logged_in_leader_type -- Matches the exact same leader type (general / wing)
+  AND (
+    -- Level 1 (రాష్ట్ర నాయకుడు) viewing Level 2 (జిల్లా నాయకుడు)
+    (:logged_in_level_id = 1)
+    
+    -- Level 2 (జిల్లా నాయకుడు) viewing Level 3 (నియోజకవర్గం నాయకుడు)
+    OR (:logged_in_level_id = 2 AND district_id = :logged_in_district_id)
+    
+    -- Level 3 (నియోజకవర్గం నాయకుడు) viewing Level 4 (మండల నాయకుడు)
+    OR (:logged_in_level_id = 3 AND constituency_id = :logged_in_constituency_id AND district_id = :logged_in_district_id )
+    
+    -- Level 4 (మండల నాయకుడు) viewing Level 5 (పంచాయతి నాయకుడు)
+    OR (:logged_in_level_id = 4 AND mandal_id = :logged_in_mandal_id AND constituency_id = :logged_in_constituency_id )
+    
+    -- Level 5 (పంచాయతి నాయకుడు) viewing Level 6 (వార్డు నాయకుడు)
+    OR (:logged_in_level_id = 5 AND panchayat_id = :logged_in_panchayat_id AND mandal_id = :logged_in_mandal_id )
+  );
+
+
+
+leader_type = :logged_in_leader_type ensures that if a wing user logs in, they only see wing records one level down. If a general user logs in, they only see general records one level down.
+Moving district_id inside the individual OR blocks allows State leaders (level_id = 1) to query down properly without crashing due to a missing district parameter.
+
+
+Example: District Level User (level_id = 2) with leader_type = 'general' and district_id = 1
+When a District leader logs in, the query evaluates to:
+* level_id = 3 (Constituency level / నియోజకవర్గం నాయకుడు)
+* leader_type = 'general'
+* district_id = 1
+
+
+SELECT * 
+FROM leaders 
+WHERE level_id = 3 
+  AND district_id = 1 
+  AND leader_type = 'general'or 'wing;
+
+
+
+This ensures only Constituency-level leaders belonging to District 1 with the exact same leader type (general or wing) are returned, completely isolating them from other districts, types, or levels. 
+
+
+Student:
+a higher-level leader should only see lower-level leaders within their jurisdiction (e.g., a District Leader for "District A" should only see Constituency Leaders inside "District A"). 
+
+
+1. Database Schema Alignment
+Ensure your database tables (e.g., users or leaders and students) include the hierarchical level and corresponding geographic foreign keys so that scoping works correctly:
+* Level ID: 1 (State), 2 (District), 3 (Constituency), 4 (Mandal), 5 (Panchayat), 6 (Ward)
+* Geographic IDs: state_id, district_id, constituency_id, mandal_id, panchayat_id
+2. Backend SQL Query Implementation
+When a leader logs into JBAC and requests the student list, your backend should dynamically retrieve the logged-in user's level and location parameters from their session, and execute the following query:
+SQL
+
+
+SELECT s.*
+FROM students AS s
+WHERE s.level_id = :logged_in_user_level_id + 1
+  AND (
+        -- If State Level Leader (1), show all District Level (2) students
+        :logged_in_user_level_id = 1
+        
+        -- If District Level Leader (2), show Constituency Level (3) students in their district
+        OR (:logged_in_user_level_id = 2 AND s.district_id = :logged_in_user_district_id)
+        
+        -- If Constituency Level Leader (3), show Mandal Level (4) students in their constituency
+        OR (:logged_in_user_level_id = 3 AND s.constituency_id = :logged_in_user_constituency_id)
+        
+        -- If Mandal Level Leader (4), show Panchayat Level (5) students in their mandal
+        OR (:logged_in_user_level_id = 4 AND s.mandal_id = :logged_in_user_mandal_id)
+        
+        -- If Panchayat Level Leader (5), show Ward Level (6) students in their panchayat
+        OR (:logged_in_user_level_id = 5 AND s.panchayat_id = :logged_in_user_panchayat_id)
+      );
+
+
+
+
+. Implementation Checklist
+* Session Parameter Binding: Always fetch :logged_in_user_level_id and the matching geographic IDs (like :logged_in_user_district_id) from secure server-side session data rather than trusting inputs sent directly from the client browser.
+* Strict Jurisdiction Validation: The AND (...) block guarantees data privacy so that a leader in one district cannot view records belonging to another district.
+* Level Boundary Check: Adding + 1 guarantees that users only see the immediate next tier down in the hierarchy (e.g., a District Leader sees Constituency-level entries, but not Panchayat-level entries).
