@@ -3733,11 +3733,13 @@ app.all(['/dashboardapi/getLeaderswebsiteData', '/dashboardapi/getLeaderswebsite
         let loggedInLeaderType = isWingRequest ? 'wing' : 'general';
         let loggedInCanonicalLevel = null;
         let leaderWing = null;
+        let loggedInRole = null;
 
         // 1. Session Parameter Binding: Fetch authoritative leader level & locations directly from DB
         if (currentUserId && currentUserId !== -1) {
             const [p]: any = await db.query('SELECT id, leadertype, generaltype, wingtype, wingtypes, district_id, constituency_id, mandal_id, village_id, state_id, d_in, approval_ind FROM pastor_reg WHERE id = ?', [currentUserId]);
             if (p && p[0]) {
+                loggedInRole = 'pastor';
                 const pWing = resolveWingCategory(p[0].wingtypes) || resolveWingCategory(p[0].wingtype);
                 if (String(p[0].leadertype) === '2' || pWing) {
                     loggedInLeaderType = 'wing';
@@ -3757,6 +3759,7 @@ app.all(['/dashboardapi/getLeaderswebsiteData', '/dashboardapi/getLeaderswebsite
             } else {
                 const [s]: any = await db.query('SELECT id, leadertype, generaltype, wingtype, wingtypes, district_id, constituency_id, mandal_id, panchayat_id, state_id, d_in, approval_ind FROM signup_form WHERE id = ?', [currentUserId]);
                 if (s && s[0]) {
+                loggedInRole = 'believer';
                     const sWing = resolveWingCategory(s[0].wingtypes) || resolveWingCategory(s[0].wingtype);
                     if (String(s[0].leadertype) === '2' || sWing) {
                         loggedInLeaderType = 'wing';
@@ -3776,6 +3779,7 @@ app.all(['/dashboardapi/getLeaderswebsiteData', '/dashboardapi/getLeaderswebsite
                 } else {
                     const [st]: any = await db.query('SELECT id, leadership, leadertype, generaltype, wingtype, district_id, constituency_id, mandal_id, village_id, state_id, d_in, approval_ind FROM student_reg WHERE id = ?', [currentUserId]);
                     if (st && st[0]) {
+                    loggedInRole = 'student';
                         loggedInLeaderType = 'wing';
                         isWingRequest = true;
                         leaderWing = resolveWingCategory(1); // Student Wing
@@ -3808,6 +3812,23 @@ app.all(['/dashboardapi/getLeaderswebsiteData', '/dashboardapi/getLeaderswebsite
                 loggedInLeaderType = 'wing';
                 isWingRequest = true;
             }
+        }
+
+        // 1.5 USER TYPE ISOLATION: Filter out requests belonging to other user types
+        let targetUserType = null;
+        const reqUserType = String(b.user_type || b.selected_user_type || '').toLowerCase().trim();
+        const reqCatId = String(b.category_id || b.category || '').trim();
+
+        if (reqUserType === 'pastor' || reqCatId === '4' || reqCatId === '3') {
+            targetUserType = 'pastor';
+        } else if (reqUserType === 'student' || reqCatId === '2') {
+            targetUserType = 'student';
+        } else if (reqUserType === 'believer' || reqCatId === '1') {
+            targetUserType = 'believer';
+        } else if (reqUserType === 'all') {
+            targetUserType = 'all';
+        } else if (loggedInRole) {
+            targetUserType = loggedInRole;
         }
 
         // 2. UNIVERSAL SQL QUERY: Targets the immediate level below (:logged_in_level_id + 1)
@@ -3948,9 +3969,9 @@ app.all(['/dashboardapi/getLeaderswebsiteData', '/dashboardapi/getLeaderswebsite
         const [constituencies]: any = await db.query('SELECT id, const_nm FROM const_dtl_t WHERE dstrct_id = ? AND d_in = 0', [districtId || 0]);
 
         if (isWingRequest) {
-            return res.json({ status: 200, data: [believers, students, pastors] });
+            return res.json({ status: 200, data: [believers, students, pastors], selected_user_type: targetUserType });
         } else {
-            return res.json({ status: 200, data: [believers, constituencies, pastors, students] });
+            return res.json({ status: 200, data: [believers, constituencies, pastors, students], selected_user_type: targetUserType });
         }
     } catch (err: any) {
         res.status(500).json({ status: 500, error: err.message });

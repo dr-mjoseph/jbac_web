@@ -3993,11 +3993,13 @@ app.all(['/dashboardapi/getLeaderswebsiteData', '/dashboardapi/getLeaderswebsite
         let loggedInLeaderType = isWingRequest ? 'wing' : 'general';
         let loggedInCanonicalLevel = null;
         let leaderWing = null;
+        let loggedInRole = null;
 
         // 1. Session Parameter Binding: Fetch authoritative leader level & locations directly from DB
         if (currentUserId && currentUserId !== -1) {
             const [p] = await db.query('SELECT id, leadertype, generaltype, wingtype, wingtypes, district_id, constituency_id, mandal_id, village_id, state_id, d_in, approval_ind FROM pastor_reg WHERE id = ?', [currentUserId]);
             if (p && p[0]) {
+                loggedInRole = 'pastor';
                 const pWing = resolveWingCategory(p[0].wingtypes) || resolveWingCategory(p[0].wingtype);
                 if (String(p[0].leadertype) === '2' || pWing) {
                     loggedInLeaderType = 'wing';
@@ -4017,6 +4019,7 @@ app.all(['/dashboardapi/getLeaderswebsiteData', '/dashboardapi/getLeaderswebsite
             } else {
                 const [s] = await db.query('SELECT id, leadertype, generaltype, wingtype, wingtypes, district_id, constituency_id, mandal_id, panchayat_id, state_id, d_in, approval_ind FROM signup_form WHERE id = ?', [currentUserId]);
                 if (s && s[0]) {
+                loggedInRole = 'believer';
                     const sWing = resolveWingCategory(s[0].wingtypes) || resolveWingCategory(s[0].wingtype);
                     if (String(s[0].leadertype) === '2' || sWing) {
                         loggedInLeaderType = 'wing';
@@ -4036,6 +4039,7 @@ app.all(['/dashboardapi/getLeaderswebsiteData', '/dashboardapi/getLeaderswebsite
                 } else {
                     const [st] = await db.query('SELECT id, leadership, leadertype, generaltype, wingtype, district_id, constituency_id, mandal_id, village_id, state_id, d_in, approval_ind FROM student_reg WHERE id = ?', [currentUserId]);
                     if (st && st[0]) {
+                    loggedInRole = 'student';
                         loggedInLeaderType = 'wing';
                         isWingRequest = true;
                         leaderWing = resolveWingCategory(1); // Student Wing
@@ -4068,6 +4072,23 @@ app.all(['/dashboardapi/getLeaderswebsiteData', '/dashboardapi/getLeaderswebsite
                 loggedInLeaderType = 'wing';
                 isWingRequest = true;
             }
+        }
+
+        // 1.5 USER TYPE ISOLATION: Filter out requests belonging to other user types
+        let targetUserType = null;
+        const reqUserType = String(b.user_type || b.selected_user_type || '').toLowerCase().trim();
+        const reqCatId = String(b.category_id || b.category || '').trim();
+
+        if (reqUserType === 'pastor' || reqCatId === '4' || reqCatId === '3') {
+            targetUserType = 'pastor';
+        } else if (reqUserType === 'student' || reqCatId === '2') {
+            targetUserType = 'student';
+        } else if (reqUserType === 'believer' || reqCatId === '1') {
+            targetUserType = 'believer';
+        } else if (reqUserType === 'all') {
+            targetUserType = 'all';
+        } else if (loggedInRole) {
+            targetUserType = loggedInRole;
         }
 
         // 2. UNIVERSAL SQL QUERY: Targets the immediate level below (:logged_in_level_id + 1)
@@ -4145,72 +4166,86 @@ app.all(['/dashboardapi/getLeaderswebsiteData', '/dashboardapi/getLeaderswebsite
         const pFullWhere = `${pGeoSql} AND ${pLevelSql} AND ${pLeaderTypeSql} AND COALESCE(pr.approval_ind, 0) != 2 AND pr.id != ?`;
         const sFullWhere = `${sGeoSql} AND ${sLevelSql} AND ${sLeaderTypeSql} AND COALESCE(st.approval_ind, 0) != 2 AND st.id != ?`;
 
-        const [believers] = await db.query(`
-            SELECT s.id, s.fname, s.lname, s.mobile_number, s.generaltype, s.leadership, s.leadertype,
-                   s.wingtype, s.wingtypes, s.wardnumber, s.subward,
-                   s.approval_ind, s.district_id, s.constituency_id, s.mandal_id, s.panchayat_id,
-                   s.address, s.nativeplace, s.villagename,
-                   COALESCE(c.const_nm, '') as constituency_name,
-                   COALESCE(m.mndl_nm, '') as mandal_name,
-                   COALESCE(p.pnchyt_nm, '') as panchayat_name,
-                   COALESCE(w.position, w.wing_name, '') as wing_name
-            FROM signup_form s
-            LEFT JOIN const_dtl_t c ON s.constituency_id = c.id
-            LEFT JOIN mndls_lst_t m ON s.mandal_id = m.id
-            LEFT JOIN pnchyt_lst_t p ON s.panchayat_id = p.id
-            LEFT JOIN wings w ON w.id = COALESCE(NULLIF(s.wingtypes, ''), s.wingtype)
-            WHERE ${bFullWhere}
-            GROUP BY s.id
-            ORDER BY s.id DESC
-        `, [...queryParams, currentUserId]);
-
-        const [pastors] = await db.query(`
-            SELECT pr.id, pr.pastorname, pr.phonenumber, pr.generaltype, pr.leadership, pr.leadertype,
-                   pr.wingtype, pr.wingtypes, pr.subward,
-                   pr.approval_ind, pr.district_id, pr.constituency_id, pr.mandal_id, pr.village_id,
-                   pr.address, pr.nativeplace, pr.villagename,
-                   COALESCE(c.const_nm, '') as constituency_name,
-                   COALESCE(m.mndl_nm, '') as mandal_name,
-                   COALESCE(p.pnchyt_nm, '') as panchayat_name,
-                   COALESCE(w.position, w.wing_name, '') as wing_name
-            FROM pastor_reg pr
-            LEFT JOIN const_dtl_t c ON pr.constituency_id = c.id
-            LEFT JOIN mndls_lst_t m ON pr.mandal_id = m.id
-            LEFT JOIN pnchyt_lst_t p ON pr.village_id = p.id
-            LEFT JOIN wings w ON w.id = COALESCE(NULLIF(pr.wingtypes, ''), pr.wingtype)
-            WHERE ${pFullWhere}
-            GROUP BY pr.id
-            ORDER BY pr.id DESC
-        `, [...queryParams, currentUserId]);
-
+        let believers = [];
+        let pastors = [];
         let students = [];
-        if (loggedInLeaderType === 'general' || (leaderWing && leaderWing.id === 1)) {
-            const [stRows] = await db.query(`
-                SELECT st.id, st.studentname as fname, '' as lname, st.number as mobile_number, st.generaltype, st.leadership, st.leadertype,
-                       st.wingtype, st.wingtype as wingtypes,
-                       st.approval_ind, st.district_id, st.constituency_id, st.mandal_id, st.village_id as panchayat_id,
-                       st.address, st.nativeplace,
+
+        // Query Believers only if targetUserType is believer or all
+        if (!targetUserType || targetUserType === 'believer' || targetUserType === 'all') {
+            const [bRows] = await db.query(`
+                SELECT s.id, s.fname, s.lname, s.mobile_number, s.generaltype, s.leadership, s.leadertype,
+                       s.wingtype, s.wingtypes, s.wardnumber, s.subward,
+                       s.approval_ind, s.district_id, s.constituency_id, s.mandal_id, s.panchayat_id,
+                       s.address, s.nativeplace, s.villagename,
                        COALESCE(c.const_nm, '') as constituency_name,
                        COALESCE(m.mndl_nm, '') as mandal_name,
                        COALESCE(p.pnchyt_nm, '') as panchayat_name,
-                       'Student Wing' as wing_name
-                FROM student_reg st
-                LEFT JOIN const_dtl_t c ON st.constituency_id = c.id
-                LEFT JOIN mndls_lst_t m ON st.mandal_id = m.id
-                LEFT JOIN pnchyt_lst_t p ON st.village_id = p.id
-                WHERE ${sFullWhere}
-                ORDER BY st.id DESC
+                       COALESCE(w.position, w.wing_name, '') as wing_name
+                FROM signup_form s
+                LEFT JOIN const_dtl_t c ON s.constituency_id = c.id
+                LEFT JOIN mndls_lst_t m ON s.mandal_id = m.id
+                LEFT JOIN pnchyt_lst_t p ON s.panchayat_id = p.id
+                LEFT JOIN wings w ON w.id = COALESCE(NULLIF(s.wingtypes, ''), s.wingtype)
+                WHERE ${bFullWhere}
+                GROUP BY s.id
+                ORDER BY s.id DESC
             `, [...queryParams, currentUserId]);
-            students = stRows || [];
+            believers = bRows || [];
+        }
+
+        // Query Pastors only if targetUserType is pastor or all
+        if (!targetUserType || targetUserType === 'pastor' || targetUserType === 'all') {
+            const [pRows] = await db.query(`
+                SELECT pr.id, pr.pastorname, pr.phonenumber, pr.generaltype, pr.leadership, pr.leadertype,
+                       pr.wingtype, pr.wingtypes, pr.subward,
+                       pr.approval_ind, pr.district_id, pr.constituency_id, pr.mandal_id, pr.village_id,
+                       pr.address, pr.nativeplace, pr.villagename,
+                       COALESCE(c.const_nm, '') as constituency_name,
+                       COALESCE(m.mndl_nm, '') as mandal_name,
+                       COALESCE(p.pnchyt_nm, '') as panchayat_name,
+                       COALESCE(w.position, w.wing_name, '') as wing_name
+                FROM pastor_reg pr
+                LEFT JOIN const_dtl_t c ON pr.constituency_id = c.id
+                LEFT JOIN mndls_lst_t m ON pr.mandal_id = m.id
+                LEFT JOIN pnchyt_lst_t p ON pr.village_id = p.id
+                LEFT JOIN wings w ON w.id = COALESCE(NULLIF(pr.wingtypes, ''), pr.wingtype)
+                WHERE ${pFullWhere}
+                GROUP BY pr.id
+                ORDER BY pr.id DESC
+            `, [...queryParams, currentUserId]);
+            pastors = pRows || [];
+        }
+
+        // Query Students only if targetUserType is student or all
+        if (!targetUserType || targetUserType === 'student' || targetUserType === 'all') {
+            if (loggedInLeaderType === 'general' || (leaderWing && leaderWing.id === 1)) {
+                const [stRows] = await db.query(`
+                    SELECT st.id, st.studentname as fname, '' as lname, st.number as mobile_number, st.generaltype, st.leadership, st.leadertype,
+                           st.wingtype, st.wingtype as wingtypes,
+                           st.approval_ind, st.district_id, st.constituency_id, st.mandal_id, st.village_id as panchayat_id,
+                           st.address, st.nativeplace,
+                           COALESCE(c.const_nm, '') as constituency_name,
+                           COALESCE(m.mndl_nm, '') as mandal_name,
+                           COALESCE(p.pnchyt_nm, '') as panchayat_name,
+                           'Student Wing' as wing_name
+                    FROM student_reg st
+                    LEFT JOIN const_dtl_t c ON st.constituency_id = c.id
+                    LEFT JOIN mndls_lst_t m ON st.mandal_id = m.id
+                    LEFT JOIN pnchyt_lst_t p ON st.village_id = p.id
+                    WHERE ${sFullWhere}
+                    ORDER BY st.id DESC
+                `, [...queryParams, currentUserId]);
+                students = stRows || [];
+            }
         }
 
         // Fetch constituencies for this district if applicable
         const [constituencies] = await db.query('SELECT id, const_nm FROM const_dtl_t WHERE dstrct_id = ? AND d_in = 0', [districtId || 0]);
 
         if (isWingRequest) {
-            return res.json({ status: 200, data: [believers, students, pastors] });
+            return res.json({ status: 200, data: [believers, students, pastors], selected_user_type: targetUserType });
         } else {
-            return res.json({ status: 200, data: [believers, constituencies, pastors, students] });
+            return res.json({ status: 200, data: [believers, constituencies, pastors, students], selected_user_type: targetUserType });
         }
     } catch (err) {
         res.status(500).json({ status: 500, error: err.message });

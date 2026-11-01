@@ -34,6 +34,20 @@
         </div>
     </div>
 
+    <!-- Active User Type Filter Indicator -->
+    <div class="container mb-3" style="text-align: center;">
+        <span class="badge" style="font-size: 0.92rem; padding: 8px 18px; border-radius: 20px; font-weight: 600;"
+            [ngStyle]="{
+                'background-color': formshow == 1 ? '#e0f2fe' : (formshow == 3 ? '#fee2e2' : '#dcfce7'),
+                'color': formshow == 1 ? '#0369a1' : (formshow == 3 ? '#991b1b' : '#166534'),
+                'border': '1px solid ' + (formshow == 1 ? '#7dd3fc' : (formshow == 3 ? '#fca5a5' : '#86efac'))
+            }">
+            📌 ఎంచుకున్న యూజర్ రకం (Selected User Type): 
+            <b>{{ formshow == 1 ? 'విశ్వాసులు (Believers)' : (formshow == 3 ? 'పాస్టర్లు (Pastors)' : 'విద్యార్థులు (Students)') }}</b>
+            — ఇతర యూజర్ కేటగిరీలు తొలగించబడ్డాయి (Other user types isolated)
+        </span>
+    </div>
+
     <br>
 
     <!-- Believers Requests Table -->

@@ -12,139 +12,232 @@ export class LeadersComponent {
   leders_array: any;
   category_id: any;
   profiledata: any = [];
-  belearr: any;
-  studentarr: any;
-  pastorarr: any;
+  belearr: any = [];
+  studentarr: any = [];
+  pastorarr: any = [];
   contituencyname: any;
   contituencynamebel: any;
-  formshow: any;
-  general: any;
-  generals: any;
-  leaders: any;
-  wingtypes: any;
+  formshow: any = 1;
+  selectedUserType: string = 'believer';
+  general: any = '';
+  generals: any = '';
+  leaders: any = '';
+  wingtypes: any = '';
   leaderid: any;
   myresdata: any;
+  cachedUserRes: any = null;
+
   constructor(private service: ServiceService, private router: Router) {
-    this.formshow = "1";
+    this.formshow = 1;
   }
 
   ngOnInit(): void {
-
     if (sessionStorage.getItem("auth_ind") == '' || sessionStorage.getItem("auth_ind") == null || sessionStorage.getItem("auth_ind") == undefined) {
-      Swal.fire("Login Required")
+      Swal.fire("Login Required");
       this.router.navigate(['/']);
+      return;
+    }
+
+    this.category_id = sessionStorage.getItem("category_id");
+    // Pre-set formshow and selectedUserType based on stored category
+    if (this.category_id === '4' || this.category_id === '3') {
+      this.selectedUserType = 'pastor';
+      this.formshow = 3;
+    } else if (this.category_id === '2') {
+      this.selectedUserType = 'student';
+      this.formshow = 2;
+    } else {
+      this.selectedUserType = 'believer';
+      this.formshow = 1;
     }
 
     this.getLeaderswebsiteData();
-    this.category_id = sessionStorage.getItem("category_id");
   }
 
-  getLeaderswebsiteData() {
+  getLeaderswebsiteData(forceUserType?: string) {
+    const storedCat = sessionStorage.getItem("category_id");
+    const storedUsrId = sessionStorage.getItem("usr_id");
+
     var data = {
-      "category": sessionStorage.getItem("category_id"),
-      "usr_id": sessionStorage.getItem("usr_id")
-    }
+      "category": storedCat,
+      "usr_id": storedUsrId
+    };
+
     this.service.getUserMainData(data).subscribe((res: any) => {
-      if (res.data.length == "0") {
+      if (!res || !res.data || res.data.length == 0) {
         Swal.fire("Your Not a General Leader (Or) Wing leader");
         this.router.navigate(['/']);
+        return;
+      }
+
+      this.cachedUserRes = res.data[0];
+      const userRole = res.data[0].role; // 'pastor', 'student', 'believer'
+
+      if (forceUserType) {
+        this.selectedUserType = forceUserType;
+        if (forceUserType === 'pastor') this.formshow = 3;
+        else if (forceUserType === 'student') this.formshow = 2;
+        else this.formshow = 1;
       } else {
-        this.leaderid = res.data[0].leadertype
-        if (res.data[0].leadertype == 1) {
-          this.leaders = "Leader "
-        } else if (res.data[0].leadertype == 2) {
-          this.leaders = "Wing "
-        }
-        this.myresdata = res.data[0].generaltype
-        if (res.data[0].leadertype == 1) {
-          if (res.data[0].generaltype == 0) {
-            this.generals = "State";
-            this.general = "District ";
-          } else if (res.data[0].generaltype == 1) {
-            this.generals = "District";
-            this.general = "Constituency ";
-          } else if (res.data[0].generaltype == 2) {
-            this.generals = "Constituency";
-            this.general = "Mandal ";
-          } else if (res.data[0].generaltype == 3) {
-            this.generals = "Mandal ";
-            this.general = "Panchayat ";
-          } else if (res.data[0].generaltype == 4) {
-            this.generals = "Panchayat ";
-            this.general = "Ward ";
-          } else if (res.data[0].generaltype == 5 || res.data[0].generaltype == 6) {
-            this.generals = "Ward ";
-            this.general = "";
-          }
-          var data = {
-            "usr_id": sessionStorage.getItem("usr_id"),
-            "category_id": sessionStorage.getItem("category_id"),
-            "leadertype": res.data[0].leadertype,
-            "wingtypes": res.data[0].wingtypes,
-            "generaltype": res.data[0].generaltype,
-            state_id: res.data[0].state_id || 1,
-            district_id: res.data[0].district_id,
-            constituency_id: res.data[0].constituency_id,
-            mandal_id: res.data[0].mandal_id,
-            panchayat_id: res.data[0].village_id
-          }
-          this.service.getLeaderswebsiteD(data).subscribe((result: any) => {
-            const rawBelievers = result.data[0] || [];
-            this.contituencyname = result.data[1];
-            const rawPastors = result.data[2] || [];
-            const rawStudents = result.data[3] || [];
-            // Keep only approved (1) and unapproved (0 / null); hide rejected (2)
-            this.belearr = rawBelievers.filter((x: any) => Number(x?.approval_ind) !== 2);
-            this.pastorarr = rawPastors.filter((x: any) => Number(x?.approval_ind) !== 2);
-            this.studentarr = rawStudents.filter((x: any) => Number(x?.approval_ind) !== 2);
-            console.log(this.belearr, this.contituencyname, this.pastorarr, this.studentarr, 'leader')
-          })
-        } else if (res.data[0].leadertype == 2) {
-          this.wingtypes = res.data[0].wing_name || res.data[0].wingtypes || "";
-          if (res.data[0].generaltype == 0) {
-            this.generals = "State";
-            this.general = "District";
-          } else if (res.data[0].generaltype == 1) {
-            this.generals = "District";
-            this.general = "Constituency";
-          } else if (res.data[0].generaltype == 2) {
-            this.generals = "Constituency";
-            this.general = "Mandal";
-          } else if (res.data[0].generaltype == 3) {
-            this.generals = "Mandal";
-            this.general = "Panchayat";
-          } else if (res.data[0].generaltype == 4) {
-            this.generals = "Panchayat";
-            this.general = "Ward";
-          } else if (res.data[0].generaltype == 5 || res.data[0].generaltype == 6) {
-            this.generals = "Ward";
-            this.general = "";
-          }
-          var data4 = {
-            "usr_id": sessionStorage.getItem("usr_id"),
-            "category_id": sessionStorage.getItem("category_id"),
-            "leadertype": res.data[0].leadertype,
-            "wingtypes": res.data[0].wingtypes,
-            "generaltype": res.data[0].generaltype,
-            wingtype: res.data[0].wingtype,
-            state_id: res.data[0].state_id || 1,
-            district_id: res.data[0].district_id,
-            constituency_id: res.data[0].constituency_id,
-            mandal_id: res.data[0].mandal_id,
-            panchayat_id: res.data[0].village_id
-          }
-          this.service.getLeaderswebsitewing(data4).subscribe((result: any) => {
-            const rawBelievers = result.data[0] || [];
-            const rawStudents = result.data[1] || [];
-            const rawPastors = result.data[2] || [];
-            this.belearr = rawBelievers.filter((x: any) => Number(x?.approval_ind) !== 2);
-            this.studentarr = rawStudents.filter((x: any) => Number(x?.approval_ind) !== 2);
-            this.pastorarr = rawPastors.filter((x: any) => Number(x?.approval_ind) !== 2);
-            console.log(this.belearr, this.studentarr, this.pastorarr, 'wing leader')
-          })
+        if (userRole === 'pastor' || storedCat === '4' || storedCat === '3') {
+          this.selectedUserType = 'pastor';
+          this.formshow = 3;
+        } else if (userRole === 'student' || storedCat === '2') {
+          this.selectedUserType = 'student';
+          this.formshow = 2;
+        } else {
+          this.selectedUserType = 'believer';
+          this.formshow = 1;
         }
       }
-    })
+
+      this.fetchSubordinateRequests();
+    });
+  }
+
+  fetchSubordinateRequests() {
+    if (!this.cachedUserRes) return;
+    const u = this.cachedUserRes;
+    this.leaderid = u.leadertype;
+    if (u.leadertype == 1) {
+      this.leaders = "Leader ";
+    } else if (u.leadertype == 2) {
+      this.leaders = "Wing ";
+    }
+    this.myresdata = u.generaltype;
+
+    if (u.leadertype == 1) {
+      if (u.generaltype == 0) {
+        this.generals = "State";
+        this.general = "District ";
+      } else if (u.generaltype == 1) {
+        this.generals = "District";
+        this.general = "Constituency ";
+      } else if (u.generaltype == 2) {
+        this.generals = "Constituency";
+        this.general = "Mandal ";
+      } else if (u.generaltype == 3) {
+        this.generals = "Mandal ";
+        this.general = "Panchayat ";
+      } else if (u.generaltype == 4) {
+        this.generals = "Panchayat ";
+        this.general = "Ward ";
+      } else if (u.generaltype == 5 || u.generaltype == 6) {
+        this.generals = "Ward ";
+        this.general = "";
+      }
+
+      var data = {
+        "usr_id": sessionStorage.getItem("usr_id"),
+        "category_id": sessionStorage.getItem("category_id"),
+        "user_type": this.selectedUserType,
+        "leadertype": u.leadertype,
+        "wingtypes": u.wingtypes,
+        "generaltype": u.generaltype,
+        state_id: u.state_id || 1,
+        district_id: u.district_id,
+        constituency_id: u.constituency_id,
+        mandal_id: u.mandal_id,
+        panchayat_id: u.village_id
+      };
+
+      this.service.getLeaderswebsiteD(data).subscribe((result: any) => {
+        const rawBelievers = result.data[0] || [];
+        this.contituencyname = result.data[1];
+        const rawPastors = result.data[2] || [];
+        const rawStudents = result.data[3] || [];
+
+        // USER TYPE ISOLATION: Display ONLY selected user type; clear others
+        if (this.selectedUserType === 'pastor') {
+          this.pastorarr = rawPastors.filter((x: any) => Number(x?.approval_ind) !== 2);
+          this.belearr = [];
+          this.studentarr = [];
+        } else if (this.selectedUserType === 'student') {
+          this.studentarr = rawStudents.filter((x: any) => Number(x?.approval_ind) !== 2);
+          this.belearr = [];
+          this.pastorarr = [];
+        } else {
+          this.belearr = rawBelievers.filter((x: any) => Number(x?.approval_ind) !== 2);
+          this.pastorarr = [];
+          this.studentarr = [];
+        }
+      });
+    } else if (u.leadertype == 2) {
+      this.wingtypes = u.wing_name || u.wingtypes || "";
+      if (u.generaltype == 0) {
+        this.generals = "State";
+        this.general = "District";
+      } else if (u.generaltype == 1) {
+        this.generals = "District";
+        this.general = "Constituency";
+      } else if (u.generaltype == 2) {
+        this.generals = "Constituency";
+        this.general = "Mandal";
+      } else if (u.generaltype == 3) {
+        this.generals = "Mandal";
+        this.general = "Panchayat";
+      } else if (u.generaltype == 4) {
+        this.generals = "Panchayat";
+        this.general = "Ward";
+      } else if (u.generaltype == 5 || u.generaltype == 6) {
+        this.generals = "Ward";
+        this.general = "";
+      }
+
+      var data4 = {
+        "usr_id": sessionStorage.getItem("usr_id"),
+        "category_id": sessionStorage.getItem("category_id"),
+        "user_type": this.selectedUserType,
+        "leadertype": u.leadertype,
+        "wingtypes": u.wingtypes,
+        "generaltype": u.generaltype,
+        wingtype: u.wingtype,
+        state_id: u.state_id || 1,
+        district_id: u.district_id,
+        constituency_id: u.constituency_id,
+        mandal_id: u.mandal_id,
+        panchayat_id: u.village_id
+      };
+
+      this.service.getLeaderswebsitewing(data4).subscribe((result: any) => {
+        const rawBelievers = result.data[0] || [];
+        const rawStudents = result.data[1] || [];
+        const rawPastors = result.data[2] || [];
+
+        // USER TYPE ISOLATION: Display ONLY selected user type; clear others
+        if (this.selectedUserType === 'pastor') {
+          this.pastorarr = rawPastors.filter((x: any) => Number(x?.approval_ind) !== 2);
+          this.belearr = [];
+          this.studentarr = [];
+        } else if (this.selectedUserType === 'student') {
+          this.studentarr = rawStudents.filter((x: any) => Number(x?.approval_ind) !== 2);
+          this.belearr = [];
+          this.pastorarr = [];
+        } else {
+          this.belearr = rawBelievers.filter((x: any) => Number(x?.approval_ind) !== 2);
+          this.pastorarr = [];
+          this.studentarr = [];
+        }
+      });
+    }
+  }
+
+  make(id: any) {
+    this.formshow = id;
+    if (id == 1) {
+      this.selectedUserType = 'believer';
+      this.pastorarr = [];
+      this.studentarr = [];
+    } else if (id == 3) {
+      this.selectedUserType = 'pastor';
+      this.belearr = [];
+      this.studentarr = [];
+    } else if (id == 2) {
+      this.selectedUserType = 'student';
+      this.belearr = [];
+      this.pastorarr = [];
+    }
+    this.fetchSubordinateRequests();
   }
 
   deleteAlert(id: any, index: any) {
@@ -175,9 +268,7 @@ export class LeadersComponent {
       });
   }
 
-  make(id: any) {
-    this.formshow = id
-  }
+
 
 
   confirm(id: any, index: any) {
