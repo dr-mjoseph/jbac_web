@@ -16,36 +16,22 @@
 
     <div class="container mt-4">
         <div class="row justify-content-center">
-            <div class="col-lg-4 col-md-4 mb-3" style="text-align: center;">
-                <button type="button" class="btn btn-lg w-100" [style.background-color]="formshow == 1 ? '#00548F' : '#f0f4f8'" [style.color]="formshow == 1 ? '#fff' : '#00548F'" style="font-weight: 600; border: 2px solid #00548F; padding: 12px 24px; border-radius: 8px;" (click)="make(1)">
+            <div class="col-lg-5 col-md-6 mb-3" style="text-align: center;" *ngIf="formshow == 1">
+                <button type="button" class="btn btn-lg w-100" style="background-color: #00548F; color: #fff; font-weight: 600; border: 2px solid #00548F; padding: 12px 24px; border-radius: 8px; cursor: default;">
                     👥 Believers Requests (విశ్వాసులు)
                 </button>
             </div>
-            <div class="col-lg-4 col-md-4 mb-3" style="text-align: center;">
-                <button type="button" class="btn btn-lg w-100" [style.background-color]="formshow == 3 ? '#8b0000' : '#fcf0f0'" [style.color]="formshow == 3 ? '#fff' : '#8b0000'" style="font-weight: 600; border: 2px solid #8b0000; padding: 12px 24px; border-radius: 8px;" (click)="make(3)">
+            <div class="col-lg-5 col-md-6 mb-3" style="text-align: center;" *ngIf="formshow == 3">
+                <button type="button" class="btn btn-lg w-100" style="background-color: #8b0000; color: #fff; font-weight: 600; border: 2px solid #8b0000; padding: 12px 24px; border-radius: 8px; cursor: default;">
                     ✝️ Pastors Requests (పాస్టర్లు)
                 </button>
             </div>
-            <div class="col-lg-4 col-md-4 mb-3" style="text-align: center;">
-                <button type="button" class="btn btn-lg w-100" [style.background-color]="formshow == 2 ? '#1e7e34' : '#f0fdf4'" [style.color]="formshow == 2 ? '#fff' : '#1e7e34'" style="font-weight: 600; border: 2px solid #1e7e34; padding: 12px 24px; border-radius: 8px;" (click)="make(2)">
+            <div class="col-lg-5 col-md-6 mb-3" style="text-align: center;" *ngIf="formshow == 2">
+                <button type="button" class="btn btn-lg w-100" style="background-color: #1e7e34; color: #fff; font-weight: 600; border: 2px solid #1e7e34; padding: 12px 24px; border-radius: 8px; cursor: default;">
                     🎓 Students Requests (విద్యార్థులు)
                 </button>
             </div>
         </div>
-    </div>
-
-    <!-- Active User Type Filter Indicator -->
-    <div class="container mb-3" style="text-align: center;">
-        <span class="badge" style="font-size: 0.92rem; padding: 8px 18px; border-radius: 20px; font-weight: 600;"
-            [ngStyle]="{
-                'background-color': formshow == 1 ? '#e0f2fe' : (formshow == 3 ? '#fee2e2' : '#dcfce7'),
-                'color': formshow == 1 ? '#0369a1' : (formshow == 3 ? '#991b1b' : '#166534'),
-                'border': '1px solid ' + (formshow == 1 ? '#7dd3fc' : (formshow == 3 ? '#fca5a5' : '#86efac'))
-            }">
-            📌 ఎంచుకున్న యూజర్ రకం (Selected User Type): 
-            <b>{{ formshow == 1 ? 'విశ్వాసులు (Believers)' : (formshow == 3 ? 'పాస్టర్లు (Pastors)' : 'విద్యార్థులు (Students)') }}</b>
-            — ఇతర యూజర్ కేటగిరీలు తొలగించబడ్డాయి (Other user types isolated)
-        </span>
     </div>
 
     <br>
