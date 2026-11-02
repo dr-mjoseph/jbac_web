@@ -194,3 +194,4 @@ if 'my-overlay' not in html:
 with open('src/app/jesus/news/news.component.html', 'w', encoding='utf-8') as f:
     f.write(html)
 print("Updated news.component.html")
+

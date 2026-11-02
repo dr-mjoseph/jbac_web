@@ -26,3 +26,4 @@ for i, line in enumerate(lines):
 with open(path, 'w', encoding='utf-8') as f:
     f.writelines(new_lines)
 print('Successfully replaced color-error function in ionic.functions.scss')
+
