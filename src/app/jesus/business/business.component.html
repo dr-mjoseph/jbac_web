@@ -51,10 +51,17 @@
     </div>
     <br>
     <div class="container mt-3" style="padding-bottom: 28px">
-        <h2>Business</h2>
+        <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+            <h2 class="m-0"><b>వ్యాపారాలు / Business</b></h2>
+            <button type="button" class="default-btn user-all-btn events-filter-toggle"
+                (click)="showFilters = !showFilters" [attr.aria-expanded]="showFilters">
+                <i class="fa fa-filter me-1"></i> ఫిల్టర్ సెర్చ్ (Filter Search)
+            </button>
+        </div>
 
+        <div class="filter-panel-wrapper" *ngIf="showFilters">
         <div class="row">
-            <div class="card" class="max-w-sm rounded overflow-hidden shadow-lg" style="padding:10px">
+            <div class="card p-3 shadow-sm border-0 filter-card">
                 <form [formGroup]="searchdenomation">
                     <div class="row">
                         <div class="col-md-2 mb-4 pb-2">
@@ -190,6 +197,7 @@
                     </div>
                 </form>
             </div>
+        </div>
         </div>
         <br><br>
         <input type="text" [(ngModel)]="searchTerm" (ngModelChange)="filterData()" placeholder="Search" />

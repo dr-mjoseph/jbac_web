@@ -16,7 +16,7 @@ Welcome to the **Jesus Believers Association Council (JBAC)** unified ecosystem 
                                     v                                   v
                       +---------------------------+       +---------------------------+
                       |   AWS Route 53 (DNS)      |       |  Android Mobile App       |
-                      |   jbac.in / www.jbac.in   |       |  (jbacApp-0.0.43.apk/aab) |
+                      |   jbac.in / www.jbac.in   |       |  (jbacApp-0.0.47.apk/aab) |
                       +---------------------------+       +---------------------------+
                                     |                                   |
                                     v                                   |
@@ -80,6 +80,10 @@ Welcome to the **Jesus Believers Association Council (JBAC)** unified ecosystem 
    - Integrated `adds_data` lifecycle engine linked with `events.enddate`. Meeting advertisements automatically disappear upon completion without manual intervention, while non-meeting announcements display continuously until stopped by admin (`d_in != 0`).
    - Universal vertical scrolling ads sidebars (`direction="up"`, `height: 550px`, hover-pause) across all 6 member service views (`/institute`, `/marriages`, `/jobs`, `/help`, `/business`, `/organization`).
    - Full-page loading spinner on `/news` preventing layout shift until news entries load.
+   - Space-saving collapsible **Filter Search** buttons across 6 service views (`/institute`, `/marriages`, `/jobs`, `/help`, `/business`, `/organization`), collapsed by default with smooth animations.
+   - Dual-expandable Filter Search on `/news` allowing users to filter stories by Date and News Category independently.
+   - Fixed vertical scrolling news/info alignment on `/organization` with standard responsive column ratios (`col-lg-8` and `col-lg-4`).
+   - Universal loading spinner overlays preventing layout jumps and displaying visual feedback during searches and subordinate data fetching.
 7. **Admin Database Cockpit Real-Time Daily KPIs (`/admin`)**:
    - Dual-metric cards displaying both cumulative **Total** and **Today's Registrations** in the exact same card box (`Today: X | Total: Y`) across all categories (Believers, Pastors, Churches, Students, Ministries, Organizations, Portal Accounts).
    - Timezone-aware IST date matching (`cts LIKE 'YYYY-MM-DD%'`) that automatically resets at midnight every day.
@@ -90,7 +94,7 @@ Welcome to the **Jesus Believers Association Council (JBAC)** unified ecosystem 
    - **Detailed Leadership Status Badges**: If a leader is from a specific wing (e.g. Student Wing, Software Wing, Drivers Wing, Media Reporters, Social Media), the exact wing name and role are displayed (e.g. `స్టూడెంట్ వింగ్ (Student Wing) - సోషల్ మీడియా లీడర్`). If from panchayat, ward, or sub-ward, detailed designations (`వార్డు నెం. 1 లీడర్`, `సబ్ వార్డు లీడర్`) and distinct color-coded badges are rendered.
    - **Clean Modern Interface**: Top graphic hero banners removed across all pages, horizontal announcement marquee bar modernized, and search filter cards enhanced with responsive Bootstrap grids.
 9. **Native Android Application (`jbac_app`)**:
-   - Android app compliant with Google Play Store standards (`targetSdkVersion 36`, `minSdkVersion 24`, release version `0.0.46` / `versionCode 46`).
+   - Android app compliant with Google Play Store standards (`targetSdkVersion 36`, `minSdkVersion 24`, release version `0.0.47` / `versionCode 47`).
    - Official production release signing via `Jbac.keystore`.
    - Full State (`రాష్ట్రం / State`) selection and cascading district loading across search modules and all registration forms.
    - Optimized navigation touch targets, zero click delay, and hardware back button handling.

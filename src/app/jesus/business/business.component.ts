@@ -11,6 +11,7 @@ import Swal from 'sweetalert2';
   styleUrls: ['./business.component.css']
 })
 export class BusinessComponent {
+  showFilters: boolean = false;
   serachMeetingform: FormGroup;
   searchdenomation: FormGroup;
   form_ind: any;

@@ -12,6 +12,66 @@ import Swal from 'sweetalert2';
 })
 export class NewsComponent {
   showSpinner: boolean = false;
+  showFilters: boolean = false;
+  showDateFilter: boolean = false;
+  showCategoryFilter: boolean = false;
+  filterDate: string = '';
+  filterCategory: string = '';
+  allnewsData: any[] = [];
+  categories: string[] = [
+    'క్రైస్తవుల మీద దాడులు',
+    'గౌరవ వేతనం, ప్రభుత్వ పథకాలు సంబంధించిన న్యూస్',
+    'క్రైస్తవులకు సంబంధించిన న్యూస్',
+    'జనరల్ న్యూస్',
+    'దళిత్ క్రిస్టియన్స్ షెడ్యూల్ కాస్ట్ స్టేటస్ న్యూస్',
+    'చదువుకి సంబంధించి',
+    'ట్రైనింగ్ కి సంబంధించి',
+    'ఉద్యోగాలకు సంబంధించి',
+    'ఆరోగ్యం కి సంబంధించి',
+    'సమాజం లోని సమస్యలు కి సంబంధించి న్యూస్',
+    'డా|| జోసెఫ్ గారి వార్తలు'
+  ];
+
+  toggleFilters() {
+    this.showFilters = !this.showFilters;
+    if (this.showFilters && !this.showDateFilter && !this.showCategoryFilter) {
+      this.showDateFilter = true;
+      this.showCategoryFilter = true;
+    }
+  }
+
+  toggleDateFilter() {
+    this.showDateFilter = !this.showDateFilter;
+  }
+
+  toggleCategoryFilter() {
+    this.showCategoryFilter = !this.showCategoryFilter;
+  }
+
+  applyNewsFilters() {
+    let filtered = [...this.allnewsData];
+    if (this.filterDate) {
+      filtered = filtered.filter(item => {
+        if (!item.cts) return false;
+        return item.cts.toString().startsWith(this.filterDate);
+      });
+    }
+    if (this.filterCategory) {
+      filtered = filtered.filter(item => {
+        return item.news && item.news.toString().trim().toLowerCase().includes(this.filterCategory.trim().toLowerCase());
+      });
+    }
+    this.searchnews = filtered;
+    this.page = 1;
+  }
+
+  resetNewsFilters() {
+    this.filterDate = '';
+    this.filterCategory = '';
+    this.searchnews = [...this.allnewsData];
+    this.page = 1;
+  }
+
   addingnews: FormGroup;
   imagesData: any = [];
   submitted: boolean = false;
@@ -211,7 +271,8 @@ export class NewsComponent {
         if (res.status == 202) {
           Swal.fire(res.message);
         } else if (res.status == 200) {
-          this.searchnews = res.data;
+          this.allnewsData = res.data || [];
+          this.applyNewsFilters();
         }
       },
       error: (err: any) => {

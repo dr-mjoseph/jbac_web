@@ -135,6 +135,56 @@
     </section>
     <section class="gradient-custom">
         <div class="container py-4">
+            <!-- News Section Header with Filter Search Toggle -->
+            <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+                <h3 class="m-0"><b>తాజా వార్తలు / Latest News</b></h3>
+                <button type="button" class="default-btn user-all-btn events-filter-toggle"
+                    (click)="toggleFilters()" [attr.aria-expanded]="showFilters">
+                    <i class="fa fa-filter me-1"></i> ఫిల్టర్ సెర్చ్ (Filter Search)
+                </button>
+            </div>
+
+            <!-- Filter Panel with 2 expandable fields: Date and News Category -->
+            <div class="card p-3 shadow-sm border-0 filter-card mb-4" *ngIf="showFilters">
+                <div class="d-flex gap-2 flex-wrap mb-3 align-items-center">
+                    <button type="button" class="btn btn-sm"
+                        [ngClass]="showDateFilter ? 'btn-primary' : 'btn-outline-primary'"
+                        (click)="toggleDateFilter()">
+                        <i class="fa fa-calendar me-1"></i> తేదీ / Date 
+                        <i class="fa ms-1" [ngClass]="showDateFilter ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
+                    </button>
+
+                    <button type="button" class="btn btn-sm"
+                        [ngClass]="showCategoryFilter ? 'btn-success' : 'btn-outline-success'"
+                        (click)="toggleCategoryFilter()">
+                        <i class="fa fa-tags me-1"></i> న్యూస్ కేటగిరీ / Category 
+                        <i class="fa ms-1" [ngClass]="showCategoryFilter ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
+                    </button>
+
+                    <button type="button" class="btn btn-sm btn-outline-secondary ms-auto"
+                        (click)="resetNewsFilters()">
+                        <i class="fa fa-refresh me-1"></i> రీసెట్ / Reset
+                    </button>
+                </div>
+
+                <div class="row g-3">
+                    <!-- Date Field (expanded on click) -->
+                    <div class="col-md-6" *ngIf="showDateFilter">
+                        <label class="form-label fw-bold">తేదీ ఎంచుకోండి (Select Date)</label>
+                        <input type="date" class="form-control" [(ngModel)]="filterDate" (change)="applyNewsFilters()">
+                    </div>
+
+                    <!-- News Category Field (expanded on click) -->
+                    <div class="col-md-6" *ngIf="showCategoryFilter">
+                        <label class="form-label fw-bold">న్యూస్ కేటగిరీ ఎంచుకోండి (Select News Category)</label>
+                        <select class="form-control form-select" [(ngModel)]="filterCategory" (change)="applyNewsFilters()">
+                            <option value="">అన్ని కేటగిరీలు (All Categories)</option>
+                            <option *ngFor="let cat of categories" [value]="cat">{{ cat }}</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
             <div class="row g-4">
                 <div class="col-lg-8">
                     <div class="row g-3">

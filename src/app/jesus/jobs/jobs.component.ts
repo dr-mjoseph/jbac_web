@@ -11,6 +11,7 @@ import Swal from 'sweetalert2';
   styleUrls: ['./jobs.component.css']
 })
 export class JobsComponent {
+  showFilters: boolean = false;
   showSpinner: boolean = false;
   mandals: any = [];
   constituency: any = [];

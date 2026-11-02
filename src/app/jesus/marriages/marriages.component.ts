@@ -11,6 +11,7 @@ import Swal from 'sweetalert2';
   styleUrls: ['./marriages.component.css']
 })
 export class MarriagesComponent {
+  showFilters: boolean = false;
   serachMeetingform: any
   districts: any = [];
   constituency: any = [];
@@ -89,7 +90,9 @@ export class MarriagesComponent {
 
   defaultdata() {
     var data = { df: 0 };
+    this.showSpinner = true;
     this.service.searchmarriages(data).subscribe((res: any) => {
+      this.showSpinner = false;
       this.marriagedata = [];
       if (res && res.status == 200 && Array.isArray(res.data)) {
         const validRows = res.data.filter((item: any) => item && (item.name || item.phonenumber || item.work));

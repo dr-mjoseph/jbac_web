@@ -2811,3 +2811,67 @@ Implemented across backend endpoints (`/dashboardapi/getLeaderswebsiteData`, `/d
   - Applied the identical `*ngIf="formshow == 1"`, `*ngIf="formshow == 3"`, and `*ngIf="formshow == 2"` conditions on the mobile action button row so that on mobile devices, a Pastor leader sees only the Pastors button, a Student leader sees only the Students button, and a Believer leader sees only the Believers button.
 - **Automated Web-to-Mobile Sync**:
   - Ran `sync-to-mobile.js` to mirror all updated templates and assets to `jbac_app`, committed, and pushed to `jbac_app` on GitHub.
+
+
+---
+
+## 56. Collapsible Search Filters Across 6 Views, News Category/Date Filters, Universal Loading Spinners & Android Release v0.0.47 (November 2, 2026)
+
+### Context & User Objectives
+1. **Mobile Header Single-Button Parity & Universal Spinners**:
+   - Replicate the strict single-button header isolation on the mobile app (`jbac_app`) so Pastor leaders see only the Pastor button, Student leaders see only the Student button, and Believer leaders see only the Believer button.
+   - Implement loading spinners across all search filters and viewing options across web and mobile.
+2. **Collapsible "Filter Search" across 6 Pages**:
+   - On `https://jbac.in/institute`, `https://jbac.in/marriages`, `https://jbac.in/jobs`, `https://jbac.in/help`, `https://jbac.in/business`, and `https://jbac.in/organization`, introduce a collapsible toggle button (`showFilters = !showFilters`) matching `https://jbac.in/events`, saving vertical page space.
+3. **Organization Page Vertical Scrolling Alignment**:
+   - Resolve layout collision and misalignment on `https://jbac.in/organization` for the right-hand news/info sidebar ("ప్రకటనలు / సమాచారం"), ensuring clean vertical scrolling without overlapping content.
+4. **News Page Date & Category Dual-Expandable Filter**:
+   - On `https://jbac.in/news`, add a "Filter Search" section with two expandable filter fields ("Date" and "News Category") that expand on click.
+5. **Android Release Build v0.0.47 (API 36+)**:
+   - Bump version code to `47` and version name to `0.0.47`.
+   - Compile and package release `.apk` and `.aab` compliant with Android 16 (API 36+).
+   - Sign with production keystore (`Jbac.keystore`), verify signatures, update documentation, and push all repositories.
+
+### Implementation Details
+1. **Collapsible Search Filters (Web)**:
+   - Added `showFilters: boolean = false` in:
+     - `institute.component.ts` & `institute.component.html`
+     - `marriages.component.ts` & `marriages.component.html`
+     - `jobs.component.ts` & `jobs.component.html`
+     - `help.component.ts` & `help.component.html`
+     - `business.component.ts` & `business.component.html`
+     - `organization.component.ts` & `organization.component.html`
+   - Added styled toggle buttons with expand/collapse chevron indicators.
+   - Wrapped filter forms in `*ngIf="showFilters"`, keeping views collapsed by default.
+2. **News Page Date & Category Filters (`news.component.ts`, `news.component.html`)**:
+   - Added `showFilters`, `showDateFilter`, `showCategoryFilter`, `filterDate`, and `filterCategory` state properties.
+   - Extracted unique categories automatically from loaded news items (`allnewsData`).
+   - Implemented `applyNewsFilters()` to filter by published date (`YYYY-MM-DD`) and category name simultaneously.
+   - Added reset filter button to restore the full news stream.
+3. **Organization Page Sidebar Alignment (`organization.component.html`, `organization.component.css`)**:
+   - Refactored layout from rigid container heights to responsive Bootstrap grid (`col-lg-8` for organization cards, `col-lg-4` for news marquee).
+   - Eliminated awkward border-radius styling and fixed vertical scrolling marquee padding to prevent text collision.
+4. **Universal Loading Spinners**:
+   - Added global CSS spinners in `src/styles.css` (`.my-overlay`, `.cusloader`, `.inline-loader-card`, `@keyframes cus-spin`).
+   - Added loading spinner overlays during data queries on Institute, Marriages, Jobs, Help, Business, and Organization pages.
+   - Injected Ionic `LoadingController` across mobile pages (`wingcommand.ts`, `jobs.ts`, `marriage.ts`, `institute.ts`) to present native activity loaders during data fetching and approval actions.
+5. **Mobile Header Single-Button Parity (`wingcommand.html`, `wingcommand.ts`)**:
+   - Enforced single-button header isolation on mobile matching web behavior:
+     - `formshow == 1`: Only Believers Requests button rendered.
+     - `formshow == 3`: Only Pastors Requests button rendered.
+     - `formshow == 2`: Only Students Requests button rendered.
+   - Completely omitted the remaining 2 buttons from the mobile template.
+6. **Android Build & Sign Pipeline (`build_and_sign_release_v47.ps1`)**:
+   - Configured `config.xml`, `package.json`, and `AndroidManifest.xml` with `versionCode="47"`, `versionName="0.0.47"`, and `targetSdkVersion="36"`.
+   - Fixed CordovaLib Java 8 / Android 36 SDK incompatibility by locking `compileSdkVersion 28` with `-PcdvTargetSdkVersion=36`.
+   - Executed Gradle release tasks: `assembleRelease` and `bundleRelease`.
+   - Aligned APK via `zipalign -v -p -f 4` and signed via `apksigner` (v1 + v2 + v3 schemes enabled).
+   - Signed AAB bundle via `jarsigner -sigalg SHA256withRSA -digestalg SHA-256`.
+   - Verified badging:
+     - `versionCode='47'`
+     - `versionName='0.0.47'`
+     - `targetSdkVersion:'36'`
+   - Generated artifacts:
+     - APK: `C:\Users\rajes\StudioProjects\jbac_app\jbacApp-0.0.47.apk`
+     - AAB: `C:\Users\rajes\StudioProjects\jbac_app\jbacApp-0.0.47.aab`
+     - Play Store AAB: `C:\Users\rajes\StudioProjects\jbac_app\appreleasesigned.aab`

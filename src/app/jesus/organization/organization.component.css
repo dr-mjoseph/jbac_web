@@ -195,7 +195,7 @@ body {
 }
 
 body {
-    background-color: var(--black);
+    /* background-color: var(--black); */
 }
 
 .main {
@@ -235,8 +235,8 @@ body {
     flex-direction: column;
     position: relative;
     overflow: hidden;
-    background-color: var(--purple);
-    border-radius: 5px 25px 5px 50px;
+    background-color: #ffffff;
+    border-radius: 12px;
     transition: transform 0.1s linear, box-shadow 0.2s;
 }
 

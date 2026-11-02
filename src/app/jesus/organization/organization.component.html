@@ -30,11 +30,16 @@
         </div>
     </div>
     <div class="container mt-3" style="padding-bottom: 28px">
-        <h3>Organisation</h3>
-        <div class="container mt-3" style="padding-bottom: 28px;">
+        <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+            <h3 class="m-0"><b>సంస్థలు / Organisation</b></h3>
+            <button type="button" class="default-btn user-all-btn events-filter-toggle"
+                (click)="showFilters = !showFilters" [attr.aria-expanded]="showFilters">
+                <i class="fa fa-filter me-1"></i> ఫిల్టర్ సెర్చ్ (Filter Search)
+            </button>
+        </div>
 
-            <div class="row">
-                <div class="card" class="max-w-sm rounded overflow-hidden shadow-lg" style="padding:10px">
+        <div class="filter-panel-wrapper mb-4" *ngIf="showFilters">
+            <div class="card p-3 shadow-sm border-0 filter-card">
                     <form [formGroup]="serachMeetingform">
                         <div class="row">
                             <div class="col-md-3 mb-4">
@@ -160,13 +165,12 @@
                             </div>
                         </div>
                     </form>
-                </div>
             </div>
         </div>
         <br>
 
         <div class="row">
-            <div class="col-lg-7">
+            <div class="col-lg-8 col-md-7">
                 <!-- Empty State Message when no records found -->
                 <div *ngIf="noRecordsFound || (hasSearched && (!marriagedata || marriagedata.length === 0))" class="col-12 py-5 text-center">
                     <div class="alert alert-warning shadow-sm p-4 mx-auto" style="max-width: 650px; border-radius: 12px; font-size: 18px; font-weight: 500; background-color: #fff3cd; color: #856404; border: 1px solid #ffeeba;">
@@ -178,7 +182,7 @@
 
                 <div class="row" *ngIf="marriagedata && marriagedata.length > 0 && !noRecordsFound">
                     <div class="col-lg-4" *ngFor="let item of marriagedata" style="margin-bottom: 16px;">
-                        <div class="flex justify-center items-center h-screen">
+                        <div class="d-flex justify-content-center items-center">
                             <div class="main">
                                 <ul class="cards">
                                     <li class="cards_item">
@@ -223,29 +227,29 @@
             </div>
 
 
-            <div class="col-lg-5">
-                <div class="news-sidebar-card shadow-sm p-3">
-                        <h5 class="fw-bold text-center text-primary mb-3 border-bottom pb-2">
-                            <i class="fa fa-bullhorn me-1"></i> ప్రకటనలు / సమాచారం
-                        </h5>
-                        <marquee onmouseover="this.stop();" onmouseout="this.start();" direction="up"
-                            style="height: 550px; scroll-behavior: smooth;">
-                            <div class="sidebar-ad-card mb-3 p-3 text-center border rounded bg-white">
-                                <h5 class="fw-bold text-success mb-1">Welcome To JBAC.IN</h5>
-                                <p class="small text-muted mb-0">ఆంధ్ర & తెలంగాణ క్రైస్తవ సేవా సమాచారం</p>
-                            </div>
-                            <div *ngFor="let item of adds" class="sidebar-ad-card mb-3 p-2 border rounded shadow-sm bg-white">
-                                <img [src]="item.image || 'assets/images/user.jpg'" (error)="$any($event.target).src = 'assets/images/user.jpg'"
-                                    (click)="openimg(item.image, openmodel)"
-                                    class="img-fluid rounded mb-2 ad-img cursor-pointer"
-                                    style="width: 100%; max-height: 220px; object-fit: cover;"
-                                    alt="Advertisement">
-                                <p class="small text-dark mb-0 fw-semibold px-1">
-                                    {{item.description}}
-                                </p>
-                            </div>
-                        </marquee>
-                    </div>
+            <div class="col-lg-4 col-md-5">
+                <div class="news-sidebar-card shadow-sm p-3 bg-white" style="border-radius: 12px; border: 1px solid #e2e8f0; height: 100%; margin-top: 0;">
+                    <h5 class="fw-bold text-center text-primary mb-3 border-bottom pb-2">
+                        <i class="fa fa-bullhorn me-1"></i> ప్రకటనలు / సమాచారం
+                    </h5>
+                    <marquee onmouseover="this.stop();" onmouseout="this.start();" direction="up" scrollamount="2" scrolldelay="35"
+                        style="height: 580px; scroll-behavior: smooth;">
+                        <div class="sidebar-ad-card mb-3 p-3 text-center border rounded bg-light">
+                            <h5 class="fw-bold text-success mb-1">Welcome To JBAC.IN</h5>
+                            <p class="small text-muted mb-0">ఆంధ్ర & తెలంగాణ క్రైస్తవ సేవా సమాచారం</p>
+                        </div>
+                        <div *ngFor="let item of adds" class="sidebar-ad-card mb-3 p-2 border rounded shadow-sm bg-white">
+                            <img [src]="item.image || 'assets/images/user.jpg'" (error)="$any($event.target).src = 'assets/images/user.jpg'"
+                                (click)="openimg(item.image, openmodel)"
+                                class="img-fluid rounded mb-2 ad-img cursor-pointer"
+                                style="width: 100%; max-height: 220px; object-fit: cover;"
+                                alt="Advertisement">
+                            <p class="small text-dark mb-0 fw-semibold px-1">
+                                {{item.description}}
+                            </p>
+                        </div>
+                    </marquee>
+                </div>
             </div>
         </div>
 

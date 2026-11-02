@@ -12,6 +12,7 @@ import Swal from 'sweetalert2';
   styleUrls: ['./organization.component.css']
 })
 export class OrganizationComponent {
+  showFilters: boolean = false;
 
   serachMeetingform: any
   districts: any = [];

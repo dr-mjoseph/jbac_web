@@ -43,8 +43,15 @@
         </div>
     </div>
     <div class="container mt-3" style="padding-bottom: 28px">
-        <h3>Marriages</h3>
-        <div class="container mt-3" style="padding-bottom: 28px;">
+        <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+            <h3 class="m-0"><b>వివాహాలు / Marriages</b></h3>
+            <button type="button" class="default-btn user-all-btn events-filter-toggle"
+                (click)="showFilters = !showFilters" [attr.aria-expanded]="showFilters">
+                <i class="fa fa-filter me-1"></i> ఫిల్టర్ సెర్చ్ (Filter Search)
+            </button>
+        </div>
+        <div class="filter-panel-wrapper" *ngIf="showFilters">
+        <div class="container mt-2" style="padding-bottom: 28px;">
 
             <div class="row">
                 <div class="card max-w-sm rounded overflow-hidden shadow-lg" style="padding:15px; background: #fff; border-radius: 12px; border: 1px solid #e2e8f0;">
@@ -215,6 +222,7 @@
                 </div>
             </div>
         </div>
+        </div>
         <br>
 
         <div class="row">
@@ -320,3 +328,8 @@
 
 </div>
 <br><br>
+<!-- Spinner Overlay -->
+<div class="my-overlay" *ngIf="showSpinner">
+    <div class="cusloader"></div>
+    <p class="text-white mt-2 font-weight-bold">డేటా లోడ్ అవుతోంది... దయచేసి వేచి ఉండండి</p>
+</div>

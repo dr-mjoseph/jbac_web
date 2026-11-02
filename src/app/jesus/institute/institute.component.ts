@@ -11,6 +11,8 @@ import Swal from 'sweetalert2';
   styleUrls: ['./institute.component.css']
 })
 export class InstituteComponent {
+  showFilters: boolean = false;
+  showSpinner: boolean = false;
   serachMeetingform: any
   districts: any = [];
   constituency: any = [];
@@ -220,9 +222,11 @@ export class InstituteComponent {
   submitted: boolean = false;
   search() {
     this.submitted = true;
+    this.showSpinner = true;
     const vals = this.serachMeetingform.value || {};
     this.service.Searchinstitute(vals).subscribe({
       next: (res: any) => {
+        this.showSpinner = false;
         this.institutedata = [];
         if (res.status == 200 && Array.isArray(res.data)) {
           this.institutedata = res.data.map((item: any) => ({ ...item, showMore: false }));
@@ -232,6 +236,7 @@ export class InstituteComponent {
         }
       },
       error: err => {
+        this.showSpinner = false;
         console.error(err);
       }
     });
@@ -283,10 +288,17 @@ export class InstituteComponent {
     this.getinstitutes();
   }
   getinstitutes() {
-    this.service.institutes().subscribe(res => {
-      this.institutesdata = res.data || [];
-      this.institutedata = res.data ? res.data.map((item: any) => ({ ...item, showMore: false })) : [];
-    })
+    this.showSpinner = true;
+    this.service.institutes().subscribe({
+      next: (res: any) => {
+        this.institutesdata = res.data || [];
+        this.institutedata = res.data ? res.data.map((item: any) => ({ ...item, showMore: false })) : [];
+        this.showSpinner = false;
+      },
+      error: (err: any) => {
+        this.showSpinner = false;
+      }
+    });
   }
   adds: any;
   getadds() {

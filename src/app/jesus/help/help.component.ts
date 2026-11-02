@@ -11,6 +11,7 @@ import { Router } from '@angular/router';
   styleUrls: ['./help.component.css']
 })
 export class HelpComponent {
+  showFilters: boolean = false;
   addinghelp: FormGroup;
   imagesData: any = [];
   showSpinner: boolean = false
