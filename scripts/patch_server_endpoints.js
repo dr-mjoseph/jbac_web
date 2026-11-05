@@ -331,3 +331,4 @@ app.all(['/dashboardapi/admin-update-investor', '/api/admin-update-investor'], a
 content = content.replace(anchor, endpointsCode + "\n" + anchor);
 fs.writeFileSync(serverTsPath, content, 'utf8');
 console.log('Successfully patched server.ts with Entrepreneur and Investor endpoints!');
+

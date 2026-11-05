@@ -40,3 +40,4 @@ if 'EntrepreneurPage' not in ts_text:
     with open(ts_path, 'w', encoding='utf-8') as f:
         f.write(ts_text)
     print("Successfully patched mobile forms.ts!")
+

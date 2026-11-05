@@ -570,3 +570,4 @@ def patch_file(file_path):
 if __name__ == '__main__':
     patch_file('public.html')
     patch_file('backend/public.html')
+

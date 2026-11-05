@@ -147,3 +147,4 @@ Tailored for Christian community investors wishing to support and fund viable Ch
 | **Android AAB** | `jbacApp-0.0.49.aab` / `appreleasesigned.aab` | **Built & Signed** | Signed with production keystore; AAPT verified `versionCode='49'`, `targetSdkVersion='36'` |
 | **Web Git Repo** | `dr-mjoseph/jbac_web` | **Ready** | Branch `main` |
 | **Mobile Git Repo** | `dr-mjoseph/jbac_app` | **Ready** | Branch `main` |
+

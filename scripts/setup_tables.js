@@ -133,3 +133,4 @@ const mysql = require('../backend/node_modules/mysql2/promise');
     process.exit(1);
   }
 })();
+

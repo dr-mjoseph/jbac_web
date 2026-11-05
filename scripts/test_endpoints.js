@@ -56,3 +56,4 @@ const mysql = require('../backend/node_modules/mysql2/promise');
     console.error('Test error:', err);
   }
 })();
+

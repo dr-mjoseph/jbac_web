@@ -71,3 +71,4 @@ with open('src/app/shared/header/header.component.html', 'w', encoding='utf-8') 
     f.write(text)
 
 print("Successfully patched header.component.html!")
+

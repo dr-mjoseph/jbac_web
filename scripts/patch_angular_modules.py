@@ -43,3 +43,4 @@ import { InvestorregisterComponent } from './jesus/investorregister/investorregi
     with open('src/app/app-routing.module.ts', 'w', encoding='utf-8') as f:
         f.write(rt_text)
     print("Updated app-routing.module.ts with routes!")
+

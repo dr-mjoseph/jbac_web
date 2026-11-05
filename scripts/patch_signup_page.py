@@ -34,3 +34,4 @@ if anchor in text and '/entrepreneurregister' not in text:
     with open('src/app/jesus/signup/signup.component.html', 'w', encoding='utf-8') as f:
         f.write(text)
     print("Successfully patched signup.component.html!")
+

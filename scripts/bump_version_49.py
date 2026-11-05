@@ -38,3 +38,4 @@ with open(mf_path, 'w', encoding='utf-8') as f:
 print("4. Updated AndroidManifest.xml")
 
 print("All version updates to 0.0.49 (versionCode 49) completed successfully!")
+

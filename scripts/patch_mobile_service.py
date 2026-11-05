@@ -25,3 +25,4 @@ if 'getBusinessTypes' not in text:
     with open(file_path, 'w', encoding='utf-8') as f:
         f.write(text)
     print("Successfully patched mobile service.ts!")
+

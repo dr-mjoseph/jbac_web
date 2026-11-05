@@ -83,3 +83,4 @@ if 'getBusinessTypes' not in svc_text:
     with open('src/app/jesus/service.service.ts', 'w', encoding='utf-8') as f:
         f.write(svc_text)
     print("Updated service.service.ts with Entrepreneur & Investor methods!")
+
