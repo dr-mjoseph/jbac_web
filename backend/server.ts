@@ -2789,10 +2789,13 @@ app.all(['/dashboardapi/updateconsis', '/dashboardapi/updateconsis/:id', '/api/u
         if (id) {
             if (tableId === 1) {
                 await db.query('UPDATE signup_form SET approval_ind = 1 WHERE id = ?', [id]);
-            } else if (tableId === 2 || tableId === 3) {
+            } else if (tableId === 2) {
+                await db.query('UPDATE student_reg SET approval_ind = 1 WHERE id = ?', [id]);
+            } else if (tableId === 3) {
                 await db.query('UPDATE pastor_reg SET approval_ind = 1 WHERE id = ?', [id]);
             } else {
                 await db.query('UPDATE signup_form SET approval_ind = 1 WHERE id = ?', [id]).catch(() => {});
+                await db.query('UPDATE student_reg SET approval_ind = 1 WHERE id = ?', [id]).catch(() => {});
                 await db.query('UPDATE pastor_reg SET approval_ind = 1 WHERE id = ?', [id]).catch(() => {});
             }
         }
@@ -3526,10 +3529,13 @@ app.all(['/dashboardapi/deleteboardmember', '/api/deleteboardmember', '/api/reje
         if (id) {
             if (tableId === 1) {
                 await db.query('UPDATE signup_form SET approval_ind = 2 WHERE id = ?', [id]);
-            } else if (tableId === 2 || tableId === 3) {
+            } else if (tableId === 2) {
+                await db.query('UPDATE student_reg SET approval_ind = 2 WHERE id = ?', [id]);
+            } else if (tableId === 3) {
                 await db.query('UPDATE pastor_reg SET approval_ind = 2 WHERE id = ?', [id]);
             } else {
                 await db.query('UPDATE signup_form SET approval_ind = 2 WHERE id = ?', [id]).catch(() => {});
+                await db.query('UPDATE student_reg SET approval_ind = 2 WHERE id = ?', [id]).catch(() => {});
                 await db.query('UPDATE pastor_reg SET approval_ind = 2 WHERE id = ?', [id]).catch(() => {});
             }
             await db.query('DELETE FROM wingleader WHERE id = ?', [id]).catch(() => {});
@@ -3657,10 +3663,10 @@ function getWingMatchSql(prefix, wing) {
 // Doc Level 5: పంచాయతి నాయకుడు (Panchayat Leader)
 // Doc Level 6: వార్డు నాయకుడు (Ward Leader)
 // -------------------------------------------------------------------------
-function getCanonicalLevel(val) {
+function getCanonicalLevel(val, isStudent = false) {
     if (val === null || val === undefined || val === '') return null;
     const str = String(val).trim().toLowerCase();
-    if (str === '0' || str.includes('state') || str.includes('రాష్ట్ర')) return 1;
+    if (!isStudent && (str === '0' || str.includes('state') || str.includes('రాష్ట్ర'))) return 1;
     if (str.includes('dist') || str.includes('జిల్లా')) return 2;
     if (str.includes('const') || str.includes('నియోజకవర్గ')) return 3;
     if (str.includes('mandal') || str.includes('municip') || str.includes('మండల')) return 4;
@@ -3668,12 +3674,26 @@ function getCanonicalLevel(val) {
     if (str.includes('ward') || str.includes('వార్డు')) return 6;
     const num = Number(val);
     if (!isNaN(num)) {
-        if (num === 0) return 1;
-        if (num === 1) return 2;
-        if (num === 2) return 3;
-        if (num === 3) return 4;
-        if (num === 4) return 5;
-        if (num === 5 || num === 6) return 6;
+        if (isStudent) {
+            // Student leadership hierarchy starts from District:
+            // 1: District Level (Canonical 2)
+            // 2: Constituency Level (Canonical 3)
+            // 3: Mandal Level (Canonical 4)
+            // 4: Panchayat Level (Canonical 5)
+            // 5: Ward / Sub-Ward Level (Canonical 6)
+            if (num === 1) return 2;
+            if (num === 2) return 3;
+            if (num === 3) return 4;
+            if (num === 4) return 5;
+            if (num >= 5) return 6;
+        } else {
+            if (num === 0) return 1;
+            if (num === 1) return 2;
+            if (num === 2) return 3;
+            if (num === 3) return 4;
+            if (num === 4) return 5;
+            if (num === 5 || num === 6) return 6;
+        }
     }
     return null;
 }
@@ -3711,11 +3731,11 @@ function getLevelSql(prefix, targetLvl) {
 }
 
 function getStudentLevelSql(prefix, targetLvl) {
-    if (targetLvl === 2) return `(${prefix}generaltype IN ('District Level', '1') OR ${prefix}generaltype LIKE '%జిల్లా%')`;
-    if (targetLvl === 3) return `(${prefix}generaltype IN ('Constituency Level', 'Constituency level', '2') OR ${prefix}generaltype LIKE '%నియోజకవర్గ%')`;
-    if (targetLvl === 4) return `(${prefix}generaltype IN ('Municipality / Mandal Level', 'Muncipality / Mandal Level', '3') OR ${prefix}generaltype LIKE '%మండల%')`;
-    if (targetLvl === 5) return `(${prefix}generaltype IN ('Ward / Panchayati Level', 'Ward / Panchaithi Level', '4') OR ${prefix}generaltype LIKE '%పంచాయతి%' OR ${prefix}generaltype LIKE '%గ్రామ%')`;
-    if (targetLvl === 6) return `(${prefix}generaltype IN ('Ward', '5', '6') OR ${prefix}generaltype LIKE '%వార్డు%')`;
+    if (targetLvl === 2) return `(${prefix}generaltype IN ('1', 'District Level') OR ${prefix}generaltype LIKE '%జిల్లా%')`;
+    if (targetLvl === 3) return `(${prefix}generaltype IN ('2', 'Constituency Level', 'Constituency level') OR ${prefix}generaltype LIKE '%నియోజకవర్గ%')`;
+    if (targetLvl === 4) return `(${prefix}generaltype IN ('3', 'Municipality / Mandal Level', 'Muncipality / Mandal Level', 'Mandal Level', 'Mandal') OR ${prefix}generaltype LIKE '%మండల%')`;
+    if (targetLvl === 5) return `(${prefix}generaltype IN ('4', 'Ward / Panchayati Level', 'Ward / Panchaithi Level', 'Panchayati Level', 'Panchayat Level', 'Village') OR ${prefix}generaltype LIKE '%పంచాయతి%' OR ${prefix}generaltype LIKE '%గ్రామ%')`;
+    if (targetLvl === 6) return `(${prefix}generaltype IN ('5', '6', 'Ward', 'Sub Ward', 'Ward / Sub-Ward Level') OR ${prefix}generaltype LIKE '%వార్డు%')`;
     return '1=0';
 }
 
@@ -3736,30 +3756,58 @@ app.all(['/dashboardapi/getLeaderswebsiteData', '/dashboardapi/getLeaderswebsite
         let loggedInRole = null;
 
         // 1. Session Parameter Binding: Fetch authoritative leader level & locations directly from DB
+        const reqUserTypeEarly = String(b.user_type || b.selected_user_type || '').toLowerCase().trim();
+        const reqCatIdEarly = String(b.category_id || b.category || '').trim();
+
         if (currentUserId && currentUserId !== -1) {
-            const [p]: any = await db.query('SELECT id, leadertype, generaltype, wingtype, wingtypes, district_id, constituency_id, mandal_id, village_id, state_id, d_in, approval_ind FROM pastor_reg WHERE id = ?', [currentUserId]);
-            if (p && p[0]) {
-                loggedInRole = 'pastor';
-                const pWing = resolveWingCategory(p[0].wingtypes) || resolveWingCategory(p[0].wingtype);
-                if (String(p[0].leadertype) === '2' || pWing) {
+            const checkStudent = async () => {
+                const [st]: any = await db.query('SELECT id, leadership, leadertype, generaltype, wingtype, district_id, constituency_id, mandal_id, village_id, state_id, d_in, approval_ind FROM student_reg WHERE id = ?', [currentUserId]);
+                if (st && st[0]) {
+                    loggedInRole = 'student';
                     loggedInLeaderType = 'wing';
                     isWingRequest = true;
-                    leaderWing = pWing;
-                    loggedInCanonicalLevel = getCanonicalLevel(p[0].wingtype) ?? getCanonicalLevel(p[0].generaltype);
-                } else {
-                    loggedInLeaderType = 'general';
-                    loggedInCanonicalLevel = getCanonicalLevel(p[0].generaltype);
+                    leaderWing = resolveWingCategory(1); // Student Wing
+                    loggedInCanonicalLevel = getCanonicalLevel(st[0].generaltype, true) ?? getCanonicalLevel(st[0].wingtype, true);
+                    if (st[0].d_in == 1 && (!loggedInCanonicalLevel || loggedInCanonicalLevel > 4)) loggedInCanonicalLevel = 2; // District Leader
+                    if (st[0].district_id) districtId = st[0].district_id;
+                    if (st[0].constituency_id) constituencyId = st[0].constituency_id;
+                    if (st[0].mandal_id) mandalId = st[0].mandal_id;
+                    if (st[0].village_id) panchayatId = st[0].village_id;
+                    if (st[0].state_id) stateId = st[0].state_id;
+                    return true;
                 }
-                if (p[0].d_in == 1 && (!loggedInCanonicalLevel || loggedInCanonicalLevel > 4)) loggedInCanonicalLevel = 2; // District Leader
-                if (p[0].district_id) districtId = p[0].district_id;
-                if (p[0].constituency_id) constituencyId = p[0].constituency_id;
-                if (p[0].mandal_id) mandalId = p[0].mandal_id;
-                if (p[0].village_id) panchayatId = p[0].village_id;
-                if (p[0].state_id) stateId = p[0].state_id;
-            } else {
+                return false;
+            };
+
+            const checkPastor = async () => {
+                const [p]: any = await db.query('SELECT id, leadertype, generaltype, wingtype, wingtypes, district_id, constituency_id, mandal_id, village_id, state_id, d_in, approval_ind FROM pastor_reg WHERE id = ?', [currentUserId]);
+                if (p && p[0]) {
+                    loggedInRole = 'pastor';
+                    const pWing = resolveWingCategory(p[0].wingtypes) || resolveWingCategory(p[0].wingtype);
+                    if (String(p[0].leadertype) === '2' || pWing) {
+                        loggedInLeaderType = 'wing';
+                        isWingRequest = true;
+                        leaderWing = pWing;
+                        loggedInCanonicalLevel = getCanonicalLevel(p[0].wingtype) ?? getCanonicalLevel(p[0].generaltype);
+                    } else {
+                        loggedInLeaderType = 'general';
+                        loggedInCanonicalLevel = getCanonicalLevel(p[0].generaltype);
+                    }
+                    if (p[0].d_in == 1 && (!loggedInCanonicalLevel || loggedInCanonicalLevel > 4)) loggedInCanonicalLevel = 2; // District Leader
+                    if (p[0].district_id) districtId = p[0].district_id;
+                    if (p[0].constituency_id) constituencyId = p[0].constituency_id;
+                    if (p[0].mandal_id) mandalId = p[0].mandal_id;
+                    if (p[0].village_id) panchayatId = p[0].village_id;
+                    if (p[0].state_id) stateId = p[0].state_id;
+                    return true;
+                }
+                return false;
+            };
+
+            const checkBeliever = async () => {
                 const [s]: any = await db.query('SELECT id, leadertype, generaltype, wingtype, wingtypes, district_id, constituency_id, mandal_id, panchayat_id, state_id, d_in, approval_ind FROM signup_form WHERE id = ?', [currentUserId]);
                 if (s && s[0]) {
-                loggedInRole = 'believer';
+                    loggedInRole = 'believer';
                     const sWing = resolveWingCategory(s[0].wingtypes) || resolveWingCategory(s[0].wingtype);
                     if (String(s[0].leadertype) === '2' || sWing) {
                         loggedInLeaderType = 'wing';
@@ -3776,21 +3824,35 @@ app.all(['/dashboardapi/getLeaderswebsiteData', '/dashboardapi/getLeaderswebsite
                     if (s[0].mandal_id) mandalId = s[0].mandal_id;
                     if (s[0].panchayat_id) panchayatId = s[0].panchayat_id;
                     if (s[0].state_id) stateId = s[0].state_id;
-                } else {
-                    const [st]: any = await db.query('SELECT id, leadership, leadertype, generaltype, wingtype, district_id, constituency_id, mandal_id, village_id, state_id, d_in, approval_ind FROM student_reg WHERE id = ?', [currentUserId]);
-                    if (st && st[0]) {
-                    loggedInRole = 'student';
-                        loggedInLeaderType = 'wing';
-                        isWingRequest = true;
-                        leaderWing = resolveWingCategory(1); // Student Wing
-                        loggedInCanonicalLevel = getCanonicalLevel(st[0].generaltype) ?? getCanonicalLevel(st[0].wingtype);
-                        if (st[0].d_in == 1 && (!loggedInCanonicalLevel || loggedInCanonicalLevel > 4)) loggedInCanonicalLevel = 2; // District Leader
-                        if (st[0].district_id) districtId = st[0].district_id;
-                        if (st[0].constituency_id) constituencyId = st[0].constituency_id;
-                        if (st[0].mandal_id) mandalId = st[0].mandal_id;
-                        if (st[0].village_id) panchayatId = st[0].village_id;
-                        if (st[0].state_id) stateId = st[0].state_id;
-                    }
+                    return true;
+                }
+                return false;
+            };
+
+            // Table priority based on requested role/category to avoid ID collision across tables
+            if (reqCatIdEarly === '2' || reqUserTypeEarly === 'student') {
+                const ok = await checkStudent();
+                if (!ok) {
+                    const okP = await checkPastor();
+                    if (!okP) await checkBeliever();
+                }
+            } else if (reqCatIdEarly === '4' || reqCatIdEarly === '3' || reqUserTypeEarly === 'pastor') {
+                const ok = await checkPastor();
+                if (!ok) {
+                    const okB = await checkBeliever();
+                    if (!okB) await checkStudent();
+                }
+            } else if (reqCatIdEarly === '1' || reqUserTypeEarly === 'believer') {
+                const ok = await checkBeliever();
+                if (!ok) {
+                    const okP = await checkPastor();
+                    if (!okP) await checkStudent();
+                }
+            } else {
+                const ok = await checkPastor();
+                if (!ok) {
+                    const okB = await checkBeliever();
+                    if (!okB) await checkStudent();
                 }
             }
         }
@@ -3978,6 +4040,160 @@ app.all(['/dashboardapi/getLeaderswebsiteData', '/dashboardapi/getLeaderswebsite
     }
 });
 
+// =========================================================================
+// ADMIN STATE-WISE DISTRICT LEADERS (ALL) & MANAGEMENT ENDPOINTS
+// =========================================================================
+app.all(['/dashboardapi/admin-district-leaders', '/api/admin-district-leaders'], async (req, res) => {
+    try {
+        const filterState = String(req.query.state_id || req.body?.state_id || '').trim();
+
+        // 1. Query Pastors
+        const [pastors] = await db.query(`
+            SELECT p.id, p.pastorname as name, p.phonenumber as mobile, p.state_id, p.district_id, 
+                   p.constituency_id, p.mandal_id, p.generaltype, p.wingtype, p.wingtypes, p.leadertype,
+                   p.d_in, p.approval_ind, p.address, p.cts,
+                   COALESCE(d.distrct_nm, '') as district_name,
+                   COALESCE(c.const_nm, '') as constituency_name,
+                   '' as wing_name,
+                   'pastor' as category, 'pastor_reg' as table_name, 3 as tableid
+            FROM pastor_reg p
+            LEFT JOIN dstrct d ON p.district_id = d.id
+            LEFT JOIN const_dtl_t c ON p.constituency_id = c.id
+            
+            WHERE p.d_in = 1 
+               OR p.generaltype IN ('1', 'District Level', 'జిల్లా నాయకుడు') 
+               OR p.generaltype LIKE '%జిల్లా%' 
+               OR (p.leadertype = 2 AND (p.wingtype IN ('1', 'District Level') OR p.wingtype LIKE '%జిల్లా%'))
+            ORDER BY p.id DESC
+        `);
+
+        // 2. Query Believers
+        const [believers] = await db.query(`
+            SELECT s.id, CONCAT(COALESCE(s.fname, ''), ' ', COALESCE(s.lname, '')) as name, 
+                   s.mobile_number as mobile, s.state_id, s.district_id, 
+                   s.constituency_id, s.mandal_id, s.generaltype, s.wingtype, s.wingtypes, s.leadertype,
+                   s.d_in, s.approval_ind, s.address, s.cts,
+                   COALESCE(d.distrct_nm, '') as district_name,
+                   COALESCE(c.const_nm, '') as constituency_name,
+                   '' as wing_name,
+                   'believer' as category, 'signup_form' as table_name, 1 as tableid
+            FROM signup_form s
+            LEFT JOIN dstrct d ON s.district_id = d.id
+            LEFT JOIN const_dtl_t c ON s.constituency_id = c.id
+            
+            WHERE s.d_in = 1 
+               OR s.generaltype IN ('1', 'District Level', 'జిల్లా నాయకుడు') 
+               OR s.generaltype LIKE '%జిల్లా%' 
+               OR (s.leadertype = 2 AND (s.wingtype IN ('1', 'District Level') OR s.wingtype LIKE '%జిల్లా%'))
+            ORDER BY s.id DESC
+        `);
+
+        // 3. Query Students
+        const [students] = await db.query(`
+            SELECT st.id, st.studentname as name, st.number as mobile, st.state_id, st.district_id,
+                   st.constituency_id, st.mandal_id, st.generaltype, st.wingtype, st.wingtype as wingtypes, st.leadertype,
+                   st.d_in, st.approval_ind, st.address, st.cts,
+                   COALESCE(d.distrct_nm, '') as district_name,
+                   COALESCE(c.const_nm, '') as constituency_name,
+                   'Student Wing' as wing_name,
+                   'student' as category, 'student_reg' as table_name, 2 as tableid
+            FROM student_reg st
+            LEFT JOIN dstrct d ON st.district_id = d.id
+            LEFT JOIN const_dtl_t c ON st.constituency_id = c.id
+            WHERE st.d_in = 1 
+               OR st.generaltype IN ('1', 'District Level', 'జిల్లా నాయకుడు') 
+               OR st.generaltype LIKE '%జిల్లా%' 
+               OR (st.leadertype = 2 AND (st.wingtype IN ('1', 'District Level') OR st.wingtype LIKE '%జిల్లా%'))
+            ORDER BY st.id DESC
+        `);
+
+        let allLeaders = [...pastors, ...believers, ...students].map((item) => {
+            let effectiveState = item.state_id || 1;
+            const distId = Number(item.district_id);
+            if (distId >= 31 && distId <= 63) effectiveState = 2;
+            else if (distId >= 5 && distId <= 30) effectiveState = 1;
+
+            let wObj = resolveWingCategory(item.wingtypes) || resolveWingCategory(item.wingtype);
+            const wingName = wObj ? wObj.telugu : (item.category === 'student' ? 'స్టూడెంట్ వింగ్' : '');
+
+            return {
+                ...item,
+                wing_name: wingName,
+                state_id: effectiveState,
+                state_name: effectiveState === 2 ? 'Telangana (TG)' : 'Andhra Pradesh (AP)',
+                is_approved: (item.d_in == 1 || item.approval_ind == 1) && item.approval_ind != 2,
+                is_rejected: item.approval_ind == 2,
+                is_pending: item.approval_ind != 1 && item.approval_ind != 2 && item.d_in != 1
+            };
+        });
+
+        if (filterState === '1') {
+            allLeaders = allLeaders.filter((x) => x.state_id === 1);
+        } else if (filterState === '2') {
+            allLeaders = allLeaders.filter((x) => x.state_id === 2);
+        }
+
+        const summary = {
+            total: allLeaders.length,
+            ap: allLeaders.filter((x) => x.state_id === 1).length,
+            tg: allLeaders.filter((x) => x.state_id === 2).length,
+            approved: allLeaders.filter((x) => x.is_approved).length,
+            pending: allLeaders.filter((x) => x.is_pending).length,
+            rejected: allLeaders.filter((x) => x.is_rejected).length,
+            pastors: allLeaders.filter((x) => x.category === 'pastor').length,
+            believers: allLeaders.filter((x) => x.category === 'believer').length,
+            students: allLeaders.filter((x) => x.category === 'student').length
+        };
+
+        res.json({ status: 200, data: allLeaders, summary });
+    } catch (err) {
+        res.status(500).json({ status: 500, error: err.message });
+    }
+});
+
+app.all(['/dashboardapi/admin-update-district-leader', '/api/admin-update-district-leader'], async (req, res) => {
+    try {
+        const b = req.body || {};
+        const id = b.id;
+        const table = String(b.table || b.table_name || '').trim();
+        const action = String(b.action || '').trim().toLowerCase(); // 'approve', 'reject', 'reset'
+        let approvalInd = b.approval_ind !== undefined ? Number(b.approval_ind) : 0;
+        let dIn = b.d_in !== undefined ? Number(b.d_in) : 0;
+
+        if (action === 'approve') {
+            approvalInd = 1;
+            dIn = 1;
+        } else if (action === 'reject') {
+            approvalInd = 2;
+            dIn = 0;
+        } else if (action === 'reset') {
+            approvalInd = 0;
+            dIn = 0;
+        }
+
+        const validTables = ['pastor_reg', 'signup_form', 'student_reg'];
+        if (!validTables.includes(table)) {
+            return res.status(400).json({ status: 400, error: 'Invalid leader table: ' + table });
+        }
+        if (!id) {
+            return res.status(400).json({ status: 400, error: 'Missing leader id' });
+        }
+
+        await db.query(`UPDATE \`${table}\` SET approval_ind = ?, d_in = ? WHERE id = ?`, [approvalInd, dIn, id]);
+
+        res.json({
+            status: 200,
+            message: `Leader ${action || 'updated'} successfully`,
+            id,
+            table,
+            approval_ind: approvalInd,
+            d_in: dIn
+        });
+    } catch (err) {
+        res.status(500).json({ status: 500, error: err.message });
+    }
+});
+
 app.all(['/dashboardapi/postwishform', '/api/postwishform'], async (req, res) => {
     try {
         const w = req.body;
@@ -4104,7 +4320,7 @@ app.all(['/dashboardapi/getUserMainData', '/dashboardapi/getUserMainData/:id', '
             if (role === 'pastor') {
                 canonicalLvl = getCanonicalLevel(u.wingtype) ?? getCanonicalLevel(u.generaltype);
             } else if (role === 'student') {
-                canonicalLvl = getCanonicalLevel(u.generaltype) ?? getCanonicalLevel(u.wingtype);
+                canonicalLvl = getCanonicalLevel(u.generaltype, true) ?? getCanonicalLevel(u.wingtype, true);
             } else {
                 canonicalLvl = getCanonicalLevel(u.generaltype);
             }
