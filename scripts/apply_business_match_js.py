@@ -461,3 +461,4 @@ def apply_patch(file_path):
 if __name__ == '__main__':
     apply_patch('public.html')
     apply_patch('backend/public.html')
+
