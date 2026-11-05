@@ -323,11 +323,15 @@
                                                     <label class="form-label">రాష్ట్రం / State <span
                                                             style="color:red; -webkit-text-stroke-width:thick;">*</span></label>
                                                     <select class="form-control" formControlName="state_id"
-                                                        (change)="onStateChange($event);">
-                                                        <option value="" disabled selected>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
+                                                        (change)="onStateChange($event);"
+                                                        [ngClass]="{'is-invalid': submitted && o['state_id'].errors }">
+                                                        <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
                                                         <option value="1">ఆంధ్రప్రదేశ్ (Andhra Pradesh - AP)</option>
                                                         <option value="2">తెలంగాణ (Telangana - TG)</option>
                                                     </select>
+                                                    <div *ngIf="submitted && o['state_id'].errors" class="invalid-feedback">
+                                                        <div *ngIf="o['state_id'].errors['required']">రాష్ట్రం తప్పనిసరిగా సెలెక్ట్ చేయాలి</div>
+                                                    </div>
                                                 </div>
                                             </div>
                                             <div class="col-md-6 mb-4 pb-2">

@@ -186,6 +186,7 @@ godOptions: string[] = [
       nativeplace: [''],
       talent: [''],
       education: [''],
+      state_id: ['', [Validators.required]],
       district_id: ['', [Validators.required]],
       constituency_id: ['', [Validators.required]],
       mandal_id: ['', [Validators.required]],
