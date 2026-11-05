@@ -109,7 +109,7 @@
               </label>
               <select formControlName="state_id" (change)="onStateChange($event)" class="form-select form-select-lg"
                       [ngClass]="{ 'is-invalid': submitted && f['state_id'].errors }">
-                <option value="">-- రాష్ట్రాన్ని ఎంచుకోండి / Select State --</option>
+                <option value="" disabled selected>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
                 <option *ngFor="let s of states" [value]="s.id">{{ s.state_name || s.name }}</option>
               </select>
               <div class="invalid-feedback" *ngIf="submitted && f['state_id'].errors">
@@ -125,7 +125,7 @@
               <select formControlName="districts" (change)="onDistrictChange($event)" class="form-select form-select-lg"
                       [ngClass]="{ 'is-invalid': submitted && f['districts'].errors }">
                 <option value="">
-                  {{ f['state_id'].value ? '-- జిల్లాను ఎంచుకోండి / Select District --' : 'ముందుగా రాష్ట్రాన్ని ఎంచుకోండి (Select State First)' }}
+                  {{ f['state_id'].value ? 'ఇక్కడ క్లిక్ చేసి ఎంచుకోండి' : 'ముందుగా రాష్ట్రాన్ని ఎంచుకోండి (Select State First)' }}
                 </option>
                 <option *ngFor="let d of districts" [value]="d.id">{{ d.distrct_nm || d.districtname }}</option>
               </select>
@@ -142,7 +142,7 @@
               <select formControlName="constituencyname" (change)="onConstituencyChange($event)" class="form-select form-select-lg"
                       [ngClass]="{ 'is-invalid': submitted && f['constituencyname'].errors }">
                 <option value="">
-                  {{ f['districts'].value ? '-- నియోజకవర్గం ఎంచుకోండి / Select Constituency --' : 'ముందుగా జిల్లాను ఎంచుకోండి (Select District First)' }}
+                  {{ f['districts'].value ? 'ఇక్కడ క్లిక్ చేసి ఎంచుకోండి' : 'ముందుగా జిల్లాను ఎంచుకోండి (Select District First)' }}
                 </option>
                 <option *ngFor="let c of constituencies" [value]="c.id">{{ c.const_nm || c.name }}</option>
               </select>
@@ -159,7 +159,7 @@
               <select formControlName="mandals" (change)="onMandalChange($event)" class="form-select form-select-lg"
                       [ngClass]="{ 'is-invalid': submitted && f['mandals'].errors }">
                 <option value="">
-                  {{ f['constituencyname'].value ? '-- మండలం ఎంచుకోండి / Select Mandal --' : 'నియోజకవర్గం ఎంచుకోండి (Select Constituency First)' }}
+                  {{ f['constituencyname'].value ? 'ఇక్కడ క్లిక్ చేసి ఎంచుకోండి' : 'నియోజకవర్గం ఎంచుకోండి (Select Constituency First)' }}
                 </option>
                 <option *ngFor="let m of mandals" [value]="m.id">{{ m.mndl_nm || m.name }}</option>
               </select>
@@ -176,7 +176,7 @@
               <select formControlName="panchayati" class="form-select form-select-lg"
                       [ngClass]="{ 'is-invalid': submitted && f['panchayati'].errors }">
                 <option value="">
-                  {{ f['mandals'].value ? '-- పంచాయతీ ఎంచుకోండి / Select Panchayat --' : 'మండలం ఎంచుకోండి (Select Mandal First)' }}
+                  {{ f['mandals'].value ? 'ఇక్కడ క్లిక్ చేసి ఎంచుకోండి' : 'మండలం ఎంచుకోండి (Select Mandal First)' }}
                 </option>
                 <option *ngFor="let p of panchayatis" [value]="p.id">{{ p.pnchyt_nm || p.name }}</option>
               </select>
@@ -220,7 +220,7 @@
               </label>
               <select formControlName="denomination_id" class="form-select form-select-lg"
                       [ngClass]="{ 'is-invalid': submitted && f['denomination_id'].errors }">
-                <option value="">-- డినామినేషన్ ఎంచుకోండి / Select Denomination --</option>
+                <option value="" disabled selected>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
                 <option *ngFor="let d of denominations" [value]="d.id">{{ d.denomation_name || d.denomination_name }}</option>
               </select>
               <div class="invalid-feedback" *ngIf="submitted && f['denomination_id'].errors">

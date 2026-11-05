@@ -1,3 +1,11 @@
+@import url('https://fonts.googleapis.com/css2?family=Ramabhadra&display=swap');
+
+:host,
+.entrepreneur-reg-container,
+.entrepreneur-reg-container * {
+  font-family: 'Ramabhadra', sans-serif !important;
+}
+
 .entrepreneur-reg-container {
   min-height: 80vh;
 }
@@ -15,6 +23,7 @@
 .form-control, .form-select {
   border-radius: 8px;
   border-color: #cbd5e1;
+  font-family: 'Ramabhadra', sans-serif !important;
 }
 
 .form-control:focus, .form-select:focus {
@@ -26,10 +35,10 @@
   background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
   border: none;
   border-radius: 10px;
+  font-family: 'Ramabhadra', sans-serif !important;
 }
 
 .btn-primary:hover {
   background: linear-gradient(135deg, #4338ca 0%, #6d28d9 100%);
   transform: translateY(-1px);
 }
-

@@ -629,3 +629,11 @@ table.table tbody td {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
 }
+
+/* Ramabhadra Font Enforcement for Entrepreneur & Investor Registration */
+.entrepreneur-reg-container,
+.entrepreneur-reg-container *,
+.investor-reg-container,
+.investor-reg-container * {
+  font-family: 'Ramabhadra', 'Segoe UI', Roboto, sans-serif !important;
+}
