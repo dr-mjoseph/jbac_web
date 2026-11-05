@@ -2875,3 +2875,85 @@ Implemented across backend endpoints (`/dashboardapi/getLeaderswebsiteData`, `/d
      - APK: `C:\Users\rajes\StudioProjects\jbac_app\jbacApp-0.0.47.apk`
      - AAB: `C:\Users\rajes\StudioProjects\jbac_app\jbacApp-0.0.47.aab`
      - Play Store AAB: `C:\Users\rajes\StudioProjects\jbac_app\appreleasesigned.aab`
+
+
+---
+
+## 📅 Sprint Log: November 5, 2026 - Release v0.0.48 (Student Hierarchy 1-5, Cross-District Bug Fix, Admin District Leaders Cockpit & Mobile Release v48)
+
+### 1. Goals & Requirements
+1. **Student Leadership Hierarchy Numbering (District $\rightarrow$ Sub-Ward)**:
+   - For student registration, leadership hierarchy starts strictly from **District** down to **Sub-Ward** (Levels 1 to 5), removing State Level.
+   - Fix bug where a District 21 student leader observed District 14 applicants in their leadership dashboard (`jbac.in/leaders`).
+2. **State-Wise District Leaders Management Cockpit (`jbac.in/admin`)**:
+   - Create a prominent top summary box on `jbac.in/admin` displaying counts of state-wise district leaders across AP & TG.
+   - Expandable into an elaborate management modal allowing admin to review, approve (`approval_ind=1, d_in=1`), reject (`approval_ind=2, d_in=0`), or reset (`approval_ind=0, d_in=0`) district leadership requests across all 3 user types.
+3. **Mobile App Release v0.0.48 (API 36+)**:
+   - Update `jbac_app` student registration with identical 1–5 hierarchy.
+   - Ensure `wingcommand.ts` correctly parses numeric levels (`1`–`5`) alongside Telugu text.
+   - Compile, sign, zipalign, and verify release `.apk` and `.aab` targeting Android API 36 with `versionCode: 48`.
+4. **Documentation & Repository Sync**:
+   - Document changes across `RELEASE_NOTES_v0.0.48.md`, `PROJECT_JOURNAL_AND_EXECUTION_LOG.md`, and synchronize both GitHub repositories.
+
+---
+
+### 2. Architecture & Implementation Details
+
+#### A. Multi-Table ID Collision Fix & Session Priority Binding (`backend/server.ts`, `backend/server.js`)
+- **The Issue**: `signup_form`, `pastor_reg`, and `student_reg` are separate database tables each using independent `AUTO_INCREMENT` IDs. When user `121` logged in as a student (`category_id=2`), previous session resolution unconditionally looked up `signup_form` first, loading believer `121` (`Birru kiran`, Kadapa - District 14) instead of student `121` (`Tagaram kavyanjali`, Krishna - District 21). This caused the district leader filter query to run with `district_id = 14`, returning wrong applicants from Kadapa.
+- **The Fix**: Implemented **Role-Aware Session Priority Lookup** in `/dashboardapi/getLeaderswebsiteData`:
+  - If `category_id == '2'` or `user_type == 'student'`, the backend prioritizes querying `student_reg` first.
+  - If `category_id IN ('3', '4')` or `user_type == 'pastor'`, it queries `pastor_reg` first.
+  - If `category_id == '1'` or `user_type == 'believer'`, it queries `signup_form` first.
+- **Canonical Level Mapping**:
+  - In `getCanonicalLevel(val, isStudent)`: For students, values `1`, `2`, `3`, `4`, `5` canonically map to levels `2` (District), `3` (Constituency), `4` (Mandal), `5` (Panchayat), and `6` (Ward/Sub-Ward).
+  - In `getStudentLevelSql(level)`: Included numeric string conditions `OR level = '1'`, `'2'`, `'3'`, `'4'`, `'5'` to match numeric student leadership submissions.
+- **Subordinate Action Handlers**:
+  - Updated `updateconsis` and `deleteboardmember` endpoints to handle `tableId === 2` (`student_reg`) for approving or removing student leadership members.
+
+#### B. State-Wise District Leaders Admin Console (`public.html`, `backend/public.html`)
+- **Top Hero Box**: Placed right below the state selector bar with real-time counters:
+  - Total District Leaders, Approved (`d_in = 1`), Pending (`approval_ind = 0`), and Rejected (`approval_ind = 2`).
+  - "Review & Approve ➔" button opening `#districtLeadersModal`.
+- **Management Modal & Endpoints**:
+  - `GET /dashboardapi/admin-district-leaders`: Aggregates all district-level leaders across AP & TG from `pastor_reg`, `signup_form`, and `student_reg`, joining `dstrct` and `states` for clean geographic metadata.
+  - `POST /dashboardapi/admin-update-district-leader`: Updates approval flags (`approval_ind`, `d_in`) dynamically for the specified leader record and table.
+  - Responsive client-side filter controls: State (All/AP/TG), Role (All/Pastors/Believers/Students), Status (All/Approved/Pending/Rejected), and instant live search.
+
+#### C. Frontend Web Form Alignment (`studentregister.component.html`)
+- Removed "State Level" from student registration hierarchy.
+- Renumbered dropdown options sequentially:
+  - `1`: జిల్లా స్థాయి (District Level)
+  - `2`: నియోజకవర్గం స్థాయి (Constituency Level)
+  - `3`: మున్సిపాలిటీ / మండల స్థాయి (Mandal Level)
+  - `4`: పంచాయతి స్థాయి (Panchayat Level)
+  - `5`: వార్డు / సబ్ వార్డు స్థాయి (Ward / Sub-Ward Level)
+
+#### D. Mobile Application Alignment & Release v0.0.48 (`jbac_app`)
+- **Student Form (`src/pages/student/student.html`)**: Aligned dropdown options to 1–5 District-to-Sub-Ward hierarchy.
+- **Leadership Status (`src/pages/wingcommand/wingcommand.ts`)**: Enhanced `getDetailedLeaderStatus` to parse numeric levels alongside localized Telugu strings.
+- **Version Configuration**:
+  - `config.xml`: `version="0.0.48"`, `android-versionCode="48"`, `android-targetSdkVersion="36"`.
+  - `package.json`: `"version": "0.0.48"`.
+  - `platforms/android/app/build.gradle`: `versionCode 48`, `versionName "0.0.48"`.
+  - `platforms/android/app/src/main/AndroidManifest.xml`: `versionCode="48"`, `versionName="0.0.48"`.
+- **Build Pipeline (`build_and_sign_release_v48.ps1`)**:
+  - Executed Gradle `assembleRelease` and `bundleRelease` with CordovaLib Java 8 compatibility lock (`compileSdkVersion 28`, `-PcdvTargetSdkVersion=36`).
+  - Aligned APK via `zipalign -v -p -f 4`.
+  - Signed APK via `apksigner` with dual v1, v2, and v3 signature schemes enabled.
+  - Signed AAB via `jarsigner` with `SHA256withRSA` using production keystore `Jbac.keystore`.
+  - Generated:
+    - `jbacApp-0.0.48.apk` (`130.4 MB`)
+    - `jbacApp-0.0.48.aab` (`127.4 MB`)
+    - `appreleasesigned.aab` (`127.4 MB`)
+
+---
+
+### 3. Verification & Live Deployment Checklist
+- [x] **Backend Fix Verification**: Live AWS Lambda invoke for Student 121 (District 21) returned only District 21 subordinates (IDs 424, 420, 129), with 0 records from Kadapa (District 14).
+- [x] **Admin District Leaders API**: Tested live: returned 66 district leaders across AP and TG with correct wing metadata and status.
+- [x] **Admin Update Leader API**: Successfully tested live approve / reject / reset operations on RDS database.
+- [x] **AWS Lambda Deployment**: Bundled `server.js` and `public.html` into `backend-deploy.zip` and deployed to `jbac-backend-api` in `ap-southeast-2`.
+- [x] **AWS S3 & CloudFront Deployment**: Production Angular bundle compiled and deployed to S3 bucket `jbac-web-production-298363284024`, CloudFront cache invalidated (`IZSTECQO41V9SF12SFGCORYOD`).
+- [x] **Mobile Release Verification**: AAPT badging confirmed `versionCode='48'`, `versionName='0.0.48'`, `targetSdkVersion:'36'`.
+- [x] **Git Repositories**: Both `jbac_web` and `jbac_app` synced on branch `main`.

@@ -1,95 +1,83 @@
-# Release Notes - JBAC Web Platform & API Server v0.0.48
+# Release Notes - JBAC Web & Mobile App v0.0.48
 
 ## Release Metadata
-- **Release Version**: `0.0.48`
-- **Release Date**: October 29, 2026
+- **Release Version**: `0.0.48` (Version Code: `48`)
+- **Release Date**: November 5, 2026
 - **Web App URL**: [https://jbac.in](https://jbac.in)
+- **Admin Database Cockpit**: [https://jbac.in/admin](https://jbac.in/admin)
 - **Leaders Portal**: [https://jbac.in/leaders](https://jbac.in/leaders)
-- **Jobs Portal**: [https://jbac.in/jobs](https://jbac.in/jobs)
-- **Login Portal**: [https://jbac.in/login](https://jbac.in/login)
+- **Student Registration**: [https://jbac.in/studentregister](https://jbac.in/studentregister)
 - **AWS S3 Production Bucket**: `jbac-web-production-298363284024`
 - **AWS CloudFront Distribution**: `EOBBU8SU7H3BI` (`d2wtiz94oy03oy.cloudfront.net`)
 - **AWS Lambda Backend API**: `jbac-backend-api` (Node.js 18.x, `ap-southeast-2`)
 - **Database**: AWS RDS MySQL 8.4 (`jbac_jbac` on `jbac-mysql-db-v3.cdeeuw0s2trf.ap-southeast-2.rds.amazonaws.com`)
+- **Mobile Target SDK**: `36` (Android 15 / 16 — API level 36 or above)
 
 ---
 
-## 📋 Release Highlights & Summary
+## 🌟 Key Updates in Version 0.0.48
 
-Version 0.0.48 introduces strict hierarchical delegation for church and community leaders, complete removal of redundant top hero banners, modern styling of the horizontal scrolling announcement bar, and elevated UI beautification for search filters, registration forms, and the login card:
-
-### 1. Strict Leadership Hierarchy & Rejection Filtering (`https://jbac.in/leaders`)
-- **One-Level-Down Visibility Model**:
-  - **District Leaders (`generaltype == 1`)**: See only subordinate **Constituency Leaders (`generaltype == 2`)** within their district.
-  - **Constituency Leaders (`generaltype == 2`)**: See only subordinate **Mandal Leaders (`generaltype == 3`)** within their constituency.
-  - **Mandal Leaders (`generaltype == 3`)**: See only subordinate **Village/Panchayat & Ward Leaders (`generaltype IN (4, 5, 6)`)** within their mandal.
-- **Immediate Disappearance of Rejected Applications**:
-  - Whenever a leader rejects an application (`approval_ind = 2`), the rejected applicant disappears immediately from the list on both the backend SQL query and frontend reactive state.
-  - Only **Approved (`approval_ind = 1`)** and **Unapproved/Pending (`approval_ind = 0` / `NULL`)** leaders remain visible.
-- **Dynamic Hierarchy Subtitles**:
-  - Table headers automatically display specific Telugu subtitles:
-    - District Level: *నియోజకవర్గాల వారిగా (Constituency-wise)*
-    - Constituency Level: *మండలాల వారిగా (Mandal-wise)*
-    - Mandal Level: *గ్రామ / వార్డు వారిగా (Village / Ward-wise)*
-
-### 2. Complete Removal of The Top Banner (Hero Banner / Header Image)
-- Removed `.top_panel_title` (the large graphic area with laptops, hands, breadcrumbs, and page titles) across every single page.
-- Page content, announcement bars, and search tools now flow cleanly directly beneath the main navigation bar without vertical clutter.
-
-### 3. Modern Horizontal Scrolling Announcement Bar (Marquee / Updates Bar)
-- Styled `.latest-news-block` with a dark slate/navy gradient (`#0b192c` to `#1e3e62`), a subtle blue border, and a vibrant pill badge (`📢 UPDATES` in crimson red gradient).
-- Clean horizontal marquee scrolling for updates, ads, and photo gallery links with golden hover highlights.
-
-### 4. Comprehensive Beautification of Filter Tables, Registration Tables & Login
-- **Jobs & Services Filter Cards**:
-  - Overhauled search cards with clean Bootstrap 12-column grid layout, eliminating awkward pixel widths (`width: 273px`) and overlapping inputs.
-  - Form controls dynamically stretch 100% of column width with soft rounded corners (`8px`), custom SVG select arrows, and crisp `#00548F` focus rings.
-- **Login Card Modernization (`/login`)**:
-  - Replaced outdated `burlywood` background with a frosted modern card featuring a deep blue gradient header (`🔐 LOGIN HERE`), high-contrast form fields, and full-width gradient login button.
-- **Registration Tables & Grids**:
-  - Unified input heights, consistent form labels, responsive padding, and high-legibility table headers across all registration and directory views.
+### 1. Student Leadership Hierarchy Restructuring (District $\rightarrow$ Sub-Ward)
+- **Removed State Level**: For student registration, leadership now starts directly from **District Level**.
+- **Sequential Numbering (Levels 1 to 5)**:
+  - `1`: **District Level (జిల్లా స్థాయి)** — Maps canonically to Level 2 (District Leader).
+  - `2`: **Constituency Level (నియోజకవర్గం స్థాయి)** — Maps canonically to Level 3 (Constituency Leader).
+  - `3`: **Municipality / Mandal Level (మున్సిపాలిటీ / మండల స్థాయి)** — Maps canonically to Level 4 (Mandal Leader).
+  - `4`: **Ward / Panchayati Level (పంచాయతి స్థాయి)** — Maps canonically to Level 5 (Panchayat Leader).
+  - `5`: **Ward / Sub-Ward Level (వార్డు / సబ్ వార్డు స్థాయి)** — Maps canonically to Level 6 (Ward/Sub-Ward Leader).
+- **Subordinate Filter Query**: Updated backend `getStudentLevelSql` to recognize both numeric strings (`'1'`, `'2'`, `'3'`, `'4'`, `'5'`) and Telugu/English text values.
 
 ---
 
-## 📝 Multi-Language Changelog Snippets
-
-### English (`en-US`)
-```text
-What's new in version 0.0.48:
-• Strict Leadership Hierarchy: District leaders view constituency leaders; constituency leaders view mandal leaders; mandal leaders view ward and panchayat leaders.
-• Rejection Clean-Up: Rejected applications disappear immediately from the list; only approved and pending applications remain visible.
-• Removed Hero Banners: Removed large graphic header banners across all pages for a clean, distraction-free layout.
-• Scrolling Announcement Bar: Redesigned the horizontal updates marquee with modern navy gradient and prominent updates badge.
-• Beautiful Form Design: Redesigned login card, filter tables, and registration inputs with responsive 100% column widths and modern styling.
-```
-
-### Telugu (`te-IN`)
-```text
-వెర్షన్ 0.0.48 నూతన విశేషాలు:
-• నాయకత్వ స్థాయి నియమాలు: జిల్లా లీడర్‌కు నియోజకవర్గ లీడర్లు మాత్రమే కనిపిస్తారు; నియోజకవర్గ లీడర్‌కు మండల లీడర్లు మాత్రమే కనిపిస్తారు; మండల లీడర్‌కు గ్రామ/వార్డు లీడర్లు మాత్రమే కనిపిస్తారు.
-• తిరస్కరించిన లీడర్ల తొలగింపు: తిరస్కరించిన దరఖాస్తులు వెంటనే జాబితా నుండి అదృశ్యమవుతాయి; ఆమోదించినవి మరియు పెండింగ్‌లో ఉన్నవి మాత్రమే కనిపిస్తాయి.
-• టాప్ బ్యానర్స్ తొలగింపు: ప్రతి పేజీలో అనవసరమైన పెద్ద గ్రాఫిక్ హెడర్ బ్యానర్లు తొలగించబడ్డాయి.
-• స్క్రోలింగ్ ప్రకటనల బార్: ఆకర్షణీయమైన బ్లూ గ్రేడియంట్ మరియు ఎరుపు బ్యాడ్జితో అప్‌డేట్స్ మార్క్యూ పునర్నిర్మించబడింది.
-• ఆకర్షణీయమైన ఫిల్టర్లు & లాగిన్: జాబ్స్ సెర్చ్ ఫిల్టర్లు, రిజిస్ట్రేషన్ ఫారమ్‌లు మరియు లాగిన్ పేజీ ఆధునిక మరియు ఆకర్షణీయ శైలిలో నవీకరించబడ్డాయి.
-```
+### 2. Multi-Table User ID Collision Fix (District 21 vs District 14 Bug)
+- **Root Cause**: `signup_form`, `pastor_reg`, and `student_reg` are independent tables with auto-incrementing IDs. When a student with ID `121` (`Tagaram kavyanjali`, District 21, Krishna, AP) logged in, previous session parameter binding checked `signup_form` first, matching believer ID `121` (`Birru kiran`, District 14, Kadapa, AP). This caused District 14 applicants to falsely display in the District 21 student leader's dashboard.
+- **The Resolution**:
+  - Implemented **Role-Aware Session Priority Lookup** in `/dashboardapi/getLeaderswebsiteData`:
+    - If `category_id == '2'` or `user_type == 'student'`, the server queries `student_reg` first.
+    - If `category_id IN ('3', '4')` or `user_type == 'pastor'`, the server queries `pastor_reg` first.
+    - If `category_id == '1'` or `user_type == 'believer'`, the server queries `signup_form` first.
+  - Verified live: District 21 student leader ID 121 now retrieves **only** direct Constituency subordinates in District 21 (`test2`, `sample18`, `Ch.vamsi kumar`) with zero records from other districts.
 
 ---
 
-## 🔧 Technical Details & Schema Verification
+### 3. State-Wise District Leaders Management Box (`jbac.in/admin`)
+- **Top Dashboard Hero Box**:
+  - Positioned prominently below the Categorical State View bar and above the metrics grid on `https://jbac.in/admin`.
+  - Displays real-time summary counts: **Total Leaders**, **Approved (`d_in = 1`)**, **Pending**, and **Rejected**.
+  - Clicking **"Review & Approve ➔"** opens the comprehensive District Leaders Console.
+- **Elaborative Management Modal (`#districtLeadersModal`)**:
+  - **State Filter**: `[All States]` | `[Andhra Pradesh (AP)]` | `[Telangana (TG)]`.
+  - **Category Filter**: `[All Roles]` | `[Pastors]` | `[Believers]` | `[Students]`.
+  - **Status Filter**: `[All Status]` | `[Approved]` | `[Pending]` | `[Rejected]`.
+  - **Live Search**: Instant client-side search by name, phone, district, constituency, or wing.
+  - **Direct Admin Controls**:
+    - `✓ Approve`: Sets `approval_ind = 1, d_in = 1`.
+    - `✕ Reject`: Sets `approval_ind = 2, d_in = 0`.
+    - `↺ Reset`: Sets `approval_ind = 0, d_in = 0`.
+  - **Real-Time UI Updates**: Modifies badges and top summary stats instantly without a full page reload.
+- **New Backend Endpoints**:
+  - `GET /dashboardapi/admin-district-leaders` & `/api/admin-district-leaders`
+  - `POST /dashboardapi/admin-update-district-leader` & `/api/admin-update-district-leader`
 
-### SQL Hierarchy Resolution in `getLeaderswebsiteData`
-```sql
--- District Leader (genType = 1) -> Constituency Subordinates
-SELECT ... FROM signup_form s
-WHERE s.district_id = ? AND s.generaltype = '2' AND COALESCE(s.approval_ind, 0) != 2 AND s.id != ?;
+---
 
--- Constituency Leader (genType = 2) -> Mandal Subordinates
-SELECT ... FROM signup_form s
-WHERE s.constituency_id = ? AND s.generaltype = '3' AND COALESCE(s.approval_ind, 0) != 2 AND s.id != ?;
+### 4. Mobile App Release v0.0.48 (API 36+)
+- **Student Registration**: Aligned `src/pages/student/student.html` with the identical 1–5 District-to-Sub-Ward hierarchy.
+- **Leaders Command Center**: Enhanced `getDetailedLeaderStatus` in `src/pages/wingcommand/wingcommand.ts` to parse numeric levels (`1`–`5`) alongside text.
+- **Target SDK Upgrade**: Set to **API 36** (`android-targetSdkVersion="36"`).
+- **Release Binaries Generated & Verified**:
+  - `jbacApp-0.0.48.aab` (`127.4 MB`) — Signed with production keystore (`SHA256withRSA`).
+  - `jbacApp-0.0.48.apk` (`130.4 MB`) — Dual-signed with Apksigner Scheme v2 + v3, 4-byte zipaligned.
+  - `appreleasesigned.aab` (`127.4 MB`) — Ready for Google Play Console submission.
 
--- Mandal Leader (genType = 3) -> Panchayat / Ward Subordinates
-SELECT ... FROM signup_form s
-WHERE s.mandal_id = ? AND (s.generaltype IN ('4', '5', '6') OR s.wardnumber IS NOT NULL OR s.subward IS NOT NULL)
-  AND COALESCE(s.approval_ind, 0) != 2 AND s.id != ?;
-```
+---
 
+## 🚀 Verification & Deployment Status
+
+| Component | Target / Environment | Status | Verification Details |
+| :--- | :--- | :--- | :--- |
+| **AWS Lambda** | `jbac-backend-api` (`ap-southeast-2`) | **Deployed** | Packaged `server.js` and `public.html`; tested live with 66 district leaders |
+| **AWS S3** | `jbac-web-production-298363284024` | **Deployed** | Angular production build and assets synced |
+| **AWS CloudFront** | `EOBBU8SU7H3BI` | **Invalidated** | Cache invalidation `IZSTECQO41V9SF12SFGCORYOD` |
+| **Web Git Repo** | `dr-mjoseph/jbac_web` | **Pushed** | Commit `4dbd495` on `main` |
+| **Mobile Git Repo** | `dr-mjoseph/jbac_app` | **Pushed** | Commit `ea714b2` on `main` |
