@@ -1,0 +1,34 @@
+.investor-reg-container {
+  min-height: 80vh;
+}
+
+.hero-card {
+  background: linear-gradient(135deg, #064e3b 0%, #111827 100%);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.section-title {
+  border-left: 4px solid #10b981;
+  padding-left: 14px;
+}
+
+.form-control, .form-select {
+  border-radius: 8px;
+  border-color: #cbd5e1;
+}
+
+.form-control:focus, .form-select:focus {
+  border-color: #10b981;
+  box-shadow: 0 0 0 0.25rem rgba(16, 185, 129, 0.15);
+}
+
+.btn-success {
+  background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+  border: none;
+  border-radius: 10px;
+}
+
+.btn-success:hover {
+  background: linear-gradient(135deg, #047857 0%, #059669 100%);
+  transform: translateY(-1px);
+}

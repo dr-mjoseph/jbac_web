@@ -1,0 +1,271 @@
+<!-- Breadcrumbs Header -->
+<div class="top_panel_title top_panel_style_3 title_present breadcrumbs_present scheme_original">
+  <div class="top_panel_title_inner inner-bg6">
+    <div class="content_wrap">
+      <h1 class="page_title">ఇన్వెస్టర్ రిజిస్ట్రేషన్ (Investor Registration)</h1>
+      <div class="breadcrumbs">
+        <a class="breadcrumbs_item home" routerLink="/">Home</a>
+        <span class="breadcrumbs_delimiter"></span>
+        <a class="breadcrumbs_item" routerLink="/signup">Registrations</a>
+        <span class="breadcrumbs_delimiter"></span>
+        <span class="breadcrumbs_item current">Investor</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="investor-reg-container container py-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-10 col-xl-9">
+
+      <!-- Hero Banner -->
+      <div class="hero-card shadow-sm rounded-4 p-4 mb-4 text-white">
+        <div class="d-flex align-items-center mb-2">
+          <span class="badge bg-white text-success fw-bold px-3 py-2 me-2">
+            💰 పెట్టుబడిదారుల విభాగం
+          </span>
+          <span class="badge bg-warning text-dark fw-bold px-3 py-2">
+            Angel Investment & Growth
+          </span>
+        </div>
+        <h2 class="fw-bold mb-2">వ్యాపార ఆలోచనలలో పెట్టుబడి & భాగస్వామ్యం (Invest in Entrepreneurial Startups)</h2>
+        <p class="mb-0 text-white-50">
+          మీరు నూతన ఆలోచనలు గల క్రైస్తవ వ్యాపారవేత్తలకు (Entrepreneurs) పెట్టుబడి అందించడానికి ఆసక్తిగా ఉన్నారా? మీ పెట్టుబడి సామర్థ్యం మరియు ఆసక్తి గల వ్యాపార రంగాలను ఇక్కడ నమోదు చేయండి.
+          <br>
+          <small class="text-light opacity-75">Register your investment capacity, preferred industries, and location to connect with vetted entrepreneurs seeking financial backing.</small>
+        </p>
+      </div>
+
+      <!-- Registration Form Card -->
+      <div class="card shadow border-0 rounded-4 p-4 p-md-5 bg-white">
+        
+        <form [formGroup]="investorForm" (ngSubmit)="onSubmit()" novalidate>
+
+          <!-- SECTION 1: PERSONAL DETAILS -->
+          <div class="section-title mb-4">
+            <h4 class="fw-bold text-dark mb-1">
+              <span class="badge bg-success text-white me-2">1</span>
+              వ్యక్తిగత వివరాలు (Personal Details)
+            </h4>
+            <p class="text-muted small">మీ ప్రాథమిక సంప్రదింపు సమాచారం నమోదు చేయండి (Enter your basic contact details)</p>
+          </div>
+
+          <div class="row g-3 mb-4">
+            <!-- Full Name -->
+            <div class="col-md-6">
+              <label class="form-label fw-bold">
+                పూర్తి పేరు (Full Name) <span class="text-danger">*</span>
+              </label>
+              <input type="text" formControlName="name" class="form-control form-control-lg" placeholder="e.g. John Wesley"
+                     [ngClass]="{ 'is-invalid': submitted && f['name'].errors }">
+              <div class="invalid-feedback" *ngIf="submitted && f['name'].errors">
+                దయచేసి మీ పూర్తి పేరు నమోదు చేయండి (Full name is required, min 3 chars).
+              </div>
+            </div>
+
+            <!-- Mobile Number -->
+            <div class="col-md-6">
+              <label class="form-label fw-bold">
+                మొబైల్ నంబర్ (Mobile Number) <span class="text-danger">*</span>
+              </label>
+              <input type="tel" formControlName="mobile" maxlength="10" class="form-control form-control-lg" placeholder="10-digit mobile number"
+                     [ngClass]="{ 'is-invalid': submitted && f['mobile'].errors }">
+              <div class="invalid-feedback" *ngIf="submitted && f['mobile'].errors">
+                దయచేసి సరైన 10 అంకెల మొబైల్ నంబర్ ఇవ్వండి (Valid 10-digit mobile required).
+              </div>
+            </div>
+
+            <!-- Email Address -->
+            <div class="col-md-12">
+              <label class="form-label fw-bold">
+                ఈమెయిల్ అడ్రస్ (Email Address)
+              </label>
+              <input type="email" formControlName="email" class="form-control form-control-lg" placeholder="investor@example.com"
+                     [ngClass]="{ 'is-invalid': submitted && f['email'].errors }">
+              <div class="invalid-feedback" *ngIf="submitted && f['email'].errors">
+                దయచేసి సరైన ఈమెయిల్ ఇవ్వండి (Please enter a valid email).
+              </div>
+            </div>
+          </div>
+
+          <hr class="my-4 text-muted">
+
+          <!-- SECTION 2: RESIDENCE ADDRESS -->
+          <div class="section-title mb-4">
+            <h4 class="fw-bold text-dark mb-1">
+              <span class="badge bg-success text-white me-2">2</span>
+              చిరునామా (Residence Address)
+            </h4>
+            <p class="text-muted small">
+              రాష్ట్రం ఎంచుకున్న తర్వాత మాత్రమే జిల్లా, నియోజకవర్గం, మండలం మరియు పంచాయతీ ఎంచుకోగలరు (Select State first to enable District to Panchayat).
+            </p>
+          </div>
+
+          <div class="row g-3 mb-4">
+            <!-- State -->
+            <div class="col-md-6">
+              <label class="form-label fw-bold">
+                రాష్ట్రం (State) <span class="text-danger">*</span>
+              </label>
+              <select formControlName="state_id" (change)="onStateChange($event)" class="form-select form-select-lg"
+                      [ngClass]="{ 'is-invalid': submitted && f['state_id'].errors }">
+                <option value="">-- రాష్ట్రాన్ని ఎంచుకోండి / Select State --</option>
+                <option *ngFor="let s of states" [value]="s.id">{{ s.state_name || s.name }}</option>
+              </select>
+              <div class="invalid-feedback" *ngIf="submitted && f['state_id'].errors">
+                రాష్ట్రం ఎంచుకోవడం తప్పనిసరి (State selection required).
+              </div>
+            </div>
+
+            <!-- District -->
+            <div class="col-md-6">
+              <label class="form-label fw-bold">
+                జిల్లా (District) <span class="text-danger">*</span>
+              </label>
+              <select formControlName="districts" (change)="onDistrictChange($event)" class="form-select form-select-lg"
+                      [ngClass]="{ 'is-invalid': submitted && f['districts'].errors }">
+                <option value="">
+                  {{ f['state_id'].value ? '-- జిల్లాను ఎంచుకోండి / Select District --' : 'ముందుగా రాష్ట్రాన్ని ఎంచుకోండి (Select State First)' }}
+                </option>
+                <option *ngFor="let d of districts" [value]="d.id">{{ d.distrct_nm || d.districtname }}</option>
+              </select>
+              <div class="invalid-feedback" *ngIf="submitted && f['districts'].errors">
+                జిల్లా ఎంచుకోవడం తప్పనిసరి (District selection required).
+              </div>
+            </div>
+
+            <!-- Constituency -->
+            <div class="col-md-4">
+              <label class="form-label fw-bold">
+                నియోజకవర్గం (Constituency) <span class="text-danger">*</span>
+              </label>
+              <select formControlName="constituencyname" (change)="onConstituencyChange($event)" class="form-select form-select-lg"
+                      [ngClass]="{ 'is-invalid': submitted && f['constituencyname'].errors }">
+                <option value="">
+                  {{ f['districts'].value ? '-- నియోజకవర్గం ఎంచుకోండి / Select Constituency --' : 'ముందుగా జిల్లాను ఎంచుకోండి (Select District First)' }}
+                </option>
+                <option *ngFor="let c of constituencies" [value]="c.id">{{ c.const_nm || c.name }}</option>
+              </select>
+              <div class="invalid-feedback" *ngIf="submitted && f['constituencyname'].errors">
+                నియోజకవర్గం తప్పనిసరి (Constituency selection required).
+              </div>
+            </div>
+
+            <!-- Mandal -->
+            <div class="col-md-4">
+              <label class="form-label fw-bold">
+                మండలం (Mandal) <span class="text-danger">*</span>
+              </label>
+              <select formControlName="mandals" (change)="onMandalChange($event)" class="form-select form-select-lg"
+                      [ngClass]="{ 'is-invalid': submitted && f['mandals'].errors }">
+                <option value="">
+                  {{ f['constituencyname'].value ? '-- మండలం ఎంచుకోండి / Select Mandal --' : 'నియోజకవర్గం ఎంచుకోండి (Select Constituency First)' }}
+                </option>
+                <option *ngFor="let m of mandals" [value]="m.id">{{ m.mndl_nm || m.name }}</option>
+              </select>
+              <div class="invalid-feedback" *ngIf="submitted && f['mandals'].errors">
+                మండలం తప్పనిసరి (Mandal selection required).
+              </div>
+            </div>
+
+            <!-- Panchayat -->
+            <div class="col-md-4">
+              <label class="form-label fw-bold">
+                పంచాయతీ / గ్రామం (Panchayat / Village) <span class="text-danger">*</span>
+              </label>
+              <select formControlName="panchayati" class="form-select form-select-lg"
+                      [ngClass]="{ 'is-invalid': submitted && f['panchayati'].errors }">
+                <option value="">
+                  {{ f['mandals'].value ? '-- పంచాయతీ ఎంచుకోండి / Select Panchayat --' : 'మండలం ఎంచుకోండి (Select Mandal First)' }}
+                </option>
+                <option *ngFor="let p of panchayatis" [value]="p.id">{{ p.pnchyt_nm || p.name }}</option>
+              </select>
+              <div class="invalid-feedback" *ngIf="submitted && f['panchayati'].errors">
+                పంచాయతీ తప్పనిసరి (Panchayat selection required).
+              </div>
+            </div>
+          </div>
+
+          <hr class="my-4 text-muted">
+
+          <!-- SECTION 3: INVESTMENT PREFERENCES -->
+          <div class="section-title mb-4">
+            <h4 class="fw-bold text-dark mb-1">
+              <span class="badge bg-success text-white me-2">3</span>
+              పెట్టుబడి ప్రాధాన్యతలు (Investment Preferences)
+            </h4>
+            <p class="text-muted small">మీరు ఏ రంగాలలో, ఎంత మొత్తం పెట్టుబడి పెట్టాలనుకుంటున్నారు?</p>
+          </div>
+
+          <div class="row g-3 mb-4">
+            <!-- Interested Business Type -->
+            <div class="col-md-6">
+              <label class="form-label fw-bold">
+                ఆసక్తి గల వ్యాపార రంగం (Interested Business Type) <span class="text-danger">*</span>
+              </label>
+              <select formControlName="business_type_id" class="form-select form-select-lg"
+                      [ngClass]="{ 'is-invalid': submitted && f['business_type_id'].errors }">
+                <option value="">-- వ్యాపార రంగాన్ని ఎంచుకోండి / Select Business Sector --</option>
+                <option *ngFor="let t of businessTypes" [value]="t.id">{{ t.business_type || t.type_english }}</option>
+              </select>
+              <div class="invalid-feedback" *ngIf="submitted && f['business_type_id'].errors">
+                వ్యాపార రంగం తప్పనిసరి (Interested business type is required).
+              </div>
+            </div>
+
+            <!-- Christian Denomination -->
+            <div class="col-md-6">
+              <label class="form-label fw-bold">
+                క్రైస్తవ డినామినేషన్ (Christian Denomination) <span class="text-danger">*</span>
+              </label>
+              <select formControlName="denomination_id" class="form-select form-select-lg"
+                      [ngClass]="{ 'is-invalid': submitted && f['denomination_id'].errors }">
+                <option value="">-- డినామినేషన్ ఎంచుకోండి / Select Denomination --</option>
+                <option *ngFor="let d of denominations" [value]="d.id">{{ d.denomation_name || d.denomination_name }}</option>
+              </select>
+              <div class="invalid-feedback" *ngIf="submitted && f['denomination_id'].errors">
+                డినామినేషన్ తప్పనిసరి (Denomination is required).
+              </div>
+            </div>
+
+            <!-- Capital Wants to Invest -->
+            <div class="col-md-12">
+              <label class="form-label fw-bold">
+                పెట్టుబడి పెట్టదలచిన మొత్తం (Capital Willing to Invest) <span class="text-danger">*</span>
+              </label>
+              <div class="input-group input-group-lg">
+                <span class="input-group-text bg-light fw-bold">₹</span>
+                <input type="text" formControlName="capital_to_invest" class="form-control" placeholder="e.g. 5,00,000 to 25,00,000"
+                       [ngClass]="{ 'is-invalid': submitted && f['capital_to_invest'].errors }">
+              </div>
+              <small class="text-muted">మీరు పెట్టుబడిగా అందించగల మొత్తం (Amount range you want to invest)</small>
+              <div class="invalid-feedback" *ngIf="submitted && f['capital_to_invest'].errors">
+                పెట్టుబడి మొత్తం ఇవ్వండి (Capital to invest is required).
+              </div>
+            </div>
+
+            <!-- Description / Investment Criteria -->
+            <div class="col-12">
+              <label class="form-label fw-bold">
+                పెట్టుబడి ప్రాధాన్యతలు & షరతులు (Investment Preferences, Terms or Criteria)
+              </label>
+              <textarea formControlName="description" rows="4" class="form-control"
+                        placeholder="భాగస్వామ్య నిబంధనలు, అంచనాలు లేదా ప్రాధాన్యతల గురించి వివరించండి (Specify profit share, equity, debt, mentorship preferences)..."></textarea>
+            </div>
+          </div>
+
+          <!-- Submit Button -->
+          <div class="d-grid gap-2 mt-5">
+            <button type="submit" class="btn btn-success btn-lg py-3 fw-bold shadow-sm" [disabled]="showSpinner">
+              <span *ngIf="showSpinner" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+              {{ showSpinner ? 'నమోదు చేయబడుతుంది... (Submitting...)' : '💰 ఇన్వెస్టర్ ప్రొఫైల్ సబ్మిట్ చేయండి (Submit Investor Registration)' }}
+            </button>
+          </div>
+
+        </form>
+
+      </div>
+
+    </div>
+  </div>
+</div>

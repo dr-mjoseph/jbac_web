@@ -61,6 +61,8 @@ import { EntryComponent } from './jesus/entry/entry.component';
 import { NamoduComponent } from './jesus/namodu/namodu.component';
 import { FamilyCouncellingComponent } from './jesus/family-councelling/family-councelling.component';
 import { DoctorregisterComponent } from './jesus/doctorregister/doctorregister.component';
+import { EntrepreneurregisterComponent } from './jesus/entrepreneurregister/entrepreneurregister.component';
+import { InvestorregisterComponent } from './jesus/investorregister/investorregister.component';
 
 
 
@@ -129,6 +131,10 @@ const routes: Routes = [
  { path: 'family-counseling', component: FamilyCouncellingComponent },
  { path: 'doctorregister', component: DoctorregisterComponent },
  { path: 'doctor-register', component: DoctorregisterComponent },
+  { path: 'entrepreneurregister', component: EntrepreneurregisterComponent },
+  { path: 'entrepreneur', component: EntrepreneurregisterComponent },
+  { path: 'investorregister', component: InvestorregisterComponent },
+  { path: 'investor', component: InvestorregisterComponent },
   {
     path: 'admin',
     children: [],

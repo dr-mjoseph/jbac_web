@@ -72,6 +72,8 @@ import { NamoduComponent } from './namodu/namodu.component';
 import { WishComponent } from './wish/wish.component';
 import { FamilyCouncellingComponent } from './family-councelling/family-councelling.component';
 import { DoctorregisterComponent } from './doctorregister/doctorregister.component';
+import { EntrepreneurregisterComponent } from './entrepreneurregister/entrepreneurregister.component';
+import { InvestorregisterComponent } from './investorregister/investorregister.component';
 
 
 
@@ -141,7 +143,9 @@ import { DoctorregisterComponent } from './doctorregister/doctorregister.compone
   NamoduComponent,
   WishComponent,
   FamilyCouncellingComponent,
-  DoctorregisterComponent
+  DoctorregisterComponent,
+    EntrepreneurregisterComponent,
+    InvestorregisterComponent
     
   ],
   imports: [

@@ -2957,3 +2957,85 @@ Implemented across backend endpoints (`/dashboardapi/getLeaderswebsiteData`, `/d
 - [x] **AWS S3 & CloudFront Deployment**: Production Angular bundle compiled and deployed to S3 bucket `jbac-web-production-298363284024`, CloudFront cache invalidated (`IZSTECQO41V9SF12SFGCORYOD`).
 - [x] **Mobile Release Verification**: AAPT badging confirmed `versionCode='48'`, `versionName='0.0.48'`, `targetSdkVersion:'36'`.
 - [x] **Git Repositories**: Both `jbac_web` and `jbac_app` synced on branch `main`.
+
+
+---
+
+## 📅 Sprint Log: November 5, 2026 - Release v0.0.49 (Entrepreneur & Investor Ecosystem, Admin Cockpit, Bilingual Parity & Mobile Release)
+
+### 1. Sprint Objectives
+1. **Entrepreneur Registration Module (`/entrepreneurregister`)**: Create a dedicated registration page for Christian entrepreneurs seeking investment and startup support. Fields: Name, Mobile, Email, Personal Address (State $\rightarrow$ District $\rightarrow$ Constituency $\rightarrow$ Mandal $\rightarrow$ Panchayat), Business Setup Place (State $\rightarrow$ District $\rightarrow$ Constituency $\rightarrow$ Mandal $\rightarrow$ Panchayat), Business Sector (from dedicated master table), Christian Denomination (from master table), Self Fund, Capital Need, and Project Details.
+2. **Investor Registration Module (`/investorregister`)**: Create a dedicated registration page for Christian investors looking to fund Christian business startups. Fields: Name, Mobile, Email, Address (State $\rightarrow$ District $\rightarrow$ Constituency $\rightarrow$ Mandal $\rightarrow$ Panchayat), Interested Business Sectors, Christian Denomination, Capital to Invest, and Investment Guidelines.
+3. **Strict Cascading Requirement**: For both modules and for both AP and TG, enforce the constraint: *if and only if state is selected then only enable district to panchayat dropdowns*.
+4. **Bilingual UI**: All labels, helper messages, validation alerts, and summaries rendered in English and Telugu.
+5. **Admin Cockpit Management (`public.html` & `jbac.in/admin`)**: Construct an interactive admin panel to view, filter, review, approve, and reject both Entrepreneur applications and Investor profiles with real-time KPI statistics.
+6. **Mobile Parity (`jbac_app`)**: Build equivalent `EntrepreneurPage` and `InvestorPage` in the Ionic mobile app, integrate API endpoints, bump to version `0.0.49` (VersionCode: `49`, Target SDK: `36`), and generate signed `.apk` and `.aab` artifacts.
+7. **Documentation & Version Control**: Document release notes and push changes to both `jbac_web` and `jbac_app` GitHub repositories.
+
+---
+
+### 2. Architecture & Implementation Details
+
+#### A. Database Schema Design & Seeding (`jbac_jbac` on AWS RDS MySQL)
+- **`business_types` Table**:
+  - Columns: `id`, `name_en`, `name_te`, `category`, `status`, `created_at`.
+  - Seeded with 16 bilingual industry sectors covering Agriculture, IT, Manufacturing, Retail, Healthcare, Food Processing, Solar Energy, Construction, Logistics, Textiles, Education, Hospitality, Automobile, Finance, Media, and General Services.
+- **`entrepreneur_reg` Table**:
+  - Columns: `id`, `name`, `mobile`, `email`, `state_id`, `district_id`, `constituency_id`, `mandal_id`, `panchayat_id`, `bus_state_id`, `bus_district_id`, `bus_constituency_id`, `bus_mandal_id`, `bus_panchayat_id`, `business_type_id`, `denomination_id`, `self_fund`, `capital_need`, `description`, `approval_ind`, `status`, `created_at`.
+- **`investor_reg` Table**:
+  - Columns: `id`, `name`, `mobile`, `email`, `state_id`, `district_id`, `constituency_id`, `mandal_id`, `panchayat_id`, `interested_business_type_id`, `denomination_id`, `capital_to_invest`, `description`, `approval_ind`, `status`, `created_at`.
+
+#### B. Backend API Gateway & Server (`backend/server.ts`, `backend/server.js`)
+- Added endpoints:
+  - `GET /dashboardapi/business-types` & `/api/business-types`: Fetches active industry sectors.
+  - `POST /dashboardapi/entrepreneur-register` & `/api/entrepreneur-register`: Handles validation and storage of entrepreneur applications.
+  - `POST /dashboardapi/investor-register` & `/api/investor-register`: Handles validation and storage of investor registrations.
+  - `GET /dashboardapi/admin-entrepreneurs` & `/api/admin-entrepreneurs`: Returns entrepreneur records joined with geographic metadata and business types.
+  - `GET /dashboardapi/admin-investors` & `/api/admin-investors`: Returns investor profiles joined with location names and interested sectors.
+  - `POST /dashboardapi/admin-update-entrepreneur` & `POST /dashboardapi/admin-update-investor`: Dynamic status updates (`approval_ind`) for admin actions.
+- Bundled into `backend/backend-deploy.zip` and deployed live to AWS Lambda `jbac-backend-api` in `ap-southeast-2`.
+
+#### C. Admin Business Match Cockpit (`public.html`, `backend/public.html`)
+- **Hero Stats Box**: Positioned below the District Leaders panel displaying:
+  - Total Entrepreneurs, Total Capital Needed, Total Investors, Total Capital Available.
+  - Interactive "Open Matching Panel ➔" button opening `#businessMatchModal`.
+- **Management Modal (`#businessMatchModal`)**:
+  - Dual tabs for Entrepreneurs and Investors.
+  - Filters by State (AP/TG), Business Sector, and instant client-side keyword search.
+  - Action buttons (`✓ Approve`, `✕ Reject`, `↺ Reset`) with real-time UI status updates and API synchronization.
+
+#### D. Web Frontend Implementation (`jbac_web`)
+- Added `EntrepreneurregisterComponent` and `InvestorregisterComponent` in `src/app/jesus/`.
+- Implemented strict state-first cascading logic for personal and business locations.
+- Complete Telugu & English bilingual templates with validation alerts and error banners.
+- Added routes in `src/app/app-routing.module.ts` (`/entrepreneurregister`, `/entrepreneur`, `/investorregister`, `/investor`).
+- Updated header menus (desktop, sticky, mobile drawer) and `signup.component.html` entry cards.
+- Angular production build compiled (`npm run build:prod` passed).
+- Synced to AWS S3 bucket `jbac-web-production-298363284024` and invalidated CloudFront cache (`I12KWOODURD71432G84RNB1TKP`).
+
+#### E. Mobile Application Implementation & Release v0.0.49 (`jbac_app`)
+- Created `EntrepreneurPage` and `InvestorPage` with Ionic lazy loading, bilingual UI, and cascading guards.
+- Updated `src/providers/service/service.ts` with API connectors.
+- Added launcher cards in `src/pages/forms/forms.html` (`gotopage(9)` and `gotopage(10)`).
+- Version Bumped:
+  - `config.xml`: `version="0.0.49"`, `android-versionCode="49"`, `android-targetSdkVersion="36"`.
+  - `package.json`: `"version": "0.0.49"`.
+  - `platforms/android/app/build.gradle`: `versionCode 49`, `versionName "0.0.49"`.
+  - `platforms/android/app/src/main/AndroidManifest.xml`: `versionCode="49"`, `versionName="0.0.49"`.
+- Executed `build_and_sign_release_v49.ps1`:
+  - Compiled and signed `jbacApp-0.0.49.apk` (Scheme v2 + v3 signed, 4-byte zipaligned, 130.5 MB).
+  - Compiled and signed `jbacApp-0.0.49.aab` (`SHA256withRSA`, 127.5 MB).
+  - Updated production Google Play submission file `appreleasesigned.aab`.
+  - Verified badging: `versionCode='49'`, `versionName='0.0.49'`, `targetSdkVersion:'36'`.
+
+---
+
+### 3. Verification & Live Deployment Checklist
+- [x] **Database Tables & Seed Data**: Verified live in MySQL AWS RDS `jbac_jbac`.
+- [x] **Backend API Live**: Verified `GET /dashboardapi/business-types` and registration endpoints returning HTTP 200 via API Gateway.
+- [x] **AWS Lambda Deployment**: Bundled code uploaded to `jbac-backend-api` in `ap-southeast-2`.
+- [x] **Admin Cockpit Functionality**: Live modal tested with state and sector filtering, and approval/rejection triggers.
+- [x] **Frontend Web Production Build**: Angular build succeeded with 0 errors and deployed to AWS S3 `jbac-web-production-298363284024`.
+- [x] **CloudFront CDN Cache Invalidation**: CloudFront invalidation completed (`I12KWOODURD71432G84RNB1TKP`).
+- [x] **Mobile Release Binaries**: Verified `versionCode='49'`, `versionName='0.0.49'`, `targetSdkVersion:'36'` with AAPT badging.
+- [x] **Documentation & Repository Sync**: Release notes v0.0.49 written for both web and mobile, execution log updated.

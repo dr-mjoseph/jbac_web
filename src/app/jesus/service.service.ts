@@ -959,7 +959,45 @@ postwishform(data: any) {
       return error;
     }));
   }
+
+  // Entrepreneur & Investor API methods
+  getBusinessTypes(): Observable<any> {
+    return this.http.post<any>(this.testApi + 'business-types', {}).pipe(
+      map(res => {
+        if (!res || !res.data || res.data.length === 0) {
+          return { status: 200, data: (FALLBACK_DROPDOWN_DATA as any).business_types || [], message: 'Success' };
+        }
+        return res;
+      }),
+      catchError(() => of({ status: 200, data: (FALLBACK_DROPDOWN_DATA as any).business_types || [], message: 'Success' }))
+    );
+  }
+
+  registerEntrepreneur(data: any): Observable<any> {
+    return this.http.post<any>(this.testApi + 'entrepreneur-register', data).pipe(map(res => res, (err: any) => err));
+  }
+
+  registerInvestor(data: any): Observable<any> {
+    return this.http.post<any>(this.testApi + 'investor-register', data).pipe(map(res => res, (err: any) => err));
+  }
+
+  getAdminEntrepreneurs(): Observable<any> {
+    return this.http.get<any>(this.testApi + 'admin-entrepreneurs').pipe(map(res => res, (err: any) => err));
+  }
+
+  getAdminInvestors(): Observable<any> {
+    return this.http.get<any>(this.testApi + 'admin-investors').pipe(map(res => res, (err: any) => err));
+  }
+
+  updateAdminEntrepreneur(data: any): Observable<any> {
+    return this.http.post<any>(this.testApi + 'admin-update-entrepreneur', data).pipe(map(res => res, (err: any) => err));
+  }
+
+  updateAdminInvestor(data: any): Observable<any> {
+    return this.http.post<any>(this.testApi + 'admin-update-investor', data).pipe(map(res => res, (err: any) => err));
+  }
 }
+
 
 
 
