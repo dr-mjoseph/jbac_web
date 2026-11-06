@@ -3039,3 +3039,115 @@ Implemented across backend endpoints (`/dashboardapi/getLeaderswebsiteData`, `/d
 - [x] **CloudFront CDN Cache Invalidation**: CloudFront invalidation completed (`I12KWOODURD71432G84RNB1TKP`).
 - [x] **Mobile Release Binaries**: Verified `versionCode='49'`, `versionName='0.0.49'`, `targetSdkVersion:'36'` with AAPT badging.
 - [x] **Documentation & Repository Sync**: Release notes v0.0.49 written for both web and mobile, execution log updated.
+
+---
+
+## 58. Fix Pastor Registration State Dropdown Default Placeholder Visibility (November 6, 2026)
+
+### 1. Issue Description & User Feedback
+- **User Feedback**: In the Pastor Registration page (`jbac.in/pastorregister`), the state select dropdown was rendering completely blank on initial page load instead of displaying the default placeholder prompt `"ఇక్కడ క్లిక్ చేసి ఎంచుకోండి"` visible to the user like the other location fields (District, Mandal, Panchayat).
+- **Observed Behavior**: The select box appeared empty/blank upon loading until clicked. In the dropdown menu itself, `"ఇక్కడ క్లిక్ చేసి ఎంచుకోండి"` was present, but it was not selected or visible in the collapsed select input.
+
+### 2. Root Cause Analysis
+- In Angular Reactive Forms, if a `<select formControlName="x">` is bound to a `FormGroup` where the property is missing from the group declaration or set to `null` while the template's placeholder option has `value=""`, Angular detects a value mismatch.
+- Angular automatically injects an empty dummy `<option value=""></option>` at index 0 and selects it by default, causing the select element to display blank whitespace on initial render.
+- Specifically in [pastorregister.component.ts](file:///c:/Users/rajes/Documents/jbac_web/src/app/jesus/pastorregister/pastorregister.component.ts), `state_id` was omitted from the initial `fb.group({ ... })` initialization.
+
+### 3. Resolution & Code Changes
+1. **Form Group Initialization & Reset**:
+   - In [pastorregister.component.ts](file:///c:/Users/rajes/Documents/jbac_web/src/app/jesus/pastorregister/pastorregister.component.ts):
+     - Added `state_id: ['', [Validators.required]]` directly in the `FormBuilder.group` definition.
+     - Added explicit initialization in `ngOnInit()`:
+       ```typescript
+       this.pastorform.patchValue({
+         state_id: ''
+       });
+       ```
+     - Preserved `state_id: ''` during form resets and re-renders.
+2. **Template Placeholder Definition**:
+   - In [pastorregister.component.html](file:///c:/Users/rajes/Documents/jbac_web/src/app/jesus/pastorregister/pastorregister.component.html):
+     - Enforced clean placeholder markup matching the other fields:
+       ```html
+       <select formControlName="state_id" (change)="onStateChange($event)" class="form-select">
+         <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
+         <option *ngFor="let s of states" [value]="s.id">{{ s.state_name }}</option>
+       </select>
+       ```
+
+### 4. Build & Deployment
+- Recompiled production bundle: `npm run build:prod` (Generated `main.d79da01e16107e56.js`).
+- Uploaded distribution to AWS S3: `aws s3 sync dist/churchwebsite s3://jbac-web-production-298363284024/ --delete`.
+- Created CloudFront cache invalidation: Distribution `EOBBU8SU7H3BI`, Invalidation ID `IBHVMZYK8FXICUMEHBDM1LBETW` (`/*`).
+- Verified live at [https://jbac.in/pastorregister](https://jbac.in/pastorregister).
+
+---
+
+## 59. Fix Admin Cockpit Business Match Hero Counter & Tab Independent Fetch (November 6, 2026)
+
+### 1. Issue Description & User Feedback
+- **User Feedback**: In the Admin Database Cockpit at [https://jbac.in/admin](https://jbac.in/admin), under the "Entrepreneur & Investor Connect (ఎంటర్‌ప్రెన్యూర్ & ఇన్వెస్టర్ డాష్‌బోర్డ్)" section, the 4 summary badges (ENTREPRENEURS, FUNDS NEEDED, INVESTORS, TO INVEST) remained displaying `--` even after active entrepreneurs and investors had registered in the database.
+
+### 2. Root Cause Analysis
+- The Business Match summary card is positioned in the global layout header outside the tab panels.
+- Previously, `fetchBusinessMatchData()` was only triggered when switching to `tab-dashboard` or if `admin-dashboard-stats` completed without network timeout. If the admin logged in and immediately viewed tables or if the stats API took longer to respond, the hero counters remained in their uninitialized `--` state.
+- Additionally, the endpoint fallback required resilient response unwrapping to handle both `{ data: [...] }` wrapped payloads and raw array responses from both `/dashboardapi/admin-entrepreneurs` and `/api/admin-entrepreneurs`.
+
+### 3. Resolution & Code Changes
+- Updated [public.html](file:///c:/Users/rajes/Documents/jbac_web/public.html), [backend/public.html](file:///c:/Users/rajes/Documents/jbac_web/backend/public.html), and [backend/admin_db.html](file:///c:/Users/rajes/Documents/jbac_web/backend/admin_db.html):
+  1. **Global Lifecycle Invocations**:
+     - Hooked `fetchBusinessMatchData(true)` into `initApp()` immediately upon authentication and initial dashboard render.
+     - Hooked `fetchBusinessMatchData(false)` into `refreshCurrentTab()` so manual toolbar refreshes keep both the tables and hero counters synchronized.
+  2. **Multi-Path & Resilient Payload Unwrapping**:
+     - Added automatic fallback between `/dashboardapi/` and `/api/` endpoints.
+     - Implemented resilient array extraction:
+       ```javascript
+       const rawEnt = Array.isArray(entRes) ? entRes : (entRes.data || entRes.rows || []);
+       const rawInv = Array.isArray(invRes) ? invRes : (invRes.data || invRes.rows || []);
+       ```
+  3. **Instant Financial Aggregations**:
+     - Aggregated `capital_need` and `capital_to_invest` across records and formatted into Indian Currency notation (₹ Lakhs / ₹ Crores).
+     - Directly updated DOM elements `#hero-entrepreneurs-count`, `#hero-funds-needed`, `#hero-investors-count`, and `#hero-to-invest`.
+- Deployed updated HTML files directly to S3 bucket `jbac-web-production-298363284024` with `Content-Type: text/html; charset=utf-8` at `/admin`, `/public.html`, and `/admin/index.html`.
+
+---
+
+## 60. Android Native App Dual-Write Architecture: 6 Dedicated AWS RDS MySQL Tables & 11 REST API Endpoints (November 6, 2026)
+
+### 1. Context & Architectural Requirements
+- The user is developing a native Android app in Android Studio (Kotlin) using `ChurchRepository.kt` with Retrofit.
+- Rather than storing mobile app data exclusively in Google Firebase (Realtime Database / Cloud Firestore), the user required dedicated tables on the JBAC AWS RDS MySQL database (`jbac-mysql-db-v3.cdeeuw0s2trf.ap-southeast-2.rds.amazonaws.com`, database `jbac_jbac`) and production REST API endpoints on AWS Lambda (`jbac-backend-api`) to enable a robust **dual-write synchronization architecture**.
+
+### 2. MySQL Database Tables Provisioned
+Provisioned 6 dedicated tables in MySQL 8.4 via automated script [scripts/create_jbac_android_tables.js](file:///c:/Users/rajes/Documents/jbac_web/scripts/create_jbac_android_tables.js):
+1. **`jbac_users`**:
+   - `uid` VARCHAR(128) PRIMARY KEY, `email` VARCHAR(255) NOT NULL, `name` VARCHAR(255), `phone` VARCHAR(50), `role` VARCHAR(50) DEFAULT 'user', `timestamp` BIGINT, `created_at` TIMESTAMP, `updated_at` TIMESTAMP ON UPDATE CURRENT_TIMESTAMP.
+2. **`jbac_news`**:
+   - `id` BIGINT AUTO_INCREMENT PRIMARY KEY, `title` VARCHAR(500) NOT NULL, `content` LONGTEXT, `image_url` VARCHAR(1000), `video_url` VARCHAR(1000), `timestamp` BIGINT, `created_at` TIMESTAMP.
+3. **`jbac_meetings`**:
+   - `id` BIGINT AUTO_INCREMENT PRIMARY KEY, `title` VARCHAR(500) NOT NULL, `date_time` VARCHAR(100), `venue_name` VARCHAR(500), `venue_query` VARCHAR(500), `timestamp` BIGINT, `created_at` TIMESTAMP.
+4. **`jbac_branches`**:
+   - `id` BIGINT AUTO_INCREMENT PRIMARY KEY, `name` VARCHAR(500) NOT NULL, `address` TEXT, `pastor_name` VARCHAR(255), `phone` VARCHAR(50), `latitude` DECIMAL(10, 8), `longitude` DECIMAL(11, 8), `created_at` TIMESTAMP.
+5. **`jbac_prayer_requests`**:
+   - `id` BIGINT AUTO_INCREMENT PRIMARY KEY, `user_id` VARCHAR(128) NOT NULL, `user_name` VARCHAR(255), `request` TEXT NOT NULL, `timestamp` BIGINT, `status` VARCHAR(50) DEFAULT 'pending', `created_at` TIMESTAMP, `INDEX idx_prayer_uid (user_id)`.
+6. **`jbac_chat_messages`**:
+   - `id` BIGINT AUTO_INCREMENT PRIMARY KEY, `sender_id` VARCHAR(128) NOT NULL, `receiver_id` VARCHAR(128) NOT NULL, `message` TEXT NOT NULL, `timestamp` BIGINT, `read_status` TINYINT(1) DEFAULT 0, `created_at` TIMESTAMP, `INDEX idx_chat_sender (sender_id)`, `INDEX idx_chat_receiver (receiver_id)`, `INDEX idx_chat_pair (sender_id, receiver_id)`.
+
+### 3. Backend REST API Endpoints Deployed (AWS Lambda)
+Implemented 11 REST API endpoints in [backend/server.ts](file:///c:/Users/rajes/Documents/jbac_web/backend/server.ts) and [backend/server.js](file:///c:/Users/rajes/Documents/jbac_web/backend/server.js):
+- `POST /dashboardapi/usersync` & `POST /api/usersync`: Upserts user profiles into `jbac_users`.
+- `POST /dashboardapi/postnews`: Inserts news bulletins into `jbac_news`.
+- `GET /dashboardapi/getnews`: Retrieves active news ordered by timestamp/created_at DESC.
+- `POST /dashboardapi/postevents`: Inserts gospel meetings into `jbac_meetings`.
+- `GET /dashboardapi/events`: Retrieves upcoming events ordered by date DESC.
+- `POST /dashboardapi/postbranches`: Inserts branch locations with coordinates into `jbac_branches`.
+- `GET /dashboardapi/branches`: Retrieves church branches and contact details.
+- `POST /dashboardapi/postprayers`: Submits prayer requests into `jbac_prayer_requests`.
+- `GET /dashboardapi/getprayers`: Retrieves prayer requests.
+- `POST /dashboardapi/postchats`: Inserts one-on-one chat messages into `jbac_chat_messages`.
+- `GET /dashboardapi/chats/:userId1/:userId2`: Retrieves the chronological conversation history between two users.
+
+### 4. Verification & Testing
+- Packaged `backend/backend-deploy.zip` and deployed to AWS Lambda `jbac-backend-api` in `ap-southeast-2`.
+- Executed automated integration test suite [scripts/test_jbac_android_endpoints.js](file:///c:/Users/rajes/Documents/jbac_web/scripts/test_jbac_android_endpoints.js).
+- All 11 endpoints returned HTTP `200 OK` with valid JSON responses.
+

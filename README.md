@@ -94,10 +94,17 @@ Welcome to the **Jesus Believers Association Council (JBAC)** unified ecosystem 
    - **Detailed Leadership Status Badges**: If a leader is from a specific wing (e.g. Student Wing, Software Wing, Drivers Wing, Media Reporters, Social Media), the exact wing name and role are displayed (e.g. `స్టూడెంట్ వింగ్ (Student Wing) - సోషల్ మీడియా లీడర్`). If from panchayat, ward, or sub-ward, detailed designations (`వార్డు నెం. 1 లీడర్`, `సబ్ వార్డు లీడర్`) and distinct color-coded badges are rendered.
    - **Clean Modern Interface**: Top graphic hero banners removed across all pages, horizontal announcement marquee bar modernized, and search filter cards enhanced with responsive Bootstrap grids.
 9. **Native Android Application (`jbac_app`)**:
-   - Android app compliant with Google Play Store standards (`targetSdkVersion 36`, `minSdkVersion 24`, release version `0.0.47` / `versionCode 47`).
+   - Android app compliant with Google Play Store standards (`targetSdkVersion 36`, `minSdkVersion 24`, release version `0.0.49` / `versionCode 49`).
    - Official production release signing via `Jbac.keystore`.
    - Full State (`రాష్ట్రం / State`) selection and cascading district loading across search modules and all registration forms.
    - Optimized navigation touch targets, zero click delay, and hardware back button handling.
+10. **Entrepreneur & Investor Ecosystem**:
+   - Bilingual incubation and matchmaking portal for Christian entrepreneurs and faith-based investors across Andhra Pradesh and Telangana.
+   - Dedicated web forms (`/entrepreneurregister`, `/investorregister`) and mobile pages (`EntrepreneurPage`, `InvestorPage`) with dual residential and business location cascades (State ➔ District ➔ Constituency ➔ Mandal ➔ Panchayat).
+   - Real-time Admin Business Match Cockpit (`/admin`) displaying cumulative entrepreneurs, funds needed, registered investors, and capital to invest with 1-click approval/rejection controls.
+11. **Android Studio Native Dual-Write Backend & REST APIs**:
+   - 6 dedicated MySQL tables (`jbac_users`, `jbac_news`, `jbac_meetings`, `jbac_branches`, `jbac_prayer_requests`, `jbac_chat_messages`) on AWS RDS MySQL 8.4.
+   - 11 production REST API endpoints deployed on AWS Lambda (`jbac-backend-api`) enabling native Android apps (`ChurchRepository.kt` via Retrofit) to dual-write alongside Firebase.
 
 ---
 
@@ -444,3 +451,63 @@ Implemented across backend endpoints (`/dashboardapi/getLeaderswebsiteData`, `/d
   - Applied the identical `*ngIf="formshow == 1"`, `*ngIf="formshow == 3"`, and `*ngIf="formshow == 2"` conditions on the mobile action button row so that on mobile devices, a Pastor leader sees only the Pastors button, a Student leader sees only the Students button, and a Believer leader sees only the Believers button.
 - **Automated Web-to-Mobile Sync**:
   - Ran `sync-to-mobile.js` to mirror all updated templates and assets to `jbac_app`, committed, and pushed to `jbac_app` on GitHub.
+
+
+---
+
+## 56. Collapsible Search Filters Across 6 Views, News Category/Date Filters, Universal Loading Spinners & Android Release v0.0.47 (November 2, 2026)
+
+### Context & Implementation
+1. **Collapsible Search Filters**: Added space-saving collapsible toggle buttons (`showFilters = !showFilters`) across 6 member service views (`/institute`, `/marriages`, `/jobs`, `/help`, `/business`, `/organization`), collapsed by default with smooth Bootstrap CSS transitions.
+2. **News Page Dual Filters**: Introduced independent expandable filters for Date and News Category on `/news` with full-page loading spinner preventing visual layout jumps.
+3. **Android Release v0.0.47**: Bumped to version `0.0.47` (VersionCode `47`, Target SDK `36`), compiled, signed, and published release binaries.
+
+---
+
+## 57. Student Leadership Hierarchy (1-5), District Isolation Bug Fix, Admin District Leaders Cockpit & Mobile Release v0.0.48 (November 5, 2026)
+
+### Context & Implementation
+1. **Student Hierarchy 1-5**: Re-scoped student leadership levels strictly from District (1) down to Sub-Ward (5), removing invalid State Level options.
+2. **Cross-District Isolation Fix**: Fixed multi-table ID collisions in `/dashboardapi/getUserMainData` where district leaders previously saw applicants from other districts due to session ID shadowing.
+3. **Admin District Leaders Cockpit**: Added hero summary cards on `jbac.in/admin` tracking district leaders across AP & TG with interactive approval/rejection modal.
+4. **Mobile Release v0.0.48**: Bumped `jbac_app` to version `0.0.48` (VersionCode `48`, Target SDK `36`), built and signed `jbacApp-0.0.48.apk` and `jbacApp-0.0.48.aab`.
+
+---
+
+## 58. Entrepreneur & Investor Ecosystem, Admin Cockpit, Bilingual Parity & Mobile Release v0.0.49 (November 5, 2026)
+
+### Context & Implementation
+1. **Entrepreneur & Investor Web Modules**:
+   - Created `/entrepreneurregister` and `/investorregister` with strict state-first cascading guards for residential and business setup locations.
+   - Complete Telugu & English bilingual interfaces with dynamic denomination and industry sector dropdowns.
+2. **Admin Business Match Cockpit**:
+   - Hero statistics card displaying total entrepreneurs, capital needed, registered investors, and capital to invest.
+   - Dual-tab matching modal with State (AP/TG) and Sector filtering, and real-time status toggles.
+3. **Mobile App Release v0.0.49**:
+   - Created `EntrepreneurPage` and `InvestorPage` in Ionic mobile app.
+   - Bumped to version `0.0.49` (VersionCode `49`, Target SDK `36`), compiled and signed `jbacApp-0.0.49.apk` and `jbacApp-0.0.49.aab`.
+
+---
+
+## 59. Pastor Registration State Dropdown Default Placeholder Visibility & Admin Cockpit Hero Counters Sync (November 6, 2026)
+
+### Context & Implementation
+1. **Pastor Registration State Dropdown Placeholder Fix**:
+   - Resolved issue where the state select element rendered blank whitespace on initial load.
+   - Initialized `state_id: ['', [Validators.required]]` in Angular Reactive Form and patched `state_id: ''` on `ngOnInit()` to visibly select `<option value="" selected disabled>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>`.
+   - Recompiled production bundle and invalidated CloudFront cache.
+2. **Admin Cockpit Hero Counters Synchronization**:
+   - Hooked `fetchBusinessMatchData(true)` into `initApp()` and `refreshCurrentTab()` in `public.html` so hero counters load immediately on login without waiting for tab switches.
+   - Added multi-path fallback and resilient array unwrapping for both `/dashboardapi/` and `/api/` routes.
+
+---
+
+## 60. Android Native Studio Dual-Write Backend: 6 AWS RDS MySQL Tables & 11 REST API Endpoints (November 6, 2026)
+
+### Context & Implementation
+1. **6 Dedicated MySQL Tables Provisioned**:
+   - Provisioned `jbac_users`, `jbac_news`, `jbac_meetings`, `jbac_branches`, `jbac_prayer_requests`, and `jbac_chat_messages` in AWS RDS MySQL 8.4 (`jbac_jbac`).
+2. **11 REST API Endpoints Deployed**:
+   - Deployed on AWS Lambda (`jbac-backend-api`) in `ap-southeast-2`: `/usersync`, `/postnews`, `/getnews`, `/postevents`, `/events`, `/postbranches`, `/branches`, `/postprayers`, `/getprayers`, `/postchats`, `/chats/:u1/:u2`.
+   - Enables native Android Studio apps using `ChurchRepository.kt` and Retrofit to dual-write alongside Firebase.
+   - Verified 100% passing automated test suite with HTTP 200 OK responses.
