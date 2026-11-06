@@ -481,3 +481,4 @@ export class TeacherregisterComponent implements OnInit {
     });
   }
 }
+

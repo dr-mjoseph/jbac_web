@@ -14,3 +14,4 @@ const fs = require('fs');
   fs.writeFileSync(filePath, c, 'utf8');
   console.log(`Updated hooks in ${filePath}`);
 });
+

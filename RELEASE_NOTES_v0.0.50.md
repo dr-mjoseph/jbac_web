@@ -110,3 +110,4 @@ Deployed to `jbac-backend-api` in `ap-southeast-2`:
   - `jbacApp-0.0.50.apk` (Signed with v1 + v2 + v3 scheme using `Jbac.keystore`)
   - `jbacApp-0.0.50.aab` (Signed with jarsigner)
   - `appreleasesigned.aab` (Ready for Google Play Store upload)
+

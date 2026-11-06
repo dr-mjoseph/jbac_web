@@ -387,3 +387,4 @@ function patchAdminHtml(filePath) {
 patchAdminHtml('public.html');
 patchAdminHtml('backend/public.html');
 patchAdminHtml('backend/admin_db.html');
+
