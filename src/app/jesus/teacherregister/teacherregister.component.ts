@@ -46,6 +46,14 @@ export class TeacherregisterComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    // Pre-seed all master dropdowns synchronously so the UI is immediately populated
+    this.roleCategories = this.getDefaultRoles();
+    this.qualificationCategories = this.getDefaultQualifications();
+    this.familyBackgrounds = this.getDefaultFamilyBackgrounds();
+    this.institutionTypes = this.getDefaultInstitutionTypes();
+    this.experienceLevels = this.getDefaultExperienceLevels();
+    this.denominations = this.getDefaultDenominations();
+
     this.initForm();
     this.loadStates();
     this.loadTeachingMasterData();

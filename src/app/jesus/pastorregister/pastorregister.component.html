@@ -325,7 +325,7 @@
                                                     <select class="form-control" formControlName="state_id"
                                                         (change)="onStateChange($event);"
                                                         [ngClass]="{'is-invalid': submitted && o['state_id'].errors }">
-                                                        <option value="">ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
+                                                        <option value="" disabled selected>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
                                                         <option value="1">ఆంధ్రప్రదేశ్ (Andhra Pradesh - AP)</option>
                                                         <option value="2">తెలంగాణ (Telangana - TG)</option>
                                                     </select>
