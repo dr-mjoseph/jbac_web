@@ -49,6 +49,7 @@ export class TeacherregisterComponent implements OnInit {
     this.initForm();
     this.loadStates();
     this.loadTeachingMasterData();
+    this.loadDenominations();
   }
 
   initForm(): void {
@@ -118,23 +119,77 @@ export class TeacherregisterComponent implements OnInit {
   loadTeachingMasterData(): void {
     this.service.getTeachingMasterData().subscribe({
       next: (res: any) => {
-        if (res) {
-          this.roleCategories = res.roles || this.getDefaultRoles();
-          this.familyBackgrounds = res.family_backgrounds || this.getDefaultFamilyBackgrounds();
-          this.institutionTypes = res.institution_types || this.getDefaultInstitutionTypes();
-          this.experienceLevels = res.experience_levels || this.getDefaultExperienceLevels();
-          this.qualificationCategories = res.qualifications || this.getDefaultQualifications();
-          this.denominations = res.denominations || [];
+        const payload = (res && res.data) ? res.data : res;
+        if (payload) {
+          if (payload.roles && payload.roles.length) this.roleCategories = payload.roles;
+          if (payload.backgrounds && payload.backgrounds.length) {
+            this.familyBackgrounds = payload.backgrounds;
+          } else if (payload.family_backgrounds && payload.family_backgrounds.length) {
+            this.familyBackgrounds = payload.family_backgrounds;
+          }
+          if (payload.institutions && payload.institutions.length) {
+            this.institutionTypes = payload.institutions;
+          } else if (payload.institution_types && payload.institution_types.length) {
+            this.institutionTypes = payload.institution_types;
+          }
+          if (payload.experience && payload.experience.length) {
+            this.experienceLevels = payload.experience;
+          } else if (payload.experience_levels && payload.experience_levels.length) {
+            this.experienceLevels = payload.experience_levels;
+          }
+          if (payload.qualifications && payload.qualifications.length) {
+            this.qualificationCategories = payload.qualifications;
+          }
+          if (payload.denominations && payload.denominations.length) {
+            this.denominations = payload.denominations;
+          }
         }
       },
       error: () => {
-        this.roleCategories = this.getDefaultRoles();
-        this.familyBackgrounds = this.getDefaultFamilyBackgrounds();
-        this.institutionTypes = this.getDefaultInstitutionTypes();
-        this.experienceLevels = this.getDefaultExperienceLevels();
-        this.qualificationCategories = this.getDefaultQualifications();
+        if (!this.roleCategories || !this.roleCategories.length) this.roleCategories = this.getDefaultRoles();
+        if (!this.familyBackgrounds || !this.familyBackgrounds.length) this.familyBackgrounds = this.getDefaultFamilyBackgrounds();
+        if (!this.institutionTypes || !this.institutionTypes.length) this.institutionTypes = this.getDefaultInstitutionTypes();
+        if (!this.experienceLevels || !this.experienceLevels.length) this.experienceLevels = this.getDefaultExperienceLevels();
+        if (!this.qualificationCategories || !this.qualificationCategories.length) this.qualificationCategories = this.getDefaultQualifications();
+        if (!this.denominations || !this.denominations.length) this.denominations = this.getDefaultDenominations();
       }
     });
+  }
+
+  loadDenominations(): void {
+    this.service.getdenomation().subscribe({
+      next: (res: any) => {
+        const list = (res && res.data) ? res.data : (Array.isArray(res) ? res : []);
+        if (list && list.length > 0) {
+          this.denominations = list;
+        } else if (!this.denominations || this.denominations.length === 0) {
+          this.denominations = this.getDefaultDenominations();
+        }
+      },
+      error: () => {
+        if (!this.denominations || this.denominations.length === 0) {
+          this.denominations = this.getDefaultDenominations();
+        }
+      }
+    });
+  }
+
+  getDefaultDenominations(): any[] {
+    return [
+      { id: 1, name: 'అసెంబ్లీ ఆఫ్ గాడ్ - Assembly of God', denomation_name: 'అసెంబ్లీ ఆఫ్ గాడ్ - Assembly of God', denomination_name: 'అసెంబ్లీ ఆఫ్ గాడ్ - Assembly of God' },
+      { id: 2, name: 'బాప్టిస్ట్ - Baptist', denomation_name: 'బాప్టిస్ట్ - Baptist', denomination_name: 'బాప్టిస్ట్ - Baptist' },
+      { id: 3, name: 'బైబిల్ మిషన్ - Bible Mission', denomation_name: 'బైబిల్ మిషన్ - Bible Mission', denomination_name: 'బైబిల్ మిషన్ - Bible Mission' },
+      { id: 4, name: 'కాథలిక్ - Catholic', denomation_name: 'కాథలిక్ - Catholic', denomination_name: 'కాథలిక్ - Catholic' },
+      { id: 5, name: 'సి.ఎస్.ఐ - CSI (Church of South India)', denomation_name: 'సి.ఎస్.ఐ - CSI (Church of South India)', denomination_name: 'సి.ఎస్.ఐ - CSI (Church of South India)' },
+      { id: 6, name: 'సి.ఎన్.ఐ - CNI (Church of North India)', denomation_name: 'సి.ఎన్.ఐ - CNI (Church of North India)', denomination_name: 'సి.ఎన్.ఐ - CNI (Church of North India)' },
+      { id: 7, name: 'లూథరన్ - Lutheran', denomation_name: 'లూథరన్ - Lutheran', denomination_name: 'లూథరన్ - Lutheran' },
+      { id: 8, name: 'మెథడిస్ట్ - Methodist', denomation_name: 'మెథడిస్ట్ - Methodist', denomination_name: 'మెథడిస్ట్ - Methodist' },
+      { id: 9, name: 'పెంతెకొస్తు - Pentecostal', denomation_name: 'పెంతెకొస్తు - Pentecostal', denomination_name: 'పెంతెకొస్తు - Pentecostal' },
+      { id: 10, name: 'సాల్వేషన్ ఆర్మీ - Salvation Army', denomation_name: 'సాల్వేషన్ ఆర్మీ - Salvation Army', denomination_name: 'సాల్వేషన్ ఆర్మీ - Salvation Army' },
+      { id: 11, name: 'సెవెంత్ డే అడ్వెంటిస్ట్ - Seventh-day Adventist', denomation_name: 'సెవెంత్ డే అడ్వెంటిస్ట్ - Seventh-day Adventist', denomination_name: 'సెవెంత్ డే అడ్వెంటిస్ట్ - Seventh-day Adventist' },
+      { id: 12, name: 'ఇండిపెండెంట్ చర్చి - Independent Church', denomation_name: 'ఇండిపెండెంట్ చర్చి - Independent Church', denomination_name: 'ఇండిపెండెంట్ చర్చి - Independent Church' },
+      { id: 13, name: 'ఇతరులు - Others', denomation_name: 'ఇతరులు - Others', denomination_name: 'ఇతరులు - Others' }
+    ];
   }
 
   getDefaultRoles(): any[] {

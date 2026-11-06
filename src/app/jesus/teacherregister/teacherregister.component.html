@@ -256,8 +256,8 @@
                   <select formControlName="faith_category" class="form-select form-select-lg"
                           [ngClass]="{ 'is-invalid': submitted && f['faith_category'].errors }">
                     <option value="">ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
-                    <option *ngFor="let d of denominations" [value]="d.name || d.denomination_name">
-                      {{ d.name || d.denomination_name }}
+                    <option *ngFor="let d of denominations" [value]="d.denomation_name || d.denomination_name || d.name">
+                      {{ d.denomation_name || d.denomination_name || d.name }}
                     </option>
                   </select>
                   <div class="invalid-feedback" *ngIf="submitted && f['faith_category'].errors">
