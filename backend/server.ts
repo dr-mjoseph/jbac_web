@@ -5361,6 +5361,462 @@ app.all(['/dashboardapi/admin-update-investor', '/api/admin-update-investor'], a
     }
 });
 
+// =========================================================================
+// ANDROID NATIVE APP DUAL-WRITE REST API ENDPOINTS (ChurchRepository.kt)
+// =========================================================================
+
+// 1. User Sync (Firebase Auth to AWS RDS MySQL)
+app.post(['/dashboardapi/usersync', '/api/usersync'], async (req: any, res: any) => {
+    try {
+        const b = req.body || {};
+        const uid = String(b.uid || b.userId || b.id || '').trim();
+        const email = String(b.email || '').trim();
+        const name = b.name || b.displayName || null;
+        const phone = b.phone || b.phoneNumber || null;
+        const role = String(b.role || 'user').trim();
+        const timestamp = b.timestamp ? Number(b.timestamp) : Date.now();
+
+        if (!uid || !email) {
+            return res.status(400).json({ status: 400, message: 'uid and email are required for usersync' });
+        }
+
+        await db.query(
+            `INSERT INTO \`jbac_users\` (\`uid\`, \`email\`, \`name\`, \`phone\`, \`role\`, \`timestamp\`)
+             VALUES (?, ?, ?, ?, ?, ?)
+             ON DUPLICATE KEY UPDATE
+               \`email\` = VALUES(\`email\`),
+               \`name\` = COALESCE(VALUES(\`name\`), \`name\`),
+               \`phone\` = COALESCE(VALUES(\`phone\`), \`phone\`),
+               \`role\` = COALESCE(VALUES(\`role\`), \`role\`),
+               \`timestamp\` = COALESCE(VALUES(\`timestamp\`), \`timestamp\`)`,
+            [uid, email, name, phone, role, timestamp]
+        );
+
+        res.json({
+            status: 200,
+            data: { uid, email, name, phone, role, timestamp },
+            message: 'User synced successfully'
+        });
+    } catch (err: any) {
+        console.error('Error in usersync:', err);
+        res.status(500).json({ status: 500, message: err.message || 'Error syncing user' });
+    }
+});
+
+// 2. Post News (Dual-write to jbac_news & post_news)
+app.post(['/dashboardapi/postnews', '/api/postnews'], async (req: any, res: any) => {
+    try {
+        const b = req.body || {};
+        const title = b.title || b.news || '';
+        const content = b.content || b.description || '';
+        const imageUrl = b.imageUrl || b.image_url || extractUploadedImage(b) || (typeof b.image === 'string' ? b.image : null);
+        const videoUrl = b.videoUrl || b.video_url || null;
+        const timestamp = b.timestamp ? Number(b.timestamp) : Date.now();
+
+        if (!title) {
+            return res.status(400).json({ status: 400, message: 'News title is required' });
+        }
+
+        const [result]: any = await db.query(
+            `INSERT INTO \`jbac_news\` (\`title\`, \`content\`, \`image_url\`, \`video_url\`, \`timestamp\`)
+             VALUES (?, ?, ?, ?, ?)`,
+            [title, content, imageUrl, videoUrl, timestamp]
+        );
+
+        try {
+            await dynamicInsert('post_news', {
+                news: title,
+                description: content,
+                image: imageUrl,
+                cts: getIndianCts(),
+                d_in: 0,
+                approval_ind: 1
+            });
+        } catch (_) {}
+
+        res.json({
+            status: 200,
+            data: {
+                id: result.insertId,
+                title,
+                content,
+                imageUrl,
+                image_url: imageUrl,
+                videoUrl,
+                video_url: videoUrl,
+                timestamp
+            },
+            message: 'News posted successfully'
+        });
+    } catch (err: any) {
+        console.error('Error posting news:', err);
+        res.status(500).json({ status: 500, message: err.message || 'Error posting news' });
+    }
+});
+
+// 3. Get News
+app.all(['/dashboardapi/getnews', '/api/getnews'], async (_req: any, res: any) => {
+    try {
+        const [rows]: any = await db.query('SELECT * FROM `jbac_news` ORDER BY `timestamp` DESC, `id` DESC');
+        let formatted = (rows || []).map((r: any) => ({
+            id: r.id,
+            title: r.title,
+            content: r.content,
+            imageUrl: r.image_url,
+            image_url: r.image_url,
+            videoUrl: r.video_url,
+            video_url: r.video_url,
+            timestamp: r.timestamp ? Number(r.timestamp) : (r.created_at ? new Date(r.created_at).getTime() : Date.now()),
+            created_at: r.created_at
+        }));
+
+        if (formatted.length === 0) {
+            const [legacyRows]: any = await db.query('SELECT * FROM `post_news` WHERE `d_in` = 0 ORDER BY `id` DESC');
+            formatted = (legacyRows || []).map((r: any) => ({
+                id: r.id,
+                title: r.news || r.title,
+                content: r.description,
+                imageUrl: r.image,
+                image_url: r.image,
+                videoUrl: null,
+                video_url: null,
+                timestamp: r.cts ? new Date(r.cts).getTime() : Date.now(),
+                created_at: r.cts
+            }));
+        }
+
+        res.json({ status: 200, data: formatted, message: 'Success' });
+    } catch (err: any) {
+        console.error('Error getting news:', err);
+        res.status(500).json({ status: 500, message: err.message || 'Error fetching news' });
+    }
+});
+
+// 4. Post Events / Meetings
+app.post(['/dashboardapi/postevents', '/api/postevents'], async (req: any, res: any) => {
+    try {
+        const b = req.body || {};
+        const title = b.title || b.meeting_title || '';
+        const dateTime = b.dateTime || b.date_time || b.date || '';
+        const venueName = b.venueName || b.venue_name || b.venue || '';
+        const venueQuery = b.venueQuery || b.venue_query || venueName;
+        const timestamp = b.timestamp ? Number(b.timestamp) : Date.now();
+
+        if (!title) {
+            return res.status(400).json({ status: 400, message: 'Meeting/Event title is required' });
+        }
+
+        const [result]: any = await db.query(
+            `INSERT INTO \`jbac_meetings\` (\`title\`, \`date_time\`, \`venue_name\`, \`venue_query\`, \`timestamp\`)
+             VALUES (?, ?, ?, ?, ?)`,
+            [title, dateTime, venueName, venueQuery, timestamp]
+        );
+
+        res.json({
+            status: 200,
+            data: {
+                id: result.insertId,
+                title,
+                dateTime,
+                date_time: dateTime,
+                venueName,
+                venue_name: venueName,
+                venueQuery,
+                venue_query: venueQuery,
+                timestamp
+            },
+            message: 'Meeting posted successfully'
+        });
+    } catch (err: any) {
+        console.error('Error posting meeting/event:', err);
+        res.status(500).json({ status: 500, message: err.message || 'Error posting meeting/event' });
+    }
+});
+
+// 5. Get Events / Meetings
+app.all(['/dashboardapi/events', '/api/events', '/dashboardapi/getevents', '/api/getevents'], async (_req: any, res: any) => {
+    try {
+        const [rows]: any = await db.query('SELECT * FROM `jbac_meetings` ORDER BY `timestamp` DESC, `id` DESC');
+        let formatted = (rows || []).map((r: any) => ({
+            id: r.id,
+            title: r.title,
+            dateTime: r.date_time,
+            date_time: r.date_time,
+            venueName: r.venue_name,
+            venue_name: r.venue_name,
+            venueQuery: r.venue_query,
+            venue_query: r.venue_query,
+            timestamp: r.timestamp ? Number(r.timestamp) : (r.created_at ? new Date(r.created_at).getTime() : Date.now()),
+            created_at: r.created_at
+        }));
+
+        if (formatted.length === 0) {
+            try {
+                const [legacyRows]: any = await db.query('SELECT * FROM `meetings` WHERE `d_in` = 0 ORDER BY `id` DESC LIMIT 50');
+                formatted = (legacyRows || []).map((r: any) => ({
+                    id: r.id,
+                    title: r.meeting_title || r.title,
+                    dateTime: r.date_time || r.date,
+                    date_time: r.date_time || r.date,
+                    venueName: r.location || r.venue,
+                    venue_name: r.location || r.venue,
+                    venueQuery: r.location || r.venue,
+                    venue_query: r.location || r.venue,
+                    timestamp: r.cts ? new Date(r.cts).getTime() : Date.now(),
+                    created_at: r.cts
+                }));
+            } catch (_) {}
+        }
+
+        res.json({ status: 200, data: formatted, message: 'Success' });
+    } catch (err: any) {
+        console.error('Error fetching meetings/events:', err);
+        res.status(500).json({ status: 500, message: err.message || 'Error fetching meetings/events' });
+    }
+});
+
+// 6. Post Branch
+app.post(['/dashboardapi/postbranches', '/api/postbranches'], async (req: any, res: any) => {
+    try {
+        const b = req.body || {};
+        const name = b.name || b.branchName || '';
+        const address = b.address || '';
+        const pastorName = b.pastorName || b.pastor_name || '';
+        const phone = b.phone || b.mobile || '';
+        const latitude = b.latitude ? Number(b.latitude) : null;
+        const longitude = b.longitude ? Number(b.longitude) : null;
+
+        if (!name) {
+            return res.status(400).json({ status: 400, message: 'Branch name is required' });
+        }
+
+        const [result]: any = await db.query(
+            `INSERT INTO \`jbac_branches\` (\`name\`, \`address\`, \`pastor_name\`, \`phone\`, \`latitude\`, \`longitude\`)
+             VALUES (?, ?, ?, ?, ?, ?)`,
+            [name, address, pastorName, phone, latitude, longitude]
+        );
+
+        res.json({
+            status: 200,
+            data: {
+                id: result.insertId,
+                name,
+                address,
+                pastorName,
+                pastor_name: pastorName,
+                phone,
+                latitude,
+                longitude
+            },
+            message: 'Branch posted successfully'
+        });
+    } catch (err: any) {
+        console.error('Error posting branch:', err);
+        res.status(500).json({ status: 500, message: err.message || 'Error posting branch' });
+    }
+});
+
+// 7. Get Branches
+app.all(['/dashboardapi/branches', '/api/branches', '/dashboardapi/getbranches', '/api/getbranches'], async (_req: any, res: any) => {
+    try {
+        const [rows]: any = await db.query('SELECT * FROM `jbac_branches` ORDER BY `id` ASC');
+        const formatted = (rows || []).map((r: any) => ({
+            id: r.id,
+            name: r.name,
+            address: r.address,
+            pastorName: r.pastor_name,
+            pastor_name: r.pastor_name,
+            phone: r.phone,
+            latitude: r.latitude ? Number(r.latitude) : null,
+            longitude: r.longitude ? Number(r.longitude) : null,
+            created_at: r.created_at
+        }));
+        res.json({ status: 200, data: formatted, message: 'Success' });
+    } catch (err: any) {
+        console.error('Error fetching branches:', err);
+        res.status(500).json({ status: 500, message: err.message || 'Error fetching branches' });
+    }
+});
+
+// 8. Post Prayer Request
+app.post(['/dashboardapi/postprayers', '/api/postprayers'], async (req: any, res: any) => {
+    try {
+        const b = req.body || {};
+        const userId = String(b.userId || b.user_id || b.uid || 'anonymous').trim();
+        const userName = b.userName || b.user_name || b.name || 'Anonymous Believer';
+        const requestText = b.request || b.prayer || b.message || '';
+        const timestamp = b.timestamp ? Number(b.timestamp) : Date.now();
+        const status = b.status || 'pending';
+
+        if (!requestText) {
+            return res.status(400).json({ status: 400, message: 'Prayer request text is required' });
+        }
+
+        if (userId && userId !== 'anonymous') {
+            try {
+                await db.query(
+                    'INSERT IGNORE INTO `jbac_users` (`uid`, `email`, `name`, `role`, `timestamp`) VALUES (?, ?, ?, ?, ?)',
+                    [userId, `${userId}@jbac.in`, userName, 'user', timestamp]
+                );
+            } catch (_) {}
+        }
+
+        const [result]: any = await db.query(
+            `INSERT INTO \`jbac_prayer_requests\` (\`user_id\`, \`user_name\`, \`request\`, \`timestamp\`, \`status\`)
+             VALUES (?, ?, ?, ?, ?)`,
+            [userId, userName, requestText, timestamp, status]
+        );
+
+        res.json({
+            status: 200,
+            data: {
+                id: result.insertId,
+                userId,
+                user_id: userId,
+                userName,
+                user_name: userName,
+                request: requestText,
+                timestamp,
+                status
+            },
+            message: 'Prayer request submitted successfully'
+        });
+    } catch (err: any) {
+        console.error('Error posting prayer request:', err);
+        res.status(500).json({ status: 500, message: err.message || 'Error submitting prayer request' });
+    }
+});
+
+// 9. Get Prayer Requests
+app.all(['/dashboardapi/getprayers', '/api/getprayers', '/dashboardapi/prayers', '/api/prayers'], async (req: any, res: any) => {
+    try {
+        const userId = req.query?.userId || req.query?.user_id || req.body?.userId || req.body?.user_id;
+        let query = 'SELECT * FROM `jbac_prayer_requests`';
+        const params: any[] = [];
+        if (userId) {
+            query += ' WHERE `user_id` = ?';
+            params.push(String(userId).trim());
+        }
+        query += ' ORDER BY `timestamp` DESC, `id` DESC';
+
+        const [rows]: any = await db.query(query, params);
+        const formatted = (rows || []).map((r: any) => ({
+            id: r.id,
+            userId: r.user_id,
+            user_id: r.user_id,
+            userName: r.user_name,
+            user_name: r.user_name,
+            request: r.request,
+            timestamp: r.timestamp ? Number(r.timestamp) : (r.created_at ? new Date(r.created_at).getTime() : Date.now()),
+            status: r.status,
+            created_at: r.created_at
+        }));
+
+        res.json({ status: 200, data: formatted, message: 'Success' });
+    } catch (err: any) {
+        console.error('Error fetching prayer requests:', err);
+        res.status(500).json({ status: 500, message: err.message || 'Error fetching prayer requests' });
+    }
+});
+
+// 10. Post Chat Message
+app.post(['/dashboardapi/postchats', '/api/postchats'], async (req: any, res: any) => {
+    try {
+        const b = req.body || {};
+        const senderId = String(b.senderId || b.sender_id || '').trim();
+        const receiverId = String(b.receiverId || b.receiver_id || '').trim();
+        const message = String(b.message || '').trim();
+        const timestamp = b.timestamp ? Number(b.timestamp) : Date.now();
+
+        if (!senderId || !receiverId || !message) {
+            return res.status(400).json({ status: 400, message: 'senderId, receiverId and message are required' });
+        }
+
+        try {
+            await db.query(
+                'INSERT IGNORE INTO `jbac_users` (`uid`, `email`, `role`, `timestamp`) VALUES (?, ?, ?, ?)',
+                [senderId, `${senderId}@jbac.in`, 'user', timestamp]
+            );
+            await db.query(
+                'INSERT IGNORE INTO `jbac_users` (`uid`, `email`, `role`, `timestamp`) VALUES (?, ?, ?, ?)',
+                [receiverId, `${receiverId}@jbac.in`, 'user', timestamp]
+            );
+        } catch (_) {}
+
+        const [result]: any = await db.query(
+            `INSERT INTO \`jbac_chat_messages\` (\`sender_id\`, \`receiver_id\`, \`message\`, \`timestamp\`, \`read_status\`)
+             VALUES (?, ?, ?, ?, 0)`,
+            [senderId, receiverId, message, timestamp]
+        );
+
+        res.json({
+            status: 200,
+            data: {
+                id: result.insertId,
+                senderId,
+                sender_id: senderId,
+                receiverId,
+                receiver_id: receiverId,
+                message,
+                timestamp,
+                readStatus: 0,
+                read_status: 0
+            },
+            message: 'Chat message sent successfully'
+        });
+    } catch (err: any) {
+        console.error('Error posting chat message:', err);
+        res.status(500).json({ status: 500, message: err.message || 'Error posting chat message' });
+    }
+});
+
+// 11. Get Chat History (Between 2 Users)
+app.all([
+    '/dashboardapi/chats/:userId1/:userId2',
+    '/api/chats/:userId1/:userId2',
+    '/dashboardapi/chats',
+    '/api/chats'
+], async (req: any, res: any) => {
+    try {
+        const p = req.params || {};
+        const q = req.query || {};
+        const b = req.body || {};
+
+        const user1 = String(p.userId1 || q.user1 || q.senderId || q.sender_id || b.user1 || b.senderId || '').trim();
+        const user2 = String(p.userId2 || q.user2 || q.receiverId || q.receiver_id || b.user2 || b.receiverId || '').trim();
+
+        if (!user1 || !user2) {
+            return res.status(400).json({ status: 400, message: 'Both user IDs are required to fetch chat history' });
+        }
+
+        const [rows]: any = await db.query(
+            `SELECT * FROM \`jbac_chat_messages\`
+             WHERE (\`sender_id\` = ? AND \`receiver_id\` = ?)
+                OR (\`sender_id\` = ? AND \`receiver_id\` = ?)
+             ORDER BY \`timestamp\` ASC, \`id\` ASC`,
+            [user1, user2, user2, user1]
+        );
+
+        const formatted = (rows || []).map((r: any) => ({
+            id: r.id,
+            senderId: r.sender_id,
+            sender_id: r.sender_id,
+            receiverId: r.receiver_id,
+            receiver_id: r.receiver_id,
+            message: r.message,
+            timestamp: r.timestamp ? Number(r.timestamp) : (r.created_at ? new Date(r.created_at).getTime() : Date.now()),
+            readStatus: r.read_status || 0,
+            read_status: r.read_status || 0,
+            created_at: r.created_at
+        }));
+
+        res.json({ status: 200, data: formatted, message: 'Success' });
+    } catch (err: any) {
+        console.error('Error fetching chat messages:', err);
+        res.status(500).json({ status: 500, message: err.message || 'Error fetching chat messages' });
+    }
+});
+
 
 app.get('/', (_req, res) => {
     res.json({

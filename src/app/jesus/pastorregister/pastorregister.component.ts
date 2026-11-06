@@ -410,6 +410,9 @@ godOptions: string[] = [
       this.logincon = true;
     } else {
       this.logincon = false;
+      if (this.pastorform) {
+        this.pastorform.patchValue({ state_id: '' });
+      }
     }
   }
 

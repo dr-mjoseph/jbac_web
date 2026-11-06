@@ -827,7 +827,8 @@ app.get(['/dashboardapi/admin-dashboard-stats', '/api/admin-dashboard-stats', '/
                 try {
                     const [r2] = await db.query(`SELECT COUNT(*) as cnt FROM \`${tbl}\` ${baseWhere ? baseWhere.trim() : ''}`);
                     return r2 && r2[0] ? Number(r2[0].cnt) : 0;
-                } catch (e2) {
+                }
+                catch (e2) {
                     return 0;
                 }
             }
@@ -860,19 +861,19 @@ app.get(['/dashboardapi/admin-dashboard-stats', '/api/admin-dashboard-stats', '/
                     let fallbackWhere = baseWhere ? `${baseWhere.trim()} AND ${dateCondition}` : `WHERE ${dateCondition}`;
                     const [r2] = await db.query(`SELECT COUNT(*) as cnt FROM \`${tbl}\` ${fallbackWhere}`);
                     return r2 && r2[0] ? Number(r2[0].cnt) : 0;
-                } catch (e2) {
+                }
+                catch (e2) {
                     return 0;
                 }
             }
         }
-        const [believers, believers_today, pastors, pastors_today, churches, churches_today, students, students_today, ministries, ministries_today, organisations, organisations_today, pastor_associations, pastor_associations_today, events_active, events_today, events_total, users, users_today] = await Promise.all([
+        const [believers, believers_today, pastors, pastors_today, churches, churches_today, students, students_today, ministries, ministries_today, organisations, organisations_today, events_active, events_today, events_total, users, users_today] = await Promise.all([
             getCount('signup_form'), getTodayCount('signup_form'),
             getCount('pastor_reg'), getTodayCount('pastor_reg'),
             getCount('church_reg'), getTodayCount('church_reg'),
             getCount('student_reg'), getTodayCount('student_reg'),
             getCount('ministry_signup'), getTodayCount('ministry_signup'),
             getCount('independentorganisation_reg'), getTodayCount('independentorganisation_reg'),
-            getCount('pastors_associations'), getTodayCount('pastors_associations'),
             getCount('events', "WHERE d_in = 0 OR d_in IS NULL"), getTodayCount('events'),
             getCount('events'),
             getCount('users'), getTodayCount('users')
@@ -895,8 +896,6 @@ app.get(['/dashboardapi/admin-dashboard-stats', '/api/admin-dashboard-stats', '/
                 ministries_today,
                 organisations,
                 organisations_today,
-                pastor_associations,
-                pastor_associations_today,
                 events_active,
                 events_today,
                 events_total,
@@ -3034,14 +3033,17 @@ app.all(['/dashboardapi/updateconsis', '/dashboardapi/updateconsis/:id', '/api/u
         if (id) {
             if (tableId === 1) {
                 await db.query('UPDATE signup_form SET approval_ind = 1 WHERE id = ?', [id]);
-            } else if (tableId === 2) {
+            }
+            else if (tableId === 2) {
                 await db.query('UPDATE student_reg SET approval_ind = 1 WHERE id = ?', [id]);
-            } else if (tableId === 3) {
+            }
+            else if (tableId === 3) {
                 await db.query('UPDATE pastor_reg SET approval_ind = 1 WHERE id = ?', [id]);
-            } else {
-                await db.query('UPDATE signup_form SET approval_ind = 1 WHERE id = ?', [id]).catch(() => {});
-                await db.query('UPDATE student_reg SET approval_ind = 1 WHERE id = ?', [id]).catch(() => {});
-                await db.query('UPDATE pastor_reg SET approval_ind = 1 WHERE id = ?', [id]).catch(() => {});
+            }
+            else {
+                await db.query('UPDATE signup_form SET approval_ind = 1 WHERE id = ?', [id]).catch(() => { });
+                await db.query('UPDATE student_reg SET approval_ind = 1 WHERE id = ?', [id]).catch(() => { });
+                await db.query('UPDATE pastor_reg SET approval_ind = 1 WHERE id = ?', [id]).catch(() => { });
             }
         }
         res.json({ status: 200, message: 'Leader approved successfully' });
@@ -3776,14 +3778,17 @@ app.all(['/dashboardapi/deleteboardmember', '/api/deleteboardmember', '/api/reje
         if (id) {
             if (tableId === 1) {
                 await db.query('UPDATE signup_form SET approval_ind = 2 WHERE id = ?', [id]);
-            } else if (tableId === 2) {
+            }
+            else if (tableId === 2) {
                 await db.query('UPDATE student_reg SET approval_ind = 2 WHERE id = ?', [id]);
-            } else if (tableId === 3) {
+            }
+            else if (tableId === 3) {
                 await db.query('UPDATE pastor_reg SET approval_ind = 2 WHERE id = ?', [id]);
-            } else {
-                await db.query('UPDATE signup_form SET approval_ind = 2 WHERE id = ?', [id]).catch(() => {});
-                await db.query('UPDATE student_reg SET approval_ind = 2 WHERE id = ?', [id]).catch(() => {});
-                await db.query('UPDATE pastor_reg SET approval_ind = 2 WHERE id = ?', [id]).catch(() => {});
+            }
+            else {
+                await db.query('UPDATE signup_form SET approval_ind = 2 WHERE id = ?', [id]).catch(() => { });
+                await db.query('UPDATE student_reg SET approval_ind = 2 WHERE id = ?', [id]).catch(() => { });
+                await db.query('UPDATE pastor_reg SET approval_ind = 2 WHERE id = ?', [id]).catch(() => { });
             }
             await db.query('DELETE FROM wingleader WHERE id = ?', [id]).catch(() => { });
         }
@@ -3854,7 +3859,6 @@ const WING_CATALOG = [
     { id: 22, telugu: 'పొలిటికల్ వింగ్', english: 'Political Wing', terms: ['political', 'politics', 'పొలిటికల్'] },
     { id: 23, telugu: 'ఇతర వింగ్స్', english: 'Other Wings', terms: ['other', 'ఇతర'] },
 ];
-
 function resolveWingCategory(rawVal) {
     if (rawVal === null || rawVal === undefined || rawVal === '' || rawVal === 'null' || rawVal === 'undefined') {
         return null;
@@ -3863,7 +3867,8 @@ function resolveWingCategory(rawVal) {
     const num = Number(rawVal);
     if (!isNaN(num) && num >= 1 && num <= 23) {
         const found = WING_CATALOG.find(w => w.id === num);
-        if (found) return found;
+        if (found)
+            return found;
     }
     for (const w of WING_CATALOG) {
         if (str === String(w.id) || str === w.telugu.toLowerCase() || str === w.english.toLowerCase()) {
@@ -3880,9 +3885,9 @@ function resolveWingCategory(rawVal) {
     }
     return null;
 }
-
 function getWingMatchSql(prefix, wing) {
-    if (!wing) return '';
+    if (!wing)
+        return '';
     const id = wing.id;
     const telugu = wing.telugu;
     const conds = [
@@ -3899,8 +3904,6 @@ function getWingMatchSql(prefix, wing) {
     }
     return `(${conds.join(' OR ')})`;
 }
-
-
 // -------------------------------------------------------------------------
 // CANONICAL 6-TIER LEADERSHIP HIERARCHY & UNIVERSAL QUERY HELPERS
 // Doc Level 1: రాష్ట్ర నాయకుడు (State Leader)
@@ -3911,14 +3914,21 @@ function getWingMatchSql(prefix, wing) {
 // Doc Level 6: వార్డు నాయకుడు (Ward Leader)
 // -------------------------------------------------------------------------
 function getCanonicalLevel(val, isStudent = false) {
-    if (val === null || val === undefined || val === '') return null;
+    if (val === null || val === undefined || val === '')
+        return null;
     const str = String(val).trim().toLowerCase();
-    if (!isStudent && (str === '0' || str.includes('state') || str.includes('రాష్ట్ర'))) return 1;
-    if (str.includes('dist') || str.includes('జిల్లా')) return 2;
-    if (str.includes('const') || str.includes('నియోజకవర్గ')) return 3;
-    if (str.includes('mandal') || str.includes('municip') || str.includes('మండల')) return 4;
-    if (str.includes('panchayat') || str.includes('village') || str.includes('పంచాయతి') || str.includes('గ్రామ')) return 5;
-    if (str.includes('ward') || str.includes('వార్డు')) return 6;
+    if (!isStudent && (str === '0' || str.includes('state') || str.includes('రాష్ట్ర')))
+        return 1;
+    if (str.includes('dist') || str.includes('జిల్లా'))
+        return 2;
+    if (str.includes('const') || str.includes('నియోజకవర్గ'))
+        return 3;
+    if (str.includes('mandal') || str.includes('municip') || str.includes('మండల'))
+        return 4;
+    if (str.includes('panchayat') || str.includes('village') || str.includes('పంచాయతి') || str.includes('గ్రామ'))
+        return 5;
+    if (str.includes('ward') || str.includes('వార్డు'))
+        return 6;
     const num = Number(val);
     if (!isNaN(num)) {
         if (isStudent) {
@@ -3928,31 +3938,42 @@ function getCanonicalLevel(val, isStudent = false) {
             // 3: Mandal Level (Canonical 4)
             // 4: Panchayat Level (Canonical 5)
             // 5: Ward / Sub-Ward Level (Canonical 6)
-            if (num === 1) return 2;
-            if (num === 2) return 3;
-            if (num === 3) return 4;
-            if (num === 4) return 5;
-            if (num >= 5) return 6;
-        } else {
-            if (num === 0) return 1;
-            if (num === 1) return 2;
-            if (num === 2) return 3;
-            if (num === 3) return 4;
-            if (num === 4) return 5;
-            if (num === 5 || num === 6) return 6;
+            if (num === 1)
+                return 2;
+            if (num === 2)
+                return 3;
+            if (num === 3)
+                return 4;
+            if (num === 4)
+                return 5;
+            if (num >= 5)
+                return 6;
+        }
+        else {
+            if (num === 0)
+                return 1;
+            if (num === 1)
+                return 2;
+            if (num === 2)
+                return 3;
+            if (num === 3)
+                return 4;
+            if (num === 4)
+                return 5;
+            if (num === 5 || num === 6)
+                return 6;
         }
     }
     return null;
 }
-
 function parseLeadershipLevel(val) {
     const canonical = getCanonicalLevel(val);
-    if (canonical === null) return null;
+    if (canonical === null)
+        return null;
     // Map canonical (1-6) to internal 0-indexed representation for client compatibility:
     // State: 0, District: 1, Constituency: 2, Mandal: 3, Panchayat: 4, Ward: 5
     return canonical === 1 ? 0 : canonical - 1;
 }
-
 function getLevelSql(prefix, targetLvl) {
     if (targetLvl === 2) {
         // District Leader
@@ -3976,16 +3997,19 @@ function getLevelSql(prefix, targetLvl) {
     }
     return '1=0';
 }
-
 function getStudentLevelSql(prefix, targetLvl) {
-    if (targetLvl === 2) return `(${prefix}generaltype IN ('District Level', '1') OR ${prefix}generaltype LIKE '%జిల్లా%')`;
-    if (targetLvl === 3) return `(${prefix}generaltype IN ('Constituency Level', 'Constituency level', '2') OR ${prefix}generaltype LIKE '%నియోజకవర్గ%')`;
-    if (targetLvl === 4) return `(${prefix}generaltype IN ('Municipality / Mandal Level', 'Muncipality / Mandal Level', '3') OR ${prefix}generaltype LIKE '%మండల%' OR ${prefix}generaltype LIKE '%మున్సిపాలిటీ%')`;
-    if (targetLvl === 5) return `(${prefix}generaltype IN ('Ward / Panchayati Level', 'Ward / Panchayat Level', '4') OR ${prefix}generaltype LIKE '%పంచాయతి%')`;
-    if (targetLvl === 6) return `(${prefix}generaltype IN ('Ward / Sub-Ward Level', '5') OR ${prefix}generaltype LIKE '%వార్డు%')`;
-    return '1=1';
+    if (targetLvl === 2)
+        return `(${prefix}generaltype IN ('1', 'District Level') OR ${prefix}generaltype LIKE '%జిల్లా%')`;
+    if (targetLvl === 3)
+        return `(${prefix}generaltype IN ('2', 'Constituency Level', 'Constituency level') OR ${prefix}generaltype LIKE '%నియోజకవర్గ%')`;
+    if (targetLvl === 4)
+        return `(${prefix}generaltype IN ('3', 'Municipality / Mandal Level', 'Muncipality / Mandal Level', 'Mandal Level', 'Mandal') OR ${prefix}generaltype LIKE '%మండల%')`;
+    if (targetLvl === 5)
+        return `(${prefix}generaltype IN ('4', 'Ward / Panchayati Level', 'Ward / Panchaithi Level', 'Panchayati Level', 'Panchayat Level', 'Village') OR ${prefix}generaltype LIKE '%పంచాయతి%' OR ${prefix}generaltype LIKE '%గ్రామ%')`;
+    if (targetLvl === 6)
+        return `(${prefix}generaltype IN ('5', '6', 'Ward', 'Sub Ward', 'Ward / Sub-Ward Level') OR ${prefix}generaltype LIKE '%వార్డు%')`;
+    return '1=0';
 }
-
 app.all(['/dashboardapi/getLeaderswebsiteData', '/dashboardapi/getLeaderswebsitewing', '/api/leaders', '/api/getLeaderswebsiteData'], async (req, res) => {
     try {
         const b = req.body || req.query || {};
@@ -3996,16 +4020,13 @@ app.all(['/dashboardapi/getLeaderswebsiteData', '/dashboardapi/getLeaderswebsite
         let panchayatId = b.panchayat_id || b.panchayatId || b.village_id || null;
         const currentUserId = b.usr_id || b.user_id || -1;
         let isWingRequest = req.path.includes('wing') || String(b.leadertype) === '2' || Boolean(b.wingtype) || Boolean(b.wingtypes);
-
         let loggedInLeaderType = isWingRequest ? 'wing' : 'general';
         let loggedInCanonicalLevel = null;
         let leaderWing = null;
         let loggedInRole = null;
-
         // 1. Session Parameter Binding: Fetch authoritative leader level & locations directly from DB
         const reqUserTypeEarly = String(b.user_type || b.selected_user_type || '').toLowerCase().trim();
         const reqCatIdEarly = String(b.category_id || b.category || '').trim();
-
         if (currentUserId && currentUserId !== -1) {
             const checkStudent = async () => {
                 const [st] = await db.query('SELECT id, leadership, leadertype, generaltype, wingtype, district_id, constituency_id, mandal_id, village_id, state_id, d_in, approval_ind FROM student_reg WHERE id = ?', [currentUserId]);
@@ -4015,17 +4036,22 @@ app.all(['/dashboardapi/getLeaderswebsiteData', '/dashboardapi/getLeaderswebsite
                     isWingRequest = true;
                     leaderWing = resolveWingCategory(1); // Student Wing
                     loggedInCanonicalLevel = getCanonicalLevel(st[0].generaltype, true) ?? getCanonicalLevel(st[0].wingtype, true);
-                    if (st[0].d_in == 1 && (!loggedInCanonicalLevel || loggedInCanonicalLevel > 4)) loggedInCanonicalLevel = 2; // District Leader
-                    if (st[0].district_id) districtId = st[0].district_id;
-                    if (st[0].constituency_id) constituencyId = st[0].constituency_id;
-                    if (st[0].mandal_id) mandalId = st[0].mandal_id;
-                    if (st[0].village_id) panchayatId = st[0].village_id;
-                    if (st[0].state_id) stateId = st[0].state_id;
+                    if (st[0].d_in == 1 && (!loggedInCanonicalLevel || loggedInCanonicalLevel > 4))
+                        loggedInCanonicalLevel = 2; // District Leader
+                    if (st[0].district_id)
+                        districtId = st[0].district_id;
+                    if (st[0].constituency_id)
+                        constituencyId = st[0].constituency_id;
+                    if (st[0].mandal_id)
+                        mandalId = st[0].mandal_id;
+                    if (st[0].village_id)
+                        panchayatId = st[0].village_id;
+                    if (st[0].state_id)
+                        stateId = st[0].state_id;
                     return true;
                 }
                 return false;
             };
-
             const checkPastor = async () => {
                 const [p] = await db.query('SELECT id, leadertype, generaltype, wingtype, wingtypes, district_id, constituency_id, mandal_id, village_id, state_id, d_in, approval_ind FROM pastor_reg WHERE id = ?', [currentUserId]);
                 if (p && p[0]) {
@@ -4036,21 +4062,27 @@ app.all(['/dashboardapi/getLeaderswebsiteData', '/dashboardapi/getLeaderswebsite
                         isWingRequest = true;
                         leaderWing = pWing;
                         loggedInCanonicalLevel = getCanonicalLevel(p[0].wingtype) ?? getCanonicalLevel(p[0].generaltype);
-                    } else {
+                    }
+                    else {
                         loggedInLeaderType = 'general';
                         loggedInCanonicalLevel = getCanonicalLevel(p[0].generaltype);
                     }
-                    if (p[0].d_in == 1 && (!loggedInCanonicalLevel || loggedInCanonicalLevel > 4)) loggedInCanonicalLevel = 2; // District Leader
-                    if (p[0].district_id) districtId = p[0].district_id;
-                    if (p[0].constituency_id) constituencyId = p[0].constituency_id;
-                    if (p[0].mandal_id) mandalId = p[0].mandal_id;
-                    if (p[0].village_id) panchayatId = p[0].village_id;
-                    if (p[0].state_id) stateId = p[0].state_id;
+                    if (p[0].d_in == 1 && (!loggedInCanonicalLevel || loggedInCanonicalLevel > 4))
+                        loggedInCanonicalLevel = 2; // District Leader
+                    if (p[0].district_id)
+                        districtId = p[0].district_id;
+                    if (p[0].constituency_id)
+                        constituencyId = p[0].constituency_id;
+                    if (p[0].mandal_id)
+                        mandalId = p[0].mandal_id;
+                    if (p[0].village_id)
+                        panchayatId = p[0].village_id;
+                    if (p[0].state_id)
+                        stateId = p[0].state_id;
                     return true;
                 }
                 return false;
             };
-
             const checkBeliever = async () => {
                 const [s] = await db.query('SELECT id, leadertype, generaltype, wingtype, wingtypes, district_id, constituency_id, mandal_id, panchayat_id, state_id, d_in, approval_ind FROM signup_form WHERE id = ?', [currentUserId]);
                 if (s && s[0]) {
@@ -4060,61 +4092,74 @@ app.all(['/dashboardapi/getLeaderswebsiteData', '/dashboardapi/getLeaderswebsite
                         loggedInLeaderType = 'wing';
                         isWingRequest = true;
                         leaderWing = sWing;
-                        loggedInCanonicalLevel = getCanonicalLevel(s[0].wingtype) ?? getCanonicalLevel(s[0].generaltype);
-                    } else {
+                        loggedInCanonicalLevel = getCanonicalLevel(s[0].generaltype) ?? getCanonicalLevel(s[0].wingtype);
+                    }
+                    else {
                         loggedInLeaderType = 'general';
                         loggedInCanonicalLevel = getCanonicalLevel(s[0].generaltype);
                     }
-                    if (s[0].d_in == 1 && (!loggedInCanonicalLevel || loggedInCanonicalLevel > 4)) loggedInCanonicalLevel = 2; // District Leader
-                    if (s[0].district_id) districtId = s[0].district_id;
-                    if (s[0].constituency_id) constituencyId = s[0].constituency_id;
-                    if (s[0].mandal_id) mandalId = s[0].mandal_id;
-                    if (s[0].panchayat_id) panchayatId = s[0].panchayat_id;
-                    if (s[0].state_id) stateId = s[0].state_id;
+                    if (s[0].d_in == 1 && (!loggedInCanonicalLevel || loggedInCanonicalLevel > 4))
+                        loggedInCanonicalLevel = 2; // District Leader
+                    if (s[0].district_id)
+                        districtId = s[0].district_id;
+                    if (s[0].constituency_id)
+                        constituencyId = s[0].constituency_id;
+                    if (s[0].mandal_id)
+                        mandalId = s[0].mandal_id;
+                    if (s[0].panchayat_id)
+                        panchayatId = s[0].panchayat_id;
+                    if (s[0].state_id)
+                        stateId = s[0].state_id;
                     return true;
                 }
                 return false;
             };
-
             // Table priority based on requested role/category to avoid ID collision across tables
             if (reqCatIdEarly === '2' || reqUserTypeEarly === 'student') {
                 const ok = await checkStudent();
                 if (!ok) {
                     const okP = await checkPastor();
-                    if (!okP) await checkBeliever();
+                    if (!okP)
+                        await checkBeliever();
                 }
-            } else if (reqCatIdEarly === '4' || reqCatIdEarly === '3' || reqUserTypeEarly === 'pastor') {
+            }
+            else if (reqCatIdEarly === '4' || reqCatIdEarly === '3' || reqUserTypeEarly === 'pastor') {
                 const ok = await checkPastor();
                 if (!ok) {
                     const okB = await checkBeliever();
-                    if (!okB) await checkStudent();
+                    if (!okB)
+                        await checkStudent();
                 }
-            } else if (reqCatIdEarly === '1' || reqUserTypeEarly === 'believer') {
+            }
+            else if (reqCatIdEarly === '1' || reqUserTypeEarly === 'believer') {
                 const ok = await checkBeliever();
                 if (!ok) {
                     const okP = await checkPastor();
-                    if (!okP) await checkStudent();
+                    if (!okP)
+                        await checkStudent();
                 }
-            } else {
-                const okP = await checkPastor();
-                if (!okP) {
+            }
+            else {
+                const ok = await checkPastor();
+                if (!ok) {
                     const okB = await checkBeliever();
-                    if (!okB) await checkStudent();
+                    if (!okB)
+                        await checkStudent();
                 }
             }
         }
-
         // If not resolved from DB, check request body
         if (loggedInCanonicalLevel === null) {
             if (b.logged_in_level_id !== undefined) {
                 loggedInCanonicalLevel = Number(b.logged_in_level_id);
-            } else if (b.generaltype !== undefined || b.generalType !== undefined) {
+            }
+            else if (b.generaltype !== undefined || b.generalType !== undefined) {
                 loggedInCanonicalLevel = getCanonicalLevel(b.generaltype !== undefined ? b.generaltype : b.generalType);
-            } else {
+            }
+            else {
                 loggedInCanonicalLevel = 2; // Default to District level
             }
         }
-
         if (!leaderWing && (b.wingtypes || b.wingtype)) {
             leaderWing = resolveWingCategory(b.wingtypes) || resolveWingCategory(b.wingtype);
             if (leaderWing) {
@@ -4122,38 +4167,38 @@ app.all(['/dashboardapi/getLeaderswebsiteData', '/dashboardapi/getLeaderswebsite
                 isWingRequest = true;
             }
         }
-
         // 1.5 USER TYPE ISOLATION: Filter out requests belonging to other user types
         let targetUserType = null;
         const reqUserType = String(b.user_type || b.selected_user_type || '').toLowerCase().trim();
         const reqCatId = String(b.category_id || b.category || '').trim();
-
         if (reqUserType === 'pastor' || reqCatId === '4' || reqCatId === '3') {
             targetUserType = 'pastor';
-        } else if (reqUserType === 'student' || reqCatId === '2') {
+        }
+        else if (reqUserType === 'student' || reqCatId === '2') {
             targetUserType = 'student';
-        } else if (reqUserType === 'believer' || reqCatId === '1') {
+        }
+        else if (reqUserType === 'believer' || reqCatId === '1') {
             targetUserType = 'believer';
-        } else if (reqUserType === 'all') {
+        }
+        else if (reqUserType === 'all') {
             targetUserType = 'all';
-        } else if (loggedInRole) {
+        }
+        else if (loggedInRole) {
             targetUserType = loggedInRole;
         }
-
         // 2. UNIVERSAL SQL QUERY: Targets the immediate level below (:logged_in_level_id + 1)
         const targetLevel = loggedInCanonicalLevel + 1;
-
         // 3. LEADER TYPE ISOLATION (general vs wing)
         let bLeaderTypeSql = '';
         let pLeaderTypeSql = '';
         let sLeaderTypeSql = '';
-
         if (loggedInLeaderType === 'general') {
             // General leader only sees general records (wingtype/wingtypes null, leadertype != 2)
             bLeaderTypeSql = `(COALESCE(s.leadertype, '1') != '2' AND (s.wingtypes IS NULL OR s.wingtypes IN ('', 'null', 'undefined')))`;
             pLeaderTypeSql = `(COALESCE(pr.leadertype, '1') != '2' AND (pr.wingtypes IS NULL OR pr.wingtypes IN ('', 'null', 'undefined')))`;
             sLeaderTypeSql = `1=1`;
-        } else {
+        }
+        else {
             // Wing leader only sees wing records of the EXACT SAME wing category
             const bWingSql = getWingMatchSql('s.', leaderWing);
             const pWingSql = getWingMatchSql('pr.', leaderWing);
@@ -4161,150 +4206,135 @@ app.all(['/dashboardapi/getLeaderswebsiteData', '/dashboardapi/getLeaderswebsite
             pLeaderTypeSql = `(pr.leadertype = '2' OR pr.leadertype = 2) AND ${pWingSql}`;
             sLeaderTypeSql = (leaderWing && leaderWing.id === 1) ? `1=1` : `1=0`;
         }
-
         // 4. LEVEL & GEOGRAPHIC SCOPING (Universal Query across all 6 tiers)
         let bGeoSql = '';
         let pGeoSql = '';
         let sGeoSql = '';
         let queryParams = [];
-
         if (loggedInCanonicalLevel === 1) {
             // Level 1 (రాష్ట్ర నాయకుడు) viewing Level 2 (జిల్లా నాయకుడు)
             bGeoSql = `(s.state_id = ? OR s.state_id IS NULL)`;
             pGeoSql = `(pr.state_id = ? OR pr.state_id IS NULL)`;
             sGeoSql = `(st.state_id = ? OR st.state_id IS NULL)`;
             queryParams = [stateId];
-        } else if (loggedInCanonicalLevel === 2) {
+        }
+        else if (loggedInCanonicalLevel === 2) {
             // Level 2 (జిల్లా నాయకుడు) viewing Level 3 (నియోజకవర్గం నాయకుడు)
             bGeoSql = `s.district_id = ?`;
             pGeoSql = `pr.district_id = ?`;
             sGeoSql = `st.district_id = ?`;
             queryParams = [districtId];
-        } else if (loggedInCanonicalLevel === 3) {
+        }
+        else if (loggedInCanonicalLevel === 3) {
             // Level 3 (నియోజకవర్గం నాయకుడు) viewing Level 4 (మండల నాయకుడు)
             bGeoSql = `s.constituency_id = ? AND (s.district_id = ? OR ? IS NULL)`;
             pGeoSql = `pr.constituency_id = ? AND (pr.district_id = ? OR ? IS NULL)`;
             sGeoSql = `st.constituency_id = ? AND (st.district_id = ? OR ? IS NULL)`;
             queryParams = [constituencyId, districtId, districtId];
-        } else if (loggedInCanonicalLevel === 4) {
+        }
+        else if (loggedInCanonicalLevel === 4) {
             // Level 4 (మండల నాయకుడు) viewing Level 5 (పంచాయతి నాయకుడు)
             bGeoSql = `s.mandal_id = ? AND (s.constituency_id = ? OR ? IS NULL)`;
             pGeoSql = `pr.mandal_id = ? AND (pr.constituency_id = ? OR ? IS NULL)`;
             sGeoSql = `st.mandal_id = ? AND (st.constituency_id = ? OR ? IS NULL)`;
             queryParams = [mandalId, constituencyId, constituencyId];
-        } else if (loggedInCanonicalLevel === 5) {
+        }
+        else if (loggedInCanonicalLevel === 5) {
             // Level 5 (పంచాయతి నాయకుడు) viewing Level 6 (వార్డు నాయకుడు)
             bGeoSql = `s.panchayat_id = ? AND (s.mandal_id = ? OR ? IS NULL)`;
             pGeoSql = `pr.village_id = ? AND (pr.mandal_id = ? OR ? IS NULL)`;
             sGeoSql = `st.village_id = ? AND (st.mandal_id = ? OR ? IS NULL)`;
             queryParams = [panchayatId, mandalId, mandalId];
-        } else {
+        }
+        else {
             // Level 6 (వార్డు నాయకుడు) - no tier below
             bGeoSql = `1=0`;
             pGeoSql = `1=0`;
             sGeoSql = `1=0`;
             queryParams = [];
         }
-
         const bLevelSql = getLevelSql('s.', targetLevel);
         const pLevelSql = getLevelSql('pr.', targetLevel);
         const sLevelSql = getStudentLevelSql('st.', targetLevel);
-
         // Exclude rejected leaders (approval_ind == 2) and exclude current logged in leader themselves
         const bFullWhere = `${bGeoSql} AND ${bLevelSql} AND ${bLeaderTypeSql} AND COALESCE(s.approval_ind, 0) != 2 AND s.id != ?`;
         const pFullWhere = `${pGeoSql} AND ${pLevelSql} AND ${pLeaderTypeSql} AND COALESCE(pr.approval_ind, 0) != 2 AND pr.id != ?`;
         const sFullWhere = `${sGeoSql} AND ${sLevelSql} AND ${sLeaderTypeSql} AND COALESCE(st.approval_ind, 0) != 2 AND st.id != ?`;
-
-        let believers = [];
-        let pastors = [];
+        const [believers] = await db.query(`
+            SELECT s.id, s.fname, s.lname, s.mobile_number, s.generaltype, s.leadership, s.leadertype,
+                   s.wingtype, s.wingtypes, s.wardnumber, s.subward,
+                   s.approval_ind, s.district_id, s.constituency_id, s.mandal_id, s.panchayat_id,
+                   s.address, s.nativeplace, s.villagename,
+                   COALESCE(c.const_nm, '') as constituency_name,
+                   COALESCE(m.mndl_nm, '') as mandal_name,
+                   COALESCE(p.pnchyt_nm, '') as panchayat_name,
+                   COALESCE(w.position, w.wing_name, '') as wing_name
+            FROM signup_form s
+            LEFT JOIN const_dtl_t c ON s.constituency_id = c.id
+            LEFT JOIN mndls_lst_t m ON s.mandal_id = m.id
+            LEFT JOIN pnchyt_lst_t p ON s.panchayat_id = p.id
+            LEFT JOIN wings w ON w.id = COALESCE(NULLIF(s.wingtypes, ''), s.wingtype)
+            WHERE ${bFullWhere}
+            GROUP BY s.id
+            ORDER BY s.id DESC
+        `, [...queryParams, currentUserId]);
+        const [pastors] = await db.query(`
+            SELECT pr.id, pr.pastorname, pr.phonenumber, pr.generaltype, pr.leadership, pr.leadertype,
+                   pr.wingtype, pr.wingtypes, pr.subward,
+                   pr.approval_ind, pr.district_id, pr.constituency_id, pr.mandal_id, pr.village_id,
+                   pr.address, pr.nativeplace, pr.villagename,
+                   COALESCE(c.const_nm, '') as constituency_name,
+                   COALESCE(m.mndl_nm, '') as mandal_name,
+                   COALESCE(p.pnchyt_nm, '') as panchayat_name,
+                   COALESCE(w.position, w.wing_name, '') as wing_name
+            FROM pastor_reg pr
+            LEFT JOIN const_dtl_t c ON pr.constituency_id = c.id
+            LEFT JOIN mndls_lst_t m ON pr.mandal_id = m.id
+            LEFT JOIN pnchyt_lst_t p ON pr.village_id = p.id
+            LEFT JOIN wings w ON w.id = COALESCE(NULLIF(pr.wingtypes, ''), pr.wingtype)
+            WHERE ${pFullWhere}
+            GROUP BY pr.id
+            ORDER BY pr.id DESC
+        `, [...queryParams, currentUserId]);
         let students = [];
-
-        // Query Believers only if targetUserType is believer or all
-        if (!targetUserType || targetUserType === 'believer' || targetUserType === 'all') {
-            const [bRows] = await db.query(`
-                SELECT s.id, s.fname, s.lname, s.mobile_number, s.generaltype, s.leadership, s.leadertype,
-                       s.wingtype, s.wingtypes, s.wardnumber, s.subward,
-                       s.approval_ind, s.district_id, s.constituency_id, s.mandal_id, s.panchayat_id,
-                       s.address, s.nativeplace, s.villagename,
+        if (loggedInLeaderType === 'general' || (leaderWing && leaderWing.id === 1)) {
+            const [stRows] = await db.query(`
+                SELECT st.id, st.studentname as fname, '' as lname, st.number as mobile_number, st.generaltype, st.leadership, st.leadertype,
+                       st.wingtype, st.wingtype as wingtypes,
+                       st.approval_ind, st.district_id, st.constituency_id, st.mandal_id, st.village_id as panchayat_id,
+                       st.address, st.nativeplace,
                        COALESCE(c.const_nm, '') as constituency_name,
                        COALESCE(m.mndl_nm, '') as mandal_name,
                        COALESCE(p.pnchyt_nm, '') as panchayat_name,
-                       COALESCE(w.position, w.wing_name, '') as wing_name
-                FROM signup_form s
-                LEFT JOIN const_dtl_t c ON s.constituency_id = c.id
-                LEFT JOIN mndls_lst_t m ON s.mandal_id = m.id
-                LEFT JOIN pnchyt_lst_t p ON s.panchayat_id = p.id
-                LEFT JOIN wings w ON w.id = COALESCE(NULLIF(s.wingtypes, ''), s.wingtype)
-                WHERE ${bFullWhere}
-                GROUP BY s.id
-                ORDER BY s.id DESC
+                       'Student Wing' as wing_name
+                FROM student_reg st
+                LEFT JOIN const_dtl_t c ON st.constituency_id = c.id
+                LEFT JOIN mndls_lst_t m ON st.mandal_id = m.id
+                LEFT JOIN pnchyt_lst_t p ON st.village_id = p.id
+                WHERE ${sFullWhere}
+                ORDER BY st.id DESC
             `, [...queryParams, currentUserId]);
-            believers = bRows || [];
+            students = stRows || [];
         }
-
-        // Query Pastors only if targetUserType is pastor or all
-        if (!targetUserType || targetUserType === 'pastor' || targetUserType === 'all') {
-            const [pRows] = await db.query(`
-                SELECT pr.id, pr.pastorname, pr.phonenumber, pr.generaltype, pr.leadership, pr.leadertype,
-                       pr.wingtype, pr.wingtypes, pr.subward,
-                       pr.approval_ind, pr.district_id, pr.constituency_id, pr.mandal_id, pr.village_id,
-                       pr.address, pr.nativeplace, pr.villagename,
-                       COALESCE(c.const_nm, '') as constituency_name,
-                       COALESCE(m.mndl_nm, '') as mandal_name,
-                       COALESCE(p.pnchyt_nm, '') as panchayat_name,
-                       COALESCE(w.position, w.wing_name, '') as wing_name
-                FROM pastor_reg pr
-                LEFT JOIN const_dtl_t c ON pr.constituency_id = c.id
-                LEFT JOIN mndls_lst_t m ON pr.mandal_id = m.id
-                LEFT JOIN pnchyt_lst_t p ON pr.village_id = p.id
-                LEFT JOIN wings w ON w.id = COALESCE(NULLIF(pr.wingtypes, ''), pr.wingtype)
-                WHERE ${pFullWhere}
-                GROUP BY pr.id
-                ORDER BY pr.id DESC
-            `, [...queryParams, currentUserId]);
-            pastors = pRows || [];
-        }
-
-        // Query Students only if targetUserType is student or all
-        if (!targetUserType || targetUserType === 'student' || targetUserType === 'all') {
-            if (loggedInLeaderType === 'general' || (leaderWing && leaderWing.id === 1)) {
-                const [stRows] = await db.query(`
-                    SELECT st.id, st.studentname as fname, '' as lname, st.number as mobile_number, st.generaltype, st.leadership, st.leadertype,
-                           st.wingtype, st.wingtype as wingtypes,
-                           st.approval_ind, st.district_id, st.constituency_id, st.mandal_id, st.village_id as panchayat_id,
-                           st.address, st.nativeplace,
-                           COALESCE(c.const_nm, '') as constituency_name,
-                           COALESCE(m.mndl_nm, '') as mandal_name,
-                           COALESCE(p.pnchyt_nm, '') as panchayat_name,
-                           'Student Wing' as wing_name
-                    FROM student_reg st
-                    LEFT JOIN const_dtl_t c ON st.constituency_id = c.id
-                    LEFT JOIN mndls_lst_t m ON st.mandal_id = m.id
-                    LEFT JOIN pnchyt_lst_t p ON st.village_id = p.id
-                    WHERE ${sFullWhere}
-                    ORDER BY st.id DESC
-                `, [...queryParams, currentUserId]);
-                students = stRows || [];
-            }
-        }
-
         // Fetch constituencies for this district if applicable
         const [constituencies] = await db.query('SELECT id, const_nm FROM const_dtl_t WHERE dstrct_id = ? AND d_in = 0', [districtId || 0]);
-
         if (isWingRequest) {
             return res.json({ status: 200, data: [believers, students, pastors], selected_user_type: targetUserType });
-        } else {
+        }
+        else {
             return res.json({ status: 200, data: [believers, constituencies, pastors, students], selected_user_type: targetUserType });
         }
-    } catch (err) {
+    }
+    catch (err) {
         res.status(500).json({ status: 500, error: err.message });
     }
 });
-
+// =========================================================================
+// ADMIN STATE-WISE DISTRICT LEADERS (ALL) & MANAGEMENT ENDPOINTS
+// =========================================================================
 app.all(['/dashboardapi/admin-district-leaders', '/api/admin-district-leaders'], async (req, res) => {
     try {
         const filterState = String(req.query.state_id || req.body?.state_id || '').trim();
-
         // 1. Query Pastors
         const [pastors] = await db.query(`
             SELECT p.id, p.pastorname as name, p.phonenumber as mobile, p.state_id, p.district_id, 
@@ -4324,7 +4354,6 @@ app.all(['/dashboardapi/admin-district-leaders', '/api/admin-district-leaders'],
                OR (p.leadertype = 2 AND (p.wingtype IN ('1', 'District Level') OR p.wingtype LIKE '%జిల్లా%'))
             ORDER BY p.id DESC
         `);
-
         // 2. Query Believers
         const [believers] = await db.query(`
             SELECT s.id, CONCAT(COALESCE(s.fname, ''), ' ', COALESCE(s.lname, '')) as name, 
@@ -4345,7 +4374,6 @@ app.all(['/dashboardapi/admin-district-leaders', '/api/admin-district-leaders'],
                OR (s.leadertype = 2 AND (s.wingtype IN ('1', 'District Level') OR s.wingtype LIKE '%జిల్లా%'))
             ORDER BY s.id DESC
         `);
-
         // 3. Query Students
         const [students] = await db.query(`
             SELECT st.id, st.studentname as name, st.number as mobile, st.state_id, st.district_id,
@@ -4364,16 +4392,15 @@ app.all(['/dashboardapi/admin-district-leaders', '/api/admin-district-leaders'],
                OR (st.leadertype = 2 AND (st.wingtype IN ('1', 'District Level') OR st.wingtype LIKE '%జిల్లా%'))
             ORDER BY st.id DESC
         `);
-
         let allLeaders = [...pastors, ...believers, ...students].map((item) => {
             let effectiveState = item.state_id || 1;
             const distId = Number(item.district_id);
-            if (distId >= 31 && distId <= 63) effectiveState = 2;
-            else if (distId >= 5 && distId <= 30) effectiveState = 1;
-
+            if (distId >= 31 && distId <= 63)
+                effectiveState = 2;
+            else if (distId >= 5 && distId <= 30)
+                effectiveState = 1;
             let wObj = resolveWingCategory(item.wingtypes) || resolveWingCategory(item.wingtype);
             const wingName = wObj ? wObj.telugu : (item.category === 'student' ? 'స్టూడెంట్ వింగ్' : '');
-
             return {
                 ...item,
                 wing_name: wingName,
@@ -4384,13 +4411,12 @@ app.all(['/dashboardapi/admin-district-leaders', '/api/admin-district-leaders'],
                 is_pending: item.approval_ind != 1 && item.approval_ind != 2 && item.d_in != 1
             };
         });
-
         if (filterState === '1') {
             allLeaders = allLeaders.filter((x) => x.state_id === 1);
-        } else if (filterState === '2') {
+        }
+        else if (filterState === '2') {
             allLeaders = allLeaders.filter((x) => x.state_id === 2);
         }
-
         const summary = {
             total: allLeaders.length,
             ap: allLeaders.filter((x) => x.state_id === 1).length,
@@ -4402,13 +4428,12 @@ app.all(['/dashboardapi/admin-district-leaders', '/api/admin-district-leaders'],
             believers: allLeaders.filter((x) => x.category === 'believer').length,
             students: allLeaders.filter((x) => x.category === 'student').length
         };
-
         res.json({ status: 200, data: allLeaders, summary });
-    } catch (err) {
+    }
+    catch (err) {
         res.status(500).json({ status: 500, error: err.message });
     }
 });
-
 app.all(['/dashboardapi/admin-update-district-leader', '/api/admin-update-district-leader'], async (req, res) => {
     try {
         const b = req.body || {};
@@ -4417,18 +4442,18 @@ app.all(['/dashboardapi/admin-update-district-leader', '/api/admin-update-distri
         const action = String(b.action || '').trim().toLowerCase(); // 'approve', 'reject', 'reset'
         let approvalInd = b.approval_ind !== undefined ? Number(b.approval_ind) : 0;
         let dIn = b.d_in !== undefined ? Number(b.d_in) : 0;
-
         if (action === 'approve') {
             approvalInd = 1;
             dIn = 1;
-        } else if (action === 'reject') {
+        }
+        else if (action === 'reject') {
             approvalInd = 2;
             dIn = 0;
-        } else if (action === 'reset') {
+        }
+        else if (action === 'reset') {
             approvalInd = 0;
             dIn = 0;
         }
-
         const validTables = ['pastor_reg', 'signup_form', 'student_reg'];
         if (!validTables.includes(table)) {
             return res.status(400).json({ status: 400, error: 'Invalid leader table: ' + table });
@@ -4436,9 +4461,7 @@ app.all(['/dashboardapi/admin-update-district-leader', '/api/admin-update-distri
         if (!id) {
             return res.status(400).json({ status: 400, error: 'Missing leader id' });
         }
-
         await db.query(`UPDATE \`${table}\` SET approval_ind = ?, d_in = ? WHERE id = ?`, [approvalInd, dIn, id]);
-
         res.json({
             status: 200,
             message: `Leader ${action || 'updated'} successfully`,
@@ -4447,11 +4470,11 @@ app.all(['/dashboardapi/admin-update-district-leader', '/api/admin-update-distri
             approval_ind: approvalInd,
             d_in: dIn
         });
-    } catch (err) {
+    }
+    catch (err) {
         res.status(500).json({ status: 500, error: err.message });
     }
 });
-
 app.all(['/dashboardapi/postwishform', '/api/postwishform'], async (req, res) => {
     try {
         const w = req.body;
@@ -4601,23 +4624,23 @@ app.all(['/dashboardapi/getUserMainData', '/dashboardapi/getUserMainData/:id', '
         const phone = b.mobile_number || b.phonenumber || b.number || '';
         const cat = String(b.category || b.category_id || '').trim();
         let matchedLeader = null;
-
         const resolveLeader = (u, role) => {
-            if (!u) return null;
+            if (!u)
+                return null;
             const isWingLeader = String(u.leadertype) === '2' || Boolean(u.wingtypes && u.wingtypes !== 'null' && u.wingtypes !== 'undefined') || (role === 'pastor' && Boolean(u.wingtype && u.wingtype !== 'null' && String(u.wingtype).trim() !== '' && String(u.leadertype) === '2'));
             let canonicalLvl = null;
             if (role === 'pastor') {
                 canonicalLvl = getCanonicalLevel(u.wingtype) ?? getCanonicalLevel(u.generaltype);
-            } else if (role === 'student') {
+            }
+            else if (role === 'student') {
                 canonicalLvl = getCanonicalLevel(u.generaltype, true) ?? getCanonicalLevel(u.wingtype, true);
-            } else {
+            }
+            else {
                 canonicalLvl = getCanonicalLevel(u.generaltype);
             }
-
             if (u.d_in == 1 && (canonicalLvl === null || canonicalLvl === undefined || canonicalLvl > 4)) {
                 canonicalLvl = 2; // Default to District incharge
             }
-
             // An approved leader has d_in == 1 OR approval_ind == 1
             const isApproved = (u.d_in == 1) || (Number(u.approval_ind) === 1);
             if (isApproved && canonicalLvl !== null) {
@@ -4646,7 +4669,6 @@ app.all(['/dashboardapi/getUserMainData', '/dashboardapi/getUserMainData/:id', '
             }
             return null;
         };
-
         // 1. Search in student_reg (Student)
         if (cat === '2' || !matchedLeader) {
             const [sRows] = await db.query('SELECT id, studentname as name, number as mobile_number, leadership, leadertype, generaltype, wingtype, district_id, constituency_id, mandal_id, village_id, state_id, d_in, approval_ind FROM student_reg WHERE (id = ? OR number = ?) LIMIT 1', [usrId || -1, phone || '']);
@@ -4680,11 +4702,11 @@ app.all(['/dashboardapi/getUserMainData', '/dashboardapi/getUserMainData/:id', '
         }
         // Not approved as a leader
         res.json({ status: 200, data: [] });
-    } catch (err) {
+    }
+    catch (err) {
         res.status(500).json({ status: 500, error: err.message });
     }
 });
-
 app.all(['/dashboardapi/postinfo', '/api/postinfo'], async (req, res) => {
     try {
         const b = req.body || {};
@@ -5306,21 +5328,19 @@ app.all(['/dashboardapi/deletecouncellingdoctor', '/api/deletecouncellingdoctor'
         res.json({ status: 200, message: 'Doctor removed successfully' });
     }
 });
-
 // ==========================================
 // ENTREPRENEUR & INVESTOR SERVICES & ADMIN APIS
 // ==========================================
-
 // 1. Business Types Dropdown Data
 app.all(['/dashboardapi/business-types', '/api/business-types', '/dashboardapi/getbusinesstypes', '/api/getbusinesstypes'], async (req, res) => {
     try {
         const [rows] = await db.query('SELECT * FROM `business_types` WHERE `d_in` = 0 AND `status` = 1 ORDER BY `id` ASC');
         res.json({ status: 200, data: rows || [], message: 'Success' });
-    } catch (err) {
+    }
+    catch (err) {
         res.json({ status: 500, message: err.message || 'Error fetching business types', data: [] });
     }
 });
-
 // Helper to resolve geographic location names
 async function resolveLocationNames(loc) {
     try {
@@ -5329,30 +5349,34 @@ async function resolveLocationNames(loc) {
         let constituency_name = loc.constituency_name || '';
         let mandal_name = loc.mandal_name || '';
         let panchayat_name = loc.panchayat_name || '';
-
         if (!state_name && loc.state_id) {
             const [rows] = await db.query('SELECT state_name FROM `states` WHERE id = ?', [loc.state_id]);
-            if (rows && rows.length > 0) state_name = rows[0].state_name;
+            if (rows && rows.length > 0)
+                state_name = rows[0].state_name;
         }
         if (!district_name && loc.district_id) {
             const [rows] = await db.query('SELECT distrct_nm FROM `dstrct` WHERE id = ?', [loc.district_id]);
-            if (rows && rows.length > 0) district_name = rows[0].distrct_nm;
+            if (rows && rows.length > 0)
+                district_name = rows[0].distrct_nm;
         }
         if (!constituency_name && loc.constituency_id) {
             const [rows] = await db.query('SELECT const_nm, name FROM `constituencies` WHERE id = ?', [loc.constituency_id]);
-            if (rows && rows.length > 0) constituency_name = rows[0].const_nm || rows[0].name;
+            if (rows && rows.length > 0)
+                constituency_name = rows[0].const_nm || rows[0].name;
         }
         if (!mandal_name && loc.mandal_id) {
             const [rows] = await db.query('SELECT mndl_nm, name FROM `mandals` WHERE id = ?', [loc.mandal_id]);
-            if (rows && rows.length > 0) mandal_name = rows[0].mndl_nm || rows[0].name;
+            if (rows && rows.length > 0)
+                mandal_name = rows[0].mndl_nm || rows[0].name;
         }
         if (!panchayat_name && loc.panchayat_id) {
             const [rows] = await db.query('SELECT pnchyt_nm, name FROM `panchayats` WHERE id = ?', [loc.panchayat_id]);
-            if (rows && rows.length > 0) panchayat_name = rows[0].pnchyt_nm || rows[0].name;
+            if (rows && rows.length > 0)
+                panchayat_name = rows[0].pnchyt_nm || rows[0].name;
         }
-
         return { state_name, district_name, constituency_name, mandal_name, panchayat_name };
-    } catch (e) {
+    }
+    catch (e) {
         return {
             state_name: loc.state_name || '',
             district_name: loc.district_name || '',
@@ -5362,7 +5386,6 @@ async function resolveLocationNames(loc) {
         };
     }
 }
-
 // 2. Register Entrepreneur
 app.all(['/dashboardapi/entrepreneur-register', '/api/entrepreneur-register', '/dashboardapi/register-entrepreneur', '/api/register-entrepreneur'], async (req, res) => {
     try {
@@ -5372,7 +5395,6 @@ app.all(['/dashboardapi/entrepreneur-register', '/api/entrepreneur-register', '/
         if (!name || !mobile) {
             return res.json({ status: 400, message: 'Name and mobile number are required. / పేరు మరియు మొబైల్ నంబర్ తప్పనిసరి.' });
         }
-
         // Resolve personal address names
         const personalLoc = await resolveLocationNames({
             state_id: b.state_id,
@@ -5386,7 +5408,6 @@ app.all(['/dashboardapi/entrepreneur-register', '/api/entrepreneur-register', '/
             mandal_name: b.mandal_name,
             panchayat_name: b.panchayat_name
         });
-
         // Resolve business location names
         const businessLoc = await resolveLocationNames({
             state_id: b.business_state_id,
@@ -5400,21 +5421,20 @@ app.all(['/dashboardapi/entrepreneur-register', '/api/entrepreneur-register', '/
             mandal_name: b.business_mandal_name,
             panchayat_name: b.business_panchayat_name
         });
-
         // Resolve business type name if needed
         let business_type = b.business_type || '';
         if (!business_type && b.business_type_id) {
             const [bRows] = await db.query('SELECT business_type FROM `business_types` WHERE id = ?', [b.business_type_id]);
-            if (bRows && bRows.length > 0) business_type = bRows[0].business_type;
+            if (bRows && bRows.length > 0)
+                business_type = bRows[0].business_type;
         }
-
         // Resolve denomination name if needed
         let denomination = b.denomination || '';
         if (!denomination && b.denomination_id) {
             const [dRows] = await db.query('SELECT denomation_name FROM `churchdenomation` WHERE id = ?', [b.denomination_id]);
-            if (dRows && dRows.length > 0) denomination = dRows[0].denomation_name;
+            if (dRows && dRows.length > 0)
+                denomination = dRows[0].denomation_name;
         }
-
         const insertSql = `
             INSERT INTO \`entrepreneur_reg\` (
                 name, mobile, email,
@@ -5427,7 +5447,6 @@ app.all(['/dashboardapi/entrepreneur-register', '/api/entrepreneur-register', '/
                 self_fund, capital_need, description
             ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         `;
-
         const params = [
             name,
             mobile,
@@ -5460,19 +5479,18 @@ app.all(['/dashboardapi/entrepreneur-register', '/api/entrepreneur-register', '/
             String(b.capital_need || ''),
             b.description || ''
         ];
-
         const [result] = await db.query(insertSql, params);
         res.json({
             status: 200,
             message: 'Entrepreneur registration submitted successfully! / మీ ఎంటర్‌ప్రెన్యూర్ వివరాలు విజయవంతంగా నమోదు చేయబడ్డాయి!',
             id: result.insertId
         });
-    } catch (err) {
+    }
+    catch (err) {
         console.error('Error in entrepreneur-register:', err);
         res.json({ status: 500, message: err.message || 'Error submitting entrepreneur registration' });
     }
 });
-
 // 3. Register Investor
 app.all(['/dashboardapi/investor-register', '/api/investor-register', '/dashboardapi/register-investor', '/api/register-investor'], async (req, res) => {
     try {
@@ -5482,7 +5500,6 @@ app.all(['/dashboardapi/investor-register', '/api/investor-register', '/dashboar
         if (!name || !mobile) {
             return res.json({ status: 400, message: 'Name and mobile number are required. / పేరు మరియు మొబైల్ నంబర్ తప్పనిసరి.' });
         }
-
         // Resolve personal address names
         const personalLoc = await resolveLocationNames({
             state_id: b.state_id,
@@ -5496,21 +5513,20 @@ app.all(['/dashboardapi/investor-register', '/api/investor-register', '/dashboar
             mandal_name: b.mandal_name,
             panchayat_name: b.panchayat_name
         });
-
         // Resolve business type name if needed
         let business_type = b.business_type || '';
         if (!business_type && b.business_type_id) {
             const [bRows] = await db.query('SELECT business_type FROM `business_types` WHERE id = ?', [b.business_type_id]);
-            if (bRows && bRows.length > 0) business_type = bRows[0].business_type;
+            if (bRows && bRows.length > 0)
+                business_type = bRows[0].business_type;
         }
-
         // Resolve denomination name if needed
         let denomination = b.denomination || '';
         if (!denomination && b.denomination_id) {
             const [dRows] = await db.query('SELECT denomation_name FROM `churchdenomation` WHERE id = ?', [b.denomination_id]);
-            if (dRows && dRows.length > 0) denomination = dRows[0].denomation_name;
+            if (dRows && dRows.length > 0)
+                denomination = dRows[0].denomation_name;
         }
-
         const insertSql = `
             INSERT INTO \`investor_reg\` (
                 name, mobile, email,
@@ -5521,7 +5537,6 @@ app.all(['/dashboardapi/investor-register', '/api/investor-register', '/dashboar
                 capital_to_invest, description
             ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         `;
-
         const params = [
             name,
             mobile,
@@ -5543,86 +5558,487 @@ app.all(['/dashboardapi/investor-register', '/api/investor-register', '/dashboar
             String(b.capital_to_invest || ''),
             b.description || ''
         ];
-
         const [result] = await db.query(insertSql, params);
         res.json({
             status: 200,
             message: 'Investor registration submitted successfully! / మీ ఇన్వెస్టర్ వివరాలు విజయవంతంగా నమోదు చేయబడ్డాయి!',
             id: result.insertId
         });
-    } catch (err) {
+    }
+    catch (err) {
         console.error('Error in investor-register:', err);
         res.json({ status: 500, message: err.message || 'Error submitting investor registration' });
     }
 });
-
 // 4. Admin List of Entrepreneurs
 app.all(['/dashboardapi/admin-entrepreneurs', '/api/admin-entrepreneurs'], async (req, res) => {
     try {
         const [rows] = await db.query('SELECT * FROM `entrepreneur_reg` WHERE `d_in` = 0 ORDER BY `id` DESC');
         res.json({ status: 200, data: rows || [], message: 'Success' });
-    } catch (err) {
+    }
+    catch (err) {
         res.json({ status: 500, message: err.message || 'Error fetching entrepreneurs', data: [] });
     }
 });
-
 // 5. Admin List of Investors
 app.all(['/dashboardapi/admin-investors', '/api/admin-investors'], async (req, res) => {
     try {
         const [rows] = await db.query('SELECT * FROM `investor_reg` WHERE `d_in` = 0 ORDER BY `id` DESC');
         res.json({ status: 200, data: rows || [], message: 'Success' });
-    } catch (err) {
+    }
+    catch (err) {
         res.json({ status: 500, message: err.message || 'Error fetching investors', data: [] });
     }
 });
-
 // 6. Admin Update Entrepreneur
 app.all(['/dashboardapi/admin-update-entrepreneur', '/api/admin-update-entrepreneur'], async (req, res) => {
     try {
         const b = req.body || {};
         const id = b.id;
         const action = b.action; // 'approve', 'reject', 'reset', 'delete'
-        if (!id) return res.json({ status: 400, message: 'ID required' });
-
+        if (!id)
+            return res.json({ status: 400, message: 'ID required' });
         if (action === 'approve') {
             await db.query('UPDATE `entrepreneur_reg` SET approval_ind = 1, d_in = 0 WHERE id = ?', [id]);
-        } else if (action === 'reject') {
+        }
+        else if (action === 'reject') {
             await db.query('UPDATE `entrepreneur_reg` SET approval_ind = 2, d_in = 0 WHERE id = ?', [id]);
-        } else if (action === 'reset') {
+        }
+        else if (action === 'reset') {
             await db.query('UPDATE `entrepreneur_reg` SET approval_ind = 0, d_in = 0 WHERE id = ?', [id]);
-        } else if (action === 'delete') {
+        }
+        else if (action === 'delete') {
             await db.query('UPDATE `entrepreneur_reg` SET d_in = 1 WHERE id = ?', [id]);
         }
         res.json({ status: 200, message: 'Entrepreneur status updated successfully' });
-    } catch (err) {
+    }
+    catch (err) {
         res.json({ status: 500, message: err.message || 'Error updating entrepreneur' });
     }
 });
-
 // 7. Admin Update Investor
 app.all(['/dashboardapi/admin-update-investor', '/api/admin-update-investor'], async (req, res) => {
     try {
         const b = req.body || {};
         const id = b.id;
         const action = b.action; // 'approve', 'reject', 'reset', 'delete'
-        if (!id) return res.json({ status: 400, message: 'ID required' });
-
+        if (!id)
+            return res.json({ status: 400, message: 'ID required' });
         if (action === 'approve') {
             await db.query('UPDATE `investor_reg` SET approval_ind = 1, d_in = 0 WHERE id = ?', [id]);
-        } else if (action === 'reject') {
+        }
+        else if (action === 'reject') {
             await db.query('UPDATE `investor_reg` SET approval_ind = 2, d_in = 0 WHERE id = ?', [id]);
-        } else if (action === 'reset') {
+        }
+        else if (action === 'reset') {
             await db.query('UPDATE `investor_reg` SET approval_ind = 0, d_in = 0 WHERE id = ?', [id]);
-        } else if (action === 'delete') {
+        }
+        else if (action === 'delete') {
             await db.query('UPDATE `investor_reg` SET d_in = 1 WHERE id = ?', [id]);
         }
         res.json({ status: 200, message: 'Investor status updated successfully' });
-    } catch (err) {
+    }
+    catch (err) {
         res.json({ status: 500, message: err.message || 'Error updating investor' });
     }
 });
-
-
+// =========================================================================
+// ANDROID NATIVE APP DUAL-WRITE REST API ENDPOINTS (ChurchRepository.kt)
+// =========================================================================
+// 1. User Sync (Firebase Auth to AWS RDS MySQL)
+app.post(['/dashboardapi/usersync', '/api/usersync'], async (req, res) => {
+    try {
+        const b = req.body || {};
+        const uid = String(b.uid || b.userId || b.id || '').trim();
+        const email = String(b.email || '').trim();
+        const name = b.name || b.displayName || null;
+        const phone = b.phone || b.phoneNumber || null;
+        const role = String(b.role || 'user').trim();
+        const timestamp = b.timestamp ? Number(b.timestamp) : Date.now();
+        if (!uid || !email) {
+            return res.status(400).json({ status: 400, message: 'uid and email are required for usersync' });
+        }
+        await db.query(`INSERT INTO \`jbac_users\` (\`uid\`, \`email\`, \`name\`, \`phone\`, \`role\`, \`timestamp\`)
+             VALUES (?, ?, ?, ?, ?, ?)
+             ON DUPLICATE KEY UPDATE
+               \`email\` = VALUES(\`email\`),
+               \`name\` = COALESCE(VALUES(\`name\`), \`name\`),
+               \`phone\` = COALESCE(VALUES(\`phone\`), \`phone\`),
+               \`role\` = COALESCE(VALUES(\`role\`), \`role\`),
+               \`timestamp\` = COALESCE(VALUES(\`timestamp\`), \`timestamp\`)`, [uid, email, name, phone, role, timestamp]);
+        res.json({
+            status: 200,
+            data: { uid, email, name, phone, role, timestamp },
+            message: 'User synced successfully'
+        });
+    }
+    catch (err) {
+        console.error('Error in usersync:', err);
+        res.status(500).json({ status: 500, message: err.message || 'Error syncing user' });
+    }
+});
+// 2. Post News (Dual-write to jbac_news & post_news)
+app.post(['/dashboardapi/postnews', '/api/postnews'], async (req, res) => {
+    try {
+        const b = req.body || {};
+        const title = b.title || b.news || '';
+        const content = b.content || b.description || '';
+        const imageUrl = b.imageUrl || b.image_url || extractUploadedImage(b) || (typeof b.image === 'string' ? b.image : null);
+        const videoUrl = b.videoUrl || b.video_url || null;
+        const timestamp = b.timestamp ? Number(b.timestamp) : Date.now();
+        if (!title) {
+            return res.status(400).json({ status: 400, message: 'News title is required' });
+        }
+        const [result] = await db.query(`INSERT INTO \`jbac_news\` (\`title\`, \`content\`, \`image_url\`, \`video_url\`, \`timestamp\`)
+             VALUES (?, ?, ?, ?, ?)`, [title, content, imageUrl, videoUrl, timestamp]);
+        try {
+            await dynamicInsert('post_news', {
+                news: title,
+                description: content,
+                image: imageUrl,
+                cts: getIndianCts(),
+                d_in: 0,
+                approval_ind: 1
+            });
+        }
+        catch (_) { }
+        res.json({
+            status: 200,
+            data: {
+                id: result.insertId,
+                title,
+                content,
+                imageUrl,
+                image_url: imageUrl,
+                videoUrl,
+                video_url: videoUrl,
+                timestamp
+            },
+            message: 'News posted successfully'
+        });
+    }
+    catch (err) {
+        console.error('Error posting news:', err);
+        res.status(500).json({ status: 500, message: err.message || 'Error posting news' });
+    }
+});
+// 3. Get News
+app.all(['/dashboardapi/getnews', '/api/getnews'], async (_req, res) => {
+    try {
+        const [rows] = await db.query('SELECT * FROM `jbac_news` ORDER BY `timestamp` DESC, `id` DESC');
+        let formatted = (rows || []).map((r) => ({
+            id: r.id,
+            title: r.title,
+            content: r.content,
+            imageUrl: r.image_url,
+            image_url: r.image_url,
+            videoUrl: r.video_url,
+            video_url: r.video_url,
+            timestamp: r.timestamp ? Number(r.timestamp) : (r.created_at ? new Date(r.created_at).getTime() : Date.now()),
+            created_at: r.created_at
+        }));
+        if (formatted.length === 0) {
+            const [legacyRows] = await db.query('SELECT * FROM `post_news` WHERE `d_in` = 0 ORDER BY `id` DESC');
+            formatted = (legacyRows || []).map((r) => ({
+                id: r.id,
+                title: r.news || r.title,
+                content: r.description,
+                imageUrl: r.image,
+                image_url: r.image,
+                videoUrl: null,
+                video_url: null,
+                timestamp: r.cts ? new Date(r.cts).getTime() : Date.now(),
+                created_at: r.cts
+            }));
+        }
+        res.json({ status: 200, data: formatted, message: 'Success' });
+    }
+    catch (err) {
+        console.error('Error getting news:', err);
+        res.status(500).json({ status: 500, message: err.message || 'Error fetching news' });
+    }
+});
+// 4. Post Events / Meetings
+app.post(['/dashboardapi/postevents', '/api/postevents'], async (req, res) => {
+    try {
+        const b = req.body || {};
+        const title = b.title || b.meeting_title || '';
+        const dateTime = b.dateTime || b.date_time || b.date || '';
+        const venueName = b.venueName || b.venue_name || b.venue || '';
+        const venueQuery = b.venueQuery || b.venue_query || venueName;
+        const timestamp = b.timestamp ? Number(b.timestamp) : Date.now();
+        if (!title) {
+            return res.status(400).json({ status: 400, message: 'Meeting/Event title is required' });
+        }
+        const [result] = await db.query(`INSERT INTO \`jbac_meetings\` (\`title\`, \`date_time\`, \`venue_name\`, \`venue_query\`, \`timestamp\`)
+             VALUES (?, ?, ?, ?, ?)`, [title, dateTime, venueName, venueQuery, timestamp]);
+        res.json({
+            status: 200,
+            data: {
+                id: result.insertId,
+                title,
+                dateTime,
+                date_time: dateTime,
+                venueName,
+                venue_name: venueName,
+                venueQuery,
+                venue_query: venueQuery,
+                timestamp
+            },
+            message: 'Meeting posted successfully'
+        });
+    }
+    catch (err) {
+        console.error('Error posting meeting/event:', err);
+        res.status(500).json({ status: 500, message: err.message || 'Error posting meeting/event' });
+    }
+});
+// 5. Get Events / Meetings
+app.all(['/dashboardapi/events', '/api/events', '/dashboardapi/getevents', '/api/getevents'], async (_req, res) => {
+    try {
+        const [rows] = await db.query('SELECT * FROM `jbac_meetings` ORDER BY `timestamp` DESC, `id` DESC');
+        let formatted = (rows || []).map((r) => ({
+            id: r.id,
+            title: r.title,
+            dateTime: r.date_time,
+            date_time: r.date_time,
+            venueName: r.venue_name,
+            venue_name: r.venue_name,
+            venueQuery: r.venue_query,
+            venue_query: r.venue_query,
+            timestamp: r.timestamp ? Number(r.timestamp) : (r.created_at ? new Date(r.created_at).getTime() : Date.now()),
+            created_at: r.created_at
+        }));
+        if (formatted.length === 0) {
+            try {
+                const [legacyRows] = await db.query('SELECT * FROM `meetings` WHERE `d_in` = 0 ORDER BY `id` DESC LIMIT 50');
+                formatted = (legacyRows || []).map((r) => ({
+                    id: r.id,
+                    title: r.meeting_title || r.title,
+                    dateTime: r.date_time || r.date,
+                    date_time: r.date_time || r.date,
+                    venueName: r.location || r.venue,
+                    venue_name: r.location || r.venue,
+                    venueQuery: r.location || r.venue,
+                    venue_query: r.location || r.venue,
+                    timestamp: r.cts ? new Date(r.cts).getTime() : Date.now(),
+                    created_at: r.cts
+                }));
+            }
+            catch (_) { }
+        }
+        res.json({ status: 200, data: formatted, message: 'Success' });
+    }
+    catch (err) {
+        console.error('Error fetching meetings/events:', err);
+        res.status(500).json({ status: 500, message: err.message || 'Error fetching meetings/events' });
+    }
+});
+// 6. Post Branch
+app.post(['/dashboardapi/postbranches', '/api/postbranches'], async (req, res) => {
+    try {
+        const b = req.body || {};
+        const name = b.name || b.branchName || '';
+        const address = b.address || '';
+        const pastorName = b.pastorName || b.pastor_name || '';
+        const phone = b.phone || b.mobile || '';
+        const latitude = b.latitude ? Number(b.latitude) : null;
+        const longitude = b.longitude ? Number(b.longitude) : null;
+        if (!name) {
+            return res.status(400).json({ status: 400, message: 'Branch name is required' });
+        }
+        const [result] = await db.query(`INSERT INTO \`jbac_branches\` (\`name\`, \`address\`, \`pastor_name\`, \`phone\`, \`latitude\`, \`longitude\`)
+             VALUES (?, ?, ?, ?, ?, ?)`, [name, address, pastorName, phone, latitude, longitude]);
+        res.json({
+            status: 200,
+            data: {
+                id: result.insertId,
+                name,
+                address,
+                pastorName,
+                pastor_name: pastorName,
+                phone,
+                latitude,
+                longitude
+            },
+            message: 'Branch posted successfully'
+        });
+    }
+    catch (err) {
+        console.error('Error posting branch:', err);
+        res.status(500).json({ status: 500, message: err.message || 'Error posting branch' });
+    }
+});
+// 7. Get Branches
+app.all(['/dashboardapi/branches', '/api/branches', '/dashboardapi/getbranches', '/api/getbranches'], async (_req, res) => {
+    try {
+        const [rows] = await db.query('SELECT * FROM `jbac_branches` ORDER BY `id` ASC');
+        const formatted = (rows || []).map((r) => ({
+            id: r.id,
+            name: r.name,
+            address: r.address,
+            pastorName: r.pastor_name,
+            pastor_name: r.pastor_name,
+            phone: r.phone,
+            latitude: r.latitude ? Number(r.latitude) : null,
+            longitude: r.longitude ? Number(r.longitude) : null,
+            created_at: r.created_at
+        }));
+        res.json({ status: 200, data: formatted, message: 'Success' });
+    }
+    catch (err) {
+        console.error('Error fetching branches:', err);
+        res.status(500).json({ status: 500, message: err.message || 'Error fetching branches' });
+    }
+});
+// 8. Post Prayer Request
+app.post(['/dashboardapi/postprayers', '/api/postprayers'], async (req, res) => {
+    try {
+        const b = req.body || {};
+        const userId = String(b.userId || b.user_id || b.uid || 'anonymous').trim();
+        const userName = b.userName || b.user_name || b.name || 'Anonymous Believer';
+        const requestText = b.request || b.prayer || b.message || '';
+        const timestamp = b.timestamp ? Number(b.timestamp) : Date.now();
+        const status = b.status || 'pending';
+        if (!requestText) {
+            return res.status(400).json({ status: 400, message: 'Prayer request text is required' });
+        }
+        if (userId && userId !== 'anonymous') {
+            try {
+                await db.query('INSERT IGNORE INTO `jbac_users` (`uid`, `email`, `name`, `role`, `timestamp`) VALUES (?, ?, ?, ?, ?)', [userId, `${userId}@jbac.in`, userName, 'user', timestamp]);
+            }
+            catch (_) { }
+        }
+        const [result] = await db.query(`INSERT INTO \`jbac_prayer_requests\` (\`user_id\`, \`user_name\`, \`request\`, \`timestamp\`, \`status\`)
+             VALUES (?, ?, ?, ?, ?)`, [userId, userName, requestText, timestamp, status]);
+        res.json({
+            status: 200,
+            data: {
+                id: result.insertId,
+                userId,
+                user_id: userId,
+                userName,
+                user_name: userName,
+                request: requestText,
+                timestamp,
+                status
+            },
+            message: 'Prayer request submitted successfully'
+        });
+    }
+    catch (err) {
+        console.error('Error posting prayer request:', err);
+        res.status(500).json({ status: 500, message: err.message || 'Error submitting prayer request' });
+    }
+});
+// 9. Get Prayer Requests
+app.all(['/dashboardapi/getprayers', '/api/getprayers', '/dashboardapi/prayers', '/api/prayers'], async (req, res) => {
+    try {
+        const userId = req.query?.userId || req.query?.user_id || req.body?.userId || req.body?.user_id;
+        let query = 'SELECT * FROM `jbac_prayer_requests`';
+        const params = [];
+        if (userId) {
+            query += ' WHERE `user_id` = ?';
+            params.push(String(userId).trim());
+        }
+        query += ' ORDER BY `timestamp` DESC, `id` DESC';
+        const [rows] = await db.query(query, params);
+        const formatted = (rows || []).map((r) => ({
+            id: r.id,
+            userId: r.user_id,
+            user_id: r.user_id,
+            userName: r.user_name,
+            user_name: r.user_name,
+            request: r.request,
+            timestamp: r.timestamp ? Number(r.timestamp) : (r.created_at ? new Date(r.created_at).getTime() : Date.now()),
+            status: r.status,
+            created_at: r.created_at
+        }));
+        res.json({ status: 200, data: formatted, message: 'Success' });
+    }
+    catch (err) {
+        console.error('Error fetching prayer requests:', err);
+        res.status(500).json({ status: 500, message: err.message || 'Error fetching prayer requests' });
+    }
+});
+// 10. Post Chat Message
+app.post(['/dashboardapi/postchats', '/api/postchats'], async (req, res) => {
+    try {
+        const b = req.body || {};
+        const senderId = String(b.senderId || b.sender_id || '').trim();
+        const receiverId = String(b.receiverId || b.receiver_id || '').trim();
+        const message = String(b.message || '').trim();
+        const timestamp = b.timestamp ? Number(b.timestamp) : Date.now();
+        if (!senderId || !receiverId || !message) {
+            return res.status(400).json({ status: 400, message: 'senderId, receiverId and message are required' });
+        }
+        try {
+            await db.query('INSERT IGNORE INTO `jbac_users` (`uid`, `email`, `role`, `timestamp`) VALUES (?, ?, ?, ?)', [senderId, `${senderId}@jbac.in`, 'user', timestamp]);
+            await db.query('INSERT IGNORE INTO `jbac_users` (`uid`, `email`, `role`, `timestamp`) VALUES (?, ?, ?, ?)', [receiverId, `${receiverId}@jbac.in`, 'user', timestamp]);
+        }
+        catch (_) { }
+        const [result] = await db.query(`INSERT INTO \`jbac_chat_messages\` (\`sender_id\`, \`receiver_id\`, \`message\`, \`timestamp\`, \`read_status\`)
+             VALUES (?, ?, ?, ?, 0)`, [senderId, receiverId, message, timestamp]);
+        res.json({
+            status: 200,
+            data: {
+                id: result.insertId,
+                senderId,
+                sender_id: senderId,
+                receiverId,
+                receiver_id: receiverId,
+                message,
+                timestamp,
+                readStatus: 0,
+                read_status: 0
+            },
+            message: 'Chat message sent successfully'
+        });
+    }
+    catch (err) {
+        console.error('Error posting chat message:', err);
+        res.status(500).json({ status: 500, message: err.message || 'Error posting chat message' });
+    }
+});
+// 11. Get Chat History (Between 2 Users)
+app.all([
+    '/dashboardapi/chats/:userId1/:userId2',
+    '/api/chats/:userId1/:userId2',
+    '/dashboardapi/chats',
+    '/api/chats'
+], async (req, res) => {
+    try {
+        const p = req.params || {};
+        const q = req.query || {};
+        const b = req.body || {};
+        const user1 = String(p.userId1 || q.user1 || q.senderId || q.sender_id || b.user1 || b.senderId || '').trim();
+        const user2 = String(p.userId2 || q.user2 || q.receiverId || q.receiver_id || b.user2 || b.receiverId || '').trim();
+        if (!user1 || !user2) {
+            return res.status(400).json({ status: 400, message: 'Both user IDs are required to fetch chat history' });
+        }
+        const [rows] = await db.query(`SELECT * FROM \`jbac_chat_messages\`
+             WHERE (\`sender_id\` = ? AND \`receiver_id\` = ?)
+                OR (\`sender_id\` = ? AND \`receiver_id\` = ?)
+             ORDER BY \`timestamp\` ASC, \`id\` ASC`, [user1, user2, user2, user1]);
+        const formatted = (rows || []).map((r) => ({
+            id: r.id,
+            senderId: r.sender_id,
+            sender_id: r.sender_id,
+            receiverId: r.receiver_id,
+            receiver_id: r.receiver_id,
+            message: r.message,
+            timestamp: r.timestamp ? Number(r.timestamp) : (r.created_at ? new Date(r.created_at).getTime() : Date.now()),
+            readStatus: r.read_status || 0,
+            read_status: r.read_status || 0,
+            created_at: r.created_at
+        }));
+        res.json({ status: 200, data: formatted, message: 'Success' });
+    }
+    catch (err) {
+        console.error('Error fetching chat messages:', err);
+        res.status(500).json({ status: 500, message: err.message || 'Error fetching chat messages' });
+    }
+});
 app.get('/', (_req, res) => {
     res.json({
         status: 200,
