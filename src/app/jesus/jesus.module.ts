@@ -74,6 +74,7 @@ import { FamilyCouncellingComponent } from './family-councelling/family-councell
 import { DoctorregisterComponent } from './doctorregister/doctorregister.component';
 import { EntrepreneurregisterComponent } from './entrepreneurregister/entrepreneurregister.component';
 import { InvestorregisterComponent } from './investorregister/investorregister.component';
+import { TeacherregisterComponent } from './teacherregister/teacherregister.component';
 
 
 
@@ -145,7 +146,8 @@ import { InvestorregisterComponent } from './investorregister/investorregister.c
   FamilyCouncellingComponent,
   DoctorregisterComponent,
     EntrepreneurregisterComponent,
-    InvestorregisterComponent
+    InvestorregisterComponent,
+    TeacherregisterComponent
     
   ],
   imports: [

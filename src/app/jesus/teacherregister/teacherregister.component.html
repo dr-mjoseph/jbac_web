@@ -1,0 +1,525 @@
+<div class="teacher-reg-container py-5 bg-light">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-lg-10 col-xl-9">
+
+        <!-- HERO HEADER -->
+        <div class="card hero-card text-white mb-4 border-0 shadow-sm rounded-4 overflow-hidden">
+          <div class="card-body p-4 p-md-5 text-center position-relative">
+            <div class="d-inline-flex p-3 rounded-circle bg-primary bg-opacity-25 mb-3">
+              <span style="font-size: 2.5rem;">📚</span>
+            </div>
+            <h2 class="fw-bold mb-2 text-white">బోధనా రంగంలో ఉద్యోగుల నమోదు</h2>
+            <h4 class="text-info fw-normal mb-3">Registration of Employees in Teaching Field</h4>
+            <p class="text-light mb-0 mx-auto" style="max-width: 650px; font-size: 0.95rem; opacity: 0.9;">
+              పాఠశాలలు, కళాశాలలు, విశ్వవిద్యాలయాలు మరియు సాంకేతిక విద్యా సంస్థలలో పనిచేస్తున్న క్రైస్తవ ఉపాధ్యాయులు, అధ్యాపకులు మరియు పరిపాలనా సిబ్బంది సమాచార నమోదు వేదిక.
+            </p>
+          </div>
+        </div>
+
+        <!-- REGISTRATION FORM CARD -->
+        <div class="card shadow-sm border-0 rounded-4">
+          <div class="card-body p-4 p-md-5">
+
+            <form [formGroup]="teacherForm" (ngSubmit)="onSubmit()" novalidate>
+
+              <!-- 1. PERSONAL DETAILS -->
+              <h5 class="fw-bold text-primary section-title mb-4">
+                1. వ్యక్తిగత వివరాలు (Personal Details)
+              </h5>
+
+              <div class="row g-3 mb-4">
+                <!-- Name with Surname -->
+                <div class="col-md-8">
+                  <label class="form-label fw-bold">
+                    ఇంటిపేరుతో సహా పూర్తి పేరు (Name with Surname) <span class="text-danger">*</span>
+                  </label>
+                  <input type="text" formControlName="name_with_surname" class="form-control form-control-lg"
+                         placeholder="ఉదా: కొండేటి రాజేష్ (Kondeti Rajesh)"
+                         [ngClass]="{ 'is-invalid': submitted && f['name_with_surname'].errors }">
+                  <div class="invalid-feedback" *ngIf="submitted && f['name_with_surname'].errors">
+                    పూర్తి పేరు తప్పనిసరి (Full name with surname is required).
+                  </div>
+                </div>
+
+                <!-- Gender -->
+                <div class="col-md-4">
+                  <label class="form-label fw-bold">
+                    లింగం (Gender) <span class="text-danger">*</span>
+                  </label>
+                  <select formControlName="gender" class="form-select form-select-lg"
+                          [ngClass]="{ 'is-invalid': submitted && f['gender'].errors }">
+                    <option value="">ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
+                    <option value="Male">పురుషుడు (Male)</option>
+                    <option value="Female">స్త్రీ (Female)</option>
+                    <option value="Other">ఇతరులు (Other)</option>
+                  </select>
+                  <div class="invalid-feedback" *ngIf="submitted && f['gender'].errors">
+                    లింగం ఎంచుకోవడం తప్పనిసరి (Gender is required).
+                  </div>
+                </div>
+
+                <!-- Mobile -->
+                <div class="col-md-6">
+                  <label class="form-label fw-bold">
+                    మొబైల్ నంబర్ (Mobile Number) <span class="text-danger">*</span>
+                  </label>
+                  <input type="tel" formControlName="mobile" class="form-control form-control-lg"
+                         placeholder="10 అంకెల మొబైల్ నంబర్" maxlength="10"
+                         [ngClass]="{ 'is-invalid': submitted && f['mobile'].errors }">
+                  <div class="invalid-feedback" *ngIf="submitted && f['mobile'].errors">
+                    సరైన 10 అంకెల మొబైల్ నంబర్ నమోదు చేయండి (Valid 10-digit mobile required).
+                  </div>
+                </div>
+
+                <!-- Email -->
+                <div class="col-md-6">
+                  <label class="form-label fw-bold">
+                    ఈమెయిల్ చిరునామా (Email Address)
+                  </label>
+                  <input type="email" formControlName="email" class="form-control form-control-lg"
+                         placeholder="example@mail.com"
+                         [ngClass]="{ 'is-invalid': submitted && f['email'].errors }">
+                  <div class="invalid-feedback" *ngIf="submitted && f['email'].errors">
+                    దయచేసి సరైన ఈమెయిల్ ఇవ్వండి (Please enter a valid email).
+                  </div>
+                </div>
+              </div>
+
+
+              <!-- 2. PROFESSIONAL PROFILE -->
+              <h5 class="fw-bold text-primary section-title mb-4 pt-3 border-top">
+                2. వృత్తి & బోధనా అనుభవ వివరాలు (Professional & Teaching Profile)
+              </h5>
+
+              <div class="row g-3 mb-4">
+                <!-- Exact Designation -->
+                <div class="col-md-6">
+                  <label class="form-label fw-bold">
+                    ఖచ్చితమైన హోదా (Exact Designation) <span class="text-danger">*</span>
+                  </label>
+                  <input type="text" formControlName="exact_designation" class="form-control form-control-lg"
+                         placeholder="ఉదా: SGT, School Assistant, Lecturer, Principal, Professor..."
+                         [ngClass]="{ 'is-invalid': submitted && f['exact_designation'].errors }">
+                  <div class="invalid-feedback" *ngIf="submitted && f['exact_designation'].errors">
+                    ఖచ్చితమైన హోదా తప్పనిసరి (Exact designation is required).
+                  </div>
+                </div>
+
+                <!-- Role Category -->
+                <div class="col-md-6">
+                  <label class="form-label fw-bold">
+                    పాత్ర వర్గం (Role Category) <span class="text-danger">*</span>
+                  </label>
+                  <select formControlName="role_category" class="form-select form-select-lg"
+                          [ngClass]="{ 'is-invalid': submitted && f['role_category'].errors }">
+                    <option value="">ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
+                    <option *ngFor="let r of roleCategories" [value]="r.name_en">
+                      {{ r.name_te }}
+                    </option>
+                  </select>
+                  <div class="invalid-feedback" *ngIf="submitted && f['role_category'].errors">
+                    పాత్ర వర్గం ఎంచుకోవడం తప్పనిసరి (Role category required).
+                  </div>
+                </div>
+
+                <!-- Qualification Category -->
+                <div class="col-md-6">
+                  <label class="form-label fw-bold">
+                    విద్యార్హత వర్గం (Qualification Category) <span class="text-danger">*</span>
+                  </label>
+                  <select formControlName="qualification_category" class="form-select form-select-lg"
+                          [ngClass]="{ 'is-invalid': submitted && f['qualification_category'].errors }">
+                    <option value="">ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
+                    <option *ngFor="let q of qualificationCategories" [value]="q.name || q.qualification_name">
+                      {{ q.name || q.qualification_name }}
+                    </option>
+                  </select>
+                  <div class="invalid-feedback" *ngIf="submitted && f['qualification_category'].errors">
+                    విద్యార్హత వర్గం తప్పనిసరి (Qualification category required).
+                  </div>
+                </div>
+
+                <!-- Total Experience Years -->
+                <div class="col-md-6">
+                  <label class="form-label fw-bold">
+                    మొత్తం అనుభవం (Total Experience : Years) <span class="text-danger">*</span>
+                  </label>
+                  <select formControlName="total_experience_years" class="form-select form-select-lg"
+                          [ngClass]="{ 'is-invalid': submitted && f['total_experience_years'].errors }">
+                    <option value="">ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
+                    <option *ngFor="let exp of experienceLevels" [value]="exp.name_en">
+                      {{ exp.name_te }}
+                    </option>
+                  </select>
+                  <div class="invalid-feedback" *ngIf="submitted && f['total_experience_years'].errors">
+                    మొత్తం అనుభవం ఎంచుకోవడం తప్పనిసరి (Experience years required).
+                  </div>
+                </div>
+
+                <!-- Experience In -->
+                <div class="col-md-12">
+                  <label class="form-label fw-bold">
+                    అనుభవం ఉన్న విభాగం / సబ్జెక్ట్ (Experience In : Subject / Field) <span class="text-danger">*</span>
+                  </label>
+                  <input type="text" formControlName="experience_in" class="form-control form-control-lg"
+                         placeholder="ఉదా: Mathematics, Physics, English, Computer Science, Telugu, Commerce..."
+                         [ngClass]="{ 'is-invalid': submitted && f['experience_in'].errors }">
+                  <div class="invalid-feedback" *ngIf="submitted && f['experience_in'].errors">
+                    అనుభవం ఉన్న సబ్జెక్ట్ లేదా విభాగం తప్పనిసరి (Experience subject/field required).
+                  </div>
+                </div>
+
+                <!-- Teacher Type (Government / Private) -->
+                <div class="col-md-6">
+                  <label class="form-label fw-bold">
+                    ఉపాధ్యాయుని రకం (Teacher Type) <span class="text-danger">*</span>
+                  </label>
+                  <select formControlName="teacher_type" class="form-select form-select-lg"
+                          [ngClass]="{ 'is-invalid': submitted && f['teacher_type'].errors }">
+                    <option value="">ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
+                    <option value="Government">ప్రభుత్వ (Government)</option>
+                    <option value="Private">ప్రైవేట్ (Private)</option>
+                  </select>
+                  <div class="invalid-feedback" *ngIf="submitted && f['teacher_type'].errors">
+                    ఉపాధ్యాయుని రకం తప్పనిసరి (Teacher type required).
+                  </div>
+                </div>
+
+                <!-- Working In (Institution Level) -->
+                <div class="col-md-6">
+                  <label class="form-label fw-bold">
+                    ఎక్కడ పనిచేస్తున్నారు (Working In) <span class="text-danger">*</span>
+                  </label>
+                  <select formControlName="working_in" class="form-select form-select-lg"
+                          [ngClass]="{ 'is-invalid': submitted && f['working_in'].errors }">
+                    <option value="">ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
+                    <option *ngFor="let inst of institutionTypes" [value]="inst.name_en">
+                      {{ inst.name_te }}
+                    </option>
+                  </select>
+                  <div class="invalid-feedback" *ngIf="submitted && f['working_in'].errors">
+                    పనిచేస్తున్న సంస్థ రకం తప్పనిసరి (Working institution type required).
+                  </div>
+                </div>
+
+                <!-- Institute Name -->
+                <div class="col-md-12">
+                  <label class="form-label fw-bold">
+                    విద్యా సంస్థ పేరు (Institute Name) <span class="text-danger">*</span>
+                  </label>
+                  <input type="text" formControlName="institute_name" class="form-control form-control-lg"
+                         placeholder="ఉదా: Z.P. High School / St. Joseph Junior College / Andhra Loyola College..."
+                         [ngClass]="{ 'is-invalid': submitted && f['institute_name'].errors }">
+                  <div class="invalid-feedback" *ngIf="submitted && f['institute_name'].errors">
+                    విద్యా సంస్థ పేరు తప్పనిసరి (Institute name required).
+                  </div>
+                </div>
+              </div>
+
+
+              <!-- 3. SOCIAL, FAITH & FAMILY BACKGROUND -->
+              <h5 class="fw-bold text-primary section-title mb-4 pt-3 border-top">
+                3. సామాజిక, ఆధ్యాత్మిక & కుటుంబ నేపథ్యం (Social, Faith & Family Background)
+              </h5>
+
+              <div class="row g-3 mb-4">
+                <!-- Caste -->
+                <div class="col-md-6">
+                  <label class="form-label fw-bold">
+                    కులం (Caste Category) <span class="text-danger">*</span>
+                  </label>
+                  <select formControlName="caste" class="form-select form-select-lg"
+                          [ngClass]="{ 'is-invalid': submitted && f['caste'].errors }">
+                    <option value="">ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
+                    <option *ngFor="let c of casteList" [value]="c">{{ c }}</option>
+                  </select>
+                  <div class="invalid-feedback" *ngIf="submitted && f['caste'].errors">
+                    కులం ఎంచుకోవడం తప్పనిసరి (Caste selection required).
+                  </div>
+                </div>
+
+                <!-- Subcaste -->
+                <div class="col-md-6">
+                  <label class="form-label fw-bold">
+                    ఉప కులం (Subcaste)
+                  </label>
+                  <input type="text" formControlName="subcaste" class="form-control form-control-lg"
+                         placeholder="ఉప కులం పేరు (ఐచ్ఛికం)">
+                </div>
+
+                <!-- Faith Category / Denomination -->
+                <div class="col-md-6">
+                  <label class="form-label fw-bold">
+                    విశ్వాస వర్గం / డినామినేషన్ (Faith Category) <span class="text-danger">*</span>
+                  </label>
+                  <select formControlName="faith_category" class="form-select form-select-lg"
+                          [ngClass]="{ 'is-invalid': submitted && f['faith_category'].errors }">
+                    <option value="">ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
+                    <option *ngFor="let d of denominations" [value]="d.name || d.denomination_name">
+                      {{ d.name || d.denomination_name }}
+                    </option>
+                  </select>
+                  <div class="invalid-feedback" *ngIf="submitted && f['faith_category'].errors">
+                    విశ్వాస వర్గం ఎంచుకోవడం తప్పనిసరి (Faith category required).
+                  </div>
+                </div>
+
+                <!-- Family Background -->
+                <div class="col-md-6">
+                  <label class="form-label fw-bold">
+                    కుటుంబ నేపథ్యం (Family Background) <span class="text-danger">*</span>
+                  </label>
+                  <select formControlName="family_background" class="form-select form-select-lg"
+                          [ngClass]="{ 'is-invalid': submitted && f['family_background'].errors }">
+                    <option value="">ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
+                    <option *ngFor="let fb of familyBackgrounds" [value]="fb.name_en">
+                      {{ fb.name_te }}
+                    </option>
+                  </select>
+                  <div class="invalid-feedback" *ngIf="submitted && f['family_background'].errors">
+                    కుటుంబ నేపథ్యం ఎంచుకోవడం తప్పనిసరి (Family background required).
+                  </div>
+                </div>
+
+                <!-- Pastor Phone -->
+                <div class="col-md-12">
+                  <label class="form-label fw-bold">
+                    మీ చర్చి / పాస్టర్ గారి ఫోన్ నంబర్ (Your Church / Pastor Phone No)
+                  </label>
+                  <input type="tel" formControlName="pastor_phone" class="form-control form-control-lg"
+                         placeholder="పాస్టర్ గారి 10 అంకెల మొబైల్ నంబర్ (ఐచ్ఛికం)" maxlength="10"
+                         [ngClass]="{ 'is-invalid': submitted && f['pastor_phone'].errors }">
+                  <div class="invalid-feedback" *ngIf="submitted && f['pastor_phone'].errors">
+                    సరైన 10 అంకెల ఫోన్ నంబర్ ఇవ్వండి (10-digit phone number required).
+                  </div>
+                </div>
+              </div>
+
+
+              <!-- 4. INSTITUTE ADDRESS (State-Guarded Cascade) -->
+              <h5 class="fw-bold text-primary section-title mb-4 pt-3 border-top">
+                4. విద్యా సంస్థ చిరునామా (Institute Address)
+              </h5>
+              <div class="alert alert-info py-2 px-3 mb-3 d-flex align-items-center" style="font-size: 0.88rem;">
+                <span class="me-2">ℹ️</span>
+                <span>ముందుగా రాష్ట్రాన్ని ఎంచుకుంటేనే జిల్లా, నియోజకవర్గం, మండలం మరియు పంచాయతీ వివరాలు కనిపిస్తాయి.</span>
+              </div>
+
+              <div class="row g-3 mb-4">
+                <!-- Inst State -->
+                <div class="col-md-6">
+                  <label class="form-label fw-bold">
+                    విద్యా సంస్థ రాష్ట్రం (Institute State) <span class="text-danger">*</span>
+                  </label>
+                  <select formControlName="inst_state_id" (change)="onInstStateChange($event)" class="form-select form-select-lg"
+                          [ngClass]="{ 'is-invalid': submitted && f['inst_state_id'].errors }">
+                    <option value="">ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
+                    <option *ngFor="let s of states" [value]="s.id">{{ s.state_name || s.name }}</option>
+                  </select>
+                  <div class="invalid-feedback" *ngIf="submitted && f['inst_state_id'].errors">
+                    రాష్ట్రం ఎంచుకోవడం తప్పనిసరి (Institute state required).
+                  </div>
+                </div>
+
+                <!-- Inst District -->
+                <div class="col-md-6">
+                  <label class="form-label fw-bold">
+                    విద్యా సంస్థ జిల్లా (Institute District) <span class="text-danger">*</span>
+                  </label>
+                  <select formControlName="inst_districts" (change)="onInstDistrictChange($event)" class="form-select form-select-lg"
+                          [ngClass]="{ 'is-invalid': submitted && f['inst_districts'].errors }">
+                    <option value="">
+                      {{ f['inst_state_id'].value ? 'ఇక్కడ క్లిక్ చేసి ఎంచుకోండి' : 'ముందుగా రాష్ట్రాన్ని ఎంచుకోండి (Select State First)' }}
+                    </option>
+                    <option *ngFor="let d of instDistricts" [value]="d.id">{{ d.distrct_nm || d.districtname }}</option>
+                  </select>
+                  <div class="invalid-feedback" *ngIf="submitted && f['inst_districts'].errors">
+                    జిల్లా ఎంచుకోవడం తప్పనిసరి (Institute district required).
+                  </div>
+                </div>
+
+                <!-- Inst Constituency -->
+                <div class="col-md-4">
+                  <label class="form-label fw-bold">
+                    నియోజకవర్గం (Constituency) <span class="text-danger">*</span>
+                  </label>
+                  <select formControlName="inst_constituencyname" (change)="onInstConstituencyChange($event)" class="form-select form-select-lg"
+                          [ngClass]="{ 'is-invalid': submitted && f['inst_constituencyname'].errors }">
+                    <option value="">
+                      {{ f['inst_districts'].value ? 'ఇక్కడ క్లిక్ చేసి ఎంచుకోండి' : 'ముందుగా జిల్లాను ఎంచుకోండి (Select District First)' }}
+                    </option>
+                    <option *ngFor="let c of instConstituencies" [value]="c.id">{{ c.constituency_name || c.name }}</option>
+                  </select>
+                  <div class="invalid-feedback" *ngIf="submitted && f['inst_constituencyname'].errors">
+                    నియోజకవర్గం తప్పనిసరి (Institute constituency required).
+                  </div>
+                </div>
+
+                <!-- Inst Mandal -->
+                <div class="col-md-4">
+                  <label class="form-label fw-bold">
+                    మండలం (Mandal) <span class="text-danger">*</span>
+                  </label>
+                  <select formControlName="inst_mandals" (change)="onInstMandalChange($event)" class="form-select form-select-lg"
+                          [ngClass]="{ 'is-invalid': submitted && f['inst_mandals'].errors }">
+                    <option value="">
+                      {{ f['inst_constituencyname'].value ? 'ఇక్కడ క్లిక్ చేసి ఎంచుకోండి' : 'ముందుగా నియోజకవర్గాన్ని ఎంచుకోండి (Select Constituency First)' }}
+                    </option>
+                    <option *ngFor="let m of instMandals" [value]="m.id">{{ m.mandal_name || m.name }}</option>
+                  </select>
+                  <div class="invalid-feedback" *ngIf="submitted && f['inst_mandals'].errors">
+                    మండలం తప్పనిసరి (Institute mandal required).
+                  </div>
+                </div>
+
+                <!-- Inst Panchayat -->
+                <div class="col-md-4">
+                  <label class="form-label fw-bold">
+                    పంచాయతీ / గ్రామం (Panchayat / Village) <span class="text-danger">*</span>
+                  </label>
+                  <select formControlName="inst_panchayati" class="form-select form-select-lg"
+                          [ngClass]="{ 'is-invalid': submitted && f['inst_panchayati'].errors }">
+                    <option value="">
+                      {{ f['inst_mandals'].value ? 'ఇక్కడ క్లిక్ చేసి ఎంచుకోండి' : 'ముందుగా మండలాన్ని ఎంచుకోండి (Select Mandal First)' }}
+                    </option>
+                    <option *ngFor="let p of instPanchayatis" [value]="p.id">{{ p.panchayat_name || p.name }}</option>
+                  </select>
+                  <div class="invalid-feedback" *ngIf="submitted && f['inst_panchayati'].errors">
+                    పంచాయతీ తప్పనిసరి (Institute panchayat required).
+                  </div>
+                </div>
+
+                <!-- Inst Detailed Address -->
+                <div class="col-md-12">
+                  <label class="form-label fw-bold">
+                    సంస్థ వీధి / డోర్ నం / ల్యాండ్‌మార్క్ (Street, Door No, Landmark)
+                  </label>
+                  <input type="text" formControlName="inst_address" class="form-control form-control-lg"
+                         placeholder="విద్యా సంస్థ వివరణాత్మక చిరునామా (Detailed Institute Address)">
+                </div>
+              </div>
+
+
+              <!-- 5. RESIDENTIAL ADDRESS (State-Guarded Cascade) -->
+              <h5 class="fw-bold text-primary section-title mb-4 pt-3 border-top">
+                5. వ్యక్తిగత నివాస చిరునామా (Residential Address)
+              </h5>
+              <div class="alert alert-info py-2 px-3 mb-3 d-flex align-items-center" style="font-size: 0.88rem;">
+                <span class="me-2">ℹ️</span>
+                <span>ముందుగా మీ నివాస రాష్ట్రాన్ని ఎంచుకుంటేనే మిగిలిన జిల్లా మరియు ప్రాంతాలు ఎంచుకోవడానికి వీలవుతుంది.</span>
+              </div>
+
+              <div class="row g-3 mb-4">
+                <!-- Res State -->
+                <div class="col-md-6">
+                  <label class="form-label fw-bold">
+                    నివాస రాష్ట్రం (Residential State) <span class="text-danger">*</span>
+                  </label>
+                  <select formControlName="res_state_id" (change)="onResStateChange($event)" class="form-select form-select-lg"
+                          [ngClass]="{ 'is-invalid': submitted && f['res_state_id'].errors }">
+                    <option value="">ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
+                    <option *ngFor="let s of states" [value]="s.id">{{ s.state_name || s.name }}</option>
+                  </select>
+                  <div class="invalid-feedback" *ngIf="submitted && f['res_state_id'].errors">
+                    నివాస రాష్ట్రం ఎంచుకోవడం తప్పనిసరి (Residential state required).
+                  </div>
+                </div>
+
+                <!-- Res District -->
+                <div class="col-md-6">
+                  <label class="form-label fw-bold">
+                    నివాస జిల్లా (Residential District) <span class="text-danger">*</span>
+                  </label>
+                  <select formControlName="res_districts" (change)="onResDistrictChange($event)" class="form-select form-select-lg"
+                          [ngClass]="{ 'is-invalid': submitted && f['res_districts'].errors }">
+                    <option value="">
+                      {{ f['res_state_id'].value ? 'ఇక్కడ క్లిక్ చేసి ఎంచుకోండి' : 'ముందుగా రాష్ట్రాన్ని ఎంచుకోండి (Select State First)' }}
+                    </option>
+                    <option *ngFor="let d of resDistricts" [value]="d.id">{{ d.distrct_nm || d.districtname }}</option>
+                  </select>
+                  <div class="invalid-feedback" *ngIf="submitted && f['res_districts'].errors">
+                    జిల్లా ఎంచుకోవడం తప్పనిసరి (Residential district required).
+                  </div>
+                </div>
+
+                <!-- Res Constituency -->
+                <div class="col-md-4">
+                  <label class="form-label fw-bold">
+                    నియోజకవర్గం (Constituency) <span class="text-danger">*</span>
+                  </label>
+                  <select formControlName="res_constituencyname" (change)="onResConstituencyChange($event)" class="form-select form-select-lg"
+                          [ngClass]="{ 'is-invalid': submitted && f['res_constituencyname'].errors }">
+                    <option value="">
+                      {{ f['res_districts'].value ? 'ఇక్కడ క్లిక్ చేసి ఎంచుకోండి' : 'ముందుగా జిల్లాను ఎంచుకోండి (Select District First)' }}
+                    </option>
+                    <option *ngFor="let c of resConstituencies" [value]="c.id">{{ c.constituency_name || c.name }}</option>
+                  </select>
+                  <div class="invalid-feedback" *ngIf="submitted && f['res_constituencyname'].errors">
+                    నియోజకవర్గం తప్పనిసరి (Residential constituency required).
+                  </div>
+                </div>
+
+                <!-- Res Mandal -->
+                <div class="col-md-4">
+                  <label class="form-label fw-bold">
+                    మండలం (Mandal) <span class="text-danger">*</span>
+                  </label>
+                  <select formControlName="res_mandals" (change)="onResMandalChange($event)" class="form-select form-select-lg"
+                          [ngClass]="{ 'is-invalid': submitted && f['res_mandals'].errors }">
+                    <option value="">
+                      {{ f['res_constituencyname'].value ? 'ఇక్కడ క్లిక్ చేసి ఎంచుకోండి' : 'ముందుగా నియోజకవర్గాన్ని ఎంచుకోండి (Select Constituency First)' }}
+                    </option>
+                    <option *ngFor="let m of resMandals" [value]="m.id">{{ m.mandal_name || m.name }}</option>
+                  </select>
+                  <div class="invalid-feedback" *ngIf="submitted && f['res_mandals'].errors">
+                    మండలం తప్పనిసరి (Residential mandal required).
+                  </div>
+                </div>
+
+                <!-- Res Panchayat -->
+                <div class="col-md-4">
+                  <label class="form-label fw-bold">
+                    పంచాయతీ / గ్రామం (Panchayat / Village) <span class="text-danger">*</span>
+                  </label>
+                  <select formControlName="res_panchayati" class="form-select form-select-lg"
+                          [ngClass]="{ 'is-invalid': submitted && f['res_panchayati'].errors }">
+                    <option value="">
+                      {{ f['res_mandals'].value ? 'ఇక్కడ క్లిక్ చేసి ఎంచుకోండి' : 'ముందుగా మండలాన్ని ఎంచుకోండి (Select Mandal First)' }}
+                    </option>
+                    <option *ngFor="let p of resPanchayatis" [value]="p.id">{{ p.panchayat_name || p.name }}</option>
+                  </select>
+                  <div class="invalid-feedback" *ngIf="submitted && f['res_panchayati'].errors">
+                    పంచాయతీ తప్పనిసరి (Residential panchayat required).
+                  </div>
+                </div>
+
+                <!-- Res Detailed Address -->
+                <div class="col-md-12">
+                  <label class="form-label fw-bold">
+                    ఇంటి నంబర్ / వీధి / ల్యాండ్‌మార్క్ (House No, Street, Landmark)
+                  </label>
+                  <input type="text" formControlName="res_address" class="form-control form-control-lg"
+                         placeholder="మీ నివాస పూర్తి చిరునామా (Detailed Residential Address)">
+                </div>
+              </div>
+
+
+              <!-- SUBMIT BUTTON -->
+              <div class="text-center pt-4">
+                <button type="submit" class="btn btn-primary btn-lg px-5 py-3 shadow" [disabled]="showSpinner">
+                  <span *ngIf="showSpinner" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                  <span *ngIf="!showSpinner">నమోదు చేయండి (Submit Registration)</span>
+                  <span *ngIf="showSpinner">నమోదవుతోంది... (Submitting...)</span>
+                </button>
+              </div>
+
+            </form>
+
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>

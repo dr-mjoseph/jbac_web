@@ -3151,3 +3151,67 @@ Implemented 11 REST API endpoints in [backend/server.ts](file:///c:/Users/rajes/
 - Executed automated integration test suite [scripts/test_jbac_android_endpoints.js](file:///c:/Users/rajes/Documents/jbac_web/scripts/test_jbac_android_endpoints.js).
 - All 11 endpoints returned HTTP `200 OK` with valid JSON responses.
 
+
+
+## 61. Teaching Field Employees Registration System: Full-Stack Web, Mobile, Database, and Admin Implementation (v0.0.50) (November 6, 2026)
+
+### 1. Context & User Requirements
+- The user requested a new comprehensive registration system titled **"Registration of Employees in Teaching field" (బోధనా రంగంలో ఉద్యోగుల నమోదు)** across both Web (`jbac_web`) and Mobile (`jbac_app`).
+- The system captures:
+  - Full Name with Surname (`ఇంటిపేరుతో సహా పూర్తి పేరు`)
+  - Gender (`లింగం`: Male / Female / Other)
+  - Mobile & Email
+  - Exact Designation (`ఖచ్చితమైన హోదా`)
+  - Role Category (`పాత్ర వర్గం`: Administration, Teaching, Administration and Teaching)
+  - Qualification Category (`విద్యార్హత వర్గం`: 10th or Below 10th, Inter, UG, PG, Ph.D, Post Doctoral)
+  - Experience (`అనుభవం`): Total Experience in years + Experience in Subject / Field
+  - Caste (`కులం`: OC, BC-A, BC-B, BC-C, BC-D, BC-E, SC, ST, Other) & Subcaste
+  - Faith Category (`విశ్వాస వర్గం` / Denomination)
+  - Family Background (`కుటుంబ నేపథ్యం`: First to Sixth Generation Employee)
+  - Church / Pastor Phone Number
+  - Teacher Type (`ఉపాధ్యాయుని రకం`: Government / Private)
+  - Working In (`ఎక్కడ పనిచేస్తున్నారు`: 10 tiers from Anganwady to Medical College)
+  - Institute Name (`విద్యా సంస్థ పేరు`)
+  - Institute Address (State-first cascading: State $\rightarrow$ District $\rightarrow$ Constituency $\rightarrow$ Mandal $\rightarrow$ Panchayat $\rightarrow$ Detailed Address)
+  - Residential Address (State-first cascading: State $\rightarrow$ District $\rightarrow$ Constituency $\rightarrow$ Mandal $\rightarrow$ Panchayat $\rightarrow$ House No / Street)
+- Font requirement: strictly use `Ramabhadra` across both Web and Mobile interfaces.
+- Mobile version bump to `0.0.50` (`versionCode 50`, `targetSdkVersion 36`).
+- Admin console integration in `jbac.in/admin`.
+- Production build & deploy to AWS S3 & CloudFront, mobile build & sign (.apk & .aab), and push to GitHub.
+
+### 2. Database Provisioning (AWS RDS MySQL `jbac_jbac`)
+Created 5 dedicated tables:
+1. `teacher_reg`: 33 columns with multi-state indexes on `mobile`, `inst_state_id`, `res_state_id`, `role_category`, and `working_in`.
+2. `teaching_role_categories`: Pre-seeded with Administration, Teaching, Administration & Teaching.
+3. `teaching_family_backgrounds`: Pre-seeded with 1st, 2nd, 3rd, 4th, and 6th generation options.
+4. `teaching_institution_types`: Pre-seeded with 10 institution tiers (Anganwady, Play School, Primary School, High School, Junior College, Vocational College, Diploma College, Degree College, Technical College, Medical College).
+5. `teaching_experience_levels`: Pre-seeded with 7 standard experience brackets.
+
+### 3. Backend REST APIs Deployed (AWS Lambda `jbac-backend-api`)
+Implemented 4 endpoints in `backend/server.ts` & `backend/server.js`:
+- `GET /dashboardapi/teaching-master-data` & `/api/teaching-master-data`
+- `POST /dashboardapi/teacher-register` & `/api/teacher-register`
+- `GET /dashboardapi/admin-teachers` & `/api/admin-teachers`
+- `POST /dashboardapi/admin-update-teacher` & `/api/admin-update-teacher`
+
+### 4. Web Application Frontend (`jbac_web`)
+- Created `TeacherregisterComponent` in `src/app/jesus/teacherregister/` (`.ts`, `.html`, `.css`).
+- Integrated `font-family: 'Ramabhadra', sans-serif !important;`.
+- Implemented state-first cascading guards on both Institute Address and Residential Address.
+- Added API methods in `src/app/jesus/service.service.ts`.
+- Registered route `/teacherregister` in `src/app/app-routing.module.ts` and declared component in `src/app/jesus/jesus.module.ts`.
+- Added navigation links in `src/app/shared/header/header.component.html` (desktop Telugu, desktop English, and mobile drawer) and entry button in `src/app/jesus/signup/signup.component.html`.
+- Fixed `pastorregister.component.html` state dropdown placeholder visibility.
+- Compiled production Angular build: `npm run build:prod`.
+- Deployed `dist/churchwebsite` to S3 bucket `jbac-web-production-298363284024` and invalidated CloudFront distribution `EOBBU8SU7H3BI`.
+
+### 5. Admin Cockpit Console (`public.html` & `backend/public.html`)
+- Added **Teaching Field Employees Directory Hero Box** with live counters: Total Faculty, Government, Private.
+- Added **Teaching Employees Console Modal** with search, state filter (AP/TG/All), role filter, type filter, status badges, and Approve/Reject controls.
+
+### 6. Mobile Application (`jbac_app`)
+- Created `TeacherPage` in `src/pages/teacher/` (`teacher.ts`, `teacher.html`, `teacher.scss`, `teacher.module.ts`).
+- Added service methods in `src/providers/service/service.ts`.
+- Added launcher card in `src/pages/forms/forms.html` (id 11) and routing in `src/pages/forms/forms.ts`.
+- Bumped version to `0.0.50`, `versionCode 50`, `targetSdkVersion 36`.
+- Compiled and signed release: generated `jbacApp-0.0.50.apk`, `jbacApp-0.0.50.aab`, updated `appreleasesigned.aab`.

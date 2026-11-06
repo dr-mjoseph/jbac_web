@@ -996,6 +996,22 @@ postwishform(data: any) {
   updateAdminInvestor(data: any): Observable<any> {
     return this.http.post<any>(this.testApi + 'admin-update-investor', data).pipe(map(res => res, (err: any) => err));
   }
+
+  registerTeacher(data: any): Observable<any> {
+    return this.http.post<any>(this.testApi + 'teacher-register', data).pipe(map(res => res, (err: any) => err));
+  }
+
+  getTeachingMasterData(): Observable<any> {
+    return this.http.get<any>(this.testApi + 'teaching-master-data').pipe(map(res => res, (err: any) => err));
+  }
+
+  getAdminTeachers(): Observable<any> {
+    return this.http.get<any>(this.testApi + 'admin-teachers').pipe(map(res => res, (err: any) => err));
+  }
+
+  updateAdminTeacher(data: any): Observable<any> {
+    return this.http.post<any>(this.testApi + 'admin-update-teacher', data).pipe(map(res => res, (err: any) => err));
+  }
 }
 
 

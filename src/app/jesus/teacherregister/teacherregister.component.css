@@ -1,0 +1,45 @@
+@import url('https://fonts.googleapis.com/css2?family=Ramabhadra&display=swap');
+
+:host,
+.teacher-reg-container,
+.teacher-reg-container * {
+  font-family: 'Ramabhadra', sans-serif !important;
+}
+
+.teacher-reg-container {
+  min-height: 80vh;
+}
+
+.hero-card {
+  background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+  border: 1px solid rgba(14, 165, 233, 0.35);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+}
+
+.section-title {
+  border-left: 4px solid #0284c7;
+  padding-left: 14px;
+}
+
+.form-control, .form-select {
+  border-radius: 8px;
+  border-color: #cbd5e1;
+  font-family: 'Ramabhadra', sans-serif !important;
+}
+
+.form-control:focus, .form-select:focus {
+  border-color: #0284c7;
+  box-shadow: 0 0 0 0.25rem rgba(2, 132, 199, 0.15);
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+  border: none;
+  border-radius: 10px;
+  font-family: 'Ramabhadra', sans-serif !important;
+}
+
+.btn-primary:hover {
+  background: linear-gradient(135deg, #0369a1 0%, #075985 100%);
+  transform: translateY(-1px);
+}

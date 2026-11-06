@@ -63,6 +63,7 @@ import { FamilyCouncellingComponent } from './jesus/family-councelling/family-co
 import { DoctorregisterComponent } from './jesus/doctorregister/doctorregister.component';
 import { EntrepreneurregisterComponent } from './jesus/entrepreneurregister/entrepreneurregister.component';
 import { InvestorregisterComponent } from './jesus/investorregister/investorregister.component';
+import { TeacherregisterComponent } from './jesus/teacherregister/teacherregister.component';
 
 
 
@@ -135,6 +136,9 @@ const routes: Routes = [
   { path: 'entrepreneur', component: EntrepreneurregisterComponent },
   { path: 'investorregister', component: InvestorregisterComponent },
   { path: 'investor', component: InvestorregisterComponent },
+  { path: 'teacherregister', component: TeacherregisterComponent },
+  { path: 'teacher', component: TeacherregisterComponent },
+  { path: 'teachers', component: TeacherregisterComponent },
   {
     path: 'admin',
     children: [],

@@ -330,6 +330,58 @@ CREATE TABLE IF NOT EXISTS `entrepreneur_reg` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 ```
 
+#### D. Teaching Field Employees (`teacher_reg`)
+```sql
+CREATE TABLE IF NOT EXISTS `teacher_reg` (
+  `id` INT AUTO_INCREMENT PRIMARY KEY,
+  `name_with_surname` VARCHAR(191) NOT NULL,
+  `gender` ENUM('Male', 'Female', 'Other') NOT NULL,
+  `mobile` VARCHAR(15) NOT NULL,
+  `email` VARCHAR(120) DEFAULT NULL,
+  `exact_designation` VARCHAR(191) NOT NULL,
+  `role_category` VARCHAR(100) NOT NULL,
+  `qualification_category` VARCHAR(100) NOT NULL,
+  `total_experience_years` VARCHAR(50) NOT NULL,
+  `experience_in` VARCHAR(191) NOT NULL,
+  `caste` VARCHAR(50) NOT NULL,
+  `subcaste` VARCHAR(100) DEFAULT NULL,
+  `faith_category` VARCHAR(100) NOT NULL,
+  `family_background` VARCHAR(100) NOT NULL,
+  `pastor_phone` VARCHAR(15) DEFAULT NULL,
+  `teacher_type` ENUM('Government', 'Private') NOT NULL,
+  `working_in` VARCHAR(100) NOT NULL,
+  `institute_name` VARCHAR(191) NOT NULL,
+  `inst_state_id` INT DEFAULT NULL,
+  `inst_district_id` INT DEFAULT NULL,
+  `inst_constituency_id` INT DEFAULT NULL,
+  `inst_mandal_id` INT DEFAULT NULL,
+  `inst_panchayat_id` INT DEFAULT NULL,
+  `inst_address` TEXT DEFAULT NULL,
+  `res_state_id` INT DEFAULT NULL,
+  `res_district_id` INT DEFAULT NULL,
+  `res_constituency_id` INT DEFAULT NULL,
+  `res_mandal_id` INT DEFAULT NULL,
+  `res_panchayat_id` INT DEFAULT NULL,
+  `res_address` TEXT DEFAULT NULL,
+  `status` ENUM('Pending', 'Approved', 'Rejected') DEFAULT 'Pending',
+  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  INDEX `idx_tr_mobile` (`mobile`),
+  INDEX `idx_tr_res_state` (`res_state_id`),
+  INDEX `idx_tr_res_district` (`res_district_id`),
+  INDEX `idx_tr_inst_state` (`inst_state_id`),
+  INDEX `idx_tr_inst_district` (`inst_district_id`),
+  INDEX `idx_tr_role_category` (`role_category`),
+  INDEX `idx_tr_working_in` (`working_in`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+```
+
+#### E. Teaching Master Tables
+- `teaching_role_categories`: Seeded with Administration, Teaching, and Administration and Teaching.
+- `teaching_family_backgrounds`: Seeded with 1st, 2nd, 3rd, 4th, and 6th generation employee tiers.
+- `teaching_institution_types`: Seeded with 10 tiers (Anganwady, Play School, Primary School, High School, Junior College, Vocational College, Diploma College, Degree College, Technical College, Medical College).
+- `teaching_experience_levels`: Seeded with 7 experience brackets (0-1, 1-3, 3-5, 5-10, 10-15, 15-20, 20+ years).
+
 #### C. Investor Registrations (`investor_reg`)
 ```sql
 CREATE TABLE IF NOT EXISTS `investor_reg` (
@@ -351,6 +403,58 @@ CREATE TABLE IF NOT EXISTS `investor_reg` (
   `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 ```
+
+#### D. Teaching Field Employees (`teacher_reg`)
+```sql
+CREATE TABLE IF NOT EXISTS `teacher_reg` (
+  `id` INT AUTO_INCREMENT PRIMARY KEY,
+  `name_with_surname` VARCHAR(191) NOT NULL,
+  `gender` ENUM('Male', 'Female', 'Other') NOT NULL,
+  `mobile` VARCHAR(15) NOT NULL,
+  `email` VARCHAR(120) DEFAULT NULL,
+  `exact_designation` VARCHAR(191) NOT NULL,
+  `role_category` VARCHAR(100) NOT NULL,
+  `qualification_category` VARCHAR(100) NOT NULL,
+  `total_experience_years` VARCHAR(50) NOT NULL,
+  `experience_in` VARCHAR(191) NOT NULL,
+  `caste` VARCHAR(50) NOT NULL,
+  `subcaste` VARCHAR(100) DEFAULT NULL,
+  `faith_category` VARCHAR(100) NOT NULL,
+  `family_background` VARCHAR(100) NOT NULL,
+  `pastor_phone` VARCHAR(15) DEFAULT NULL,
+  `teacher_type` ENUM('Government', 'Private') NOT NULL,
+  `working_in` VARCHAR(100) NOT NULL,
+  `institute_name` VARCHAR(191) NOT NULL,
+  `inst_state_id` INT DEFAULT NULL,
+  `inst_district_id` INT DEFAULT NULL,
+  `inst_constituency_id` INT DEFAULT NULL,
+  `inst_mandal_id` INT DEFAULT NULL,
+  `inst_panchayat_id` INT DEFAULT NULL,
+  `inst_address` TEXT DEFAULT NULL,
+  `res_state_id` INT DEFAULT NULL,
+  `res_district_id` INT DEFAULT NULL,
+  `res_constituency_id` INT DEFAULT NULL,
+  `res_mandal_id` INT DEFAULT NULL,
+  `res_panchayat_id` INT DEFAULT NULL,
+  `res_address` TEXT DEFAULT NULL,
+  `status` ENUM('Pending', 'Approved', 'Rejected') DEFAULT 'Pending',
+  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  INDEX `idx_tr_mobile` (`mobile`),
+  INDEX `idx_tr_res_state` (`res_state_id`),
+  INDEX `idx_tr_res_district` (`res_district_id`),
+  INDEX `idx_tr_inst_state` (`inst_state_id`),
+  INDEX `idx_tr_inst_district` (`inst_district_id`),
+  INDEX `idx_tr_role_category` (`role_category`),
+  INDEX `idx_tr_working_in` (`working_in`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+```
+
+#### E. Teaching Master Tables
+- `teaching_role_categories`: Seeded with Administration, Teaching, and Administration and Teaching.
+- `teaching_family_backgrounds`: Seeded with 1st, 2nd, 3rd, 4th, and 6th generation employee tiers.
+- `teaching_institution_types`: Seeded with 10 tiers (Anganwady, Play School, Primary School, High School, Junior College, Vocational College, Diploma College, Degree College, Technical College, Medical College).
+- `teaching_experience_levels`: Seeded with 7 experience brackets (0-1, 1-3, 3-5, 5-10, 10-15, 15-20, 20+ years).
 
 ---
 

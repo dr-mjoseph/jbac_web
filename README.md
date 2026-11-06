@@ -511,3 +511,27 @@ Implemented across backend endpoints (`/dashboardapi/getLeaderswebsiteData`, `/d
    - Deployed on AWS Lambda (`jbac-backend-api`) in `ap-southeast-2`: `/usersync`, `/postnews`, `/getnews`, `/postevents`, `/events`, `/postbranches`, `/branches`, `/postprayers`, `/getprayers`, `/postchats`, `/chats/:u1/:u2`.
    - Enables native Android Studio apps using `ChurchRepository.kt` and Retrofit to dual-write alongside Firebase.
    - Verified 100% passing automated test suite with HTTP 200 OK responses.
+
+
+---
+
+## 61. Teaching Field Employees Registration System, Admin Directory & Mobile Release v0.0.50 (November 6, 2026)
+
+### Context & Implementation
+1. **Teaching Field Registration System (`/teacherregister`)**:
+   - Bilingual Telugu & English registration form for Christian educators, professors, lecturers, and educational administrators across Andhra Pradesh & Telangana.
+   - Enforced `Ramabhadra` font styling throughout the web and mobile interfaces.
+   - Captured full name with surname, gender, mobile, email, exact designation, role category, qualification category, total experience years, experience subject, caste, faith category, family background (1st to 6th generation), church/pastor phone, teacher type (Government / Private), working institution level (10 tiers from Anganwady to Medical College), and institute name.
+   - Strict state-first cascading guards on both Institute Address and Residential Address.
+2. **Database Provisioning (AWS RDS MySQL `jbac_jbac`)**:
+   - Created `teacher_reg` (33 columns, multi-state indexing) and 4 master lookup tables (`teaching_role_categories`, `teaching_family_backgrounds`, `teaching_institution_types`, `teaching_experience_levels`).
+3. **Backend REST APIs Deployed (AWS Lambda `jbac-backend-api`)**:
+   - Implemented 4 endpoints in `backend/server.ts`: `/dashboardapi/teaching-master-data`, `/dashboardapi/teacher-register`, `/dashboardapi/admin-teachers`, and `/dashboardapi/admin-update-teacher`.
+4. **Admin Database Cockpit (`/admin`)**:
+   - Integrated Teaching Field Employees hero summary card with live counts for Total Faculty, Government, and Private educators.
+   - Implemented interactive modal with search, AP/TG state filter, role filter, type filter, status badges, and 1-click Approve/Reject actions.
+5. **Mobile Application Release v0.0.50**:
+   - Created `TeacherPage` in `src/pages/teacher/` with `Ramabhadra` font styling and bilingual UI.
+   - Added launcher card in `forms.html` (id 11) and updated navigation.
+   - Bumped version to `0.0.50` (`versionCode 50`, `targetSdkVersion 36`).
+   - Successfully compiled and signed `jbacApp-0.0.50.apk` (v1+v2+v3 scheme) and `jbacApp-0.0.50.aab` / `appreleasesigned.aab`.
