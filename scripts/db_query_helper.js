@@ -43,3 +43,4 @@ function runSql(query) {
     console.error('Error:', err.message);
   }
 })();
+

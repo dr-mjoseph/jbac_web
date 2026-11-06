@@ -129,3 +129,4 @@ const tables = [
   const verifyRes = await runSql("SHOW TABLES LIKE 'jbac_%'");
   console.log(verifyRes);
 })();
+
