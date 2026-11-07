@@ -639,7 +639,9 @@ select.form-select,
 }
 
 select option,
-.form-select option {
+.form-select option,
+select.form-select option,
+.teacher-reg-container select option {
   color: #1e293b !important;
   background-color: #ffffff !important;
   font-family: 'Ramabhadra', 'Segoe UI', Roboto, sans-serif !important;

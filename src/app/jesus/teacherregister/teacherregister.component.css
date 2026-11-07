@@ -27,10 +27,13 @@
   font-family: 'Ramabhadra', sans-serif !important;
 }
 
-select option {
+select option,
+.form-select option,
+:host ::ng-deep select option,
+:host ::ng-deep .form-select option {
   color: #1e293b !important;
   background-color: #ffffff !important;
-  font-family: 'Ramabhadra', sans-serif !important;
+  font-family: 'Ramabhadra', 'Segoe UI', Roboto, sans-serif !important;
 }
 
 .form-control:focus, .form-select:focus {
