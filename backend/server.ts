@@ -5991,7 +5991,13 @@ app.all(['/dashboardapi/teacher-register', '/api/teacher-register', '/dashboarda
 // 3. Admin List of Teachers
 app.all(['/dashboardapi/admin-teachers', '/api/admin-teachers'], async (req: any, res: any) => {
     try {
-        const [rows]: any = await db.query('SELECT * FROM `teacher_reg` ORDER BY `id` DESC');
+        const [rows]: any = await db.query(`
+            SELECT *,
+                   name AS name_with_surname,
+                   designation AS exact_designation
+            FROM \`teacher_reg\`
+            ORDER BY \`id\` DESC
+        `);
         res.json({ status: 200, data: rows || [], message: 'Success' });
     } catch (err: any) {
         res.status(500).json({ status: 500, message: err.message || 'Error fetching teachers', data: [] });
