@@ -5898,8 +5898,8 @@ app.all(['/dashboardapi/teacher-register', '/api/teacher-register', '/dashboarda
                 \`pastor_phone\`, \`teacher_type\`, \`working_in\`, \`institute_name\`,
                 \`inst_state_id\`, \`inst_district_id\`, \`inst_constituency_id\`, \`inst_mandal_id\`, \`inst_panchayat_id\`, \`inst_address\`,
                 \`res_state_id\`, \`res_district_id\`, \`res_constituency_id\`, \`res_mandal_id\`, \`res_panchayat_id\`, \`res_address\`,
-                \`description\`
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+                \`description\`, \`about_achievements\`
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
             [
                 name,
                 mobile,
@@ -5932,7 +5932,8 @@ app.all(['/dashboardapi/teacher-register', '/api/teacher-register', '/dashboarda
                 b.res_mandal_id || b.mandal_id ? Number(b.res_mandal_id || b.mandal_id) : null,
                 b.res_panchayat_id || b.panchayat_id ? Number(b.res_panchayat_id || b.panchayat_id) : null,
                 b.res_address || [resLoc.state_name, resLoc.district_name, resLoc.constituency_name, resLoc.mandal_name, resLoc.panchayat_name].filter(Boolean).join(', ') || null,
-                b.description || null
+                b.description || b.about_achievements || null,
+                b.about_achievements || b.description || null
             ]
         );
 

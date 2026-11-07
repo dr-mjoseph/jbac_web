@@ -630,10 +630,27 @@ table.table tbody td {
   100% { transform: rotate(360deg); }
 }
 
-/* Ramabhadra Font Enforcement for Entrepreneur & Investor Registration */
+/* Global Select and Option Styling Consistency */
+select.form-select,
+.form-select,
+.form-control {
+  color: #1e293b !important;
+  background-color: #ffffff !important;
+}
+
+select option,
+.form-select option {
+  color: #1e293b !important;
+  background-color: #ffffff !important;
+  font-family: 'Ramabhadra', 'Segoe UI', Roboto, sans-serif !important;
+}
+
+/* Ramabhadra Font Enforcement for Entrepreneur, Investor & Teacher Registration */
 .entrepreneur-reg-container,
 .entrepreneur-reg-container *,
 .investor-reg-container,
-.investor-reg-container * {
+.investor-reg-container *,
+.teacher-reg-container,
+.teacher-reg-container * {
   font-family: 'Ramabhadra', 'Segoe UI', Roboto, sans-serif !important;
 }

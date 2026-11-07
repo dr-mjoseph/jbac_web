@@ -2694,6 +2694,7 @@
         <td style="padding:10px 14px;">
           <div style="font-weight:600; color:#fff;">${item.institute_name || 'N/A'}</div>
           <div style="font-size:0.78rem; color:#a5b4fc;">🏛️ ${item.working_in || 'N/A'}</div>
+          ${item.about_achievements ? `<div style="font-size:0.75rem; color:#38bdf8; margin-top:4px;" title="${item.about_achievements}">🏆 ${item.about_achievements}</div>` : ''}
         </td>
         <td style="padding:10px 14px;">
           <div style="font-weight:600; color:#fbbf24;">${item.total_experience_years || 'N/A'}</div>

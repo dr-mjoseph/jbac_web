@@ -27,6 +27,12 @@
   font-family: 'Ramabhadra', sans-serif !important;
 }
 
+select option {
+  color: #1e293b !important;
+  background-color: #ffffff !important;
+  font-family: 'Ramabhadra', sans-serif !important;
+}
+
 .form-control:focus, .form-select:focus {
   border-color: #0284c7;
   box-shadow: 0 0 0 0.25rem rgba(2, 132, 199, 0.15);

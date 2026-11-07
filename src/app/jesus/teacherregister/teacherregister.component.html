@@ -49,7 +49,7 @@
                   </label>
                   <select formControlName="gender" class="form-select form-select-lg"
                           [ngClass]="{ 'is-invalid': submitted && f['gender'].errors }">
-                    <option value="">ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
+                    <option value="" disabled selected>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
                     <option value="Male">పురుషుడు (Male)</option>
                     <option value="Female">స్త్రీ (Female)</option>
                     <option value="Other">ఇతరులు (Other)</option>
@@ -113,7 +113,7 @@
                   </label>
                   <select formControlName="role_category" class="form-select form-select-lg"
                           [ngClass]="{ 'is-invalid': submitted && f['role_category'].errors }">
-                    <option value="">ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
+                    <option value="" disabled selected>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
                     <option *ngFor="let r of roleCategories" [value]="r.name_en">
                       {{ r.name_te }}
                     </option>
@@ -130,7 +130,7 @@
                   </label>
                   <select formControlName="qualification_category" class="form-select form-select-lg"
                           [ngClass]="{ 'is-invalid': submitted && f['qualification_category'].errors }">
-                    <option value="">ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
+                    <option value="" disabled selected>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
                     <option *ngFor="let q of qualificationCategories" [value]="q.name || q.qualification_name">
                       {{ q.name || q.qualification_name }}
                     </option>
@@ -147,9 +147,9 @@
                   </label>
                   <select formControlName="total_experience_years" class="form-select form-select-lg"
                           [ngClass]="{ 'is-invalid': submitted && f['total_experience_years'].errors }">
-                    <option value="">ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
-                    <option *ngFor="let exp of experienceLevels" [value]="exp.name_en">
-                      {{ exp.name_te }}
+                    <option value="" disabled selected>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
+                    <option *ngFor="let exp of experienceLevels" [value]="exp.years_range || exp.name_en">
+                      {{ exp.label_te || exp.name_te || exp.years_range }}
                     </option>
                   </select>
                   <div class="invalid-feedback" *ngIf="submitted && f['total_experience_years'].errors">
@@ -177,7 +177,7 @@
                   </label>
                   <select formControlName="teacher_type" class="form-select form-select-lg"
                           [ngClass]="{ 'is-invalid': submitted && f['teacher_type'].errors }">
-                    <option value="">ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
+                    <option value="" disabled selected>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
                     <option value="Government">ప్రభుత్వ (Government)</option>
                     <option value="Private">ప్రైవేట్ (Private)</option>
                   </select>
@@ -193,7 +193,7 @@
                   </label>
                   <select formControlName="working_in" class="form-select form-select-lg"
                           [ngClass]="{ 'is-invalid': submitted && f['working_in'].errors }">
-                    <option value="">ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
+                    <option value="" disabled selected>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
                     <option *ngFor="let inst of institutionTypes" [value]="inst.name_en">
                       {{ inst.name_te }}
                     </option>
@@ -215,6 +215,15 @@
                     విద్యా సంస్థ పేరు తప్పనిసరి (Institute name required).
                   </div>
                 </div>
+
+                <!-- Write about yourself and your achievements -->
+                <div class="col-md-12">
+                  <label class="form-label fw-bold">
+                    మీ గురించి మరియు మీ సాధించిన విజయాల గురించి రాయండి (Write about yourself and your achievements)
+                  </label>
+                  <textarea formControlName="about_achievements" rows="4" class="form-control"
+                            placeholder="మీ విద్యా బోధనా ప్రస్థానం, సాధించిన విజయాలు, గుర్తింపులు, అవార్డులు లేదా ఇతర ముఖ్య వివరాలు ఇక్కడ నమోదు చేయండి (Write about your teaching journey, achievements, recognitions, awards or other key details)..."></textarea>
+                </div>
               </div>
 
 
@@ -231,7 +240,7 @@
                   </label>
                   <select formControlName="caste" class="form-select form-select-lg"
                           [ngClass]="{ 'is-invalid': submitted && f['caste'].errors }">
-                    <option value="">ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
+                    <option value="" disabled selected>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
                     <option *ngFor="let c of casteList" [value]="c">{{ c }}</option>
                   </select>
                   <div class="invalid-feedback" *ngIf="submitted && f['caste'].errors">
@@ -255,7 +264,7 @@
                   </label>
                   <select formControlName="faith_category" class="form-select form-select-lg"
                           [ngClass]="{ 'is-invalid': submitted && f['faith_category'].errors }">
-                    <option value="">ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
+                    <option value="" disabled selected>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
                     <option *ngFor="let d of denominations" [value]="d.denomation_name || d.denomination_name || d.name">
                       {{ d.denomation_name || d.denomination_name || d.name }}
                     </option>
@@ -272,7 +281,7 @@
                   </label>
                   <select formControlName="family_background" class="form-select form-select-lg"
                           [ngClass]="{ 'is-invalid': submitted && f['family_background'].errors }">
-                    <option value="">ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
+                    <option value="" disabled selected>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
                     <option *ngFor="let fb of familyBackgrounds" [value]="fb.name_en">
                       {{ fb.name_te }}
                     </option>
@@ -314,7 +323,7 @@
                   </label>
                   <select formControlName="inst_state_id" (change)="onInstStateChange($event)" class="form-select form-select-lg"
                           [ngClass]="{ 'is-invalid': submitted && f['inst_state_id'].errors }">
-                    <option value="">ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
+                    <option value="" disabled selected>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
                     <option *ngFor="let s of states" [value]="s.id">{{ s.state_name || s.name }}</option>
                   </select>
                   <div class="invalid-feedback" *ngIf="submitted && f['inst_state_id'].errors">
@@ -418,7 +427,7 @@
                   </label>
                   <select formControlName="res_state_id" (change)="onResStateChange($event)" class="form-select form-select-lg"
                           [ngClass]="{ 'is-invalid': submitted && f['res_state_id'].errors }">
-                    <option value="">ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
+                    <option value="" disabled selected>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
                     <option *ngFor="let s of states" [value]="s.id">{{ s.state_name || s.name }}</option>
                   </select>
                   <div class="invalid-feedback" *ngIf="submitted && f['res_state_id'].errors">

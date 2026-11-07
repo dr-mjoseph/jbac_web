@@ -60,6 +60,35 @@ export class TeacherregisterComponent implements OnInit {
     this.loadDenominations();
   }
 
+  normalizeDenominations(list: any[]): any[] {
+    if (!Array.isArray(list) || list.length === 0) return this.getDefaultDenominations();
+    return list.map((d: any, idx: number) => {
+      const rawName = (typeof d === 'string' ? d : (d.denomation_name || d.denomination_name || d.name || '')) || '';
+      const cleanName = rawName.trim();
+      return {
+        id: d.id || idx + 1,
+        denomation_name: cleanName,
+        denomination_name: cleanName,
+        name: cleanName
+      };
+    }).filter(d => d.name.length > 0);
+  }
+
+  normalizeExperienceLevels(rawExp: any[]): any[] {
+    if (!Array.isArray(rawExp) || rawExp.length === 0) return this.getDefaultExperienceLevels();
+    return rawExp.map((e: any, idx: number) => {
+      const years = (e.years_range || e.name_en || '').toString().trim();
+      const label = (e.label_te || e.name_te || e.years_range || e.name_en || '').toString().trim();
+      return {
+        id: e.id || idx + 1,
+        years_range: years,
+        name_en: years,
+        label_te: label,
+        name_te: label
+      };
+    }).filter(e => e.years_range.length > 0);
+  }
+
   initForm(): void {
     this.teacherForm = this.fb.group({
       // Personal & Professional Core
@@ -99,7 +128,10 @@ export class TeacherregisterComponent implements OnInit {
       res_constituencyname: [{ value: '', disabled: true }, [Validators.required]],
       res_mandals: [{ value: '', disabled: true }, [Validators.required]],
       res_panchayati: [{ value: '', disabled: true }, [Validators.required]],
-      res_address: ['']
+      res_address: [''],
+
+      // Personal Achievements & Profile
+      about_achievements: ['']
     });
   }
 
@@ -140,16 +172,15 @@ export class TeacherregisterComponent implements OnInit {
           } else if (payload.institution_types && payload.institution_types.length) {
             this.institutionTypes = payload.institution_types;
           }
-          if (payload.experience && payload.experience.length) {
-            this.experienceLevels = payload.experience;
-          } else if (payload.experience_levels && payload.experience_levels.length) {
-            this.experienceLevels = payload.experience_levels;
+          const rawExp = payload.experience || payload.experience_levels;
+          if (rawExp && rawExp.length) {
+            this.experienceLevels = this.normalizeExperienceLevels(rawExp);
           }
           if (payload.qualifications && payload.qualifications.length) {
             this.qualificationCategories = payload.qualifications;
           }
           if (payload.denominations && payload.denominations.length) {
-            this.denominations = payload.denominations;
+            this.denominations = this.normalizeDenominations(payload.denominations);
           }
         }
       },
@@ -169,7 +200,7 @@ export class TeacherregisterComponent implements OnInit {
       next: (res: any) => {
         const list = (res && res.data) ? res.data : (Array.isArray(res) ? res : []);
         if (list && list.length > 0) {
-          this.denominations = list;
+          this.denominations = this.normalizeDenominations(list);
         } else if (!this.denominations || this.denominations.length === 0) {
           this.denominations = this.getDefaultDenominations();
         }
@@ -235,13 +266,13 @@ export class TeacherregisterComponent implements OnInit {
 
   getDefaultExperienceLevels(): any[] {
     return [
-      { id: 1, name_en: '0-1 Years', name_te: '0 - 1 సంవత్సరం (0-1 Years)' },
-      { id: 2, name_en: '1-3 Years', name_te: '1 - 3 సంవత్సరాలు (1-3 Years)' },
-      { id: 3, name_en: '3-5 Years', name_te: '3 - 5 సంవత్సరాలు (3-5 Years)' },
-      { id: 4, name_en: '5-10 Years', name_te: '5 - 10 సంవత్సరాలు (5-10 Years)' },
-      { id: 5, name_en: '10-15 Years', name_te: '10 - 15 సంవత్సరాలు (10-15 Years)' },
-      { id: 6, name_en: '15-20 Years', name_te: '15 - 20 సంవత్సరాలు (15-20 Years)' },
-      { id: 7, name_en: '20+ Years', name_te: '20 కంటే ఎక్కువ సంవత్సరాలు (20+ Years)' }
+      { id: 1, years_range: '0-1 Years', name_en: '0-1 Years', label_te: '0 - 1 సంవత్సరం (0-1 Years)', name_te: '0 - 1 సంవత్సరం (0-1 Years)' },
+      { id: 2, years_range: '1-3 Years', name_en: '1-3 Years', label_te: '1 - 3 సంవత్సరాలు (1-3 Years)', name_te: '1 - 3 సంవత్సరాలు (1-3 Years)' },
+      { id: 3, years_range: '3-5 Years', name_en: '3-5 Years', label_te: '3 - 5 సంవత్సరాలు (3-5 Years)', name_te: '3 - 5 సంవత్సరాలు (3-5 Years)' },
+      { id: 4, years_range: '5-10 Years', name_en: '5-10 Years', label_te: '5 - 10 సంవత్సరాలు (5-10 Years)', name_te: '5 - 10 సంవత్సరాలు (5-10 Years)' },
+      { id: 5, years_range: '10-15 Years', name_en: '10-15 Years', label_te: '10 - 15 సంవత్సరాలు (10-15 Years)', name_te: '10 - 15 సంవత్సరాలు (10-15 Years)' },
+      { id: 6, years_range: '15-20 Years', name_en: '15-20 Years', label_te: '15 - 20 సంవత్సరాలు (15-20 Years)', name_te: '15 - 20 సంవత్సరాలు (15-20 Years)' },
+      { id: 7, years_range: '20+ Years', name_en: '20+ Years', label_te: '20 కంటే ఎక్కువ సంవత్సరాలు (20+ Years)', name_te: '20 కంటే ఎక్కువ సంవత్సరాలు (20+ Years)' }
     ];
   }
 
@@ -516,7 +547,11 @@ export class TeacherregisterComponent implements OnInit {
       res_constituency_id: Number(raw.res_constituencyname),
       res_mandal_id: Number(raw.res_mandals),
       res_panchayat_id: Number(raw.res_panchayati),
-      res_address: raw.res_address || ''
+      res_address: raw.res_address || '',
+
+      // About & Achievements
+      about_achievements: raw.about_achievements || '',
+      description: raw.about_achievements || ''
     };
 
     this.service.registerTeacher(payload).subscribe({
