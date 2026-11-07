@@ -53,3 +53,4 @@
   ALTER TABLE teacher_reg ADD COLUMN about_achievements TEXT DEFAULT NULL;
   ```
 - **Live Portal**: Verified on [https://jbac.in/teacherregister](https://jbac.in/teacherregister) with CloudFront invalidation.
+
