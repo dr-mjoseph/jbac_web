@@ -566,10 +566,12 @@ export class TeacherregisterComponent implements OnInit {
     const raw = this.teacherForm.getRawValue();
 
     const payload = {
+      name: raw.name_with_surname,
       name_with_surname: raw.name_with_surname,
       gender: raw.gender,
       mobile: raw.mobile,
       email: raw.email || '',
+      designation: raw.exact_designation,
       exact_designation: raw.exact_designation,
       role_category: raw.role_category,
       qualification_category: raw.qualification_category,
@@ -612,14 +614,23 @@ export class TeacherregisterComponent implements OnInit {
     this.service.registerTeacher(payload).subscribe({
       next: (res: any) => {
         this.showSpinner = false;
-        Swal.fire({
-          icon: 'success',
-          title: 'విజయవంతంగా నమోదైంది! (Successfully Registered!)',
-          text: res.message || 'మీ బోధనా రంగ ఉద్యోగి వివరాలు విజయవంతంగా నమోదు చేయబడ్డాయి.',
-          confirmButtonColor: '#0284c7'
-        }).then(() => {
-          this.router.navigate(['/']);
-        });
+        if (res && (res.status === 200 || res.id)) {
+          Swal.fire({
+            icon: 'success',
+            title: 'విజయవంతంగా నమోదైంది! (Successfully Registered!)',
+            text: res.message || 'మీ బోధనా రంగ ఉద్యోగి వివరాలు విజయవంతంగా నమోదు చేయబడ్డాయి.',
+            confirmButtonColor: '#0284c7'
+          }).then(() => {
+            this.router.navigate(['/']);
+          });
+        } else {
+          Swal.fire({
+            icon: 'error',
+            title: 'నమోదు విఫలమైంది (Registration Failed)',
+            text: res?.message || 'దయచేసి వివరాలను సరిచూసుకోండి.',
+            confirmButtonColor: '#ef4444'
+          });
+        }
       },
       error: (err: any) => {
         this.showSpinner = false;

@@ -6073,10 +6073,10 @@ app.all(['/dashboardapi/teaching-master-data', '/api/teaching-master-data'], asy
 app.all(['/dashboardapi/teacher-register', '/api/teacher-register', '/dashboardapi/register-teacher', '/api/register-teacher'], async (req, res) => {
     try {
         const b = req.body || {};
-        const name = (b.name || '').trim();
+        const name = (b.name || b.name_with_surname || b.fullname || '').trim();
         const mobile = String(b.mobile || b.phone || b.mobile_number || '').trim();
         if (!name || !mobile) {
-            return res.json({ status: 400, message: 'Name and mobile number are required. / పేరు మరియు మొబైల్ నంబర్ తప్పనిసరి.' });
+            return res.status(400).json({ status: 400, message: 'Name and mobile number are required. / పేరు మరియు మొబైల్ నంబర్ తప్పనిసరి.' });
         }
         // Resolve Residential Address Names
         const resLoc = await resolveLocationNames({
@@ -6155,7 +6155,7 @@ app.all(['/dashboardapi/teacher-register', '/api/teacher-register', '/dashboarda
             mobile,
             b.email ? String(b.email).trim() : null,
             b.gender || 'Not Specified',
-            b.designation || 'Teacher',
+            b.exact_designation || b.designation || 'Teacher',
             b.role_category || 'Teaching',
             b.qualification_category || 'UG',
             b.qualification_id ? Number(b.qualification_id) : null,
