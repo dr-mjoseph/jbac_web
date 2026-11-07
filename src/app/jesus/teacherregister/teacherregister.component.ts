@@ -39,6 +39,10 @@ export class TeacherregisterComponent implements OnInit {
 
   casteList: string[] = ['OC', 'BC-A', 'BC-B', 'BC-C', 'BC-D', 'BC-E', 'SC', 'ST', 'Others / ఇతరులు'];
 
+  // CV / Profile Upload
+  cvBase64: string = '';
+  cvFileName: string = '';
+
   constructor(
     private fb: FormBuilder,
     private service: ServiceService,
@@ -131,7 +135,10 @@ export class TeacherregisterComponent implements OnInit {
       res_address: [''],
 
       // Personal Achievements & Profile
-      about_achievements: ['']
+      about_achievements: [''],
+
+      // CV / Profile Upload (Optional)
+      cv_profile: ['']
     });
   }
 
@@ -285,6 +292,50 @@ export class TeacherregisterComponent implements OnInit {
       { id: 5, name: 'Ph.D (డాక్టరేట్)' },
       { id: 6, name: 'Post Doctoral (పోస్ట్ డాక్టోరల్)' }
     ];
+  }
+
+  // ==========================================
+  // CV / PROFILE UPLOAD HANDLERS
+  // ==========================================
+  onCvFileSelected(event: any): void {
+    const file = event.target?.files?.[0];
+    if (!file) return;
+
+    const validExtensions = ['pdf', 'doc', 'docx'];
+    const ext = file.name.split('.').pop()?.toLowerCase() || '';
+    if (!validExtensions.includes(ext)) {
+      Swal.fire({
+        icon: 'error',
+        title: 'చెల్లని ఫైల్ ఫార్మాట్ (Invalid Format)',
+        text: 'దయచేసి PDF లేదా DOC/DOCX ఫైల్ మాత్రమే అప్‌లోడ్ చేయండి (Please upload a PDF or DOC/DOCX file only).'
+      });
+      event.target.value = '';
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'ఫైల్ పరిమాణం చాలా పెద్దది (File Too Large)',
+        text: 'ఫైల్ పరిమాణం 5MB లోపు ఉండాలి (File size must be under 5MB).'
+      });
+      event.target.value = '';
+      return;
+    }
+
+    this.cvFileName = file.name;
+    const reader = new FileReader();
+    reader.onload = () => {
+      this.cvBase64 = reader.result as string;
+      this.teacherForm.patchValue({ cv_profile: this.cvBase64 });
+    };
+    reader.readAsDataURL(file);
+  }
+
+  removeCvFile(): void {
+    this.cvBase64 = '';
+    this.cvFileName = '';
+    this.teacherForm.patchValue({ cv_profile: '' });
   }
 
   // ==========================================
@@ -551,7 +602,11 @@ export class TeacherregisterComponent implements OnInit {
 
       // About & Achievements
       about_achievements: raw.about_achievements || '',
-      description: raw.about_achievements || ''
+      description: raw.about_achievements || '',
+
+      // CV / Profile
+      cv_profile: this.cvBase64 || '',
+      cv_file: this.cvBase64 || ''
     };
 
     this.service.registerTeacher(payload).subscribe({

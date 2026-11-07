@@ -3218,30 +3218,38 @@ Implemented 4 endpoints in `backend/server.ts` & `backend/server.js`:
 
 ---
 
-## 62. Release v0.0.51: Teacher Registration Profile Enhancements, Dropdown Reliability, Global Styling & Mobile Release v51
+## 62. Release v0.0.51: Teacher Registration Profile Enhancements, Dropdown Reliability, Global Styling, CV Upload & Mobile Release v51
 
 ### 1. Database Schema Update (`jbac_jbac` on AWS RDS MySQL 8.4)
 - Added column `about_achievements TEXT DEFAULT NULL` to table `teacher_reg`.
+- Added standard timestamp column `cts VARCHAR(50) DEFAULT NULL` to table `teacher_reg`.
+- Added CV file storage columns `cv_profile LONGTEXT DEFAULT NULL` and `cv_file LONGTEXT DEFAULT NULL` to table `teacher_reg`.
 - Verified column persistence via query execution endpoint:
   ```sql
   ALTER TABLE teacher_reg ADD COLUMN about_achievements TEXT DEFAULT NULL;
+  ALTER TABLE teacher_reg ADD COLUMN cts VARCHAR(50) DEFAULT NULL, ADD COLUMN cv_profile LONGTEXT DEFAULT NULL, ADD COLUMN cv_file LONGTEXT DEFAULT NULL;
   ```
 
 ### 2. AWS Lambda Backend API Update (`jbac-backend-api`)
-- Updated `POST /dashboardapi/teacher-register` and `POST /api/teacher-register` in `backend/server.ts` & `backend/server.js` to ingest and persist `about_achievements` and `description`.
-- Built and packaged `backend/backend-deploy.zip` and deployed directly to AWS Lambda `jbac-backend-api` in `ap-southeast-2` (`CodeSha256: oJfW+TKn0GXNCPdSlzg6hxmr6c/lNH7Mydf0Fq8rotw=`, Status: Active).
+- Updated `POST /dashboardapi/teacher-register` and `POST /api/teacher-register` in `backend/server.ts` & `backend/server.js`:
+  - Automatically captures and records `cts` (Indian standard timestamp).
+  - Accepts CV/Profile files (PDF, DOC, DOCX), uploads them to Amazon S3 bucket `jbac-web-production-298363284024` under `uploads/teacher_cv/`, and saves the public clickable URL (`https://jbac.in/uploads/teacher_cv/...`) into `cv_profile` and `cv_file`.
+  - Ingests and persists `about_achievements` and `description`.
+- Built and packaged `backend/backend-deploy.zip` and deployed directly to AWS Lambda `jbac-backend-api` in `ap-southeast-2` (`CodeSha256: LX04n3cQvG6EKbw4LLE4QhxNmPgL9l6LePKa5cyDhrA=`, Status: Active).
 
 ### 3. Web Frontend Updates (`jbac_web`)
 - **Achievements Field**: Added "మీ గురించి మరియు మీ సాధించిన విజయాల గురించి రాయండి (Write about yourself and your achievements)" full-width textarea to `src/app/jesus/teacherregister/teacherregister.component.html` and form control in `teacherregister.component.ts`.
+- **Upload CV/Profile Field**: Added optional file upload input (`.pdf, .doc, .docx`) with 5MB validation, file selection feedback, and remove button in `teacherregister.component.html` and `teacherregister.component.ts`.
 - **Experience Dropdown Fix**: Implemented `normalizeExperienceLevels()` to accurately map database columns `years_range` and `label_te`, resolving blank option rendering in Chrome and mobile web.
 - **Faith Category Dropdown Fix**: Implemented `normalizeDenominations()` to trim and safely parse denominations from both `teaching-master-data` and `denomations` API endpoints, with complete synchronous fallback.
 - **Global Option Visibility & Styling**: Enforced explicit dark font (`#1e293b`) and white background (`#ffffff`) for `<select>` and `<option>` elements in `src/styles.css` along with `.teacher-reg-container` inclusion in `Ramabhadra` font rules.
-- **Admin Directory**: Updated `backend/admin_db.html`, `backend/public.html`, and `public.html` to display the "విజయాలు / Achievements" badge in faculty candidate profiles.
-- **Production Build & S3/CloudFront Sync**: Generated production bundle `main.c0279853e9b8cc02.js` and `styles.afcdadb1d87e46d3.css`, uploaded to `s3://jbac-web-production-298363284024`, and triggered CloudFront cache invalidation (`I49P7VG5GSD7TD7WJPOTKJSPQK`).
+- **Admin Directory**: Updated `backend/admin_db.html`, `backend/public.html`, and `public.html` with a prominent `📄 View CV / Profile` link button opening the stored resume directly, along with registration `cts` timestamps.
+- **Production Build & S3/CloudFront Sync**: Generated production bundle `main.343f58cb45eaecb4.js` and `styles.afcdadb1d87e46d3.css`, uploaded to `s3://jbac-web-production-298363284024`, and triggered CloudFront cache invalidation (`ICA3HF78YVPXS3XSVB3IXPVJ6P`).
 
 ### 4. Mobile Application Updates (`jbac_app`)
 - Updated `TeacherPage` in `src/pages/teacher/teacher.html` and `src/pages/teacher/teacher.ts`:
   - Added `about_achievements` textarea and form control.
+  - Added "Upload CV/Profile" optional input accepting PDF and DOC files with ES5-compatible file validation and Base64 encoding.
   - Implemented `normalizeExperienceLevels()` and `normalizeDenominations()`.
   - Bumped version to `0.0.51`, `versionCode 51`, and ensured `targetSdkVersion 36`.
 - Compiled and signed release binaries:

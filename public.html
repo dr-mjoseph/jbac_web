@@ -2695,6 +2695,8 @@
           <div style="font-weight:600; color:#fff;">${item.institute_name || 'N/A'}</div>
           <div style="font-size:0.78rem; color:#a5b4fc;">🏛️ ${item.working_in || 'N/A'}</div>
           ${item.about_achievements ? `<div style="font-size:0.75rem; color:#38bdf8; margin-top:4px;" title="${item.about_achievements}">🏆 ${item.about_achievements}</div>` : ''}
+          ${item.cv_profile || item.cv_file ? `<div style="margin-top:6px;"><a href="${item.cv_profile || item.cv_file}" target="_blank" rel="noopener noreferrer" style="display:inline-flex; align-items:center; gap:4px; padding:3px 8px; border-radius:6px; font-size:0.75rem; font-weight:700; text-decoration:none; background:rgba(14,165,233,0.15); color:#38bdf8; border:1px solid rgba(14,165,233,0.4);">📄 View CV / Profile</a></div>` : ''}
+          ${item.cts ? `<div style="font-size:0.72rem; color:#94a3b8; margin-top:4px;">🕒 ${item.cts}</div>` : ''}
         </td>
         <td style="padding:10px 14px;">
           <div style="font-weight:600; color:#fbbf24;">${item.total_experience_years || 'N/A'}</div>

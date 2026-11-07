@@ -538,19 +538,20 @@ Implemented across backend endpoints (`/dashboardapi/getLeaderswebsiteData`, `/d
 
 ---
 
-## 62. Teaching Field Enhancements, Dropdown Reliability, Global Styling & Mobile Release v0.0.51 (November 7, 2026)
+## 62. Teaching Field Enhancements, CV Upload, Dropdown Reliability, Global Styling & Mobile Release v0.0.51 (November 7, 2026)
 
 ### Context & Implementation
-1. **Achievements & Bio Field Added**:
+1. **Achievements, CTS & CV/Profile Fields Added**:
    - Added "మీ గురించి మరియు మీ సాధించిన విజయాల గురించి రాయండి (Write about yourself and your achievements)" full-width textarea to Teacher Registration on both Web (`/teacherregister`) and Mobile (`TeacherPage`).
-   - Added persistent column `about_achievements TEXT DEFAULT NULL` in MySQL RDS table `teacher_reg`.
-   - Updated AWS Lambda backend `jbac-backend-api` to persist and retrieve candidate achievements.
-   - Updated Admin console faculty directory modals to show candidate achievements.
+   - Added optional "సీవీ / ప్రొఫైల్ అప్‌లోడ్ (Upload CV / Profile)" input supporting PDF and DOC/DOCX formats up to 5MB.
+   - Added persistent columns `about_achievements TEXT`, `cts VARCHAR(50)`, `cv_profile LONGTEXT`, and `cv_file LONGTEXT` in MySQL RDS table `teacher_reg`.
+   - Updated AWS Lambda backend `jbac-backend-api` to persist Indian timestamp `cts`, upload CVs directly to Amazon S3 (`https://jbac.in/uploads/teacher_cv/...`), and save clickable URLs in `cv_profile`.
+   - Updated Admin console faculty directory modals to show candidate achievements, registration `cts` timestamps, and a 1-click `📄 View CV / Profile` link.
 2. **Total Experience & Faith Category Dropdown Fixes**:
    - Normalized `experienceLevels` to map database column keys `years_range` and `label_te` seamlessly, eliminating blank white dropdown rows.
    - Normalized `denominations` with whitespace and newline trimming, pre-seeding synchronous fallbacks to guarantee non-empty lists.
    - Added global CSS rules in `src/styles.css` forcing dark font (`#1e293b`) on white background (`#ffffff`) for `<select>` and `<option>` elements across all browsers.
-3. **Mobile Application Release v0.0.51**:
+3. **Mobile Application Release v0.0.51 (Updated)**:
    - Updated version to `0.0.51` and `versionCode 51` across `config.xml`, `package.json`, `build.gradle`, and `AndroidManifest.xml`.
    - Maintained Android 16 target compatibility (`targetSdkVersion 36`).
    - Compiled, signed, and verified: `jbacApp-0.0.51.apk`, `jbacApp-0.0.51.aab`, and `appreleasesigned.aab`.

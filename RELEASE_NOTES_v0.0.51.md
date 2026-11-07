@@ -10,17 +10,17 @@
 
 ## 🚀 Key Updates & Enhancements in v0.0.51
 
-### 1. New Field: "Write about yourself and your achievements" (మీ గురించి మరియు మీ సాధించిన విజయాల గురించి రాయండి)
+### 1. New Fields: "Write about yourself and your achievements" & "Upload CV/Profile"
 - **Web (`jbac_web`) & Mobile (`jbac_app`)**:
   - Added dedicated full-width textarea field: `about_achievements` under the Professional & Teaching Profile section.
-  - Allows teaching professionals to showcase their teaching journey, academic achievements, recognitions, institutional awards, and special responsibilities.
+  - Added optional **"Upload CV/Profile" (సీవీ / ప్రొఫైల్ అప్‌లోడ్)** field accepting `.pdf, .doc, .docx` documents (up to 5MB) with selection feedback and remove option.
   - Telugu & English bilingual placeholder guidance: `"మీ విద్యా బోధనా ప్రస్థానం, సాధించిన విజయాలు, గుర్తింపులు, అవార్డులు లేదా ఇతర ముఖ్య వివరాలు ఇక్కడ నమోదు చేయండి..."`.
 - **Database (`teacher_reg`)**:
-  - Added persistent column `about_achievements TEXT DEFAULT NULL` to the `teacher_reg` table in AWS RDS MySQL 8.4.
-  - Synchronized with `description` column for backward-compatible dual-read access.
+  - Added persistent columns `about_achievements TEXT DEFAULT NULL`, `cts VARCHAR(50) DEFAULT NULL`, `cv_profile LONGTEXT DEFAULT NULL`, and `cv_file LONGTEXT DEFAULT NULL` to the `teacher_reg` table in AWS RDS MySQL 8.4.
+  - Uploaded resumes are securely stored on Amazon S3 and saved as direct, clickable HTTP links (`https://jbac.in/uploads/teacher_cv/...`) viewable by administrators.
 - **Backend REST API**:
-  - Enhanced `POST /dashboardapi/teacher-register` and `POST /api/teacher-register` to ingest and persist `about_achievements`.
-  - Exposed `about_achievements` in `GET /dashboardapi/admin-teachers` for admin review in the Faculty Directory Cockpit.
+  - Enhanced `POST /dashboardapi/teacher-register` and `POST /api/teacher-register` to ingest `cts`, auto-upload CV documents to Amazon S3, and persist `about_achievements`.
+  - Exposed `about_achievements`, `cts`, and `cv_profile` in `GET /dashboardapi/admin-teachers` for admin review in the Faculty Directory Cockpit with a 1-click `📄 View CV / Profile` button.
 
 ---
 

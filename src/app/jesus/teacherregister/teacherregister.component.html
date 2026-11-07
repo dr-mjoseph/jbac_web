@@ -224,6 +224,26 @@
                   <textarea formControlName="about_achievements" rows="4" class="form-control"
                             placeholder="మీ విద్యా బోధనా ప్రస్థానం, సాధించిన విజయాలు, గుర్తింపులు, అవార్డులు లేదా ఇతర ముఖ్య వివరాలు ఇక్కడ నమోదు చేయండి (Write about your teaching journey, achievements, recognitions, awards or other key details)..."></textarea>
                 </div>
+
+                <!-- Upload CV / Profile (Optional) -->
+                <div class="col-md-12">
+                  <label class="form-label fw-bold">
+                    సీవీ / ప్రొఫైల్ అప్‌లోడ్ (Upload CV / Profile) <span class="text-muted fw-normal fs-6">(ఐచ్ఛికం / Optional)</span>
+                  </label>
+                  <input type="file" class="form-control form-control-lg" (change)="onCvFileSelected($event)"
+                         accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document">
+                  <div class="form-text text-muted mt-1">
+                    దయచేసి PDF లేదా DOC/DOCX ఫార్మాట్‌లో మాత్రమే అప్‌లోడ్ చేయండి (Please upload in PDF or DOC/DOCX format, max 5MB).
+                  </div>
+                  <div *ngIf="cvFileName" class="mt-2 p-2 bg-light rounded border d-flex align-items-center justify-content-between">
+                    <span class="text-success fw-bold">
+                      📄 ఎంచుకున్న ఫైల్ (Selected): {{ cvFileName }}
+                    </span>
+                    <button type="button" class="btn btn-sm btn-outline-danger" (click)="removeCvFile()">
+                      తొలగించు (Remove)
+                    </button>
+                  </div>
+                </div>
               </div>
 
 

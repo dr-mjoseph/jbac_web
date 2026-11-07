@@ -5889,6 +5889,43 @@ app.all(['/dashboardapi/teacher-register', '/api/teacher-register', '/dashboarda
             panchayat_name: b.inst_panchayat_name
         });
 
+        // Timestamp handling
+        const cts = b.cts ? String(b.cts).trim() : getIndianCts();
+
+        // CV / Profile Upload handling (PDF / DOC)
+        let cvUrl: string | null = b.cv_profile || b.cv_file || b.resume || null;
+        if (cvUrl && typeof cvUrl === 'string' && cvUrl.startsWith('data:')) {
+            try {
+                const matches = cvUrl.match(/^data:([A-Za-z0-9\-+\/.]+);base64,(.+)$/);
+                if (matches && matches.length === 3) {
+                    const mimeType = matches[1];
+                    const buffer = Buffer.from(matches[2], 'base64');
+                    let ext = 'pdf';
+                    if (mimeType.includes('msword') || mimeType.includes('doc')) ext = 'doc';
+                    if (mimeType.includes('wordprocessingml') || mimeType.includes('docx')) ext = 'docx';
+                    const sanitizedName = name.replace(/[^a-zA-Z0-9]/g, '_').toLowerCase();
+                    const fileName = `cv_${Date.now()}_${sanitizedName}.${ext}`;
+                    const s3Key = `uploads/teacher_cv/${fileName}`;
+                    
+                    try {
+                        const { S3Client, PutObjectCommand } = require('@aws-sdk/client-s3');
+                        const s3 = new S3Client({ region: 'ap-southeast-2' });
+                        await s3.send(new PutObjectCommand({
+                            Bucket: 'jbac-web-production-298363284024',
+                            Key: s3Key,
+                            Body: buffer,
+                            ContentType: mimeType
+                        }));
+                        cvUrl = `https://jbac.in/${s3Key}`;
+                    } catch (s3Err) {
+                        console.warn('S3 upload attempt failed, retaining base64/data string:', s3Err);
+                    }
+                }
+            } catch (cvErr) {
+                console.warn('Error parsing CV base64 data:', cvErr);
+            }
+        }
+
         const [result]: any = await db.query(
             `INSERT INTO \`teacher_reg\` (
                 \`name\`, \`mobile\`, \`email\`, \`gender\`, \`designation\`,
@@ -5898,8 +5935,8 @@ app.all(['/dashboardapi/teacher-register', '/api/teacher-register', '/dashboarda
                 \`pastor_phone\`, \`teacher_type\`, \`working_in\`, \`institute_name\`,
                 \`inst_state_id\`, \`inst_district_id\`, \`inst_constituency_id\`, \`inst_mandal_id\`, \`inst_panchayat_id\`, \`inst_address\`,
                 \`res_state_id\`, \`res_district_id\`, \`res_constituency_id\`, \`res_mandal_id\`, \`res_panchayat_id\`, \`res_address\`,
-                \`description\`, \`about_achievements\`
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+                \`description\`, \`about_achievements\`, \`cts\`, \`cv_profile\`, \`cv_file\`
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
             [
                 name,
                 mobile,
@@ -5933,7 +5970,10 @@ app.all(['/dashboardapi/teacher-register', '/api/teacher-register', '/dashboarda
                 b.res_panchayat_id || b.panchayat_id ? Number(b.res_panchayat_id || b.panchayat_id) : null,
                 b.res_address || [resLoc.state_name, resLoc.district_name, resLoc.constituency_name, resLoc.mandal_name, resLoc.panchayat_name].filter(Boolean).join(', ') || null,
                 b.description || b.about_achievements || null,
-                b.about_achievements || b.description || null
+                b.about_achievements || b.description || null,
+                cts,
+                cvUrl,
+                cvUrl
             ]
         );
 
