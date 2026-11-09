@@ -13,7 +13,38 @@
 .hero-card {
   background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
   border: 1px solid rgba(14, 165, 233, 0.35);
-  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 8px 20px -4px rgba(0, 0, 0, 0.25);
+}
+
+.hero-card .hero-icon-badge {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: rgba(14, 165, 233, 0.2);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4rem;
+  margin-bottom: 6px;
+}
+
+.hero-card .hero-title {
+  font-size: 1.35rem;
+  font-weight: 700;
+  margin-bottom: 3px;
+  letter-spacing: -0.01em;
+}
+
+.hero-card .hero-subtitle {
+  font-size: 0.92rem;
+  margin-bottom: 6px;
+}
+
+.hero-card .hero-desc {
+  font-size: 0.82rem;
+  line-height: 1.4;
+  max-width: 620px;
+  opacity: 0.85;
 }
 
 .section-title {

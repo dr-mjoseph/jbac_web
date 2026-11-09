@@ -596,6 +596,41 @@ app.delete(['/api/crud/:table/:id', '/dashboardapi/crud/:table/:id', '/crud/:tab
         res.status(500).json({ success: false, status: 500, error: err.message });
     }
 });
+// Batch Delete multiple records
+app.post(['/api/crud/:table/batch-delete', '/dashboardapi/crud/:table/batch-delete', '/crud/:table/batch-delete'], async (req, res) => {
+    if (!verifyAdminAuth(req)) {
+        return res.status(401).json({ success: false, status: 401, error: 'Unauthorized: Admin authentication required.' });
+    }
+    const table = req.params.table;
+    const { ids } = req.body || {};
+    if (!isValidTable(table)) {
+        return res.status(400).json({ success: false, status: 400, error: `Invalid table: ${table}` });
+    }
+    if (!Array.isArray(ids) || ids.length === 0) {
+        return res.status(400).json({ success: false, status: 400, error: 'Array of record IDs is required' });
+    }
+    try {
+        const conn = await db.getConnection();
+        let delRes;
+        try {
+            await conn.query('SET FOREIGN_KEY_CHECKS = 0');
+            [delRes] = await conn.query(`DELETE FROM \`${table}\` WHERE \`id\` IN (?)`, [ids]);
+        } finally {
+            await conn.query('SET FOREIGN_KEY_CHECKS = 1');
+            conn.release();
+        }
+        res.json({
+            success: true,
+            status: 200,
+            table,
+            deletedCount: delRes ? delRes.affectedRows : 0,
+            message: `Successfully deleted ${delRes ? delRes.affectedRows : 0} records`
+        });
+    } catch (err) {
+        res.status(500).json({ success: false, status: 500, error: err.message });
+    }
+});
+
 // Batch Import Table Data (CSV / JSON with Upsert, Update, or Insert)
 app.post(['/dashboardapi/import/:table', '/api/import/:table', '/crud/import/:table'], async (req, res) => {
     if (!verifyAdminAuth(req)) {

@@ -32,6 +32,93 @@
       --code-bg: #0d131f;
     }
 
+    /* =========================================================================
+       LIGHT THEME STYLING
+       ========================================================================= */
+    body.light-theme {
+      --bg-dark: #f8fafc;
+      --bg-surface: #ffffff;
+      --bg-card: #f8fafc;
+      --bg-card-hover: #f1f5f9;
+      --border-subtle: #cbd5e1;
+      --border-focus: #2563eb;
+      --text-main: #0f172a;
+      --text-muted: #475569;
+      --text-dim: #64748b;
+      --primary: #2563eb;
+      --primary-hover: #1d4ed8;
+      --primary-light: rgba(37, 99, 235, 0.1);
+      --success: #059669;
+      --success-light: rgba(5, 150, 105, 0.1);
+      --warning: #d97706;
+      --warning-light: rgba(217, 119, 6, 0.1);
+      --danger: #dc2626;
+      --danger-light: rgba(220, 38, 38, 0.1);
+      --accent: #7c3aed;
+      --code-bg: #f8fafc;
+    }
+
+    body.light-theme .brand-title h1 { color: #0f172a; }
+    body.light-theme .table-name-badge { color: #0f172a; }
+    body.light-theme .metric-card-value { color: #0f172a; }
+    body.light-theme .sql-editor { color: #0f172a; }
+    body.light-theme .endpoint-input { color: #1e40af; }
+    body.light-theme .modal-header h3 { color: #0f172a; }
+    body.light-theme .modal-card { background: #ffffff; }
+    body.light-theme .data-grid th {
+      background: #f1f5f9;
+      color: #334155;
+      border-bottom: 1px solid #cbd5e1;
+      border-right: 1px solid #e2e8f0;
+    }
+    body.light-theme .data-grid td {
+      color: #0f172a;
+      border-bottom: 1px solid #e2e8f0;
+      border-right: 1px solid #f1f5f9;
+    }
+    body.light-theme .data-grid tr:hover td { background: #f1f5f9; }
+    body.light-theme .data-grid tr.selected-row td { background: rgba(239, 68, 68, 0.14) !important; }
+    body.light-theme .history-pill { background: #f1f5f9; border-color: #cbd5e1; color: #334155; }
+    body.light-theme .history-pill:hover { border-color: #2563eb; color: #0f172a; }
+    body.light-theme .quick-query-sql { color: #1d4ed8; }
+    body.light-theme .cell-null { color: #94a3b8; }
+    body.light-theme .admin-badge { background: rgba(124, 58, 237, 0.1); border-color: rgba(124, 58, 237, 0.3); color: #6d28d9; }
+    body.light-theme .metric-card-icon { background: rgba(0, 0, 0, 0.04); }
+    body.light-theme .modal-close-btn { color: #64748b; }
+    body.light-theme .modal-close-btn:hover { color: #0f172a; }
+    body.light-theme .table-list-item.active { color: #1d4ed8; font-weight: 700; }
+    body.light-theme .row-count-badge { background: rgba(0, 0, 0, 0.06); color: #475569; }
+    body.light-theme .nav-tab { color: #475569; }
+    body.light-theme .nav-tab:hover { color: #0f172a; }
+    body.light-theme .nav-tab.active { color: #2563eb; font-weight: 700; }
+    body.light-theme .btn { background: #f1f5f9; border-color: #cbd5e1; color: #0f172a; }
+    body.light-theme .btn:hover { background: #e2e8f0; }
+    body.light-theme .btn-primary { background: #2563eb; border-color: #2563eb; color: #ffffff; }
+    body.light-theme .btn-primary:hover { background: #1d4ed8; border-color: #1d4ed8; }
+    body.light-theme .btn-danger { background: #dc2626; border-color: #dc2626; color: #ffffff; }
+    body.light-theme .btn-danger:hover { background: #b91c1c; border-color: #b91c1c; }
+    body.light-theme .btn-success { background: #059669; border-color: #059669; color: #ffffff; }
+    body.light-theme .btn-success:hover { background: #047857; border-color: #047857; }
+    body.light-theme .endpoint-select-wrap { background: #f1f5f9; border-color: #cbd5e1; }
+    body.light-theme #themeToggleBtn { background: #e2e8f0; border-color: #cbd5e1; color: #0f172a; }
+    body.light-theme #themeToggleBtn:hover { background: #cbd5e1; }
+    body.light-theme ::-webkit-scrollbar-track { background: #f1f5f9; }
+    body.light-theme ::-webkit-scrollbar-thumb { background: #cbd5e1; }
+    body.light-theme ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+    /* Multi-select Row Highlight & Checkboxes */
+    .data-grid tr.selected-row td {
+      background: rgba(239, 68, 68, 0.18) !important;
+    }
+    .row-select-cb, #selectAllCheckbox {
+      width: 16px;
+      height: 16px;
+      cursor: pointer;
+      accent-color: var(--danger);
+      vertical-align: middle;
+    }
+
+
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
       font-family: 'Inter', system-ui, -apple-system, sans-serif;
@@ -1090,6 +1177,9 @@
       </div>
       <button class="btn btn-sm" onclick="saveAndTestApi()">⚡ Connect</button>
       <button class="btn btn-sm btn-primary" onclick="refreshCurrentTab()">🔄 Refresh</button>
+      <button class="btn btn-sm" id="themeToggleBtn" onclick="toggleTheme()" title="Toggle Light / Dark Mode" style="font-weight:600; gap:5px;">
+        <span id="themeToggleIcon">☀️</span> <span id="themeToggleText">Light</span>
+      </button>
       
       <!-- Authenticated Admin User Status -->
       <div class="admin-badge" id="adminBadge">
@@ -1122,6 +1212,135 @@
       </div>
       <div id="dashboardStateIndicator" style="font-size:0.82rem; color:var(--text-dim);">
         Showing all registered users & activities across AP & TG
+      </div>
+    </div>
+
+        <!-- ENTREPRENEUR & INVESTOR CONNECT HERO BOX -->
+    <div id="businessMatchHeroBox" style="background: linear-gradient(135deg, rgba(17, 24, 39, 0.95), rgba(30, 27, 75, 0.95)); border: 1px solid rgba(99, 102, 241, 0.45); border-radius: 14px; padding: 18px 24px; margin-bottom: 22px; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.4), 0 0 15px rgba(99, 102, 241, 0.15); cursor: pointer; transition: all 0.25s ease;" onclick="openBusinessMatchModal()" onmouseover="this.style.borderColor='rgba(99, 102, 241, 0.9)'; this.style.boxShadow='0 12px 30px -5px rgba(0, 0, 0, 0.5), 0 0 20px rgba(99, 102, 241, 0.3)';" onmouseout="this.style.borderColor='rgba(99, 102, 241, 0.45)'; this.style.boxShadow='0 10px 25px -5px rgba(0, 0, 0, 0.4), 0 0 15px rgba(99, 102, 241, 0.15)';">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px;">
+        <div style="display:flex; align-items:center; gap:16px;">
+          <div style="width:52px; height:52px; border-radius:14px; background:linear-gradient(135deg, #6366f1, #a855f7); display:flex; align-items:center; justify-content:center; font-size:26px; box-shadow:0 4px 14px rgba(99,102,241,0.35); flex-shrink:0;">
+            💼
+          </div>
+          <div>
+            <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+              <h3 style="margin:0; font-size:1.22rem; font-weight:700; color:#fff; letter-spacing:-0.2px;">Entrepreneur & Investor Connect (ఎంటర్‌ప్రెన్యూర్ & ఇన్వెస్టర్ డాష్‌బోర్డ్)</h3>
+              <span style="background:rgba(99,102,241,0.2); color:#a5b4fc; border:1px solid rgba(99,102,241,0.4); padding:3px 10px; border-radius:20px; font-size:0.75rem; font-weight:700; text-transform:uppercase; letter-spacing:0.5px;">Business Networking</span>
+            </div>
+            <p style="margin:5px 0 0; font-size:0.86rem; color:var(--text-muted);">
+              Review entrepreneurs looking to launch startups, their business setup locations & needed capital, alongside investors ready to fund ideas across AP & TG.
+            </p>
+          </div>
+        </div>
+
+        <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+          <div style="background:rgba(99,102,241,0.1); border:1px solid rgba(99,102,241,0.35); padding:8px 16px; border-radius:10px; text-align:center; min-width:110px;">
+            <div style="font-size:0.7rem; color:#a5b4fc; text-transform:uppercase; letter-spacing:0.5px; font-weight:600;">Entrepreneurs</div>
+            <div id="entSummaryCount" style="font-size:1.25rem; font-weight:700; color:#fff;">--</div>
+          </div>
+          <div style="background:rgba(236,72,153,0.1); border:1px solid rgba(236,72,153,0.35); padding:8px 16px; border-radius:10px; text-align:center; min-width:110px;">
+            <div style="font-size:0.7rem; color:#f472b6; text-transform:uppercase; letter-spacing:0.5px; font-weight:600;">Funds Needed</div>
+            <div id="entSummaryCapital" style="font-size:1.15rem; font-weight:700; color:#f472b6;">--</div>
+          </div>
+          <div style="background:rgba(16,185,129,0.1); border:1px solid rgba(16,185,129,0.35); padding:8px 16px; border-radius:10px; text-align:center; min-width:110px;">
+            <div style="font-size:0.7rem; color:#34d399; text-transform:uppercase; letter-spacing:0.5px; font-weight:600;">Investors</div>
+            <div id="invSummaryCount" style="font-size:1.25rem; font-weight:700; color:#fff;">--</div>
+          </div>
+          <div style="background:rgba(52,211,153,0.1); border:1px solid rgba(52,211,153,0.35); padding:8px 16px; border-radius:10px; text-align:center; min-width:110px;">
+            <div style="font-size:0.7rem; color:#34d399; text-transform:uppercase; letter-spacing:0.5px; font-weight:600;">To Invest</div>
+            <div id="invSummaryCapital" style="font-size:1.15rem; font-weight:700; color:#34d399;">--</div>
+          </div>
+
+          <button class="btn btn-primary" style="padding:10px 18px; border-radius:10px; font-weight:700; display:flex; align-items:center; gap:8px; cursor:pointer; background:linear-gradient(135deg, #6366f1, #8b5cf6); border:none;" onclick="event.stopPropagation(); openBusinessMatchModal();">
+            <span>View Portfolios</span>
+            <span style="font-size:1.1rem;">➔</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    
+    <!-- TEACHING FIELD EMPLOYEES DIRECTORY HERO BOX -->
+    <div id="teacherDirectoryHeroBox" style="background: linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(8, 47, 73, 0.95)); border: 1px solid rgba(14, 165, 233, 0.45); border-radius: 14px; padding: 18px 24px; margin-bottom: 22px; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.4), 0 0 15px rgba(14, 165, 233, 0.15); cursor: pointer; transition: all 0.25s ease;" onclick="openTeacherDirectoryModal()" onmouseover="this.style.borderColor='rgba(14, 165, 233, 0.9)'; this.style.boxShadow='0 12px 30px -5px rgba(0, 0, 0, 0.5), 0 0 20px rgba(14, 165, 233, 0.3)';" onmouseout="this.style.borderColor='rgba(14, 165, 233, 0.45)'; this.style.boxShadow='0 10px 25px -5px rgba(0, 0, 0, 0.4), 0 0 15px rgba(14, 165, 233, 0.15)';">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px;">
+        <div style="display:flex; align-items:center; gap:16px;">
+          <div style="width:52px; height:52px; border-radius:14px; background:linear-gradient(135deg, #0284c7, #0ea5e9); display:flex; align-items:center; justify-content:center; font-size:26px; box-shadow:0 4px 14px rgba(14,165,233,0.35); flex-shrink:0;">
+            📚
+          </div>
+          <div>
+            <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+              <h3 style="margin:0; font-size:1.22rem; font-weight:700; color:#fff; letter-spacing:-0.2px;">Teaching Field Employees Directory (బోధనా రంగ ఉద్యోగుల డాష్‌బోర్డ్)</h3>
+              <span style="background:rgba(14,165,233,0.2); color:#7dd3fc; border:1px solid rgba(14,165,233,0.4); padding:3px 10px; border-radius:20px; font-size:0.75rem; font-weight:700; text-transform:uppercase; letter-spacing:0.5px;">Education Network</span>
+            </div>
+            <p style="margin:5px 0 0; font-size:0.86rem; color:var(--text-muted);">
+              Review Christian educators, lecturers, professors and administrative staff working across schools, colleges and universities in AP & TG.
+            </p>
+          </div>
+        </div>
+
+        <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+          <div style="background:rgba(14,165,233,0.1); border:1px solid rgba(14,165,233,0.35); padding:8px 16px; border-radius:10px; text-align:center; min-width:110px;">
+            <div style="font-size:0.7rem; color:#7dd3fc; text-transform:uppercase; letter-spacing:0.5px; font-weight:600;">Total Faculty</div>
+            <div id="teachersSummaryCount" style="font-size:1.25rem; font-weight:700; color:#fff;">--</div>
+          </div>
+          <div style="background:rgba(16,185,129,0.1); border:1px solid rgba(16,185,129,0.35); padding:8px 16px; border-radius:10px; text-align:center; min-width:110px;">
+            <div style="font-size:0.7rem; color:#34d399; text-transform:uppercase; letter-spacing:0.5px; font-weight:600;">Government</div>
+            <div id="teachersGovtCount" style="font-size:1.15rem; font-weight:700; color:#34d399;">--</div>
+          </div>
+          <div style="background:rgba(245,158,11,0.1); border:1px solid rgba(245,158,11,0.35); padding:8px 16px; border-radius:10px; text-align:center; min-width:110px;">
+            <div style="font-size:0.7rem; color:#fbbf24; text-transform:uppercase; letter-spacing:0.5px; font-weight:600;">Private</div>
+            <div id="teachersPvtCount" style="font-size:1.15rem; font-weight:700; color:#fbbf24;">--</div>
+          </div>
+
+          <button class="btn btn-primary" style="padding:10px 18px; border-radius:10px; font-weight:700; display:flex; align-items:center; gap:8px; cursor:pointer; background:linear-gradient(135deg, #0284c7, #0284c7); border:none;" onclick="event.stopPropagation(); openTeacherDirectoryModal();">
+            <span>View Faculty</span>
+            <span style="font-size:1.1rem;">➔</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  
+
+    <!-- STATE-WISE DISTRICT LEADERS (ALL) HERO MANAGEMENT BOX -->
+    <div id="districtLeadersHeroBox" style="background: linear-gradient(135deg, rgba(30, 41, 59, 0.95), rgba(15, 23, 42, 0.95)); border: 1px solid rgba(245, 158, 11, 0.4); border-radius: 14px; padding: 18px 24px; margin-bottom: 22px; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.4), 0 0 15px rgba(245, 158, 11, 0.1); cursor: pointer; transition: all 0.25s ease;" onclick="openDistrictLeadersModal()" onmouseover="this.style.borderColor='rgba(245, 158, 11, 0.8)'; this.style.boxShadow='0 12px 30px -5px rgba(0, 0, 0, 0.5), 0 0 20px rgba(245, 158, 11, 0.2)';" onmouseout="this.style.borderColor='rgba(245, 158, 11, 0.4)'; this.style.boxShadow='0 10px 25px -5px rgba(0, 0, 0, 0.4), 0 0 15px rgba(245, 158, 11, 0.1)';">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px;">
+        <div style="display:flex; align-items:center; gap:16px;">
+          <div style="width:52px; height:52px; border-radius:14px; background:linear-gradient(135deg, #f59e0b, #ef4444); display:flex; align-items:center; justify-content:center; font-size:26px; box-shadow:0 4px 14px rgba(245,158,11,0.35); flex-shrink:0;">
+            👑
+          </div>
+          <div>
+            <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+              <h3 style="margin:0; font-size:1.22rem; font-weight:700; color:#fff; letter-spacing:-0.2px;">State-Wise District Leaders (All)</h3>
+              <span style="background:rgba(245,158,11,0.18); color:#fbbf24; border:1px solid rgba(245,158,11,0.4); padding:3px 10px; border-radius:20px; font-size:0.75rem; font-weight:700; text-transform:uppercase; letter-spacing:0.5px;">Executive Approval</span>
+            </div>
+            <p style="margin:5px 0 0; font-size:0.86rem; color:var(--text-muted);">
+              Manage and grant leadership authorizations (<code style="color:#fbbf24;">d_in = 1</code>) for District Leaders across Pastors, Believers & Students for AP & TG. Click to expand full roster.
+            </p>
+          </div>
+        </div>
+
+        <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+          <div style="background:rgba(255,255,255,0.04); border:1px solid var(--border-subtle); padding:8px 16px; border-radius:10px; text-align:center; min-width:85px;">
+            <div style="font-size:0.7rem; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.5px; font-weight:600;">Total</div>
+            <div id="dlSummaryTotal" style="font-size:1.25rem; font-weight:700; color:var(--text-main);">--</div>
+          </div>
+          <div style="background:rgba(16,185,129,0.08); border:1px solid rgba(16,185,129,0.3); padding:8px 16px; border-radius:10px; text-align:center; min-width:85px;">
+            <div style="font-size:0.7rem; color:#10b981; text-transform:uppercase; letter-spacing:0.5px; font-weight:600;">Approved</div>
+            <div id="dlSummaryApproved" style="font-size:1.25rem; font-weight:700; color:#10b981;">--</div>
+          </div>
+          <div style="background:rgba(245,158,11,0.08); border:1px solid rgba(245,158,11,0.3); padding:8px 16px; border-radius:10px; text-align:center; min-width:85px;">
+            <div style="font-size:0.7rem; color:#f59e0b; text-transform:uppercase; letter-spacing:0.5px; font-weight:600;">Pending</div>
+            <div id="dlSummaryPending" style="font-size:1.25rem; font-weight:700; color:#f59e0b;">--</div>
+          </div>
+          <div style="background:rgba(239,68,68,0.08); border:1px solid rgba(239,68,68,0.3); padding:8px 16px; border-radius:10px; text-align:center; min-width:85px;">
+            <div style="font-size:0.7rem; color:#ef4444; text-transform:uppercase; letter-spacing:0.5px; font-weight:600;">Rejected</div>
+            <div id="dlSummaryRejected" style="font-size:1.25rem; font-weight:700; color:#ef4444;">--</div>
+          </div>
+          <button class="btn btn-primary" style="padding:10px 18px; border-radius:10px; font-weight:700; display:flex; align-items:center; gap:8px; cursor:pointer;" onclick="event.stopPropagation(); openDistrictLeadersModal();">
+            <span>Review & Approve</span>
+            <span style="font-size:1.1rem;">➔</span>
+          </button>
+        </div>
       </div>
     </div>
 
@@ -1196,6 +1415,18 @@
           <div class="metric-today-badge" title="Registered Today"><span class="metric-today-dot"></span>Today: <strong id="stat-orgs-today">0</strong></div>
         </div>
         <div class="metric-card-footer">independentorganisation_reg &bull; Total: <span id="stat-orgs-total">--</span></div>
+      </div>
+
+      <div class="metric-card" onclick="openStateCategoryQuery('pastors_associations')">
+        <div class="metric-card-header">
+          <span>Pastor Associations</span>
+          <div class="metric-card-icon">🤝</div>
+        </div>
+        <div class="metric-card-stat-row">
+          <div class="metric-card-value" id="stat-pastor-associations">--</div>
+          <div class="metric-today-badge" title="Registered Today"><span class="metric-today-dot"></span>Today: <strong id="stat-pastor-associations-today">0</strong></div>
+        </div>
+        <div class="metric-card-footer">pastors_associations &bull; Total: <span id="stat-pastor-associations-total">--</span></div>
       </div>
 
       <div class="metric-card" onclick="openStateCategoryQuery('events')">
@@ -1394,6 +1625,7 @@
             <option value="1">🏛️ AP Only</option>
             <option value="2">🏛️ TG Only</option>
           </select>
+          <button class="btn btn-sm btn-danger" id="bulkDeleteBtn" style="display:none; align-items:center; gap:6px; font-weight:700;" onclick="openBulkDeleteModal()" title="Delete all selected entries">🗑️ Delete Selected (<span id="bulkDeleteCount">0</span>)</button>
           <button class="btn btn-sm btn-success" onclick="openAddRecordModal()">➕ New Record</button>
           <button class="btn btn-sm" id="exportCsvBtn" onclick="exportCurrentTable('csv')" title="Export full table to CSV / Excel">📥 Export CSV</button>
           <button class="btn btn-sm" id="exportJsonBtn" onclick="exportCurrentTable('json')" title="Export full table to JSON">📥 Export JSON</button>
@@ -1420,6 +1652,315 @@
        MODALS: VIEW, EDIT, ADD, DELETE, LIGHTBOX
        ========================================================================= -->
   <!-- Record View Modal -->
+    
+  <!-- Teaching Employees Directory Modal -->
+  <div class="modal-backdrop" id="teacherDirectoryModal" style="display:none; align-items:center; justify-content:center; padding:20px; z-index:9999;">
+    <div class="modal-card" style="max-width:1300px; width:100%; max-height:92vh; display:flex; flex-direction:column; background:var(--bg-surface); border:1px solid var(--border-subtle); border-radius:16px; box-shadow:0 25px 50px -12px rgba(0,0,0,0.7); overflow:hidden;">
+      <!-- Modal Header -->
+      <div style="padding:18px 24px; border-bottom:1px solid var(--border-subtle); display:flex; justify-content:space-between; align-items:center; background:linear-gradient(90deg, rgba(14,165,233,0.1), rgba(2,132,199,0.05));">
+        <div style="display:flex; align-items:center; gap:12px;">
+          <div style="width:40px; height:40px; border-radius:10px; background:linear-gradient(135deg, #0284c7, #0ea5e9); display:flex; align-items:center; justify-content:center; font-size:20px; color:#fff;">
+            📚
+          </div>
+          <div>
+            <h3 style="margin:0; font-size:1.25rem; font-weight:700; color:#fff;">Teaching Field Employees Console (బోధనా రంగ ఉద్యోగుల డాష్‌బోర్డ్)</h3>
+            <p style="margin:2px 0 0; font-size:0.82rem; color:var(--text-muted);">
+              Manage registered teachers, lecturers, professors and staff with institutional & residential mapping across AP & TG.
+            </p>
+          </div>
+        </div>
+        <button onclick="closeTeacherDirectoryModal()" style="background:none; border:none; color:var(--text-dim); font-size:24px; cursor:pointer; line-height:1; padding:4px 8px; border-radius:6px;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='var(--text-dim)'">✕</button>
+      </div>
+
+      <!-- Controls Bar -->
+      <div style="padding:14px 24px; background:rgba(255,255,255,0.015); border-bottom:1px solid var(--border-subtle); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+        <div style="display:flex; align-items:center; gap:10px;">
+          <span style="font-size:0.9rem; font-weight:600; color:#7dd3fc;">Registered Faculty:</span>
+          <span id="tdTotalBadge" style="background:rgba(14,165,233,0.2); color:#7dd3fc; padding:2px 10px; border-radius:12px; font-weight:700; font-size:0.82rem;">0</span>
+        </div>
+
+        <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+          <select id="tdFilterState" onchange="applyTeacherFilters()" style="background:var(--bg-elevated); border:1px solid var(--border-subtle); color:var(--text-main); border-radius:8px; padding:7px 12px; font-size:0.84rem; cursor:pointer;">
+            <option value="all">All States (అన్ని రాష్ట్రాలు)</option>
+            <option value="1">Andhra Pradesh (AP)</option>
+            <option value="2">Telangana (TG)</option>
+          </select>
+
+          <select id="tdFilterRole" onchange="applyTeacherFilters()" style="background:var(--bg-elevated); border:1px solid var(--border-subtle); color:var(--text-main); border-radius:8px; padding:7px 12px; font-size:0.84rem; cursor:pointer;">
+            <option value="all">All Roles (అన్ని పాత్రలు)</option>
+            <option value="Teaching">Teaching</option>
+            <option value="Administration">Administration</option>
+            <option value="Administration and Teaching">Admin & Teaching</option>
+          </select>
+
+          <select id="tdFilterType" onchange="applyTeacherFilters()" style="background:var(--bg-elevated); border:1px solid var(--border-subtle); color:var(--text-main); border-radius:8px; padding:7px 12px; font-size:0.84rem; cursor:pointer;">
+            <option value="all">All Types (Govt & Pvt)</option>
+            <option value="Government">Government (ప్రభుత్వ)</option>
+            <option value="Private">Private (ప్రైవేట్)</option>
+          </select>
+
+          <input type="text" id="tdSearchInput" placeholder="🔍 Search by name, designation, institute, phone..." oninput="applyTeacherFilters()" style="background:var(--bg-elevated); border:1px solid var(--border-subtle); color:var(--text-main); border-radius:8px; padding:7px 12px; font-size:0.84rem; width:250px;">
+
+          <button onclick="fetchTeacherData(true)" style="background:var(--bg-elevated); border:1px solid var(--border-subtle); color:var(--text-main); border-radius:8px; padding:7px 14px; font-size:0.84rem; cursor:pointer; font-weight:600;" title="Reload Data">
+            🔄 Refresh
+          </button>
+        </div>
+      </div>
+
+      <!-- Table Body -->
+      <div style="flex:1; overflow-y:auto; padding:20px 24px;">
+        <div id="tdSpinner" style="display:none; text-align:center; padding:50px 0;">
+          <div style="display:inline-block; width:36px; height:36px; border:3px solid rgba(14,165,233,0.2); border-top-color:#0ea5e9; border-radius:50%; animation:spin 0.8s linear infinite;"></div>
+          <div style="margin-top:12px; color:var(--text-muted); font-size:0.88rem;">Loading Teaching Staff records...</div>
+        </div>
+
+        <div id="tdContainer">
+          <table class="data-table" style="width:100%; border-collapse:separate; border-spacing:0; font-size:0.85rem;">
+            <thead>
+              <tr style="background:rgba(255,255,255,0.03);">
+                <th style="padding:10px 12px; text-align:center; width:45px;">#</th>
+                <th style="padding:10px 14px; text-align:left;">Teacher Name & Contact</th>
+                <th style="padding:10px 14px; text-align:left;">Designation & Role</th>
+                <th style="padding:10px 14px; text-align:left;">Working In & Institute</th>
+                <th style="padding:10px 14px; text-align:left;">Experience & Subject</th>
+                <th style="padding:10px 14px; text-align:left;">Institute Address</th>
+                <th style="padding:10px 14px; text-align:left;">Residential Address</th>
+                <th style="padding:10px 12px; text-align:center;">Type</th>
+                <th style="padding:10px 12px; text-align:center;">Status</th>
+                <th style="padding:10px 12px; text-align:center;">Action</th>
+              </tr>
+            </thead>
+            <tbody id="tdTeachersTbody">
+              <!-- Dynamically populated -->
+            </tbody>
+          </table>
+          <div id="tdNoRecords" style="display:none; text-align:center; padding:40px; color:var(--text-dim);">
+            No teaching staff records found matching your criteria.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+
+  <!-- Entrepreneur & Investor Elaborative Management Modal -->
+  <div class="modal-backdrop" id="businessMatchModal" style="display:none; align-items:center; justify-content:center; padding:20px; z-index:9999;">
+    <div class="modal-card" style="max-width:1300px; width:100%; max-height:92vh; display:flex; flex-direction:column; background:var(--bg-surface); border:1px solid var(--border-subtle); border-radius:16px; box-shadow:0 25px 50px -12px rgba(0,0,0,0.7); overflow:hidden;">
+      
+      <!-- Modal Header -->
+      <div style="padding:18px 24px; border-bottom:1px solid var(--border-subtle); display:flex; justify-content:space-between; align-items:center; background:linear-gradient(90deg, rgba(99,102,241,0.1), rgba(168,85,247,0.05));">
+        <div style="display:flex; align-items:center; gap:12px;">
+          <div style="width:40px; height:40px; border-radius:10px; background:linear-gradient(135deg, #6366f1, #a855f7); display:flex; align-items:center; justify-content:center; font-size:20px; color:#fff;">
+            💼
+          </div>
+          <div>
+            <h3 style="margin:0; font-size:1.25rem; font-weight:700; color:#fff;">Entrepreneurs & Investors Console (ఎంటర్‌ప్రెన్యూర్ & ఇన్వెస్టర్ డాష్‌బోర్డ్)</h3>
+            <p style="margin:2px 0 0; font-size:0.82rem; color:var(--text-muted);">
+              Track business aspirations, self capital & investor pledges with localized address matching across AP & TG.
+            </p>
+          </div>
+        </div>
+        <button onclick="closeBusinessMatchModal()" style="background:none; border:none; color:var(--text-dim); font-size:24px; cursor:pointer; line-height:1; padding:4px 8px; border-radius:6px;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='var(--text-dim)'">✕</button>
+      </div>
+
+      <!-- Tab Switcher & Filter Controls -->
+      <div style="padding:14px 24px; background:rgba(255,255,255,0.015); border-bottom:1px solid var(--border-subtle); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+        
+        <!-- Tab Navigation -->
+        <div style="display:flex; gap:8px;">
+          <button id="bmTabEntrepreneurs" onclick="switchBmTab('entrepreneurs')" style="padding:8px 18px; border-radius:8px; font-weight:700; font-size:0.88rem; cursor:pointer; border:1px solid #6366f1; background:#6366f1; color:#fff; display:flex; align-items:center; gap:8px;">
+            <span>🚀 Entrepreneurs (వ్యాపార ఔత్సాహికులు)</span>
+            <span id="bmEntBadge" style="background:rgba(255,255,255,0.2); padding:1px 7px; border-radius:10px; font-size:0.75rem;">0</span>
+          </button>
+          <button id="bmTabInvestors" onclick="switchBmTab('investors')" style="padding:8px 18px; border-radius:8px; font-weight:700; font-size:0.88rem; cursor:pointer; border:1px solid var(--border-subtle); background:transparent; color:var(--text-muted); display:flex; align-items:center; gap:8px;">
+            <span>💰 Investors (పెట్టుబడిదారులు)</span>
+            <span id="bmInvBadge" style="background:rgba(255,255,255,0.08); padding:1px 7px; border-radius:10px; font-size:0.75rem;">0</span>
+          </button>
+        </div>
+
+        <!-- Filter Controls -->
+        <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+          <select id="bmFilterState" onchange="applyBmFilters()" style="background:var(--bg-elevated); border:1px solid var(--border-subtle); color:var(--text-main); border-radius:8px; padding:7px 12px; font-size:0.84rem; cursor:pointer;">
+            <option value="all">All States (అన్ని రాష్ట్రాలు)</option>
+            <option value="1">Andhra Pradesh (AP)</option>
+            <option value="2">Telangana (TG)</option>
+          </select>
+
+          <select id="bmFilterType" onchange="applyBmFilters()" style="background:var(--bg-elevated); border:1px solid var(--border-subtle); color:var(--text-main); border-radius:8px; padding:7px 12px; font-size:0.84rem; cursor:pointer; max-width:200px;">
+            <option value="all">All Business Types (అన్ని రంగాలు)</option>
+          </select>
+
+          <input type="text" id="bmSearchInput" placeholder="🔍 Search by name, phone, district, town..." oninput="applyBmFilters()" style="background:var(--bg-elevated); border:1px solid var(--border-subtle); color:var(--text-main); border-radius:8px; padding:7px 12px; font-size:0.84rem; width:220px;">
+
+          <button onclick="fetchBusinessMatchData(true)" style="background:var(--bg-elevated); border:1px solid var(--border-subtle); color:var(--text-main); border-radius:8px; padding:7px 14px; font-size:0.84rem; cursor:pointer; font-weight:600;" title="Reload Data">
+            🔄 Refresh
+          </button>
+        </div>
+      </div>
+
+      <!-- Modal Body (Table Container) -->
+      <div style="flex:1; overflow-y:auto; padding:20px 24px;">
+        
+        <!-- Loading Spinner -->
+        <div id="bmSpinner" style="display:none; text-align:center; padding:50px 0;">
+          <div style="display:inline-block; width:36px; height:36px; border:3px solid rgba(99,102,241,0.2); border-top-color:#6366f1; border-radius:50%; animation:spin 0.8s linear infinite;"></div>
+          <div style="margin-top:12px; color:var(--text-muted); font-size:0.88rem;">Loading Entrepreneur & Investor records...</div>
+        </div>
+
+        <!-- ENTREPRENEURS TABLE -->
+        <div id="bmEntrepreneursContainer">
+          <table class="data-table" style="width:100%; border-collapse:separate; border-spacing:0; font-size:0.85rem;">
+            <thead>
+              <tr style="background:rgba(255,255,255,0.03);">
+                <th style="padding:10px 12px; text-align:center; width:45px;">#</th>
+                <th style="padding:10px 14px; text-align:left;">Entrepreneur Name & Contact</th>
+                <th style="padding:10px 14px; text-align:left;">Personal Residence</th>
+                <th style="padding:10px 14px; text-align:left;">Business Setup Location</th>
+                <th style="padding:10px 14px; text-align:left;">Business Sector</th>
+                <th style="padding:10px 14px; text-align:right;">Self Fund</th>
+                <th style="padding:10px 14px; text-align:right;">Capital Needed</th>
+                <th style="padding:10px 12px; text-align:center;">Date</th>
+                <th style="padding:10px 12px; text-align:center;">Action</th>
+              </tr>
+            </thead>
+            <tbody id="bmEntrepreneursTbody">
+              <!-- Dynamically populated -->
+            </tbody>
+          </table>
+        </div>
+
+        <!-- INVESTORS TABLE -->
+        <div id="bmInvestorsContainer" style="display:none;">
+          <table class="data-table" style="width:100%; border-collapse:separate; border-spacing:0; font-size:0.85rem;">
+            <thead>
+              <tr style="background:rgba(255,255,255,0.03);">
+                <th style="padding:10px 12px; text-align:center; width:45px;">#</th>
+                <th style="padding:10px 14px; text-align:left;">Investor Name & Contact</th>
+                <th style="padding:10px 14px; text-align:left;">Residence / Location</th>
+                <th style="padding:10px 14px; text-align:left;">Interested Sector(s)</th>
+                <th style="padding:10px 14px; text-align:right;">Capital to Invest</th>
+                <th style="padding:10px 12px; text-align:center;">Date</th>
+                <th style="padding:10px 12px; text-align:center;">Action</th>
+              </tr>
+            </thead>
+            <tbody id="bmInvestorsTbody">
+              <!-- Dynamically populated -->
+            </tbody>
+          </table>
+        </div>
+
+      </div>
+
+      <!-- Modal Footer -->
+      <div style="padding:12px 24px; border-top:1px solid var(--border-subtle); display:flex; justify-content:space-between; align-items:center; background:rgba(0,0,0,0.2);">
+        <div id="bmFooterStats" style="font-size:0.82rem; color:var(--text-dim);">
+          Showing records
+        </div>
+        <button class="btn btn-secondary" onclick="closeBusinessMatchModal()" style="padding:6px 16px; border-radius:8px; font-size:0.85rem;">
+          Close
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- District Leaders Elaborative Management Modal -->
+  <div class="modal-backdrop" id="districtLeadersModal" style="display:none; align-items:center; justify-content:center; padding:20px; z-index:9999;">
+    <div class="modal-card" style="max-width:1250px; width:100%; max-height:92vh; display:flex; flex-direction:column; background:var(--bg-surface); border:1px solid var(--border-subtle); border-radius:16px; box-shadow:0 25px 50px -12px rgba(0,0,0,0.7); overflow:hidden;">
+      
+      <!-- Modal Header -->
+      <div class="modal-header" style="padding:18px 24px; border-bottom:1px solid var(--border-subtle); display:flex; justify-content:space-between; align-items:center; background:var(--bg-card);">
+        <div style="display:flex; align-items:center; gap:12px;">
+          <div style="width:38px; height:38px; border-radius:10px; background:linear-gradient(135deg, #f59e0b, #ef4444); display:flex; align-items:center; justify-content:center; font-size:20px; color:#fff;">
+            👑
+          </div>
+          <div>
+            <h3 style="margin:0; font-size:1.25rem; font-weight:700; color:var(--text-main);">State-Wise District Leaders (All Roles)</h3>
+            <p style="margin:2px 0 0; font-size:0.8rem; color:var(--text-muted);">
+              Comprehensive leadership authorization roster for Pastors, Believers & Students across Andhra Pradesh and Telangana
+            </p>
+          </div>
+        </div>
+        <button class="modal-close-btn" onclick="closeDistrictLeadersModal()" style="background:none; border:none; font-size:24px; color:var(--text-muted); cursor:pointer;">&times;</button>
+      </div>
+
+      <!-- Modal Filter Toolbar -->
+      <div style="padding:14px 24px; background:var(--bg-dark); border-bottom:1px solid var(--border-subtle); display:flex; flex-wrap:wrap; gap:12px; align-items:center; justify-content:space-between;">
+        <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap; flex:1; min-width:300px;">
+          <div style="position:relative; flex:1; min-width:220px;">
+            <input type="text" id="dlFilterSearch" placeholder="🔍 Search name, phone, district, constituency..." oninput="renderDistrictLeadersTable()" style="width:100%; padding:8px 14px; background:var(--bg-surface); border:1px solid var(--border-subtle); border-radius:8px; color:var(--text-main); font-size:0.88rem; outline:none;" />
+          </div>
+        </div>
+
+        <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
+          <!-- State Filter -->
+          <div style="display:flex; gap:4px; background:var(--bg-card); padding:3px; border-radius:8px; border:1px solid var(--border-subtle);">
+            <button class="btn btn-sm dl-state-btn active" data-state="all" onclick="setDlStateFilter('all', this)" style="padding:4px 10px; font-size:0.78rem; border-radius:6px;">All States</button>
+            <button class="btn btn-sm dl-state-btn" data-state="1" onclick="setDlStateFilter('1', this)" style="padding:4px 10px; font-size:0.78rem; border-radius:6px;">AP</button>
+            <button class="btn btn-sm dl-state-btn" data-state="2" onclick="setDlStateFilter('2', this)" style="padding:4px 10px; font-size:0.78rem; border-radius:6px;">TG</button>
+          </div>
+
+          <!-- Category Filter -->
+          <div style="display:flex; gap:4px; background:var(--bg-card); padding:3px; border-radius:8px; border:1px solid var(--border-subtle);">
+            <button class="btn btn-sm dl-cat-btn active" data-cat="all" onclick="setDlCatFilter('all', this)" style="padding:4px 10px; font-size:0.78rem; border-radius:6px;">All Roles</button>
+            <button class="btn btn-sm dl-cat-btn" data-cat="pastor" onclick="setDlCatFilter('pastor', this)" style="padding:4px 10px; font-size:0.78rem; border-radius:6px;">Pastors</button>
+            <button class="btn btn-sm dl-cat-btn" data-cat="believer" onclick="setDlCatFilter('believer', this)" style="padding:4px 10px; font-size:0.78rem; border-radius:6px;">Believers</button>
+            <button class="btn btn-sm dl-cat-btn" data-cat="student" onclick="setDlCatFilter('student', this)" style="padding:4px 10px; font-size:0.78rem; border-radius:6px;">Students</button>
+          </div>
+
+          <!-- Status Filter -->
+          <div style="display:flex; gap:4px; background:var(--bg-card); padding:3px; border-radius:8px; border:1px solid var(--border-subtle);">
+            <button class="btn btn-sm dl-status-btn active" data-status="all" onclick="setDlStatusFilter('all', this)" style="padding:4px 10px; font-size:0.78rem; border-radius:6px;">All Status</button>
+            <button class="btn btn-sm dl-status-btn" data-status="approved" onclick="setDlStatusFilter('approved', this)" style="padding:4px 10px; font-size:0.78rem; border-radius:6px; color:#10b981;">Approved</button>
+            <button class="btn btn-sm dl-status-btn" data-status="pending" onclick="setDlStatusFilter('pending', this)" style="padding:4px 10px; font-size:0.78rem; border-radius:6px; color:#f59e0b;">Pending</button>
+            <button class="btn btn-sm dl-status-btn" data-status="rejected" onclick="setDlStatusFilter('rejected', this)" style="padding:4px 10px; font-size:0.78rem; border-radius:6px; color:#ef4444;">Rejected</button>
+          </div>
+
+          <button class="btn btn-sm" onclick="fetchDistrictLeadersData(true)" title="Refresh Data" style="padding:6px 12px; font-size:0.82rem; background:var(--bg-card); border:1px solid var(--border-subtle); color:var(--text-main); border-radius:8px; cursor:pointer;">🔄 Refresh</button>
+        </div>
+      </div>
+
+      <!-- Modal Body (Table of Leaders) -->
+      <div class="modal-body" style="padding:0; flex:1; overflow-y:auto; background:var(--bg-dark);">
+        <div id="dlLoadingSpinner" style="display:none; text-align:center; padding:50px;">
+          <div style="font-size:1.8rem; margin-bottom:10px;">⏳</div>
+          <div style="color:var(--text-muted); font-size:0.95rem;">Loading District Leaders...</div>
+        </div>
+
+        <table id="dlTable" style="width:100%; border-collapse:collapse; font-size:0.86rem; text-align:left;">
+          <thead style="background:var(--bg-surface); position:sticky; top:0; z-index:10; border-bottom:1px solid var(--border-subtle);">
+            <tr>
+              <th style="padding:12px 14px; color:var(--text-muted); font-weight:600; width:50px; text-align:center;">#</th>
+              <th style="padding:12px 14px; color:var(--text-muted); font-weight:600;">Leader Name & ID</th>
+              <th style="padding:12px 14px; color:var(--text-muted); font-weight:600;">Role / Category</th>
+              <th style="padding:12px 14px; color:var(--text-muted); font-weight:600;">State</th>
+              <th style="padding:12px 14px; color:var(--text-muted); font-weight:600;">District & Constituency</th>
+              <th style="padding:12px 14px; color:var(--text-muted); font-weight:600;">Phone</th>
+              <th style="padding:12px 14px; color:var(--text-muted); font-weight:600; text-align:center;">Status</th>
+              <th style="padding:12px 14px; color:var(--text-muted); font-weight:600; text-align:center; min-width:200px;">Actions (Admin Control)</th>
+            </tr>
+          </thead>
+          <tbody id="dlTableBody">
+            <!-- Dynamic Leader Rows Rendered Here -->
+          </tbody>
+        </table>
+
+        <div id="dlEmptyState" style="display:none; text-align:center; padding:60px 20px;">
+          <div style="font-size:2.4rem; margin-bottom:10px;">🔍</div>
+          <div style="font-size:1.05rem; font-weight:600; color:var(--text-main);">No District Leaders Found</div>
+          <div style="color:var(--text-dim); font-size:0.85rem; margin-top:4px;">Try clearing or adjusting your search filters</div>
+        </div>
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="modal-footer" style="padding:12px 24px; border-top:1px solid var(--border-subtle); display:flex; justify-content:space-between; align-items:center; background:var(--bg-card);">
+        <div id="dlTableCount" style="font-size:0.84rem; color:var(--text-muted);">Showing 0 district leaders</div>
+        <button class="btn btn-sm" onclick="closeDistrictLeadersModal()" style="padding:7px 18px; border-radius:8px; background:var(--bg-surface); border:1px solid var(--border-subtle); color:var(--text-main); font-weight:600; cursor:pointer;">Close</button>
+      </div>
+
+    </div>
+  </div>
+
   <div class="modal-backdrop" id="viewModal">
     <div class="modal-card">
       <div class="modal-header">
@@ -1463,6 +2004,32 @@
       <div class="modal-footer">
         <button class="btn" onclick="closeDeleteModal()">Cancel</button>
         <button class="btn btn-danger" id="confirmDeleteBtn" onclick="executeDeleteRecord()">Delete Record</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bulk Delete Confirmation Modal -->
+  <div class="modal-backdrop" id="bulkDeleteModal">
+    <div class="modal-card" style="max-width:540px;">
+      <div class="modal-header" style="background:rgba(239,68,68,0.1); border-bottom:1px solid rgba(239,68,68,0.3);">
+        <h3 style="color:var(--danger); display:flex; align-items:center; gap:8px;">
+          <span>⚠️</span> Confirm Batch Deletion
+        </h3>
+        <button class="modal-close-btn" onclick="closeBulkDeleteModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p style="font-size:0.95rem; line-height:1.5; color:var(--text-main);">
+          Are you sure you want to permanently delete <strong id="bulkDeleteConfirmCount" style="color:var(--danger); font-size:1.15rem;">0</strong> selected record(s) from table <code id="bulkDeleteTableName" style="color:var(--primary); font-weight:700;"></code>?
+        </p>
+        <div style="background:var(--code-bg); border:1px solid var(--border-subtle); border-radius:8px; padding:10px 14px; max-height:120px; overflow-y:auto; font-family:'JetBrains Mono', monospace; font-size:0.8rem; color:var(--text-main);" id="bulkDeleteIdList">
+        </div>
+        <p style="font-size:0.8rem; color:var(--text-muted); margin-top:4px;">
+          ⚠️ <strong>Permanent Action:</strong> This will delete these records directly from AWS RDS MySQL.
+        </p>
+      </div>
+      <div class="modal-footer" style="padding:14px 20px; border-top:1px solid var(--border-subtle); display:flex; justify-content:flex-end; gap:10px;">
+        <button class="btn" onclick="closeBulkDeleteModal()">Cancel</button>
+        <button class="btn btn-danger" id="confirmBulkDeleteBtn" onclick="executeBulkDeleteRecords()">🗑️ Permanently Delete</button>
       </div>
     </div>
   </div>
@@ -1594,6 +2161,7 @@
     }
 
     function onTableStateFilterChange() {
+      clearRowSelection();
       currentOffset = 0;
       fetchActiveTableData();
     }
@@ -1785,6 +2353,8 @@
     async function initApp() {
       await testConnection();
       loadDashboardMetrics();
+      fetchDistrictLeadersData();
+      fetchBusinessMatchData(true);
       loadTables();
     }
 
@@ -1851,10 +2421,911 @@
       if (activeTab.id === 'tab-dashboard') loadDashboardMetrics();
       else if (activeTab.id === 'tab-query') executeQuery();
       else if (activeTab.id === 'tab-explorer') fetchActiveTableData();
+      fetchDistrictLeadersData(true);
+      fetchBusinessMatchData(true);
     }
 
     // Dashboard Metrics
-    async function loadDashboardMetrics(stateId = dashboardActiveState) {
+      // --- STATE-WISE DISTRICT LEADERS MANAGEMENT ---
+  let dlAllLeaders = [];
+  let dlCurrentState = 'all';
+  let dlCurrentCat = 'all';
+  let dlCurrentStatus = 'all';
+
+  async function fetchDistrictLeadersData(showSpinner = false) {
+    const spinner = document.getElementById('dlLoadingSpinner');
+    const table = document.getElementById('dlTable');
+    const emptyState = document.getElementById('dlEmptyState');
+
+    if (showSpinner && spinner) {
+      spinner.style.display = 'block';
+      if (table) table.style.display = 'none';
+      if (emptyState) emptyState.style.display = 'none';
+    }
+
+    try {
+      const res = await fetch(`${API_BASE}/dashboardapi/admin-district-leaders`, {
+        headers: getAuthHeaders()
+      });
+      if (res.ok) {
+        const json = await res.json();
+        dlAllLeaders = json.data || [];
+        const summary = json.summary || {};
+
+        // Update Top Box Summary Counters
+        const elTot = document.getElementById('dlSummaryTotal');
+        if (elTot) elTot.textContent = Number(summary.total || dlAllLeaders.length).toLocaleString();
+        const elApp = document.getElementById('dlSummaryApproved');
+        if (elApp) elApp.textContent = Number(summary.approved || 0).toLocaleString();
+        const elPen = document.getElementById('dlSummaryPending');
+        if (elPen) elPen.textContent = Number(summary.pending || 0).toLocaleString();
+        const elRej = document.getElementById('dlSummaryRejected');
+        if (elRej) elRej.textContent = Number(summary.rejected || 0).toLocaleString();
+
+        renderDistrictLeadersTable();
+      }
+    } catch (e) {
+      console.error('Error fetching district leaders:', e);
+    } finally {
+      if (spinner) spinner.style.display = 'none';
+      if (table) table.style.display = 'table';
+    }
+  }
+
+  function openDistrictLeadersModal() {
+    const m = document.getElementById('districtLeadersModal');
+    if (m) {
+      m.style.display = 'flex';
+      fetchDistrictLeadersData(true);
+    }
+  }
+
+  function closeDistrictLeadersModal() {
+    const m = document.getElementById('districtLeadersModal');
+    if (m) m.style.display = 'none';
+  }
+
+  function setDlStateFilter(val, btn) {
+    dlCurrentState = val;
+    document.querySelectorAll('.dl-state-btn').forEach(b => {
+      b.classList.remove('active');
+      b.style.background = 'transparent';
+      b.style.color = 'var(--text-main)';
+    });
+    btn.classList.add('active');
+    btn.style.background = 'var(--primary)';
+    btn.style.color = '#fff';
+    renderDistrictLeadersTable();
+  }
+
+  function setDlCatFilter(val, btn) {
+    dlCurrentCat = val;
+    document.querySelectorAll('.dl-cat-btn').forEach(b => {
+      b.classList.remove('active');
+      b.style.background = 'transparent';
+      b.style.color = 'var(--text-main)';
+    });
+    btn.classList.add('active');
+    btn.style.background = 'var(--primary)';
+    btn.style.color = '#fff';
+    renderDistrictLeadersTable();
+  }
+
+  function setDlStatusFilter(val, btn) {
+    dlCurrentStatus = val;
+    document.querySelectorAll('.dl-status-btn').forEach(b => {
+      b.classList.remove('active');
+      b.style.background = 'transparent';
+      b.style.color = 'var(--text-main)';
+    });
+    btn.classList.add('active');
+    btn.style.background = 'var(--primary)';
+    btn.style.color = '#fff';
+    renderDistrictLeadersTable();
+  }
+
+  function renderDistrictLeadersTable() {
+    const searchVal = (document.getElementById('dlFilterSearch')?.value || '').toLowerCase().trim();
+    const tbody = document.getElementById('dlTableBody');
+    const emptyState = document.getElementById('dlEmptyState');
+    const table = document.getElementById('dlTable');
+    const countEl = document.getElementById('dlTableCount');
+
+    if (!tbody) return;
+
+    let filtered = dlAllLeaders.filter(item => {
+      if (dlCurrentState === '1' && item.state_id !== 1) return false;
+      if (dlCurrentState === '2' && item.state_id !== 2) return false;
+
+      if (dlCurrentCat !== 'all' && item.category !== dlCurrentCat) return false;
+
+      if (dlCurrentStatus === 'approved' && !item.is_approved) return false;
+      if (dlCurrentStatus === 'pending' && !item.is_pending) return false;
+      if (dlCurrentStatus === 'rejected' && !item.is_rejected) return false;
+
+      if (searchVal) {
+        const text = `${item.name || ''} ${item.mobile || ''} ${item.district_name || ''} ${item.constituency_name || ''} ${item.wing_name || ''} ${item.generaltype || ''}`.toLowerCase();
+        if (!text.includes(searchVal)) return false;
+      }
+      return true;
+    });
+
+    if (countEl) countEl.textContent = `Showing ${filtered.length} of ${dlAllLeaders.length} district leaders`;
+
+    if (filtered.length === 0) {
+      tbody.innerHTML = '';
+      if (table) table.style.display = 'none';
+      if (emptyState) emptyState.style.display = 'block';
+      return;
+    }
+
+    if (table) table.style.display = 'table';
+    if (emptyState) emptyState.style.display = 'none';
+
+    tbody.innerHTML = filtered.map((item, idx) => {
+      const catBadgeColor = item.category === 'pastor' ? 'rgba(168, 85, 247, 0.2)' : (item.category === 'student' ? 'rgba(245, 158, 11, 0.2)' : 'rgba(59, 130, 246, 0.2)');
+      const catTextColor = item.category === 'pastor' ? '#c084fc' : (item.category === 'student' ? '#fbbf24' : '#60a5fa');
+      const catIcon = item.category === 'pastor' ? '✝️ Pastor' : (item.category === 'student' ? '🎓 Student' : '👥 Believer');
+      
+      let statusBadge = '';
+      if (item.is_approved) {
+        statusBadge = `<span style="background:rgba(16,185,129,0.15); color:#10b981; border:1px solid rgba(16,185,129,0.3); padding:4px 10px; border-radius:20px; font-weight:700; font-size:0.78rem;">✓ Approved (d_in=1)</span>`;
+      } else if (item.is_rejected) {
+        statusBadge = `<span style="background:rgba(239,68,68,0.15); color:#ef4444; border:1px solid rgba(239,68,68,0.3); padding:4px 10px; border-radius:20px; font-weight:700; font-size:0.78rem;">✕ Rejected</span>`;
+      } else {
+        statusBadge = `<span style="background:rgba(245,158,11,0.15); color:#f59e0b; border:1px solid rgba(245,158,11,0.3); padding:4px 10px; border-radius:20px; font-weight:700; font-size:0.78rem;">⏳ Pending Review</span>`;
+      }
+
+      return `
+        <tr style="border-bottom:1px solid var(--border-subtle); transition: background 0.15s ease;" onmouseover="this.style.background='rgba(255,255,255,0.02)';" onmouseout="this.style.background='transparent';">
+          <td style="padding:12px 14px; text-align:center; color:var(--text-dim); font-weight:600;">${idx + 1}</td>
+          <td style="padding:12px 14px;">
+            <div style="font-weight:700; color:var(--text-main); font-size:0.92rem;">${item.name || '--'}</div>
+            <div style="font-size:0.75rem; color:var(--text-dim); margin-top:2px;">ID: <code style="color:var(--text-muted);">${item.id}</code> &bull; Table: ${item.table_name}</div>
+          </td>
+          <td style="padding:12px 14px;">
+            <span style="background:${catBadgeColor}; color:${catTextColor}; padding:3px 9px; border-radius:12px; font-weight:600; font-size:0.76rem; display:inline-block;">${catIcon}</span>
+            <div style="font-size:0.76rem; color:var(--text-muted); margin-top:4px;">${item.wing_name ? `వింగ్: ${item.wing_name}` : (item.generaltype || 'District Leader')}</div>
+          </td>
+          <td style="padding:12px 14px;">
+            <span style="padding:2px 8px; border-radius:6px; font-size:0.76rem; font-weight:600; background:rgba(255,255,255,0.05); color:var(--text-muted);">${item.state_name}</span>
+          </td>
+          <td style="padding:12px 14px;">
+            <div style="font-weight:600; color:var(--text-main); font-size:0.86rem;">${item.district_name || 'District ID: ' + item.district_id}</div>
+            <div style="font-size:0.76rem; color:var(--text-dim); margin-top:2px;">Const: ${item.constituency_name || item.constituency_id || '--'}</div>
+          </td>
+          <td style="padding:12px 14px;">
+            ${item.mobile ? `<a href="tel:${item.mobile}" style="color:#60a5fa; text-decoration:none; font-weight:600;">📞 ${item.mobile}</a>` : '<span style="color:var(--text-dim);">--</span>'}
+          </td>
+          <td style="padding:12px 14px; text-align:center;">
+            ${statusBadge}
+          </td>
+          <td style="padding:12px 14px; text-align:center;">
+            <div style="display:flex; gap:6px; justify-content:center; flex-wrap:wrap;">
+              <button class="btn btn-sm" onclick="handleAdminUpdateDistrictLeader('${item.table_name}', ${item.id}, 'approve')" style="background:#10b981; color:#fff; border:none; padding:5px 11px; border-radius:6px; font-weight:700; cursor:pointer;" title="Approve Leader (d_in=1, approval_ind=1)">
+                ✓ Approve
+              </button>
+              <button class="btn btn-sm" onclick="handleAdminUpdateDistrictLeader('${item.table_name}', ${item.id}, 'reject')" style="background:#ef4444; color:#fff; border:none; padding:5px 11px; border-radius:6px; font-weight:700; cursor:pointer;" title="Reject Leader (d_in=0, approval_ind=2)">
+                ✕ Reject
+              </button>
+              <button class="btn btn-sm" onclick="handleAdminUpdateDistrictLeader('${item.table_name}', ${item.id}, 'reset')" style="background:var(--bg-card); color:var(--text-muted); border:1px solid var(--border-subtle); padding:5px 9px; border-radius:6px; font-weight:600; cursor:pointer;" title="Reset Status to Pending">
+                ↺ Reset
+              </button>
+            </div>
+          </td>
+        </tr>
+      `;
+    }).join('');
+  }
+
+  async function handleAdminUpdateDistrictLeader(tableName, id, action) {
+    try {
+      const res = await fetch(`${API_BASE}/dashboardapi/admin-update-district-leader`, {
+        method: 'POST',
+        headers: {
+          ...getAuthHeaders(),
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ table: tableName, id, action })
+      });
+
+      if (res.ok) {
+        // Update local item
+        const idx = dlAllLeaders.findIndex(x => x.table_name === tableName && Number(x.id) === Number(id));
+        if (idx !== -1) {
+          if (action === 'approve') {
+            dlAllLeaders[idx].approval_ind = 1;
+            dlAllLeaders[idx].d_in = 1;
+            dlAllLeaders[idx].is_approved = true;
+            dlAllLeaders[idx].is_pending = false;
+            dlAllLeaders[idx].is_rejected = false;
+          } else if (action === 'reject') {
+            dlAllLeaders[idx].approval_ind = 2;
+            dlAllLeaders[idx].d_in = 0;
+            dlAllLeaders[idx].is_approved = false;
+            dlAllLeaders[idx].is_pending = false;
+            dlAllLeaders[idx].is_rejected = true;
+          } else if (action === 'reset') {
+            dlAllLeaders[idx].approval_ind = 0;
+            dlAllLeaders[idx].d_in = 0;
+            dlAllLeaders[idx].is_approved = false;
+            dlAllLeaders[idx].is_pending = true;
+            dlAllLeaders[idx].is_rejected = false;
+          }
+        }
+
+        // Update counters
+        const appCount = dlAllLeaders.filter(x => x.is_approved).length;
+        const penCount = dlAllLeaders.filter(x => x.is_pending).length;
+        const rejCount = dlAllLeaders.filter(x => x.is_rejected).length;
+
+        const elApp = document.getElementById('dlSummaryApproved');
+        if (elApp) elApp.textContent = appCount.toLocaleString();
+        const elPen = document.getElementById('dlSummaryPending');
+        if (elPen) elPen.textContent = penCount.toLocaleString();
+        const elRej = document.getElementById('dlSummaryRejected');
+        if (elRej) elRej.textContent = rejCount.toLocaleString();
+
+        renderDistrictLeadersTable();
+        showNotification(`District Leader #${id} ${action.toUpperCase()}D successfully!`);
+      } else {
+        const err = await res.json().catch(() => ({}));
+        alert('Failed to update leader: ' + (err.error || res.statusText));
+      }
+    } catch (e) {
+      alert('Error updating leader: ' + e.message);
+    }
+  }
+
+  // ==========================================
+  
+  // ==========================================
+  // TEACHING STAFF DIRECTORY MANAGEMENT
+  // ==========================================
+  let allTeachersData = [];
+
+  async function fetchTeacherData(isRefresh = false, stateFilter = dashboardActiveState) {
+    const spinner = document.getElementById('tdSpinner');
+    const container = document.getElementById('tdContainer');
+
+    if (isRefresh && spinner) spinner.style.display = 'block';
+    if (isRefresh && container) container.style.opacity = '0.4';
+
+    try {
+      const authHdrs = getAuthHeaders();
+      let res;
+      try {
+        const r1 = await fetch(`${API_BASE}/dashboardapi/admin-teachers`, { headers: authHdrs });
+        if (r1.ok) res = await r1.json();
+      } catch (_) {}
+
+      if (!res) {
+        try {
+          const r2 = await fetch(`${API_BASE}/api/admin-teachers`, { headers: authHdrs });
+          if (r2.ok) res = await r2.json();
+        } catch (_) {}
+      }
+
+      allTeachersData = (res && res.data && Array.isArray(res.data)) ? res.data : (Array.isArray(res) ? res : []);
+
+      updateTeacherHeroStats(stateFilter);
+      applyTeacherFilters();
+    } catch (err) {
+      console.error('Error fetching teacher data:', err);
+    } finally {
+      if (spinner) spinner.style.display = 'none';
+      if (container) container.style.opacity = '1';
+    }
+  }
+
+  function updateTeacherHeroStats(stateFilter = dashboardActiveState) {
+    const sId = String(stateFilter || 'all');
+    const list = sId === 'all'
+      ? allTeachersData
+      : allTeachersData.filter(t => String(t.inst_state_id) === sId || String(t.res_state_id) === sId);
+
+    const govtCount = list.filter(t => (t.teacher_type || '').toLowerCase() === 'government').length;
+    const pvtCount = list.filter(t => (t.teacher_type || '').toLowerCase() === 'private').length;
+
+    const elTotal = document.getElementById('teachersSummaryCount');
+    if (elTotal) elTotal.textContent = list.length.toLocaleString();
+
+    const elGovt = document.getElementById('teachersGovtCount');
+    if (elGovt) elGovt.textContent = govtCount.toLocaleString();
+
+    const elPvt = document.getElementById('teachersPvtCount');
+    if (elPvt) elPvt.textContent = pvtCount.toLocaleString();
+
+    const elBadge = document.getElementById('tdTotalBadge');
+    if (elBadge) elBadge.textContent = list.length;
+  }
+
+  function applyTeacherFilters() {
+    const stateFilter = document.getElementById('tdFilterState')?.value || 'all';
+    const roleFilter = document.getElementById('tdFilterRole')?.value || 'all';
+    const typeFilter = document.getElementById('tdFilterType')?.value || 'all';
+    const search = (document.getElementById('tdSearchInput')?.value || '').toLowerCase().trim();
+
+    let filtered = allTeachersData.filter(t => {
+      if (stateFilter !== 'all') {
+        const sid = String(stateFilter);
+        if (String(t.inst_state_id) !== sid && String(t.res_state_id) !== sid) return false;
+      }
+      if (roleFilter !== 'all' && (t.role_category || '').toLowerCase() !== roleFilter.toLowerCase()) {
+        return false;
+      }
+      if (typeFilter !== 'all' && (t.teacher_type || '').toLowerCase() !== typeFilter.toLowerCase()) {
+        return false;
+      }
+      if (search) {
+        const text = [
+          t.name, t.name_with_surname, t.fullname, t.mobile, t.designation, t.exact_designation, t.working_in,
+          t.institute_name, t.inst_district_name, t.res_district_name,
+          t.experience_in, t.faith_category, t.about_achievements, t.description
+        ].filter(Boolean).join(' ').toLowerCase();
+        if (!text.includes(search)) return false;
+      }
+      return true;
+    });
+
+    renderTeacherTable(filtered);
+  }
+
+  function renderTeacherTable(items) {
+    const tbody = document.getElementById('tdTeachersTbody');
+    const noRec = document.getElementById('tdNoRecords');
+    if (!tbody) return;
+
+    tbody.innerHTML = '';
+    if (!items || items.length === 0) {
+      if (noRec) noRec.style.display = 'block';
+      return;
+    }
+    if (noRec) noRec.style.display = 'none';
+
+    items.forEach((item, index) => {
+      const tr = document.createElement('tr');
+      tr.style.borderBottom = '1px solid var(--border-subtle)';
+
+      const typeBadge = item.teacher_type === 'Government'
+        ? '<span style="background:rgba(16,185,129,0.2); color:#34d399; padding:2px 8px; border-radius:12px; font-size:0.75rem; font-weight:700;">Government</span>'
+        : '<span style="background:rgba(245,158,11,0.2); color:#fbbf24; padding:2px 8px; border-radius:12px; font-size:0.75rem; font-weight:700;">Private</span>';
+
+      const statusBadge = item.status === 'Approved'
+        ? '<span style="background:rgba(16,185,129,0.2); color:#34d399; padding:2px 8px; border-radius:12px; font-size:0.75rem; font-weight:700;">Approved</span>'
+        : (item.status === 'Rejected'
+          ? '<span style="background:rgba(239,68,68,0.2); color:#f87171; padding:2px 8px; border-radius:12px; font-size:0.75rem; font-weight:700;">Rejected</span>'
+          : '<span style="background:rgba(234,179,8,0.2); color:#facc15; padding:2px 8px; border-radius:12px; font-size:0.75rem; font-weight:700;">Pending</span>');
+
+      tr.innerHTML = `
+        <td style="padding:10px 12px; text-align:center; color:var(--text-dim);">${index + 1}</td>
+        <td style="padding:10px 14px;">
+          <div style="font-weight:700; color:var(--text-main);">${item.name || item.name_with_surname || item.fullname || 'N/A'}</div>
+          <div style="font-size:0.78rem; color:var(--text-muted);">📱 ${item.mobile || 'N/A'} ${item.email ? ' | ✉️ ' + item.email : ''}</div>
+          <div style="font-size:0.75rem; color:var(--text-dim);">⛪ Pastor: ${item.pastor_phone || 'N/A'} | ${item.faith_category || 'N/A'}</div>
+        </td>
+        <td style="padding:10px 14px;">
+          <div style="font-weight:600; color:#38bdf8;">${item.designation || item.exact_designation || 'N/A'}</div>
+          <div style="font-size:0.78rem; color:var(--text-muted);">Role: ${item.role_category || 'N/A'}</div>
+          <div style="font-size:0.75rem; color:var(--text-dim);">Qual: ${item.qualification_category || 'N/A'}</div>
+        </td>
+        <td style="padding:10px 14px;">
+          <div style="font-weight:600; color:var(--text-main);">${item.institute_name || 'N/A'}</div>
+          <div style="font-size:0.78rem; color:#a5b4fc;">🏛️ ${item.working_in || 'N/A'}</div>
+          ${item.about_achievements ? `<div style="font-size:0.75rem; color:#38bdf8; margin-top:4px;" title="${item.about_achievements}">🏆 ${item.about_achievements}</div>` : ''}
+          ${item.cv_profile || item.cv_file ? `<div style="margin-top:6px;"><a href="${item.cv_profile || item.cv_file}" target="_blank" rel="noopener noreferrer" style="display:inline-flex; align-items:center; gap:4px; padding:3px 8px; border-radius:6px; font-size:0.75rem; font-weight:700; text-decoration:none; background:rgba(14,165,233,0.15); color:#38bdf8; border:1px solid rgba(14,165,233,0.4);">📄 View CV / Profile</a></div>` : ''}
+          ${item.cts ? `<div style="font-size:0.72rem; color:#94a3b8; margin-top:4px;">🕒 ${item.cts}</div>` : ''}
+        </td>
+        <td style="padding:10px 14px;">
+          <div style="font-weight:600; color:#fbbf24;">${item.total_experience_years || 'N/A'}</div>
+          <div style="font-size:0.78rem; color:var(--text-muted);">Subject: ${item.experience_in || 'N/A'}</div>
+          <div style="font-size:0.75rem; color:var(--text-dim);">Family: ${item.family_background || 'N/A'}</div>
+        </td>
+        <td style="padding:10px 14px; max-width:180px; font-size:0.78rem; color:var(--text-muted);">
+          ${item.inst_address_text || item.inst_address || [item.inst_district_name, item.inst_state_name].filter(Boolean).join(', ') || 'N/A'}
+        </td>
+        <td style="padding:10px 14px; max-width:180px; font-size:0.78rem; color:var(--text-muted);">
+          ${item.res_address_text || item.res_address || [item.res_district_name, item.res_state_name].filter(Boolean).join(', ') || 'N/A'}
+        </td>
+        <td style="padding:10px 12px; text-align:center;">${typeBadge}</td>
+        <td style="padding:10px 12px; text-align:center;">${statusBadge}</td>
+        <td style="padding:10px 12px; text-align:center;">
+          <div style="display:flex; gap:6px; justify-content:center;">
+            <button onclick="handleAdminUpdateTeacher(${item.id}, 'Approved')" title="Approve" style="background:#10b981; border:none; color:#fff; border-radius:6px; padding:4px 8px; cursor:pointer; font-size:0.75rem;">✓</button>
+            <button onclick="handleAdminUpdateTeacher(${item.id}, 'Rejected')" title="Reject" style="background:#ef4444; border:none; color:#fff; border-radius:6px; padding:4px 8px; cursor:pointer; font-size:0.75rem;">✕</button>
+          </div>
+        </td>
+      `;
+      tbody.appendChild(tr);
+    });
+  }
+
+  function openTeacherDirectoryModal() {
+    const m = document.getElementById('teacherDirectoryModal');
+    if (m) {
+      m.style.display = 'flex';
+      const stateSelect = document.getElementById('tdFilterState');
+      if (stateSelect && dashboardActiveState) {
+        stateSelect.value = dashboardActiveState;
+      }
+      fetchTeacherData(true);
+    }
+  }
+
+  function closeTeacherDirectoryModal() {
+    const m = document.getElementById('teacherDirectoryModal');
+    if (m) m.style.display = 'none';
+  }
+
+  async function handleAdminUpdateTeacher(id, action) {
+    try {
+      const res = await fetch(`${API_BASE}/dashboardapi/admin-update-teacher`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...getAuthHeaders()
+        },
+        body: JSON.stringify({ id, action })
+      });
+      if (res.ok) {
+        const item = allTeachersData.find(t => t.id === id);
+        if (item) item.status = action;
+        applyTeacherFilters();
+      } else {
+        alert('Action could not be saved: HTTP ' + res.status);
+      }
+    } catch (e) {
+      alert('Error updating teacher record: ' + e.message);
+    }
+  }
+  
+
+  // ENTREPRENEUR & INVESTOR MANAGEMENT CONSOLE
+  // ==========================================
+  let allEntrepreneursData = [];
+  let allInvestorsData = [];
+  let currentBmTab = 'entrepreneurs';
+  let bmCurrentState = 'all';
+  let bmCurrentType = 'all';
+
+  function formatIndianCurrency(num) {
+    if (!num) return '₹ 0';
+    const n = typeof num === 'string' ? parseFloat(num.replace(/,/g, '').trim()) : Number(num);
+    if (isNaN(n) || n <= 0) return '₹ 0';
+    if (n >= 10000000) {
+      return `₹ ${(n / 10000000).toFixed(2)} Cr`;
+    } else if (n >= 100000) {
+      return `₹ ${(n / 100000).toFixed(2)} L`;
+    } else {
+      return `₹ ${n.toLocaleString('en-IN')}`;
+    }
+  }
+
+  async function fetchBusinessMatchData(isRefresh = false, stateFilter = dashboardActiveState) {
+    const spinner = document.getElementById('bmSpinner');
+    const entContainer = document.getElementById('bmEntrepreneursContainer');
+    const invContainer = document.getElementById('bmInvestorsContainer');
+
+    if (isRefresh && spinner) spinner.style.display = 'block';
+    if (isRefresh && entContainer) entContainer.style.opacity = '0.4';
+    if (isRefresh && invContainer) invContainer.style.opacity = '0.4';
+
+    try {
+      const authHdrs = getAuthHeaders();
+      const fetchJson = async (path) => {
+        try {
+          const r1 = await fetch(`${API_BASE}${path}`, { headers: authHdrs });
+          if (r1.ok) {
+            const j1 = await r1.json();
+            return j1;
+          }
+        } catch (_) {}
+        try {
+          const altPath = path.startsWith('/dashboardapi') ? path.replace('/dashboardapi', '/api') : `/dashboardapi${path}`;
+          const r2 = await fetch(`${API_BASE}${altPath}`, { headers: authHdrs });
+          if (r2.ok) return await r2.json();
+        } catch (_) {}
+        return { data: [] };
+      };
+
+      const [resEnt, resInv, resTypes] = await Promise.all([
+        fetchJson('/dashboardapi/admin-entrepreneurs'),
+        fetchJson('/dashboardapi/admin-investors'),
+        fetchJson('/dashboardapi/business-types')
+      ]);
+
+      allEntrepreneursData = (resEnt && resEnt.data && Array.isArray(resEnt.data)) ? resEnt.data : (Array.isArray(resEnt) ? resEnt : []);
+      allInvestorsData = (resInv && resInv.data && Array.isArray(resInv.data)) ? resInv.data : (Array.isArray(resInv) ? resInv : []);
+
+      // Populate business type filter options in modal if not already populated
+      const typeFilter = document.getElementById('bmFilterType');
+      if (typeFilter && resTypes && resTypes.data && Array.isArray(resTypes.data) && typeFilter.options.length <= 1) {
+        resTypes.data.forEach(t => {
+          const opt = document.createElement('option');
+          opt.value = t.name_en || t.business_type || t.type_english || t.name_te || t.id;
+          opt.textContent = `${t.name_te || t.type_telugu || ''} - ${t.name_en || t.type_english || t.business_type || ''}`;
+          typeFilter.appendChild(opt);
+        });
+      }
+
+      // Update Top Summary Box Counters
+      updateBusinessMatchHeroStats(stateFilter);
+
+      // Render Tables inside modal
+      applyBmFilters();
+
+    } catch (err) {
+      console.error('Error fetching business match data:', err);
+    } finally {
+      if (spinner) spinner.style.display = 'none';
+      if (entContainer) entContainer.style.opacity = '1';
+      if (invContainer) invContainer.style.opacity = '1';
+    }
+  }
+
+  function updateBusinessMatchHeroStats(stateFilter = dashboardActiveState) {
+    const sId = String(stateFilter || 'all');
+    
+    // Filter entrepreneurs by state if stateFilter is active
+    const entList = sId === 'all' 
+      ? allEntrepreneursData 
+      : allEntrepreneursData.filter(e => String(e.state_id) === sId || String(e.business_state_id) === sId);
+
+    // Filter investors by state if stateFilter is active
+    const invList = sId === 'all' 
+      ? allInvestorsData 
+      : allInvestorsData.filter(i => String(i.state_id) === sId);
+
+    // Sum capital needed by entrepreneurs
+    const totalFundsNeeded = entList.reduce((acc, curr) => {
+      const val = parseFloat(String(curr.capital_need || '0').replace(/,/g, '').trim()) || 0;
+      return acc + val;
+    }, 0);
+
+    // Sum capital to invest by investors
+    const totalToInvest = invList.reduce((acc, curr) => {
+      const val = parseFloat(String(curr.capital_to_invest || '0').replace(/,/g, '').trim()) || 0;
+      return acc + val;
+    }, 0);
+
+    // Update Hero elements
+    const elEntCount = document.getElementById('entSummaryCount');
+    if (elEntCount) elEntCount.textContent = entList.length.toLocaleString();
+
+    const elEntCapital = document.getElementById('entSummaryCapital');
+    if (elEntCapital) elEntCapital.textContent = formatIndianCurrency(totalFundsNeeded);
+
+    const elInvCount = document.getElementById('invSummaryCount');
+    if (elInvCount) elInvCount.textContent = invList.length.toLocaleString();
+
+    const elInvCapital = document.getElementById('invSummaryCapital');
+    if (elInvCapital) elInvCapital.textContent = formatIndianCurrency(totalToInvest);
+
+    // Also update modal header badges
+    const badgeEnt = document.getElementById('bmEntBadge');
+    if (badgeEnt) badgeEnt.textContent = allEntrepreneursData.length;
+
+    const badgeInv = document.getElementById('bmInvBadge');
+    if (badgeInv) badgeInv.textContent = allInvestorsData.length;
+  }
+
+  function openBusinessMatchModal() {
+    const m = document.getElementById('businessMatchModal');
+    if (m) {
+      m.style.display = 'flex';
+      // Sync modal state filter with global dashboard active state if applicable
+      const stateSelect = document.getElementById('bmFilterState');
+      if (stateSelect && dashboardActiveState) {
+        stateSelect.value = dashboardActiveState;
+      }
+      fetchBusinessMatchData(true);
+    }
+  }
+
+  function closeBusinessMatchModal() {
+    const m = document.getElementById('businessMatchModal');
+    if (m) m.style.display = 'none';
+  }
+
+  function switchBmTab(tab) {
+    currentBmTab = tab;
+    const btnEnt = document.getElementById('bmTabEntrepreneurs');
+    const btnInv = document.getElementById('bmTabInvestors');
+    const containerEnt = document.getElementById('bmEntrepreneursContainer');
+    const containerInv = document.getElementById('bmInvestorsContainer');
+
+    if (tab === 'entrepreneurs') {
+      if (btnEnt) {
+        btnEnt.style.background = '#6366f1';
+        btnEnt.style.color = '#fff';
+        btnEnt.style.borderColor = '#6366f1';
+      }
+      if (btnInv) {
+        btnInv.style.background = 'transparent';
+        btnInv.style.color = 'var(--text-muted)';
+        btnInv.style.borderColor = 'var(--border-subtle)';
+      }
+      if (containerEnt) containerEnt.style.display = 'block';
+      if (containerInv) containerInv.style.display = 'none';
+    } else {
+      if (btnInv) {
+        btnInv.style.background = '#10b981';
+        btnInv.style.color = '#fff';
+        btnInv.style.borderColor = '#10b981';
+      }
+      if (btnEnt) {
+        btnEnt.style.background = 'transparent';
+        btnEnt.style.color = 'var(--text-muted)';
+        btnEnt.style.borderColor = 'var(--border-subtle)';
+      }
+      if (containerEnt) containerEnt.style.display = 'none';
+      if (containerInv) containerInv.style.display = 'block';
+    }
+    applyBmFilters();
+  }
+
+  function applyBmFilters() {
+    const stateVal = document.getElementById('bmFilterState')?.value || 'all';
+    const typeVal = document.getElementById('bmFilterType')?.value || 'all';
+    const searchVal = (document.getElementById('bmSearchInput')?.value || '').toLowerCase().trim();
+
+    const matchesFilter = (item, isEntrepreneur) => {
+      // State filter check
+      if (stateVal !== 'all') {
+        const itemState = String(item.state_id);
+        const itemBusState = String(item.business_state_id || item.state_id);
+        if (itemState !== stateVal && itemBusState !== stateVal) return false;
+      }
+
+      // Business type filter check
+      if (typeVal !== 'all') {
+        const bType = (item.business_type || '').toLowerCase();
+        if (!bType.includes(typeVal.toLowerCase())) return false;
+      }
+
+      // Search keyword filter check
+      if (searchVal) {
+        const hay = [
+          item.name,
+          item.mobile,
+          item.email,
+          item.district_name,
+          item.constituency_name,
+          item.mandal_name,
+          item.panchayat_name,
+          item.business_type,
+          item.denomination,
+          item.business_district_name,
+          item.business_mandal_name,
+          item.description
+        ].filter(Boolean).join(' ').toLowerCase();
+
+        if (!hay.includes(searchVal)) return false;
+      }
+
+      return true;
+    };
+
+    const filteredEnt = allEntrepreneursData.filter(e => matchesFilter(e, true));
+    const filteredInv = allInvestorsData.filter(i => matchesFilter(i, false));
+
+    renderEntrepreneursTable(filteredEnt);
+    renderInvestorsTable(filteredInv);
+
+    const footerStats = document.getElementById('bmFooterStats');
+    if (footerStats) {
+      if (currentBmTab === 'entrepreneurs') {
+        footerStats.textContent = `Showing ${filteredEnt.length} of ${allEntrepreneursData.length} entrepreneurs`;
+      } else {
+        footerStats.textContent = `Showing ${filteredInv.length} of ${allInvestorsData.length} investors`;
+      }
+    }
+  }
+
+  function renderEntrepreneursTable(list) {
+    const tbody = document.getElementById('bmEntrepreneursTbody');
+    if (!tbody) return;
+
+    if (!list || list.length === 0) {
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="9" style="text-align:center; padding:40px; color:var(--text-muted);">
+            <div style="font-size:1.8rem; margin-bottom:8px;">🔍</div>
+            <div style="font-weight:600;">No Entrepreneur Applications Found</div>
+            <div style="font-size:0.8rem; margin-top:4px;">No records match your selected filters.</div>
+          </td>
+        </tr>
+      `;
+      return;
+    }
+
+    tbody.innerHTML = list.map((item, idx) => {
+      const personalLoc = [item.district_name, item.mandal_name, item.panchayat_name].filter(Boolean).join(', ') || item.state_name || 'N/A';
+      const busLoc = [item.business_district_name, item.business_mandal_name, item.business_panchayat_name].filter(Boolean).join(', ') || item.business_state_name || personalLoc;
+      const dateStr = item.created_at ? new Date(item.created_at).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : '--';
+
+      let statusBadge = `<span style="background:rgba(245,158,11,0.15); color:#f59e0b; border:1px solid rgba(245,158,11,0.3); padding:3px 8px; border-radius:6px; font-size:0.75rem; font-weight:600;">Pending</span>`;
+      if (item.approval_ind == 1) {
+        statusBadge = `<span style="background:rgba(16,185,129,0.15); color:#10b981; border:1px solid rgba(16,185,129,0.3); padding:3px 8px; border-radius:6px; font-size:0.75rem; font-weight:600;">Approved</span>`;
+      } else if (item.approval_ind == 2) {
+        statusBadge = `<span style="background:rgba(239,68,68,0.15); color:#ef4444; border:1px solid rgba(239,68,68,0.3); padding:3px 8px; border-radius:6px; font-size:0.75rem; font-weight:600;">Rejected</span>`;
+      }
+
+      return `
+        <tr style="border-bottom:1px solid var(--border-subtle); transition:background 0.15s ease;" onmouseover="this.style.background='rgba(255,255,255,0.02)'" onmouseout="this.style.background='transparent'">
+          <td style="padding:10px 12px; text-align:center; color:var(--text-dim);">${idx + 1}</td>
+          <td style="padding:10px 14px;">
+            <div style="font-weight:700; color:var(--text-main); font-size:0.92rem;">${item.name || '--'}</div>
+            <div style="font-size:0.78rem; color:var(--text-muted); display:flex; gap:8px; margin-top:2px;">
+              <span>📞 <a href="tel:${item.mobile}" style="color:#818cf8; text-decoration:none;">${item.mobile || '--'}</a></span>
+              ${item.email ? `<span>✉️ ${item.email}</span>` : ''}
+            </div>
+            ${item.denomination ? `<div style="font-size:0.75rem; color:#a5b4fc; margin-top:3px;">⛪ ${item.denomination}</div>` : ''}
+          </td>
+          <td style="padding:10px 14px; color:var(--text-muted); font-size:0.83rem;">
+            <div>${personalLoc}</div>
+            <span style="font-size:0.75rem; color:var(--text-dim);">${item.state_name || (item.state_id == 1 ? 'Andhra Pradesh' : 'Telangana')}</span>
+          </td>
+          <td style="padding:10px 14px; font-size:0.83rem;">
+            <div style="color:var(--text-main); font-weight:600;">📍 ${busLoc}</div>
+            <span style="font-size:0.75rem; color:var(--text-dim);">${item.business_state_name || (item.business_state_id == 1 ? 'Andhra Pradesh' : 'Telangana')}</span>
+          </td>
+          <td style="padding:10px 14px;">
+            <span style="background:rgba(99,102,241,0.12); color:#a5b4fc; border:1px solid rgba(99,102,241,0.25); padding:3px 9px; border-radius:6px; font-size:0.78rem; font-weight:600; display:inline-block;">
+              ${item.business_type || 'General'}
+            </span>
+            ${item.description && item.description !== 'n/a' ? `<div style="font-size:0.76rem; color:var(--text-dim); margin-top:4px; max-width:220px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" title="${item.description}">💡 ${item.description}</div>` : ''}
+          </td>
+          <td style="padding:10px 14px; text-align:right; font-weight:600; color:#94a3b8; font-size:0.88rem;">
+            ${formatIndianCurrency(item.self_fund)}
+          </td>
+          <td style="padding:10px 14px; text-align:right; font-weight:700; color:#f472b6; font-size:0.92rem;">
+            ${formatIndianCurrency(item.capital_need)}
+          </td>
+          <td style="padding:10px 12px; text-align:center; color:var(--text-dim); font-size:0.78rem; white-space:nowrap;">
+            ${dateStr}
+          </td>
+          <td style="padding:10px 12px; text-align:center;">
+            <div style="display:flex; flex-direction:column; align-items:center; gap:4px;">
+              ${statusBadge}
+              <div style="display:flex; gap:4px; margin-top:4px;">
+                <button onclick="handleAdminUpdateEntrepreneur(${item.id}, 'approve')" style="padding:3px 7px; border-radius:4px; font-size:0.72rem; background:#10b981; color:#fff; border:none; cursor:pointer;" title="Approve">✓</button>
+                <button onclick="handleAdminUpdateEntrepreneur(${item.id}, 'reject')" style="padding:3px 7px; border-radius:4px; font-size:0.72rem; background:#ef4444; color:#fff; border:none; cursor:pointer;" title="Reject">✕</button>
+                <button onclick="handleAdminUpdateEntrepreneur(${item.id}, 'reset')" style="padding:3px 7px; border-radius:4px; font-size:0.72rem; background:rgba(255,255,255,0.1); color:var(--text-main); border:none; cursor:pointer;" title="Reset Status">↺</button>
+              </div>
+            </div>
+          </td>
+        </tr>
+      `;
+    }).join('');
+  }
+
+  function renderInvestorsTable(list) {
+    const tbody = document.getElementById('bmInvestorsTbody');
+    if (!tbody) return;
+
+    if (!list || list.length === 0) {
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="7" style="text-align:center; padding:40px; color:var(--text-muted);">
+            <div style="font-size:1.8rem; margin-bottom:8px;">🔍</div>
+            <div style="font-weight:600;">No Investor Profiles Found</div>
+            <div style="font-size:0.8rem; margin-top:4px;">No investor records match your selected filters.</div>
+          </td>
+        </tr>
+      `;
+      return;
+    }
+
+    tbody.innerHTML = list.map((item, idx) => {
+      const loc = [item.district_name, item.mandal_name, item.panchayat_name].filter(Boolean).join(', ') || item.state_name || 'N/A';
+      const dateStr = item.created_at ? new Date(item.created_at).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : '--';
+
+      let statusBadge = `<span style="background:rgba(245,158,11,0.15); color:#f59e0b; border:1px solid rgba(245,158,11,0.3); padding:3px 8px; border-radius:6px; font-size:0.75rem; font-weight:600;">Pending</span>`;
+      if (item.approval_ind == 1) {
+        statusBadge = `<span style="background:rgba(16,185,129,0.15); color:#10b981; border:1px solid rgba(16,185,129,0.3); padding:3px 8px; border-radius:6px; font-size:0.75rem; font-weight:600;">Approved</span>`;
+      } else if (item.approval_ind == 2) {
+        statusBadge = `<span style="background:rgba(239,68,68,0.15); color:#ef4444; border:1px solid rgba(239,68,68,0.3); padding:3px 8px; border-radius:6px; font-size:0.75rem; font-weight:600;">Rejected</span>`;
+      }
+
+      return `
+        <tr style="border-bottom:1px solid var(--border-subtle); transition:background 0.15s ease;" onmouseover="this.style.background='rgba(255,255,255,0.02)'" onmouseout="this.style.background='transparent'">
+          <td style="padding:10px 12px; text-align:center; color:var(--text-dim);">${idx + 1}</td>
+          <td style="padding:10px 14px;">
+            <div style="font-weight:700; color:var(--text-main); font-size:0.92rem;">${item.name || '--'}</div>
+            <div style="font-size:0.78rem; color:var(--text-muted); display:flex; gap:8px; margin-top:2px;">
+              <span>📞 <a href="tel:${item.mobile}" style="color:#34d399; text-decoration:none;">${item.mobile || '--'}</a></span>
+              ${item.email ? `<span>✉️ ${item.email}</span>` : ''}
+            </div>
+            ${item.denomination ? `<div style="font-size:0.75rem; color:#6ee7b7; margin-top:3px;">⛪ ${item.denomination}</div>` : ''}
+          </td>
+          <td style="padding:10px 14px; color:var(--text-muted); font-size:0.83rem;">
+            <div>📍 ${loc}</div>
+            <span style="font-size:0.75rem; color:var(--text-dim);">${item.state_name || (item.state_id == 1 ? 'Andhra Pradesh' : 'Telangana')}</span>
+          </td>
+          <td style="padding:10px 14px;">
+            <span style="background:rgba(16,185,129,0.12); color:#34d399; border:1px solid rgba(16,185,129,0.25); padding:3px 9px; border-radius:6px; font-size:0.78rem; font-weight:600; display:inline-block;">
+              ${item.business_type || 'Multiple Sectors'}
+            </span>
+            ${item.description && item.description !== 'n/a' ? `<div style="font-size:0.76rem; color:var(--text-dim); margin-top:4px; max-width:240px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" title="${item.description}">📝 ${item.description}</div>` : ''}
+          </td>
+          <td style="padding:10px 14px; text-align:right; font-weight:700; color:#34d399; font-size:0.95rem;">
+            ${formatIndianCurrency(item.capital_to_invest)}
+          </td>
+          <td style="padding:10px 12px; text-align:center; color:var(--text-dim); font-size:0.78rem; white-space:nowrap;">
+            ${dateStr}
+          </td>
+          <td style="padding:10px 12px; text-align:center;">
+            <div style="display:flex; flex-direction:column; align-items:center; gap:4px;">
+              ${statusBadge}
+              <div style="display:flex; gap:4px; margin-top:4px;">
+                <button onclick="handleAdminUpdateInvestor(${item.id}, 'approve')" style="padding:3px 7px; border-radius:4px; font-size:0.72rem; background:#10b981; color:#fff; border:none; cursor:pointer;" title="Approve">✓</button>
+                <button onclick="handleAdminUpdateInvestor(${item.id}, 'reject')" style="padding:3px 7px; border-radius:4px; font-size:0.72rem; background:#ef4444; color:#fff; border:none; cursor:pointer;" title="Reject">✕</button>
+                <button onclick="handleAdminUpdateInvestor(${item.id}, 'reset')" style="padding:3px 7px; border-radius:4px; font-size:0.72rem; background:rgba(255,255,255,0.1); color:var(--text-main); border:none; cursor:pointer;" title="Reset Status">↺</button>
+              </div>
+            </div>
+          </td>
+        </tr>
+      `;
+    }).join('');
+  }
+
+  async function handleAdminUpdateEntrepreneur(id, action) {
+    try {
+      const res = await fetch(`${API_BASE}/dashboardapi/admin-update-entrepreneur`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...getAuthHeaders()
+        },
+        body: JSON.stringify({ id, action })
+      }).then(r => r.json());
+
+      if (res && res.status === 200) {
+        const item = allEntrepreneursData.find(e => e.id == id);
+        if (item) {
+          if (action === 'approve') item.approval_ind = 1;
+          if (action === 'reject') item.approval_ind = 2;
+          if (action === 'reset') item.approval_ind = 0;
+        }
+        applyBmFilters();
+      } else {
+        alert(res?.message || 'Failed to update entrepreneur status');
+      }
+    } catch (e) {
+      console.error('Error updating entrepreneur:', e);
+    }
+  }
+
+  async function handleAdminUpdateInvestor(id, action) {
+    try {
+      const res = await fetch(`${API_BASE}/dashboardapi/admin-update-investor`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...getAuthHeaders()
+        },
+        body: JSON.stringify({ id, action })
+      }).then(r => r.json());
+
+      if (res && res.status === 200) {
+        const item = allInvestorsData.find(i => i.id == id);
+        if (item) {
+          if (action === 'approve') item.approval_ind = 1;
+          if (action === 'reject') item.approval_ind = 2;
+          if (action === 'reset') item.approval_ind = 0;
+        }
+        applyBmFilters();
+      } else {
+        alert(res?.message || 'Failed to update investor status');
+      }
+    } catch (e) {
+      console.error('Error updating investor:', e);
+    }
+  }
+
+
+  async function loadDashboardMetrics(stateId = dashboardActiveState) {
       try {
         const url = `${API_BASE}/dashboardapi/admin-dashboard-stats${stateId && stateId !== 'all' ? `?state_id=${stateId}` : ''}`;
         const res = await fetch(url, {
@@ -1882,8 +3353,12 @@
           setStat('stat-students', s.students, s.students_today);
           setStat('stat-ministries', s.ministries, s.ministries_today);
           setStat('stat-orgs', s.organisations, s.organisations_today);
+          setStat('stat-pastor-associations', s.pastor_associations, s.pastor_associations_today);
           setStat('stat-events', s.events_active, s.events_today);
           setStat('stat-users', s.users, s.users_today);
+          fetchDistrictLeadersData();
+          fetchBusinessMatchData(false, stateId);
+          fetchTeacherData(false, stateId);
           if (document.getElementById('stat-events-total')) {
             document.getElementById('stat-events-total').textContent = `${Number(s.events_total || 0).toLocaleString()} total meetings`;
           }
@@ -2090,6 +3565,7 @@
           </div>`;
       });
       container.innerHTML = html;
+      updateBulkDeleteUI();
     }
 
     function filterTablesList() {
@@ -2159,17 +3635,23 @@
       const container = document.getElementById('explorerTableContainer');
       if (!rows || rows.length === 0) {
         container.innerHTML = '<div class="empty-state" style="padding:40px; text-align:center; color:var(--text-dim);"><h3>0 records found in this table</h3></div>';
+        clearRowSelection();
         return;
       }
 
       currentTableCols = Object.keys(rows[0]);
-      let html = '<table class="data-grid"><thead><tr><th style="width:90px; text-align:center;">Actions</th>';
+      let html = '<table class="data-grid"><thead><tr>';
+      html += '<th style="width:40px; text-align:center;"><input type="checkbox" id="selectAllCheckbox" onchange="toggleSelectAllRows(this)" title="Select all visible rows"></th>';
+      html += '<th style="width:90px; text-align:center;">Actions</th>';
       currentTableCols.forEach(c => { html += `<th>${escapeHtml(c)}</th>`; });
       html += '</tr></thead><tbody>';
 
       rows.forEach(r => {
         const id = r.id || r.ID || '';
-        html += `<tr><td style="text-align:center;">
+        const isChecked = id && selectedRowIds.has(String(id));
+        html += `<tr class="${isChecked ? 'selected-row' : ''}">`;
+        html += `<td style="text-align:center;"><input type="checkbox" class="row-select-cb" value="${id}" onchange="toggleRowSelection('${id}', this.checked)" ${isChecked ? 'checked' : ''} ${!id ? 'disabled' : ''}></td>`;
+        html += `<td style="text-align:center;">
           <button class="btn btn-sm" onclick='openViewModal(${JSON.stringify(r).replace(/'/g, "&#39;")})' title="View">👁️</button>
           <button class="btn btn-sm btn-primary" onclick='openEditModal(${JSON.stringify(r).replace(/'/g, "&#39;")})' title="Edit">✏️</button>
           ${id ? `<button class="btn btn-sm btn-danger" onclick="openDeleteModal(${id})" title="Delete">🗑️</button>` : ''}
@@ -2210,6 +3692,7 @@
     }
 
     function prevPage() {
+      clearRowSelection();
       if (currentOffset >= currentLimit) {
         currentOffset -= currentLimit;
         fetchActiveTableData();
@@ -2217,6 +3700,7 @@
     }
 
     function nextPage() {
+      clearRowSelection();
       if ((currentOffset + currentLimit) < currentTableTotal) {
         currentOffset += currentLimit;
         fetchActiveTableData();
@@ -2224,6 +3708,7 @@
     }
 
     function changePageSize() {
+      clearRowSelection();
       currentLimit = Number(document.getElementById('pageSizeSelect').value) || 100;
       currentOffset = 0;
       fetchActiveTableData();
@@ -2341,6 +3826,203 @@
 
     function closeDeleteModal() {
       document.getElementById('deleteModal').classList.remove('open');
+    }
+
+    // ==========================================
+    // THEME TOGGLE (LIGHT / DARK)
+    // ==========================================
+    function initTheme() {
+      const saved = localStorage.getItem('jbac_admin_theme') || 'dark';
+      if (saved === 'light') {
+        document.body.classList.add('light-theme');
+        updateThemeToggleUI(true);
+      } else {
+        document.body.classList.remove('light-theme');
+        updateThemeToggleUI(false);
+      }
+    }
+
+    function toggleTheme() {
+      const isLight = document.body.classList.toggle('light-theme');
+      localStorage.setItem('jbac_admin_theme', isLight ? 'light' : 'dark');
+      updateThemeToggleUI(isLight);
+    }
+
+    function updateThemeToggleUI(isLight) {
+      const icon = document.getElementById('themeToggleIcon');
+      const text = document.getElementById('themeToggleText');
+      const btn = document.getElementById('themeToggleBtn');
+      if (icon && text) {
+        if (isLight) {
+          icon.textContent = '🌙';
+          text.textContent = 'Dark';
+          if (btn) btn.title = 'Switch to Dark Mode';
+        } else {
+          icon.textContent = '☀️';
+          text.textContent = 'Light';
+          if (btn) btn.title = 'Switch to Light Mode';
+        }
+      }
+    }
+
+    // Call initTheme immediately so there is no flash of theme
+    try { initTheme(); } catch (_) {}
+
+    // ==========================================
+    // MULTI-SELECT & BATCH DELETION
+    // ==========================================
+    let selectedRowIds = new Set();
+
+    function clearRowSelection() {
+      selectedRowIds.clear();
+      updateBulkDeleteUI();
+    }
+
+    function toggleRowSelection(id, isChecked) {
+      const strId = String(id);
+      if (isChecked) {
+        selectedRowIds.add(strId);
+      } else {
+        selectedRowIds.delete(strId);
+      }
+      updateBulkDeleteUI();
+    }
+
+    function toggleSelectAllRows(masterCb) {
+      const isChecked = masterCb.checked;
+      const checkboxes = document.querySelectorAll('.row-select-cb:not([disabled])');
+      checkboxes.forEach(cb => {
+        cb.checked = isChecked;
+        const id = String(cb.value);
+        if (isChecked) {
+          selectedRowIds.add(id);
+        } else {
+          selectedRowIds.delete(id);
+        }
+      });
+      updateBulkDeleteUI();
+    }
+
+    function updateBulkDeleteUI() {
+      const btn = document.getElementById('bulkDeleteBtn');
+      const countSpan = document.getElementById('bulkDeleteCount');
+      const count = selectedRowIds.size;
+
+      if (countSpan) countSpan.textContent = count;
+      if (btn) {
+        btn.style.display = count > 0 ? 'inline-flex' : 'none';
+      }
+
+      const masterCb = document.getElementById('selectAllCheckbox');
+      const checkboxes = document.querySelectorAll('.row-select-cb:not([disabled])');
+      if (masterCb && checkboxes.length > 0) {
+        let allChecked = true;
+        let anyChecked = false;
+        checkboxes.forEach(cb => {
+          const row = cb.closest('tr');
+          if (cb.checked) {
+            anyChecked = true;
+            if (row) row.classList.add('selected-row');
+          } else {
+            allChecked = false;
+            if (row) row.classList.remove('selected-row');
+          }
+        });
+        masterCb.checked = allChecked && anyChecked;
+        masterCb.indeterminate = anyChecked && !allChecked;
+      } else if (masterCb) {
+        masterCb.checked = false;
+        masterCb.indeterminate = false;
+      }
+    }
+
+    function openBulkDeleteModal() {
+      if (selectedRowIds.size === 0) return;
+      const modal = document.getElementById('bulkDeleteModal');
+      document.getElementById('bulkDeleteConfirmCount').textContent = selectedRowIds.size;
+      document.getElementById('bulkDeleteTableName').textContent = currentTable;
+
+      const idArray = Array.from(selectedRowIds);
+      document.getElementById('bulkDeleteIdList').textContent = `Record IDs (${idArray.length}): ${idArray.join(', ')}`;
+      modal.classList.add('open');
+    }
+
+    function closeBulkDeleteModal() {
+      const modal = document.getElementById('bulkDeleteModal');
+      if (modal) modal.classList.remove('open');
+    }
+
+    async function executeBulkDeleteRecords() {
+      if (selectedRowIds.size === 0 || !currentTable) return;
+      const btn = document.getElementById('confirmBulkDeleteBtn');
+      btn.textContent = '⏳ Deleting...';
+      btn.disabled = true;
+
+      const ids = Array.from(selectedRowIds);
+
+      try {
+        let success = false;
+        let deletedCount = 0;
+
+        // 1. Try dedicated batch-delete API
+        try {
+          const res = await fetch(`${API_BASE}/dashboardapi/crud/${currentTable}/batch-delete`, {
+            method: 'POST',
+            headers: getAuthHeaders(),
+            body: JSON.stringify({ ids: ids })
+          });
+
+          if (res.status === 401) {
+            showAuthOverlay('Admin Authentication Required to Delete Records.');
+            return;
+          }
+
+          if (res.ok) {
+            const json = await res.json();
+            if (json.success) {
+              success = true;
+              deletedCount = json.deletedCount || ids.length;
+            }
+          }
+        } catch (e) {
+          console.warn('batch-delete endpoint failed, attempting query fallback...', e);
+        }
+
+        // 2. Fallback via execute-query if batch-delete not available
+        if (!success) {
+          const idListStr = ids.map(id => `'${String(id).replace(/'/g, "''")}'`).join(', ');
+          const sql = `SET FOREIGN_KEY_CHECKS = 0; DELETE FROM \`${currentTable}\` WHERE \`id\` IN (${idListStr}); SET FOREIGN_KEY_CHECKS = 1;`;
+          const res = await fetch(`${API_BASE}/dashboardapi/execute-query`, {
+            method: 'POST',
+            headers: getAuthHeaders(),
+            body: JSON.stringify({ query: sql })
+          });
+
+          if (res.status === 401) {
+            showAuthOverlay('Admin Authentication Required.');
+            return;
+          }
+
+          if (res.ok) {
+            success = true;
+            deletedCount = ids.length;
+          }
+        }
+
+        if (success) {
+          closeBulkDeleteModal();
+          clearRowSelection();
+          fetchActiveTableData();
+          showImportStatus(`✅ Successfully deleted ${deletedCount} record(s) from "${currentTable}".`, 'success');
+        } else {
+          alert('Batch delete failed. Please check table permissions or console logs.');
+        }
+      } catch (err) {
+        alert(`Error deleting records: ${err.message}`);
+      } finally {
+        btn.textContent = '🗑️ Permanently Delete';
+        btn.disabled = false;
+      }
     }
 
     async function executeDeleteRecord() {
