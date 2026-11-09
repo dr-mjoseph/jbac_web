@@ -3336,3 +3336,21 @@ Implemented 4 endpoints in `backend/server.ts` & `backend/server.js`:
   - Added `<meta name="google-site-verification" content="_oLcacoasFR-yEuakbg-gz1ZqHfVCJVdGF-JgHMxg_0" />` to `src/index.html` and `dist/churchwebsite/index.html`.
   - Deployed updated `index.html` to S3 bucket `s3://jbac-web-production-298363284024` and invalidated CloudFront cache (`IAL0890IHMLU1YTIJA8VGDLUPA`).
 
+
+### 6. Google Search Console & PageSpeed Optimization Technical Guide
+- **Investigation of Automated Optimization Artifacts (Commit `ba679b3`)**:
+  - Investigated 15 modified/untracked files appearing in the workspace:
+    - `src/index.html`: `defer` added to 20+ vendor and utility scripts (`jquery-migrate`, `revolution slider`, `essential grid`, etc.), preloads switched from heavy PNG to lightweight WebP for `Banner01.webp` and `Banner03.webp`, Google Fonts appended with `&display=swap`.
+    - `src/index.html.bak`: Clean pre-optimization backup snapshot created for instant rollback safety.
+    - 12 converted WebP images in `src/assets/images/` saving over 1.2 MB on initial page load.
+    - `aws/deploy.ps1`: `index.html` cache-control updated to `public, max-age=300, must-revalidate` to balance revalidation performance with instant deployment freshness.
+  - Confirmed these modifications originated from the parallel PageSpeed & Search Console optimization agent (`jbac-marketing-agent`, conversation `f4343538-fc0f-425a-bab9-d6791b11594a`).
+  - Identified and rejected an unrelated patch pasted for an external repository (`lumina-web-app`).
+- **Authored Comprehensive Technical Guide**:
+  - Created [`PAGESPEED_AND_SEARCH_CONSOLE_OPTIMIZATION_GUIDE.md`](PAGESPEED_AND_SEARCH_CONSOLE_OPTIMIZATION_GUIDE.md) providing:
+    - Root cause analysis of initial PageSpeed scores (render-blocking JS, uncompressed banners, font FOIT, cache headers).
+    - File-by-file breakdown of all 15 assets.
+    - Core Web Vitals impact breakdown (LCP, FCP, TBT, CLS).
+    - Mermaid architecture diagram of the optimization flow.
+    - Verification commands and testing links (`https://pagespeed.web.dev/analysis/https-jbac-in/`).
+    - Emergency safe-revert rollback procedure using `src/index.html.bak`.
