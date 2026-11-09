@@ -3319,3 +3319,20 @@ Implemented 4 endpoints in `backend/server.ts` & `backend/server.js`:
     - `https://jbac.in/sitemap.xml` -> `HTTP 200 OK` (`Content-Type: application/xml`, 7095 bytes).
     - `https://jbac.in/robots.txt` -> `HTTP 200 OK` (`Content-Type: text/plain`, 101 bytes).
 
+### 5. Google Search Console Domain Ownership Verification (Amazon Route 53 DNS & Meta Tag)
+- **Domain DNS TXT Record via Amazon Route 53**:
+  - The domain `jbac.in` is registered via GoDaddy with active nameservers pointed to **Amazon Route 53** (Hosted Zone `Z04439382BRRO1T3Y6B16`).
+  - Executed change-batch UPSERT adding Google's DNS verification record alongside existing SPF and Microsoft 365 records:
+    ```text
+    jbac.in. IN TXT "google-site-verification=_oLcacoasFR-yEuakbg-gz1ZqHfVCJVdGF-JgHMxg_0"
+    ```
+  - Global synchronization status: `INSYNC` (`/change/C006227025319X8XCRN6H`).
+  - Verified globally via Google Public DNS (`8.8.8.8`):
+    ```powershell
+    Resolve-DnsName -Name jbac.in -Type TXT -Server 8.8.8.8
+    # Returns: google-site-verification=_oLcacoasFR-yEuakbg-gz1ZqHfVCJVdGF-JgHMxg_0
+    ```
+- **Fallback Verification Meta Tag**:
+  - Added `<meta name="google-site-verification" content="_oLcacoasFR-yEuakbg-gz1ZqHfVCJVdGF-JgHMxg_0" />` to `src/index.html` and `dist/churchwebsite/index.html`.
+  - Deployed updated `index.html` to S3 bucket `s3://jbac-web-production-298363284024` and invalidated CloudFront cache (`IAL0890IHMLU1YTIJA8VGDLUPA`).
+

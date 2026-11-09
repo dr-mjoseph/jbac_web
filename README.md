@@ -578,5 +578,9 @@ Implemented across backend endpoints (`/dashboardapi/getLeaderswebsiteData`, `/d
    - Generated standard XML sitemap (`sitemap.xml`) covering all 40+ public routes, service directories, and all 10 specialized registration wings.
    - Configured `robots.txt` referencing `https://jbac.in/sitemap.xml`.
    - Deployed on Amazon S3 and AWS Lambda with `application/xml` and `text/plain` headers, verified live via CloudFront.
+5. **Domain Verification via Amazon Route 53 DNS & HTML Meta Tag**:
+   - Resolved GoDaddy DNS delegation to Amazon Route 53 (`Z04439382BRRO1T3Y6B16`).
+   - Added DNS TXT record `google-site-verification=_oLcacoasFR-yEuakbg-gz1ZqHfVCJVdGF-JgHMxg_0` synchronized across global Route 53 edge locations.
+   - Added verification `<meta>` tag to `src/index.html` and deployed to production CloudFront.
 
 

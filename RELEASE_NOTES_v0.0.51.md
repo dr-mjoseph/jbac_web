@@ -77,12 +77,22 @@
 
 ---
 
+### 7. Google Search Console Domain Verification
+- **Route 53 DNS TXT Record**:
+  - Added TXT record `google-site-verification=_oLcacoasFR-yEuakbg-gz1ZqHfVCJVdGF-JgHMxg_0` to AWS Route 53 Hosted Zone `Z04439382BRRO1T3Y6B16` for `jbac.in`.
+  - Propagated globally with status `INSYNC` and verified with Google Public DNS (`8.8.8.8`).
+- **HTML Verification Tag**:
+  - Added verification `<meta>` tag to `index.html` on CloudFront.
+
+---
+
 ## 🛠️ Verification & Validation
 - **AAPT Badging**:
   ```
   package: name='io.ionic.starterjbac' versionCode='51' versionName='0.0.51'
   targetSdkVersion:'36'
   ```
+- **DNS TXT Record**: Verified with `Resolve-DnsName -Name jbac.in -Type TXT -Server 8.8.8.8` (Active).
 - **Live Sitemap**: Verified on [https://jbac.in/sitemap.xml](https://jbac.in/sitemap.xml) (HTTP 200 OK).
 - **Live Robots**: Verified on [https://jbac.in/robots.txt](https://jbac.in/robots.txt) (HTTP 200 OK).
 - **Live Admin Cockpit**: Verified on [https://jbac.in/admin](https://jbac.in/admin).
