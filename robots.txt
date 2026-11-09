@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /public.html
+
+Sitemap: https://jbac.in/sitemap.xml

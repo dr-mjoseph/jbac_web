@@ -383,6 +383,43 @@ app.get(['/api/tables', '/dashboardapi/tables', '/tables'], async (_req, res) =>
     }
 });
 
+// SEO Sitemap & Robots
+app.get(['/sitemap.xml', '/api/sitemap.xml', '/dashboardapi/sitemap.xml'], (_req, res) => {
+    res.setHeader('Content-Type', 'application/xml; charset=utf-8');
+    const candidates = [
+        path.join(__dirname, 'sitemap.xml'),
+        path.join(process.cwd(), 'sitemap.xml'),
+        path.join(process.cwd(), 'backend', 'sitemap.xml'),
+        path.join(process.cwd(), 'src', 'sitemap.xml')
+    ];
+    for (const p of candidates) {
+        try {
+            if (fs.existsSync(p)) {
+                return res.send(fs.readFileSync(p, 'utf8'));
+            }
+        } catch (_) {}
+    }
+    res.status(404).send('<!-- sitemap not found -->');
+});
+
+app.get(['/robots.txt', '/api/robots.txt', '/dashboardapi/robots.txt'], (_req, res) => {
+    res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+    const candidates = [
+        path.join(__dirname, 'robots.txt'),
+        path.join(process.cwd(), 'robots.txt'),
+        path.join(process.cwd(), 'backend', 'robots.txt'),
+        path.join(process.cwd(), 'src', 'robots.txt')
+    ];
+    for (const p of candidates) {
+        try {
+            if (fs.existsSync(p)) {
+                return res.send(fs.readFileSync(p, 'utf8'));
+            }
+        } catch (_) {}
+    }
+    res.send("User-agent: *\nAllow: /\nDisallow: /admin\nDisallow: /public.html\nSitemap: https://jbac.in/sitemap.xml\n");
+});
+
 // Interactive Web Database Cockpit UI & Public Admin HTML
 app.get(['/public.html', '/admin', '/dashboard', '/cockpit', '/admin-db', '/api/admin-db', '/dashboardapi/admin-db', '/api/admin-database-view'], (_req, res) => {
     res.setHeader('Content-Type', 'text/html; charset=utf-8');

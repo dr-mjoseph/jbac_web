@@ -24,7 +24,9 @@
               "src/favicon.ico",
               "src/assets",
               "src/.htaccess",
-              "src/public.html"
+              "src/public.html",
+              "src/sitemap.xml",
+              "src/robots.txt"
             ],
             "styles": [
               "src/custom-theme.scss",

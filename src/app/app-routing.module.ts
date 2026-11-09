@@ -155,6 +155,22 @@ const routes: Routes = [
       return false;
     }]
   },
+  {
+    path: 'sitemap.xml',
+    children: [],
+    canActivate: [() => {
+      window.location.href = '/sitemap.xml';
+      return false;
+    }]
+  },
+  {
+    path: 'robots.txt',
+    children: [],
+    canActivate: [() => {
+      window.location.href = '/robots.txt';
+      return false;
+    }]
+  },
  { path: '**', redirectTo: '' }
 ];
 
