@@ -545,4 +545,30 @@ class ChurchRepository(
 }
 ```
 
+---
+
+## 4. Admin Database Cockpit Batch Deletion API
+
+To support administrative bulk cleanup and record management across all 89 database tables, a dedicated atomic batch delete endpoint is exposed on AWS Lambda (`jbac-backend-api`):
+
+| HTTP Method | Route | Description | Request Body Payload |
+| :--- | :--- | :--- | :--- |
+| `POST` | `/dashboardapi/crud/:table/batch-delete` | Batch delete multiple records by ID | `{"ids": [101, 102, 103]}` |
+
+### Security & Integrity Features:
+1. **Admin Authorization**: Enforces `verifyAdminAuth(req)` via `x-admin-auth` header or `Authorization: Bearer <token>`.
+2. **Table Whitelisting**: Validates table names using `isValidTable(table)`.
+3. **Atomic Execution**: Temporarily suspends foreign key checks (`SET FOREIGN_KEY_CHECKS = 0`), deletes matching records via parameterized SQL `WHERE id IN (?)`, and re-enforces integrity constraints (`SET FOREIGN_KEY_CHECKS = 1`).
+4. **Response Payload**:
+   ```json
+   {
+     "success": true,
+     "status": 200,
+     "table": "teacher_reg",
+     "deletedCount": 3,
+     "message": "Successfully deleted 3 records"
+   }
+   ```
+
+
 

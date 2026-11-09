@@ -556,3 +556,27 @@ Implemented across backend endpoints (`/dashboardapi/getLeaderswebsiteData`, `/d
    - Maintained Android 16 target compatibility (`targetSdkVersion 36`).
    - Compiled, signed, and verified: `jbacApp-0.0.51.apk`, `jbacApp-0.0.51.aab`, and `appreleasesigned.aab`.
 
+---
+
+## 63. Admin Cockpit Multi-Select Batch Delete, Light/Dark Theme Switch, Compact Teacher Banner & SEO Sitemap/Robots (November 9, 2026)
+
+### Context & Implementation
+1. **Admin Multi-Select Batch Deletion (`/admin`)**:
+   - Master and individual row checkboxes added across all 89 database tables in `Tables & Schema Explorer (89)`.
+   - Selected rows highlight with `.selected-row` background tint.
+   - Dynamic action button `🗑️ Delete Selected (N)` with live counter appears in toolbar.
+   - Full confirmation modal with target table, record count, and record IDs preview.
+   - New atomic backend endpoint: `POST /dashboardapi/crud/:table/batch-delete` managing foreign keys and performing batch deletions with automatic SQL query fallback.
+2. **Light / Dark Theme Toggle Switch (`/admin`)**:
+   - Added `#themeToggleBtn` (`☀️ Light` / `🌙 Dark`) to header controls.
+   - Complete CSS styling palette under `body.light-theme` with high-contrast text (`#0f172a`), clean borders, and clear table/modal readability.
+   - Persistent theme setting in browser `localStorage` (`jbac_admin_theme`).
+3. **Teacher Registration Compact Banner (`/teacherregister`)**:
+   - Reduced hero card padding, typography margins, and replaced large icon with a 44x44px circular icon badge (`.hero-icon-badge`).
+   - Slashed title banner height by >60% (~150px vs ~380px) bringing form fields above the fold while preserving Telugu `Ramabhadra` typography.
+4. **Google Search Console Sitemap & Robots Configuration**:
+   - Generated standard XML sitemap (`sitemap.xml`) covering all 40+ public routes, service directories, and all 10 specialized registration wings.
+   - Configured `robots.txt` referencing `https://jbac.in/sitemap.xml`.
+   - Deployed on Amazon S3 and AWS Lambda with `application/xml` and `text/plain` headers, verified live via CloudFront.
+
+

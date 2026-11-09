@@ -3258,3 +3258,64 @@ Implemented 4 endpoints in `backend/server.ts` & `backend/server.js`:
   - `appreleasesigned.aab` (127 MB, signed)
   - Verified with AAPT badging: `versionCode='51'`, `versionName='0.0.51'`, `targetSdkVersion:'36'`.
 
+---
+
+## 63. Admin Cockpit Multi-Select Batch Delete, Light/Dark Theme Switch, Compact Teacher Banner, and Google Search Console Sitemap & Robots Deployment (November 9, 2026)
+
+### 1. Admin Multi-Select Batch Delete Functionality (`https://jbac.in/admin`)
+- **Interactive Checkboxes & Select All**:
+  - In `backend/admin_db.html`, `backend/public.html`, `public.html`, `Api/public.html`, `src/public.html`, and `src/assets/public.html`:
+  - Added row-level checkboxes (`.row-select-cb`) and master table-header checkbox (`#selectAllCheckbox`) to `Tables & Schema Explorer (89)` across all 89 database tables.
+  - Added `.selected-row` CSS styling highlighting selected records with a subtle red background tint.
+  - Implemented dynamic toolbar button `🗑️ Delete Selected (N)` (`#bulkDeleteBtn`) that automatically appears whenever 1 or more rows are checked and displays the active selection count.
+  - Implemented a confirmation modal (`#bulkDeleteModal`) warning the admin, displaying the target table name, exact number of selected records, and an inspectable list of the selected IDs.
+- **Backend Batch Delete REST API (`jbac-backend-api`)**:
+  - Added endpoint `POST /api/crud/:table/batch-delete`, `/dashboardapi/crud/:table/batch-delete`, `/crud/:table/batch-delete` in `backend/server.ts` & `backend/server.js`.
+  - Enforces `verifyAdminAuth(req)`.
+  - Validates `isValidTable(table)` and `Array.isArray(ids)`.
+  - Atomically disables foreign key checks (`SET FOREIGN_KEY_CHECKS = 0`), executes `DELETE FROM \`${table}\` WHERE \`id\` IN (?)` with `[ids]`, re-enables foreign key checks (`SET FOREIGN_KEY_CHECKS = 1`), and releases connection.
+  - Returns `success: true`, `status: 200`, `table`, and `deletedCount`.
+  - Frontend includes automatic SQL query fallback via `/dashboardapi/execute-query` for maximum resilience.
+
+### 2. Light / Dark Theme Switch for Admin Cockpit
+- **Theme Switcher UI**:
+  - Added `#themeToggleBtn` (`☀️ Light` / `🌙 Dark`) to top navbar header controls in `backend/admin_db.html` and all public admin HTML targets.
+- **Light Theme Palette (`body.light-theme`)**:
+  - Configured complete CSS custom property overrides:
+    - Backgrounds: `--bg-dark: #f8fafc`, `--bg-surface: #ffffff`, `--bg-card: #f8fafc`.
+    - Borders: `--border-subtle: #cbd5e1`, `--border-focus: #2563eb`.
+    - Text: `--text-main: #0f172a`, `--text-muted: #475569`, `--text-dim: #64748b`.
+    - Accents & Badges: High contrast blue (`#2563eb`), green (`#059669`), red (`#dc2626`).
+  - Styled data grid headers (`th`), table rows (`td`), hovered rows, selected rows, query editor, input boxes, modal dialogs, and scrollbars for crisp readability.
+- **State Persistence**:
+  - Integrated `initTheme()` and `toggleTheme()` storing user preference in `localStorage.getItem('jbac_admin_theme')`.
+  - Automatically restores saved theme on page initialization to eliminate any flashing effect.
+
+### 3. Teacher Registration Banner Height Reduction (`https://jbac.in/teacherregister`)
+- **Compact Hero Header**:
+  - In `src/app/jesus/teacherregister/teacherregister.component.html`:
+    - Reduced outer container vertical padding from `py-5` to `py-3 py-md-4`.
+    - Reduced hero card padding from `p-4 p-md-5` to `py-3 px-3 px-md-4`.
+    - Replaced the large emoji banner with a compact 44x44px circular icon badge (`.hero-icon-badge`).
+  - In `src/app/jesus/teacherregister/teacherregister.component.css`:
+    - Added styles for `.hero-icon-badge`, `.hero-title` (`1.35rem`), `.hero-subtitle` (`0.92rem`), and `.hero-desc` (`0.82rem`, line-height 1.4, max-width 620px).
+    - Reduced total hero banner vertical height from ~380px down to ~150px (over 60% reduction), bringing the registration form into immediate view above the fold while preserving Telugu `Ramabhadra` typography.
+
+### 4. Google Search Console SEO Sitemap & Robots Configuration
+- **Sitemap Generation (`sitemap.xml`)**:
+  - Authored standard XML sitemap (`sitemap.xml`) in accordance with Sitemaps.org 0.9 schema.
+  - Included all 40+ public routes on `https://jbac.in/`: core navigation pages, service directories, job boards, matrimony, church search, leaders directory, and all 10 specialized wing registration portals (`/teacherregister`, `/doctorregister`, `/entrepreneurregister`, `/investorregister`, etc.).
+  - Added `<lastmod>2026-11-09</lastmod>`, `<changefreq>`, and search `<priority>` weights.
+- **Robots Directives (`robots.txt`)**:
+  - Authored `robots.txt` specifying `User-agent: *`, `Allow: /`, `Disallow: /admin`, `Disallow: /public.html`, and `Sitemap: https://jbac.in/sitemap.xml`.
+- **Build & Lambda Pipeline Integration**:
+  - Updated `angular.json` assets list to include `src/sitemap.xml` and `src/robots.txt`.
+  - Added explicit routing in `src/app/app-routing.module.ts` preventing SPA redirection loops for crawler requests.
+  - Added `/sitemap.xml` and `/robots.txt` route handlers in `backend/server.ts` & `backend/server.js` serving `application/xml` and `text/plain` content types.
+- **Production S3 & CloudFront Deployment**:
+  - Uploaded `sitemap.xml` and `robots.txt` directly to root of S3 bucket `s3://jbac-web-production-298363284024`.
+  - Invalidated CloudFront distribution `EOBBU8SU7H3BI`.
+  - Live verification:
+    - `https://jbac.in/sitemap.xml` -> `HTTP 200 OK` (`Content-Type: application/xml`, 7095 bytes).
+    - `https://jbac.in/robots.txt` -> `HTTP 200 OK` (`Content-Type: text/plain`, 101 bytes).
+

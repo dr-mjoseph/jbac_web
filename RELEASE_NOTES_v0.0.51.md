@@ -42,15 +42,49 @@
 
 ---
 
+### 4. Admin Cockpit Multi-Select Batch Delete & Light/Dark Theme Switch
+- **Multi-Select Batch Deletion**:
+  - Master and individual row checkboxes added across all 89 tables in `Tables & Schema Explorer (89)` on `https://jbac.in/admin`.
+  - Selected rows highlight with `.selected-row` background tint.
+  - Floating toolbar button `🗑️ Delete Selected (N)` with live counter appears in toolbar.
+  - Confirmation modal warning the admin with target table name, count, and ID list.
+  - Added atomic backend endpoint `POST /dashboardapi/crud/:table/batch-delete` managing foreign keys and performing atomic SQL deletions with query fallback.
+- **Light / Dark Theme Toggle**:
+  - Added `#themeToggleBtn` (`☀️ Light` / `🌙 Dark`) to header controls.
+  - Full CSS custom properties palette under `body.light-theme` with high-contrast slate text (`#0f172a`), clean borders, and clear table/modal readability.
+  - Theme preference persisted in `localStorage` (`jbac_admin_theme`).
+
+---
+
+### 5. Teacher Registration Compact Hero Banner
+- **Compact Hero Design**:
+  - In `teacherregister.component.html` and `.css`:
+    - Reduced outer container vertical padding and card body padding.
+    - Replaced large icon with a compact 44x44px circular icon badge (`.hero-icon-badge`).
+    - Tightened title, subtitle, and description margins and font sizing.
+    - Slashed title banner height by >60% (~150px vs ~380px) bringing form fields above the fold while preserving Telugu `Ramabhadra` typography.
+
+---
+
+### 6. Google Search Console SEO Sitemap & Robots Configuration
+- **Sitemap Generation (`sitemap.xml`)**:
+  - Authored standard XML sitemap (`sitemap.xml`) covering all 40+ public routes, service directories, and all 10 specialized registration wings.
+- **Robots Directives (`robots.txt`)**:
+  - Configured `robots.txt` referencing `https://jbac.in/sitemap.xml`.
+- **Live Deployment**:
+  - Uploaded to Amazon S3 root and AWS Lambda route handlers (`/sitemap.xml`, `/robots.txt`).
+  - Verified live via CloudFront with `application/xml` and `text/plain` headers.
+
+---
+
 ## 🛠️ Verification & Validation
 - **AAPT Badging**:
   ```
   package: name='io.ionic.starterjbac' versionCode='51' versionName='0.0.51'
   targetSdkVersion:'36'
   ```
-- **Database Column**:
-  ```sql
-  ALTER TABLE teacher_reg ADD COLUMN about_achievements TEXT DEFAULT NULL;
-  ```
-- **Live Portal**: Verified on [https://jbac.in/teacherregister](https://jbac.in/teacherregister) with CloudFront invalidation.
+- **Live Sitemap**: Verified on [https://jbac.in/sitemap.xml](https://jbac.in/sitemap.xml) (HTTP 200 OK).
+- **Live Robots**: Verified on [https://jbac.in/robots.txt](https://jbac.in/robots.txt) (HTTP 200 OK).
+- **Live Admin Cockpit**: Verified on [https://jbac.in/admin](https://jbac.in/admin).
+- **Live Teacher Portal**: Verified on [https://jbac.in/teacherregister](https://jbac.in/teacherregister) with CloudFront invalidation.
 
