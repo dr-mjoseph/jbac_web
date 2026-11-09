@@ -45,7 +45,7 @@ if ([string]::IsNullOrWhiteSpace($BucketName)) {
 
 Write-Host "`n[Step 2/3] Uploading compiled files to s3://$BucketName..." -ForegroundColor Green
 & aws s3 sync dist/churchwebsite "s3://$BucketName" --delete --cache-control "public, max-age=31536000, immutable" --exclude "index.html" --region $Region
-& aws s3 cp dist/churchwebsite/index.html "s3://$BucketName/index.html" --cache-control "no-cache, no-store, must-revalidate" --region $Region
+& aws s3 cp dist/churchwebsite/index.html "s3://$BucketName/index.html" --cache-control "public, max-age=300, must-revalidate" --region $Region
 
 # 4. Invalidate CloudFront
 if ([string]::IsNullOrWhiteSpace($DistributionId)) {
