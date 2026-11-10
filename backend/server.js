@@ -988,7 +988,7 @@ app.get(['/dashboardapi/admin-dashboard-stats', '/api/admin-dashboard-stats', '/
 // Master Lookups: Denominations, Districts, Constituencies, Mandals, Panchayats
 app.all(['/dashboardapi/denomations', '/api/denominations', '/denominations'], async (_req, res) => {
     try {
-        const [rows] = await db.query('SELECT id, denomation_name, denomation_name as denomination_name, d_in FROM churchdenomation WHERE d_in = 0 ORDER BY denomation_name ASC');
+        const [rows] = await db.query('SELECT id, denomation_name, denomation_name as denomination, denomation_name as denomination_name, d_in FROM churchdenomation WHERE d_in = 0 ORDER BY denomation_name ASC');
         res.json({ status: 200, data: rows });
     }
     catch (err) {

@@ -650,3 +650,21 @@ Implemented across backend endpoints (`/dashboardapi/getLeaderswebsiteData`, `/d
    - Built Angular production bundles (`npm run build:prod`).
    - Synced to AWS S3 `s3://jbac-web-production-298363284024`.
    - Invalidated CloudFront distribution `EOBBU8SU7H3BI` (invalidation `I7AK6Z4XGJNX5ECMGS63S8SJFC`).
+
+
+---
+
+## 66. Institute Registration Relocation to Registrations Menu, Clean Telugu Registration Sub-Items & Denomination Dropdown Whitespace Resolution (November 10, 2026)
+
+### Key Updates
+1. **Relocated Christian Educational Institutes Registration**:
+   - Moved "క్రిస్టియన్ విద్యా సంస్థల నమోదు" (`/addinstitute`) from "సేవలు" (Services) to "రిజిస్ట్రేషన్స్" (Registrations) across desktop main header, sticky navbar, and mobile drawer navigation.
+2. **Standardized Telugu Registration Sub-Items**:
+   - Removed English annotations `(Entrepreneur)`, `(Investor)`, `(Teachers)` from the Registrations dropdown menu for a clean, professional Telugu UI.
+3. **Denomination Dropdown Whitespace Bug Fix**:
+   - **Root Cause**: Database table `churchdenomation` uses column name `denomation_name`. The template requested `{{item.denomination}}`, which returned `undefined` and caused browsers to render ~50 blank whitespace options.
+   - **Fix**: Added `denomation_name as denomination` alias to `/dashboardapi/denomations` in backend API (`server.ts` & `server.js`) and added defensive fallbacks `{{ item.denomation_name || item.denomination_name || item.denomination }}` across both web and mobile templates.
+4. **Deployments**:
+   - Packaged and deployed update to AWS Lambda `jbac-backend-api`.
+   - Built production Angular bundle (`npm run build:prod`) and deployed to AWS S3 & CloudFront (Distribution `EOBBU8SU7H3BI`).
+   - Synced mobile app (`jbac_app`), compiled clean, and pushed to GitHub `main` (`52865fd`).

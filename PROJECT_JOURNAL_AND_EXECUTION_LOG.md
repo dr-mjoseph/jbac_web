@@ -3499,3 +3499,68 @@ The user requested the following enhancements across Web, Backend, Database, and
   - Renamed service 2 to **"క్రిస్టియన్ విద్యా సంస్థల నమోదు"**.
 - Built and validated with `ionic-app-scripts build` (0 errors in 12.63s).
 - Committed and pushed to `https://github.com/dr-mjoseph/jbac_app.git` (commit `e1e8719`).
+
+
+---
+
+## 66. Institute Registration Relocation to Registrations Menu, Clean Telugu Registration Sub-Items & Denomination Dropdown Whitespace Resolution (November 10, 2026)
+
+### Context & Objectives
+1. **Move Educational Institute Registration**:
+   - Relocate the Christian Educational Institutes Registration form (`/addinstitute` - "క్రిస్టియన్ విద్యా సంస్థల నమోదు") from the "Services" (`సేవలు`) menu to the "Registrations" (`రిజిస్ట్రేషన్స్`) menu.
+2. **Denomination Dropdown Blank Display Fix**:
+   - Resolve the issue on `https://jbac.in/addinstitute` where clicking the "Denomination" (`డెనామినేషన్ ఎంచుకోండి`) dropdown rendered an oversized blank white box with empty choices.
+3. **Streamline Telugu Registration Sub-Items**:
+   - Remove English parenthetical suffixes (`(Entrepreneur)`, `(Investor)`, `(Teachers)`) from all registration sub-menu items to provide a clean, consistent Telugu presentation.
+4. **Cross-Platform Sync & Deployment**:
+   - Update backend Lambda API, Angular web application, and Ionic mobile application (`jbac_app`), deploying web changes to AWS S3 + CloudFront and pushing all commits to GitHub.
+
+---
+
+### Root Cause Analysis & Resolutions
+
+#### 1. Denomination Dropdown Whitespace Bug
+- **Root Cause**:
+  - In the MySQL table `churchdenomation`, the column name for the denomination title is `denomation_name`.
+  - The backend endpoint `/dashboardapi/denomations` previously executed:
+    `SELECT id, denomation_name, denomation_name as denomination_name, d_in FROM churchdenomation...`
+  - In `addinstitute.component.html` (and mobile `addinstitute.html`), the option label was bound to `{{item.denomination}}`.
+  - Because `item.denomination` was `undefined`, Angular rendered ~50 `<option>` elements containing empty strings. The browser opened a dropdown with dozens of blank rows, presenting as an empty white rectangle.
+- **Resolution**:
+  - In `backend/server.ts` & `backend/server.js`:
+    ```sql
+    SELECT id, denomation_name, denomation_name as denomination, denomation_name as denomination_name, d_in 
+    FROM churchdenomation WHERE d_in = 0 ORDER BY denomation_name ASC
+    ```
+  - In `src/app/jesus/addinstitute/addinstitute.component.html` and `jbac_app/src/pages/addinstitute/addinstitute.html`:
+    ```html
+    <option *ngFor="let item of denomation" [value]="item.id">
+        {{ item.denomation_name || item.denomination_name || item.denomination }}
+    </option>
+    ```
+  - Repackaged `backend/backend-deploy.zip` and deployed directly to AWS Lambda `jbac-backend-api`.
+
+#### 2. Navigation Menu Reorganization (`header.component.html`)
+- Across all three navigation headers (Desktop primary header, desktop sticky scroll navbar, and mobile drawer/canvas menu):
+  - Moved `క్రిస్టియన్ విద్యా సంస్థల నమోదు` (`/addinstitute`) from `సేవలు` (Services) into `రిజిస్ట్రేషన్స్` (Registrations).
+  - Cleaned up sub-items by removing English annotations:
+    - `ఎంటర్‌ప్రెన్యూర్ రిజిస్ట్రేషన్ (Entrepreneur)` ➔ `ఎంటర్‌ప్రెన్యూర్ రిజిస్ట్రేషన్`
+    - `ఇన్వెస్టర్ రిజిస్ట్రేషన్ (Investor)` ➔ `ఇన్వెస్టర్ రిజిస్ట్రేషన్`
+    - `బోధనా రంగ ఉద్యోగుల నమోదు (Teachers)` ➔ `బోధనా రంగ ఉద్యోగుల నమోదు`
+
+---
+
+### Deployment & Verification
+
+1. **AWS Lambda Backend (`jbac-backend-api`)**:
+   - Packaged with `scripts/update_zip.ps1`.
+   - Updated function code via AWS CLI. State: `Active`, LastUpdateStatus: `Successful`.
+2. **Web Production Build & CloudFront Deployment**:
+   - Compiled with `npm run build:prod` (0 errors).
+   - Synced bundle to AWS S3 bucket `s3://jbac-web-production-298363284024`.
+   - Set strict `no-cache, no-store, must-revalidate` cache-control on `index.html`.
+   - Created CloudFront cache invalidation `IGGWBH1K3ATR82PYJ0UKKFG3U` on distribution `EOBBU8SU7H3BI`.
+3. **Mobile App Codebase (`jbac_app`)**:
+   - Synced denomination template fix in `src/pages/addinstitute/addinstitute.html`.
+   - Built and validated with `npm run build` (0 errors).
+   - Rebased and pushed to `https://github.com/dr-mjoseph/jbac_app.git` on branch `main` (`52865fd`).

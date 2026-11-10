@@ -146,7 +146,7 @@
                                                     [ngClass]="{'is-invalid': submitted && i['denomination_id'].errors }">
                                                     <option value="" selected disabled>డెనామినేషన్ ఎంచుకోండి</option>
                                                     <option *ngFor="let item of denomation" [value]="item.id">
-                                                        {{item.denomination}}
+                                                        {{ item.denomation_name || item.denomination_name || item.denomination }}
                                                     </option>
                                                 </select>
                                                 <div *ngIf="submitted && i['denomination_id'].errors"

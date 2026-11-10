@@ -201,15 +201,19 @@
                                     </li>
                                     <li class="menu-item">
                                         <a routerLink="/entrepreneurregister" routerLinkActive="active"
-                                            [routerLinkActiveOptions]="{exact: true}">ఎంటర్‌ప్రెన్యూర్ రిజిస్ట్రేషన్ (Entrepreneur)</a>
+                                            [routerLinkActiveOptions]="{exact: true}">ఎంటర్‌ప్రెన్యూర్ రిజిస్ట్రేషన్</a>
                                     </li>
                                     <li class="menu-item">
                                         <a routerLink="/investorregister" routerLinkActive="active"
-                                            [routerLinkActiveOptions]="{exact: true}">ఇన్వెస్టర్ రిజిస్ట్రేషన్ (Investor)</a>
+                                            [routerLinkActiveOptions]="{exact: true}">ఇన్వెస్టర్ రిజిస్ట్రేషన్</a>
                                     </li>
                                     <li class="menu-item">
                                         <a routerLink="/teacherregister" routerLinkActive="active"
-                                            [routerLinkActiveOptions]="{exact: true}">బోధనా రంగ ఉద్యోగుల నమోదు (Teachers)</a>
+                                            [routerLinkActiveOptions]="{exact: true}">బోధనా రంగ ఉద్యోగుల నమోదు</a>
+                                    </li>
+                                    <li class="menu-item">
+                                        <a routerLink="/addinstitute" routerLinkActive="active"
+                                            [routerLinkActiveOptions]="{exact: true}">క్రిస్టియన్ విద్యా సంస్థల నమోదు</a>
                                     </li>
 
                                 </ul>
@@ -223,10 +227,6 @@
                                     <li class="menu-item" *ngIf="notlogin">
                                         <a routerLink="/institute" routerLinkActive="active"
                                             [routerLinkActiveOptions]="{exact: true}">క్రైస్తవ సంస్థలు</a>
-                                    </li>
-                                    <li class="menu-item" *ngIf="notlogin">
-                                        <a routerLink="/addinstitute" routerLinkActive="active"
-                                            [routerLinkActiveOptions]="{exact: true}">క్రిస్టియన్ విద్యా సంస్థల నమోదు</a>
                                     </li>
                                       <!-- <li class="menu-item" *ngIf="notlogin">
                                         <a routerLink="/gallery" routerLinkActive="active"
@@ -483,15 +483,19 @@
                             </li>
                             <li class="menu-item">
                                 <a href="/entrepreneurregister" routerLinkActive="active"
-                                    [routerLinkActiveOptions]="{exact: true}">ENTREPRENEUR REGISTER</a>
+                                    [routerLinkActiveOptions]="{exact: true}">ఎంటర్‌ప్రెన్యూర్ రిజిస్ట్రేషన్</a>
                             </li>
                             <li class="menu-item">
                                 <a href="/investorregister" routerLinkActive="active"
-                                    [routerLinkActiveOptions]="{exact: true}">INVESTOR REGISTER</a>
+                                    [routerLinkActiveOptions]="{exact: true}">ఇన్వెస్టర్ రిజిస్ట్రేషన్</a>
                             </li>
                             <li class="menu-item">
                                 <a href="/teacherregister" routerLinkActive="active"
-                                    [routerLinkActiveOptions]="{exact: true}">TEACHERS REGISTER</a>
+                                    [routerLinkActiveOptions]="{exact: true}">బోధనా రంగ ఉద్యోగుల నమోదు</a>
+                            </li>
+                            <li class="menu-item">
+                                <a href="/addinstitute" routerLinkActive="active"
+                                    [routerLinkActiveOptions]="{exact: true}">క్రిస్టియన్ విద్యా సంస్థల నమోదు</a>
                             </li>
                         </ul>
                     </li>
@@ -504,10 +508,6 @@
                             <li class="menu-item" *ngIf="notlogin">
                                 <a href="/institute" routerLinkActive="active"
                                     [routerLinkActiveOptions]="{exact: true}">Institutes</a>
-                            </li>
-                            <li class="menu-item" *ngIf="notlogin">
-                                <a href="/addinstitute" routerLinkActive="active"
-                                    [routerLinkActiveOptions]="{exact: true}">క్రిస్టియన్ విద్యా సంస్థల నమోదు</a>
                             </li>
                             
                             <li class="menu-item" *ngIf="notlogin">
@@ -794,15 +794,19 @@
                         </li>
                         <li class="menu-item">
                             <a (click)="closeMobileMenu()" routerLink="/entrepreneurregister" routerLinkActive="active"
-                                [routerLinkActiveOptions]="{exact: true}">ఎంటర్‌ప్రెన్యూర్ రిజిస్ట్రేషన్ (Entrepreneur Register)</a>
+                                [routerLinkActiveOptions]="{exact: true}">ఎంటర్‌ప్రెన్యూర్ రిజిస్ట్రేషన్</a>
                         </li>
                         <li class="menu-item">
                             <a (click)="closeMobileMenu()" routerLink="/investorregister" routerLinkActive="active"
-                                [routerLinkActiveOptions]="{exact: true}">ఇన్వెస్టర్ రిజిస్ట్రేషన్ (Investor Register)</a>
+                                [routerLinkActiveOptions]="{exact: true}">ఇన్వెస్టర్ రిజిస్ట్రేషన్</a>
                         </li>
                         <li class="menu-item">
                             <a (click)="closeMobileMenu()" routerLink="/teacherregister" routerLinkActive="active"
-                                [routerLinkActiveOptions]="{exact: true}">బోధనా రంగ ఉద్యోగుల నమోదు (Teachers Register)</a>
+                                [routerLinkActiveOptions]="{exact: true}">బోధనా రంగ ఉద్యోగుల నమోదు</a>
+                        </li>
+                        <li class="menu-item">
+                            <a (click)="closeMobileMenu()" routerLink="/addinstitute" routerLinkActive="active"
+                                [routerLinkActiveOptions]="{exact: true}">🎓 క్రిస్టియన్ విద్యా సంస్థల నమోదు</a>
                         </li>
                     </ul>
                 </li>
@@ -820,10 +824,6 @@
                         <li class="menu-item">
                             <a (click)="closeMobileMenu()" routerLink="/institute" routerLinkActive="active"
                                 [routerLinkActiveOptions]="{exact: true}">క్రైస్తవ సంస్థలు</a>
-                        </li>
-                        <li class="menu-item">
-                            <a (click)="closeMobileMenu()" routerLink="/addinstitute" routerLinkActive="active"
-                                [routerLinkActiveOptions]="{exact: true}">🎓 క్రిస్టియన్ విద్యా సంస్థల నమోదు</a>
                         </li>
                         <li class="menu-item">
                             <a (click)="closeMobileMenu()" routerLink="/jobs" routerLinkActive="active"
