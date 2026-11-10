@@ -3354,3 +3354,42 @@ Implemented 4 endpoints in `backend/server.ts` & `backend/server.js`:
     - Mermaid architecture diagram of the optimization flow.
     - Verification commands and testing links (`https://pagespeed.web.dev/analysis/https-jbac-in/`).
     - Emergency safe-revert rollback procedure using `src/index.html.bak`.
+
+
+---
+
+## 64. Teacher Registration WhatsApp Number Field & Mobile App Release v0.0.52 (November 10, 2026)
+
+### Context & User Objectives
+The user requested:
+1. Add one more field "whatsApp number" beside mobile number field to the teacher register for mobile app and web.
+2. Create the field in the database table.
+3. Update all documentation.
+4. Generate a new .aab and .apk of version 0.0.52 with API level 36 or more.
+
+### Technical Implementation
+1. **Database Migration (AWS RDS MySQL `jbac_jbac`)**:
+   - Checked column structure in `teacher_reg`.
+   - Executed SQL alteration: `ALTER TABLE \`teacher_reg\` ADD COLUMN \`whatsapp\` varchar(25) DEFAULT NULL AFTER \`mobile\`;`.
+   - Verified column presence: `whatsapp varchar(25) DEFAULT NULL` positioned immediately after `mobile`.
+2. **Backend API Update (`backend/server.ts`, `backend/server.js`)**:
+   - In `POST /dashboardapi/teacher-register` and `/api/teacher-register`:
+     - Added extraction: `const whatsapp = String(b.whatsapp || b.whatsapp_number || b.whatsappno || '').trim() || null;`.
+     - Updated INSERT query: `INSERT INTO \`teacher_reg\` (\`name\`, \`mobile\`, \`whatsapp\`, \`email\`, ...) VALUES (?, ?, ?, ?, ...)`.
+   - Packaged into `backend/backend-deploy.zip` and deployed directly to AWS Lambda `jbac-backend-api` (Active, updated runtime).
+3. **Web Application Registration Portal (`src/app/jesus/teacherregister/`)**:
+   - In `teacherregister.component.html`: Updated personal contact details row from 2 columns to 3 balanced responsive columns:
+     - Mobile Number: `col-md-4` with 10-digit mandatory validation.
+     - WhatsApp Number: `col-md-4` with 10-digit validation and numeric-only keypress handler.
+     - Email Address: `col-md-4`.
+   - In `teacherregister.component.ts`: Added `whatsapp` form control, `numericOnly` validator, and mapped `whatsapp` into the submission payload.
+   - In `backend/admin_db.html`, `public.html`, `Api/public.html`: Updated teacher directory table row to display WhatsApp badge (`💬 WA: <number>`).
+   - Successfully built production bundle (`npm run build:prod`), synced to S3 bucket `s3://jbac-web-production-298363284024`, and invalidated CloudFront distribution `EOBBU8SU7H3BI`.
+4. **Mobile Hybrid Application (`jbac_app`)**:
+   - In `src/pages/teacher/teacher.html`: Added stacked ion-item for `వాట్సాప్ నంబర్ (WhatsApp Number)` directly beside Mobile Number.
+   - In `src/pages/teacher/teacher.ts`: Bound form control and passed `whatsapp` in payload to `registerTeacher` service.
+   - Updated version to `0.0.52` and versionCode `52` across `config.xml`, `package.json`, `build.gradle`, and `AndroidManifest.xml` targeting API Level 36 (`targetSdkVersion 36`).
+   - Authored `build_and_sign_release_v52.ps1` and compiled releases:
+     - `jbacApp-0.0.52.apk` (130 MB, aligned 4-byte, dual v2+v3 signed).
+     - `jbacApp-0.0.52.aab` & `appreleasesigned.aab` (127 MB, jarsigner signed).
+   - Committed and pushed changes to `https://github.com/dr-mjoseph/jbac_app.git`.

@@ -60,20 +60,35 @@
                 </div>
 
                 <!-- Mobile -->
-                <div class="col-md-6">
+                <div class="col-md-4">
                   <label class="form-label fw-bold">
                     మొబైల్ నంబర్ (Mobile Number) <span class="text-danger">*</span>
                   </label>
                   <input type="tel" formControlName="mobile" class="form-control form-control-lg"
                          placeholder="10 అంకెల మొబైల్ నంబర్" maxlength="10"
+                         (keypress)="numericOnly($event)"
                          [ngClass]="{ 'is-invalid': submitted && f['mobile'].errors }">
                   <div class="invalid-feedback" *ngIf="submitted && f['mobile'].errors">
                     సరైన 10 అంకెల మొబైల్ నంబర్ నమోదు చేయండి (Valid 10-digit mobile required).
                   </div>
                 </div>
 
+                <!-- WhatsApp -->
+                <div class="col-md-4">
+                  <label class="form-label fw-bold">
+                    వాట్సాప్ నంబర్ (WhatsApp Number)
+                  </label>
+                  <input type="tel" formControlName="whatsapp" class="form-control form-control-lg"
+                         placeholder="10 అంకెల వాట్సాప్ నంబర్" maxlength="10"
+                         (keypress)="numericOnly($event)"
+                         [ngClass]="{ 'is-invalid': submitted && f['whatsapp'].errors }">
+                  <div class="invalid-feedback" *ngIf="submitted && f['whatsapp'].errors">
+                    సరైన 10 అంకెల వాట్సాప్ నంబర్ నమోదు చేయండి (Valid 10-digit WhatsApp required).
+                  </div>
+                </div>
+
                 <!-- Email -->
-                <div class="col-md-6">
+                <div class="col-md-4">
                   <label class="form-label fw-bold">
                     ఈమెయిల్ చిరునామా (Email Address)
                   </label>

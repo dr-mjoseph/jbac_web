@@ -99,6 +99,7 @@ export class TeacherregisterComponent implements OnInit {
       name_with_surname: ['', [Validators.required, Validators.minLength(3)]],
       gender: ['', [Validators.required]],
       mobile: ['', [Validators.required, Validators.pattern(/^[0-9]{10}$/)]],
+      whatsapp: ['', [Validators.pattern(/^[0-9]{10}$/)]],
       email: ['', [Validators.email]],
       exact_designation: ['', [Validators.required]],
       role_category: ['', [Validators.required]],
@@ -570,6 +571,7 @@ export class TeacherregisterComponent implements OnInit {
       name_with_surname: raw.name_with_surname,
       gender: raw.gender,
       mobile: raw.mobile,
+      whatsapp: raw.whatsapp ? String(raw.whatsapp).trim() : '',
       email: raw.email || '',
       designation: raw.exact_designation,
       exact_designation: raw.exact_designation,
@@ -643,6 +645,11 @@ export class TeacherregisterComponent implements OnInit {
         });
       }
     });
+  }
+
+  numericOnly(event: any): boolean {
+    const patt = /^([0-9])$/;
+    return patt.test(event.key);
   }
 }
 

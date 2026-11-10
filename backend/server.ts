@@ -5929,6 +5929,7 @@ app.all(['/dashboardapi/teacher-register', '/api/teacher-register', '/dashboarda
         const b = req.body || {};
         const name = (b.name || b.name_with_surname || b.fullname || '').trim();
         const mobile = String(b.mobile || b.phone || b.mobile_number || '').trim();
+        const whatsapp = String(b.whatsapp || b.whatsapp_number || b.whatsappno || '').trim() || null;
         if (!name || !mobile) {
             return res.status(400).json({ status: 400, message: 'Name and mobile number are required. / పేరు మరియు మొబైల్ నంబర్ తప్పనిసరి.' });
         }
@@ -6000,7 +6001,7 @@ app.all(['/dashboardapi/teacher-register', '/api/teacher-register', '/dashboarda
 
         const [result]: any = await db.query(
             `INSERT INTO \`teacher_reg\` (
-                \`name\`, \`mobile\`, \`email\`, \`gender\`, \`designation\`,
+                \`name\`, \`mobile\`, \`whatsapp\`, \`email\`, \`gender\`, \`designation\`,
                 \`role_category\`, \`qualification_category\`, \`qualification_id\`,
                 \`total_experience_years\`, \`experience_in\`, \`caste\`, \`subcaste\`,
                 \`denomination_id\`, \`faith_category\`, \`family_background\`,
@@ -6008,10 +6009,11 @@ app.all(['/dashboardapi/teacher-register', '/api/teacher-register', '/dashboarda
                 \`inst_state_id\`, \`inst_district_id\`, \`inst_constituency_id\`, \`inst_mandal_id\`, \`inst_panchayat_id\`, \`inst_address\`,
                 \`res_state_id\`, \`res_district_id\`, \`res_constituency_id\`, \`res_mandal_id\`, \`res_panchayat_id\`, \`res_address\`,
                 \`description\`, \`about_achievements\`, \`cts\`, \`cv_profile\`, \`cv_file\`
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
             [
                 name,
                 mobile,
+                whatsapp,
                 b.email ? String(b.email).trim() : null,
                 b.gender || 'Not Specified',
                 b.exact_designation || b.designation || 'Teacher',
