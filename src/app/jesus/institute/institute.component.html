@@ -208,45 +208,54 @@
         <br><br>
         </div>
         <div class="row">
-            <div class="col-lg-7">
+            <div class="col-lg-8">
                 <div class="row">
-                    <div class="col-lg-4" *ngFor="let item of institutedata" style="margin-bottom:16px;width:292px;">
+                    <div class="col-md-6 col-12 mb-4" *ngFor="let item of institutedata">
                         <div class="flex justify-center items-center h-screen">
-                            <div class="main">
-                                <ul class="cards">
-                                    <li class="cards_item">
-                                        <div class="card" tabindex="0">
-                                            <div class="card_image">
+                            <div class="main w-100">
+                                <ul class="cards p-0 m-0 list-unstyled">
+                                    <li class="cards_item w-100">
+                                        <div class="card w-100" tabindex="0" style="border-radius: 0 !important;">
+                                            <div class="card_image" style="border-radius: 0 !important; height: 260px;">
                                                 <img *ngIf="item.image == undefined || item.image == null || item.image == '' "
                                                     src="../../../assets/images/no.jpg"
-                                                    style="height: 267px;width:266px;">
-                                                <img src="{{item.image}}" (click)="openimg(item.image,openmodel)"
-                                                    style="height:267px; width:266px;">
+                                                    style="height: 260px; width: 100%; object-fit: cover; border-radius: 0 !important;">
+                                                <img *ngIf="item.image" src="{{item.image}}" (click)="openimg(item.image,openmodel)"
+                                                    style="height: 260px; width: 100%; object-fit: cover; border-radius: 0 !important; cursor: pointer;">
                                             </div>
-                                            &nbsp;
-                                            <div class="card_content">
+                                            <div class="card_content p-3">
                                                 <div class="card_text">
-                                                    <p>Institute Name:<strong> {{item.institutename}}</strong></p>
-                                                    <p>Courses Offered: <b>{{item.course_offered}} </b></p>
-                                                    <p>College Type:<strong> {{item.college_type}}</strong></p>
-                                                    <a (click)="toggleDisplayDiv()" style="color:rgb(175, 15, 15)">
-                                                        READMORE
-                                                    </a>
-                                                    <p [hidden]="isShowDiv"> Phone
-                                                        Number:<strong>{{item.phonenumber}}</strong>
-                                                    </p>
-                                                    <a href="{{item.location}}" [hidden]="isShowDiv">
-                                                        <img src="assets/images/marker.png" style="width:45px;"></a>
-                                                    <a href="{{item.youtube}}" [hidden]="isShowDiv">
-                                                        <img src="assets/images/newicon.png" style="width:45px;
-                                               height: 45px; "></a>
-                                                    <a href="{{item.facebook}}" [hidden]="isShowDiv">
-                                                        <img src="assets/images/Facebook.png" style="width:45px;
-                                                    "></a>&nbsp;
-                                                    <a href="tel:+91{{item.phonenumber}}" [hidden]="isShowDiv">
-                                                        <img src="assets/images/phone.png" style="width:45px;
-                                                                    "></a>
+                                                    <p class="mb-1">Institute Name: <strong>{{item.institutename}}</strong></p>
+                                                    <p class="mb-2">Courses Offered: <b>{{item.course_offered || 'N/A'}}</b></p>
+                                                    
+                                                    <!-- Social media icons set under courses offered -->
+                                                    <div class="institute-social-icons my-2 d-flex align-items-center gap-2 flex-wrap">
+                                                        <a *ngIf="item.location" [href]="item.location" target="_blank" title="Location">
+                                                            <img src="assets/images/marker.png" style="width:40px; height:40px;" alt="Location">
+                                                        </a>
+                                                        <a *ngIf="item.youtube" [href]="item.youtube" target="_blank" title="YouTube">
+                                                            <img src="assets/images/newicon.png" style="width:40px; height:40px;" alt="YouTube">
+                                                        </a>
+                                                        <a *ngIf="item.facebook" [href]="item.facebook" target="_blank" title="Facebook">
+                                                            <img src="assets/images/Facebook.png" style="width:40px; height:40px;" alt="Facebook">
+                                                        </a>
+                                                        <a *ngIf="item.phonenumber" [href]="'tel:+91' + item.phonenumber" title="Call">
+                                                            <img src="assets/images/phone.png" style="width:40px; height:40px;" alt="Call">
+                                                        </a>
+                                                    </div>
 
+                                                    <!-- READ MORE option available under social media icons -->
+                                                    <div class="mt-2 pt-2 border-top">
+                                                        <a (click)="item.showMore = !item.showMore" class="fw-bold" style="color:rgb(175, 15, 15); cursor: pointer; text-decoration: none;">
+                                                            {{ item.showMore ? 'READ LESS ▲' : 'READ MORE ▼' }}
+                                                        </a>
+                                                        <div *ngIf="item.showMore" class="institute-details mt-2 pt-2 border-top small" style="background: rgba(255,255,255,0.08); padding: 8px; border-radius: 0;">
+                                                            <p class="mb-1" *ngIf="item.owner_name"><strong>Chairman / Owner:</strong> {{item.owner_name}}</p>
+                                                            <p class="mb-1" *ngIf="item.address"><strong>Address:</strong> {{item.address}}</p>
+                                                            <p class="mb-1" *ngIf="item.website"><strong>Website:</strong> <a [href]="item.website" target="_blank" style="color: #64b5f6;">{{item.website}}</a></p>
+                                                            <p class="mb-0" *ngIf="item.description"><strong>Description:</strong> {{item.description}}</p>
+                                                        </div>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
@@ -257,7 +266,7 @@
                     </div>
                 </div>
             </div>
-            <div class="col-lg-5">
+            <div class="col-lg-4">
                 <div class="news-sidebar-card shadow-sm p-3">
                         <h5 class="fw-bold text-center text-primary mb-3 border-bottom pb-2">
                             <i class="fa fa-bullhorn me-1"></i> ప్రకటనలు / సమాచారం

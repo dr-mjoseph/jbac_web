@@ -44,6 +44,23 @@ export class AddinstituteComponent {
   ministryname: any;
   from_id: any;
 
+  collegeTypeOptions: string[] = [
+    'School',
+    'Junior College',
+    'Degree College',
+    'PG College',
+    'Engineering College',
+    'Medical / Nursing College',
+    'Pharmacy College',
+    'B.Ed / D.Ed College',
+    'Polytechnic / ITI',
+    'Bible College',
+    'University',
+    'Other'
+  ];
+  selectedCollegeTypes: string[] = [];
+  gettingLocation: boolean = false;
+
   constructor(private formBuilder: FormBuilder, private service: ServiceService, private modalService: NgbModal, private route: ActivatedRoute, private router: Router) {
 
     this.route.queryParams.subscribe(params => {
@@ -108,16 +125,19 @@ export class AddinstituteComponent {
 
     this.addinginsututies = this.formBuilder.group({
       checkbox: [''],
-      believer_id: ['',],
-      pastor_id: ['',],
+      believer_id: [''],
+      pastor_id: [''],
+      owner_name: ['', [Validators.required]],
       institutename: ['', [Validators.required]],
+      denomination_id: ['', [Validators.required]],
       collegetype: ['', [Validators.required]],
       courses: ['', [Validators.required]],
-      phonenumber: ['', [Validators.required, Validators.maxLength(10)]],
+      phonenumber: ['', [Validators.required, Validators.maxLength(10), Validators.minLength(10)]],
       youtube: [''],
       website: [''],
       image: [''],
       description: [''],
+      state_id: ['1', [Validators.required]],
       district_id: ['', [Validators.required]],
       constituency_id: ['', [Validators.required]],
       mandal_id: ['', [Validators.required]],
@@ -618,31 +638,85 @@ export class AddinstituteComponent {
   }
 
 
+  onCollegeTypeCheckbox(type: string, event: any) {
+    if (event.target.checked) {
+      if (!this.selectedCollegeTypes.includes(type)) {
+        this.selectedCollegeTypes.push(type);
+      }
+    } else {
+      this.selectedCollegeTypes = this.selectedCollegeTypes.filter(t => t !== type);
+    }
+    this.addinginsututies.patchValue({
+      collegetype: this.selectedCollegeTypes.join(', ')
+    });
+  }
+
+  getCurrentLocation() {
+    if (navigator.geolocation) {
+      this.gettingLocation = true;
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const lat = position.coords.latitude;
+          const lng = position.coords.longitude;
+          const gMapsUrl = `https://www.google.com/maps?q=${lat},${lng}`;
+          this.addinginsututies.patchValue({
+            location: gMapsUrl
+          });
+          this.gettingLocation = false;
+          Swal.fire({
+            icon: 'success',
+            title: 'ప్రస్తుత లొకేషన్ విజయవంతంగా తీసుకోబడింది',
+            timer: 2000,
+            showConfirmButton: false
+          });
+        },
+        (error) => {
+          this.gettingLocation = false;
+          console.error('Geolocation error:', error);
+          Swal.fire('లొకేషన్ పొందలేకపోయాము. దయచేసి బ్రౌజర్‌లో లొకేషన్ అనుమతించండి లేదా గూగుల్ మ్యాప్స్ లింక్‌ను మాన్యువల్‌గా పేస్ట్ చేయండి.');
+        },
+        { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+      );
+    } else {
+      Swal.fire('ఈ పరికరంలో జియోలొకేషన్ సపోర్ట్ లేదు.');
+    }
+  }
+
   postinsututies() {
     this.submitted = true;
     this.showSpinner = true;
     if (this.addinginsututies.invalid) {
       Swal.fire('* ఉన్న తప్పనిసరి  ఫీల్డ్స్ ఎంటర్ చేయండి');
     } else {
-      this.addinginsututies.value.image = this.imagesDatains
-      this.addinginsututies.value.usr_id = sessionStorage.getItem('usr_id')
-      this.addinginsututies.value.number = sessionStorage.getItem('mobile_number')
+      this.addinginsututies.value.image = this.imagesDatains;
+      this.addinginsututies.value.usr_id = sessionStorage.getItem('usr_id');
+      this.addinginsututies.value.number = sessionStorage.getItem('mobile_number');
+      if (this.selectedCollegeTypes && this.selectedCollegeTypes.length > 0) {
+        this.addinginsututies.value.collegetype = this.selectedCollegeTypes.join(', ');
+        this.addinginsututies.value.college_type = this.selectedCollegeTypes.join(', ');
+      }
+      this.addinginsututies.value.owner_name = this.addinginsututies.value.owner_name;
+      this.addinginsututies.value.chairman_name = this.addinginsututies.value.owner_name;
+      this.addinginsututies.value.denomination = this.addinginsututies.value.denomination_id;
       const sId = Number(this.addinginsututies.value.state_id) || (Number(this.addinginsututies.value.district_id) >= 31 && Number(this.addinginsututies.value.district_id) <= 63 ? 2 : 1);
       this.addinginsututies.value.state_id = sId;
       this.addinginsututies.value.state = sId === 2 ? 'Telangana' : 'Andhra Pradesh';
       this.service.postinsututies(this.addinginsututies.value).subscribe((res: any) => {
         if (res.status == 200) {
-          Swal.fire('విజయవంతముగా నమోదు చేయబడింది, మీ ఫోన్ నెంబర్ మరియు పాస్వర్డ్ తో లాగిన్ అవగలరు')
+          Swal.fire('విజయవంతముగా నమోదు చేయబడింది, మీ ఫోన్ నెంబర్ మరియు పాస్వర్డ్ తో లాగిన్ అవగలరు');
           this.addinginsututies.reset();
+          this.selectedCollegeTypes = [];
           this.imagesDatains = [];
           this.submitted = false;
           this.showSpinner = false;
         } else {
-          alert('సర్వర్ డౌన్ వుంది, దయచేసి తరువాత ప్రయత్నిచండి')
+          alert('సర్వర్ డౌన్ వుంది, దయచేసి తరువాత ప్రయత్నిచండి');
+          this.showSpinner = false;
         }
       },
         error => {
-        })
+          this.showSpinner = false;
+        });
     }
     this.showSpinner = false;
   }

@@ -27,9 +27,10 @@
                     <div class="col-12 col-lg-9 col-xl-7">
                         <div class="card shadow-2-strong card-registration" style="border-radius: 15px;">
                             <div class="card-body p-4 p-md-5">
-                                <h3 class="mb-4 pb-2 pb-md-0 mb-md-5">Adding Institutes</h3>
+                                <h3 class="mb-4 pb-2 pb-md-0 mb-md-5"><b>క్రిస్టియన్ విద్యా సంస్థల నమోదు</b></h3>
                                 <form [formGroup]="addinginsututies">
                                     <div class="row">
+                                        <!-- Field commented: Type Of Owner
                                         <div class="col-md-6 mb-4 pb-2">
                                             <div class="form-outline">
                                                 <label class="form-label">Type Of Owner</label>
@@ -75,10 +76,9 @@
                                                 </div>
                                             </div>
                                         </div>
+                                        -->
 
-
-
-
+                                        <!-- Field commented: Type Of Ministry
                                         <div class="col-md-6 mb-4 pb-2">
                                             <div class="form-outline">
                                                 <label class="form-label">Type Of Ministry</label>
@@ -105,13 +105,29 @@
                                                 </select>
                                             </div>
                                         </div>
+                                        -->
 
                                         <div class="col-md-6 mb-4">
                                             <div class="form-outline">
-                                                <label class="form-label">Institute Name<span
+                                                <label class="form-label">ఛైర్మన్ / ఓనర్ పేరు (Chairman / Owner Name)<span
+                                                        style="color:red; -webkit-text-stroke-width:thick;">*</span></label>
+                                                <input type="text" formControlName="owner_name" class="form-control"
+                                                    placeholder="ఛైర్మన్ లేదా ఓనర్ పేరు"
+                                                    [ngClass]="{'is-invalid': submitted && i['owner_name'].errors }">
+                                                <div *ngIf="submitted && i['owner_name'].errors"
+                                                    class="invalid-feedback">
+                                                    <div *ngIf="i['owner_name'].errors['required']">ఛైర్మన్ / ఓనర్ పేరు అవసరం (Owner Name is required)
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-6 mb-4">
+                                            <div class="form-outline">
+                                                <label class="form-label">సంస్థ / కళాశాల పేరు (Institute Name)<span
                                                         style="color:red; -webkit-text-stroke-width:thick;">*</span></label>
                                                 <input type="text" formControlName="institutename" class="form-control"
-                                                    placeholder="Institute Name"
+                                                    placeholder="సంస్థ / కళాశాల పేరు"
                                                     [ngClass]="{'is-invalid': submitted && i['institutename'].errors }">
                                                 <div *ngIf="submitted && i['institutename'].errors"
                                                     class="invalid-feedback">
@@ -124,25 +140,38 @@
 
                                         <div class="col-md-6 mb-4 pb-2">
                                             <div class="form-outline">
-                                                <label class="form-label">College Type<span
+                                                <label class="form-label">డెనామినేషన్ (Denomination)<span
                                                         style="color:red; -webkit-text-stroke-width:thick;">*</span></label>
-                                                <select class="form-control" formControlName="collegetype"
-                                                    style="height:37px;width: 273px;"
-                                                    [ngClass]="{'is-invalid': submitted && i['collegetype'].errors }">
-                                                    <option value="" selected disabled>Select College Type</option>
-                                                    <option value="Biblecollege">Bible College</option>
-                                                    <option value="PlaySchool">Play School</option>
-                                                    <option value="HighSchool">High School</option>
-                                                    <option value="Inter">Inter</option>
-                                                    <option value="Degree/Engneering">Degree/ Engneering</option>
-                                                    <option value="PGCollege">PG College</option>
+                                                <select class="form-control" formControlName="denomination_id"
+                                                    [ngClass]="{'is-invalid': submitted && i['denomination_id'].errors }">
+                                                    <option value="" selected disabled>డెనామినేషన్ ఎంచుకోండి</option>
+                                                    <option *ngFor="let item of denomation" [value]="item.id">
+                                                        {{item.denomination}}
+                                                    </option>
                                                 </select>
-                                                <div *ngIf="submitted && i['collegetype'].errors"
+                                                <div *ngIf="submitted && i['denomination_id'].errors"
                                                     class="invalid-feedback">
-                                                    <div *ngIf="i['collegetype'].errors['required']">College Type is
-                                                        required
+                                                    <div *ngIf="i['denomination_id'].errors['required']">Denomination is required
                                                     </div>
                                                 </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-12 mb-4 pb-2">
+                                            <label class="form-label">కళాశాల / విద్యా సంస్థ రకము (College / Institute Type)<span
+                                                    style="color:red; -webkit-text-stroke-width:thick;">*</span></label>
+                                            <div class="row px-2">
+                                                <div class="col-6 col-md-4 col-lg-3 mb-2" *ngFor="let cType of collegeTypeOptions">
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="checkbox" [id]="'ctype_' + cType" [value]="cType"
+                                                            [checked]="selectedCollegeTypes.includes(cType)"
+                                                            (change)="onCollegeTypeCheckbox(cType, $event)">
+                                                        <label class="form-check-label" [for]="'ctype_' + cType">{{ cType }}</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div *ngIf="submitted && (!selectedCollegeTypes || selectedCollegeTypes.length === 0)" class="text-danger small mt-1">
+                                                కనీసం ఒక కళాశాల / సంస్థ రకాన్ని ఎంచుకోండి (College Type is required)
                                             </div>
                                         </div>
 
@@ -170,10 +199,9 @@
                                                     maxlength="10" minlength="10" (keypress)="numericOnly($event)" />
                                                 <div *ngIf="submitted && i['phonenumber'].errors"
                                                     class="invalid-feedback">
-                                                    <div *ngIf="i['phonenumber'].errors['required']">Phone Number 1 is
+                                                    <div *ngIf="i['phonenumber'].errors['required']">Phone Number is
                                                         required</div>
-                                                    <div *ngIf="i['phonenumber'].errors['minlength']">Less than 10
-                                                        digits</div>
+                                                    <div *ngIf="i['phonenumber'].errors['minlength']">10 digits required</div>
                                                 </div>
                                             </div>
                                         </div>
@@ -306,6 +334,7 @@
                                             </div>
                                             <br>
                                             <div class="row">
+                                                <!-- Field commented: Pastor selection
                                                 <div class="col-md-6 mb-4 pb-2" *ngIf="form==2">
                                                     <div class="form-outline">
                                                         <label class="form-label">Pastor<span
@@ -328,13 +357,19 @@
                                                         </div>
                                                     </div>
                                                 </div>
+                                                -->
 
-                                                <div class="col-md-6 mb-4">
+                                                <div class="col-md-12 mb-4">
                                                     <div class="form-outline">
-                                                        <label class="form-label">Location</label>
-                                                        <input type="text" formControlName="location"
-                                                            class="form-control" placeholder="Enter Your location" />
-
+                                                        <label class="form-label">గూగుల్ లొకేషన్ లింక్ (Google Location Link)</label>
+                                                        <div class="input-group">
+                                                            <input type="text" formControlName="location"
+                                                                class="form-control" placeholder="గూగుల్ మ్యాప్స్ లొకేషన్ లింక్ పేస్ట్ చేయండి లేదా బటన్ క్లిక్ చేయండి" />
+                                                            <button type="button" class="btn btn-primary" (click)="getCurrentLocation()" [disabled]="gettingLocation">
+                                                                <i class="fa fa-map-marker me-1"></i> {{ gettingLocation ? 'తీసుకుంటున్నాము...' : '📍 ప్రస్తుత లొకేషన్' }}
+                                                            </button>
+                                                        </div>
+                                                        <small class="text-muted">మీ కరెంట్ లొకేషన్‌ను ఆటోమేటిక్‌గా పొందడానికి 'ప్రస్తుత లొకేషన్' బటన్ క్లిక్ చేయండి</small>
                                                     </div>
                                                 </div>
                                             </div>

@@ -224,6 +224,10 @@
                                         <a routerLink="/institute" routerLinkActive="active"
                                             [routerLinkActiveOptions]="{exact: true}">క్రైస్తవ సంస్థలు</a>
                                     </li>
+                                    <li class="menu-item" *ngIf="notlogin">
+                                        <a routerLink="/addinstitute" routerLinkActive="active"
+                                            [routerLinkActiveOptions]="{exact: true}">క్రిస్టియన్ విద్యా సంస్థల నమోదు</a>
+                                    </li>
                                       <!-- <li class="menu-item" *ngIf="notlogin">
                                         <a routerLink="/gallery" routerLinkActive="active"
                                             [routerLinkActiveOptions]="{exact: true}">Photo Gallery</a>
@@ -500,6 +504,10 @@
                             <li class="menu-item" *ngIf="notlogin">
                                 <a href="/institute" routerLinkActive="active"
                                     [routerLinkActiveOptions]="{exact: true}">Institutes</a>
+                            </li>
+                            <li class="menu-item" *ngIf="notlogin">
+                                <a href="/addinstitute" routerLinkActive="active"
+                                    [routerLinkActiveOptions]="{exact: true}">క్రిస్టియన్ విద్యా సంస్థల నమోదు</a>
                             </li>
                             
                             <li class="menu-item" *ngIf="notlogin">
@@ -812,6 +820,10 @@
                         <li class="menu-item">
                             <a (click)="closeMobileMenu()" routerLink="/institute" routerLinkActive="active"
                                 [routerLinkActiveOptions]="{exact: true}">క్రైస్తవ సంస్థలు</a>
+                        </li>
+                        <li class="menu-item">
+                            <a (click)="closeMobileMenu()" routerLink="/addinstitute" routerLinkActive="active"
+                                [routerLinkActiveOptions]="{exact: true}">🎓 క్రిస్టియన్ విద్యా సంస్థల నమోదు</a>
                         </li>
                         <li class="menu-item">
                             <a (click)="closeMobileMenu()" routerLink="/jobs" routerLinkActive="active"

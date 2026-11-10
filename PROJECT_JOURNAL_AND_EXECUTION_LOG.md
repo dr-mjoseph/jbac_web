@@ -3393,3 +3393,109 @@ The user requested:
      - `jbacApp-0.0.52.apk` (130 MB, aligned 4-byte, dual v2+v3 signed).
      - `jbacApp-0.0.52.aab` & `appreleasesigned.aab` (127 MB, jarsigner signed).
    - Committed and pushed changes to `https://github.com/dr-mjoseph/jbac_app.git`.
+
+
+---
+
+## 65. Help Portal Overhaul, Christian Educational Institutes Registration ("క్రిస్టియన్ విద్యా సంస్థల నమోదు"), & Institutes Card Redesign (November 10, 2026)
+
+### Context & Objectives
+The user requested the following enhancements across Web, Backend, Database, and Mobile App:
+1. **Help Page (`https://jbac.in/help`)**:
+   - Remove the `ఫిల్టర్ సెర్చ్ (Filter / Post)` button and the lower view content (redundant cards in `col-lg-8`).
+   - Keep the ads scrolling marquee (`ప్రకటనలు / సమాచారం`) in the right sidebar.
+   - Convert "Looking for help" into an always-visible, user-friendly Telugu-only form by adding `పేరు (Name)`, `మొబైల్ నంబర్ (Mobile Number)`, and `చిరునామా (Address)` along with `సహాయం రకం (Help Type)` and `వివరణ (Description)`.
+   - Make the image upload field optional (not mandatory).
+   - Remove English titles and use clean Telugu labels throughout.
+   - Update the database table (`helps`) and backend API.
+2. **Add Institute (`https://jbac.in/addinstitute`)**:
+   - Add a direct menu link under Services (`సేవలు`) titled **"క్రిస్టియన్ విద్యా సంస్థల నమోదు"** (`christian vidya samsthalu namodu`).
+   - In the registration form: comment out the code for "Type of Owner" and "Type of Ministry" fields (making them invisible).
+   - Add new fields: "ఛైర్మన్ / ఓనర్ పేరు (Chairman / Owner Name)" and "ఫోన్ నంబర్ (Phone Number)".
+   - "College Type": replace the single-select dropdown with multi-select checkboxes to allow selecting multiple educational institutions simultaneously.
+   - Add field: "డెనామినేషన్ (Denomination)" dropdown populated dynamically from the existing database table.
+   - Upgrade "Location" field to "గూగుల్ లొకేషన్ లింక్ (Google Location Link)".
+   - Add a "📍 ప్రస్తుత లొకేషన్ (Current Location)" button that automatically detects the user's GPS/browser geolocation and generates a Google Maps link.
+   - Update the database table (`institutes`) and backend API.
+3. **Institute Listing (`https://jbac.in/institute`)**:
+   - Enlarge the institute view cards and eliminate all curved edges (`border-radius: 0 !important;`).
+   - Remove visibility of "College Type" and "Phone Number" on every card.
+   - Reorder card contents: position the social media icons row directly under "Courses Offered", and position the "READ MORE" expander toggle underneath the social media icons.
+4. **Mobile Hybrid App (`jbac_app`)**:
+   - Mirror all Help, Add Institute, and Institute card redesign changes into the Ionic/Cordova mobile codebase.
+5. **Documentation & GitHub**:
+   - Update project journal, execution log, and README.
+   - Push commits to both `jbac_web` and `jbac_app` repositories.
+
+### Technical Implementation
+
+#### 1. Database Schema Migrations (AWS RDS MySQL `jbac_jbac`)
+- Executed migration script `scripts/check_and_migrate.js`:
+  - `ALTER TABLE \`helps\` ADD COLUMN \`address\` text DEFAULT NULL AFTER \`mobile_number\`;`
+  - `ALTER TABLE \`institutes\` ADD COLUMN \`owner_name\` varchar(255) DEFAULT NULL AFTER \`institutename\`;`
+  - `ALTER TABLE \`institutes\` MODIFY COLUMN \`college_type\` text DEFAULT NULL;` (expanded from `varchar(255)` to support multiple comma-separated institute selections).
+- Verified table structures via `DESCRIBE helps` and `DESCRIBE institutes`.
+
+#### 2. Backend API Updates (`backend/server.ts`, `backend/server.js`)
+- In `POST /dashboardapi/posthelping` and `/api/posthelping`:
+  - Added `address: h.address || ''` mapping to `dynamicInsert('helps', ...)`.
+- In `POST /dashboardapi/postinsututies` and `/api/postinstitutes`:
+  - Added support for `owner_name: i.owner_name || i.chairman_name || null`.
+  - Added support for `denomination_id: i.denomination_id || i.denomination || null`.
+  - Added multi-select array handler: `if (Array.isArray(i.college_type)) i.college_type = i.college_type.filter(Boolean).join(', ');`.
+  - Mapped contact number: `if (i.phone && !i.phonenumber) i.phonenumber = i.phone;`.
+- Repackaged `backend/backend-deploy.zip` with `scripts/update_zip.ps1` and deployed directly to AWS Lambda `jbac-backend-api` (Runtime: Node.js 18.x, Memory: 256MB, ap-southeast-2).
+
+#### 3. Web Portal Updates (`jbac_web`)
+- **Navigation Menu (`src/app/shared/header/header.component.html`)**:
+  - Added `<li class="menu-item"><a routerLink="/addinstitute">క్రిస్టియన్ విద్యా సంస్థల నమోదు</a></li>` across desktop and mobile Services dropdown menus.
+- **Help Portal (`src/app/jesus/help/`)**:
+  - `help.component.html`:
+    - Removed `ఫిల్టర్ సెర్చ్ (Filter / Post)` button.
+    - Set title to **"సహాయం కోరండి"** (pure Telugu).
+    - Form is permanently visible (no accordion toggle) with fields: `పేరు (Name)*`, `మొబైల్ నంబర్ (Mobile Number)*`, `చిరునామా (Address)*`, `సహాయం రకం (Help Type)*`, `చిత్రం అప్‌లోడ్ (ఐచ్ఛికం - Image Upload Optional)`, `సహాయ వివరాలు / వివరణ (Description)*`, and `సమర్పించండి (Submit)` button.
+    - Removed lower card display (`searchevents`).
+    - Balanced layout into 8-column Form on the left and 4-column Scrolling Ads marquee (`ప్రకటనలు / సమాచారం`) on the right.
+  - `help.component.ts`:
+    - Updated `FormBuilder.group` to include `name`, `mobile_number`, `address`, `help`, `description`, and optional `image`.
+    - Auto-prefilled `name` and `mobile_number` from `sessionStorage` if logged in.
+- **Add Institute (`src/app/jesus/addinstitute/`)**:
+  - `addinstitute.component.html`:
+    - Commented out "Type of Owner" and "Type of Ministry" blocks.
+    - Added "ఛైర్మన్ / ఓనర్ పేరు (Chairman / Owner Name)" and "ఫోన్ నంబర్ (Phone Number)".
+    - Replaced college type dropdown with 12 multi-select checkboxes: `School`, `Junior College`, `Degree College`, `PG College`, `Engineering College`, `Medical / Nursing College`, `Pharmacy College`, `B.Ed / D.Ed College`, `Polytechnic / ITI`, `Bible College`, `University`, `Other`.
+    - Added "డెనామినేషన్ (Denomination)" dropdown populated dynamically from `this.denomation`.
+    - Added "గూగుల్ లొకేషన్ లింక్ (Google Location Link)" input with "📍 ప్రస్తుత లొకేషన్" button.
+  - `addinstitute.component.ts`:
+    - Added `onCollegeTypeCheckbox` method for toggle management.
+    - Added `getCurrentLocation()` using `navigator.geolocation.getCurrentPosition` to generate Google Maps coordinates link.
+- **Institutes Directory (`src/app/jesus/institute/`)**:
+  - `institute.component.html`:
+    - Enlarged cards by switching grid wrapper to `col-md-6 col-12 mb-4` with full responsive card width.
+    - Removed "College Type" and "Phone Number" visibility from all cards.
+    - Moved social media icons (`marker`, `youtube`, `facebook`, `phone`) directly under "Courses Offered".
+    - Placed individual card "READ MORE ▼" / "READ LESS ▲" toggle under the social icons displaying Chairman/Owner, Address, Website, and Description.
+  - `institute.component.css`:
+    - Enforced square corners with `border-radius: 0 !important;` on `.card`, `.card_image`, and card images.
+- **Deployment**:
+  - Compiled production bundle with `npm run build:prod` (0 errors).
+  - Synced to AWS S3 bucket `s3://jbac-web-production-298363284024`.
+  - Set `no-cache, no-store, must-revalidate` on `index.html`.
+  - Created CloudFront cache invalidation `I7AK6Z4XGJNX5ECMGS63S8SJFC` on distribution `EOBBU8SU7H3BI`.
+
+#### 4. Mobile App Updates (`jbac_app`)
+- **Help (`src/pages/help/`)**:
+  - Added `name`, `mobile_number`, and `address` fields in `help.html` and `help.ts`.
+  - Made image upload optional and standardized Telugu labels.
+- **Add Institute (`src/pages/addinstitute/`)**:
+  - Commented out Owner and Ministry sections.
+  - Added Owner Name, Denomination dropdown, and multi-select College Type checkboxes.
+  - Added Google Location Link input and "📍 ప్రస్తుత లొకేషన్" button with geolocation fallback.
+- **Institutes View (`src/pages/institute/`)**:
+  - Enforced square corners (`border-radius: 0 !important;`).
+  - Removed "College Type" and "Phone Number" paragraphs.
+  - Positioned social action buttons under Courses Offered and Read More below icons.
+- **Account Hub (`src/pages/account/account.html`)**:
+  - Renamed service 2 to **"క్రిస్టియన్ విద్యా సంస్థల నమోదు"**.
+- Built and validated with `ionic-app-scripts build` (0 errors in 12.63s).
+- Committed and pushed to `https://github.com/dr-mjoseph/jbac_app.git` (commit `e1e8719`).

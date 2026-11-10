@@ -613,3 +613,40 @@ Implemented across backend endpoints (`/dashboardapi/getLeaderswebsiteData`, `/d
      - `jbacApp-0.0.52.apk` (dual v2+v3 signed, 4-byte zipalign).
      - `jbacApp-0.0.52.aab` & `appreleasesigned.aab` (signed with `Jbac.keystore`, Google Play ready).
    - Created `RELEASE_NOTES_v0.0.52.md`.
+
+
+---
+
+## 65. Help Portal Overhaul, Christian Educational Institutes Registration ("క్రిస్టియన్ విద్యా సంస్థల నమోదు"), & Institutes Card Redesign (November 10, 2026)
+
+### Context & Implementation
+1. **Help Page Overhaul (`https://jbac.in/help`)**:
+   - Removed `ఫిల్టర్ సెర్చ్ (Filter / Post)` button and lower card list view.
+   - Preserved scrolling advertisements marquee (`ప్రకటనలు / సమాచారం`) in the right sidebar.
+   - Converted "Looking for help" into an always-visible Telugu form: `పేరు (Name)*`, `మొబైల్ నంబర్ (Mobile Number)*`, `చిరునామా (Address)*`, `సహాయం రకం (Help Type)*`, `సహాయ వివరాలు / వివరణ (Description)*`, and optional `చిత్రం అప్‌లోడ్ (Image Upload)`.
+   - Removed all English titles and formatted in clear Telugu.
+2. **Christian Educational Institutes Registration (`https://jbac.in/addinstitute`)**:
+   - Added direct navigation link under Services (`సేవలు`) as **"క్రిస్టియన్ విద్యా సంస్థల నమోదు"** (`christian vidya samsthalu namodu`).
+   - In form: commented out "Type of Owner" and "Type of Ministry" fields.
+   - Added fields: "ఛైర్మన్ / ఓనర్ పేరు (Chairman / Owner Name)" and "ఫోన్ నంబర్ (Phone Number)".
+   - Replaced college type dropdown with 12 multi-select checkboxes for institutions (School, Junior College, Degree College, PG, Engineering, Medical/Nursing, Pharmacy, B.Ed/D.Ed, Polytechnic/ITI, Bible College, University, Other).
+   - Added "డెనామినేషన్ (Denomination)" dropdown populated dynamically from the database.
+   - Upgraded location to "గూగుల్ లొకేషన్ లింక్ (Google Location Link)" with a "📍 ప్రస్తుత లొకేషన్" (Current Location) geolocation auto-detect button.
+3. **Institutes Listing Redesign (`https://jbac.in/institute`)**:
+   - Enlarged view cards with responsive `col-md-6` layout and removed all curved edges (`border-radius: 0 !important;`).
+   - Removed visibility of "College Type" and "Phone Number" on every card.
+   - Positioned social media action icons (Location, YouTube, Facebook, Call) directly under "Courses Offered".
+   - Added "READ MORE ▼" / "READ LESS ▲" expander toggle underneath the social media icons to view Chairman/Owner, Address, Website, and Description.
+4. **Database & Backend API Updates**:
+   - Altered RDS MySQL `helps` table: added column `address text DEFAULT NULL`.
+   - Altered `institutes` table: added column `owner_name varchar(255) DEFAULT NULL`, expanded `college_type` to `text`.
+   - Updated `POST /dashboardapi/posthelping` and `POST /dashboardapi/postinsututies` in `backend/server.ts` & `backend/server.js`.
+   - Packaged and deployed update to AWS Lambda `jbac-backend-api`.
+5. **Mobile Application Sync (`jbac_app`)**:
+   - Mirrored all form and listing changes to `help`, `addinstitute`, `institute`, and `account` pages in `jbac_app`.
+   - Verified clean compilation with `ionic-app-scripts build` (0 errors).
+   - Committed and pushed to `https://github.com/dr-mjoseph/jbac_app.git` (commit `e1e8719`).
+6. **Web Production Deployment**:
+   - Built Angular production bundles (`npm run build:prod`).
+   - Synced to AWS S3 `s3://jbac-web-production-298363284024`.
+   - Invalidated CloudFront distribution `EOBBU8SU7H3BI` (invalidation `I7AK6Z4XGJNX5ECMGS63S8SJFC`).

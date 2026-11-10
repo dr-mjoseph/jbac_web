@@ -19,10 +19,13 @@ export class HelpComponent {
   constructor(private formBuilder: FormBuilder, private service: ServiceService, private modalService: NgbModal , private router: Router) {
 
     this.addinghelp = this.formBuilder.group({
-      image: ['', [Validators.required]],
+      name: ['', [Validators.required]],
+      mobile_number: ['', [Validators.required]],
+      address: ['', [Validators.required]],
+      help: ['', [Validators.required]],
       description: ['', [Validators.required]],
-      help: ['']
-    })
+      image: ['']
+    });
 
 
   }
@@ -33,7 +36,15 @@ export class HelpComponent {
       this.router.navigate(['/']);
     }
 
-    
+    const defName = sessionStorage.getItem('name') || '';
+    const defMobile = sessionStorage.getItem('mobile_number') || '';
+    if (defName || defMobile) {
+      this.addinghelp.patchValue({
+        name: defName,
+        mobile_number: defMobile
+      });
+    }
+
     this.gethelps();
     this.getadds();
   }
@@ -61,34 +72,38 @@ export class HelpComponent {
   postmeetings() {
     this.showSpinner = true;
     if (this.addinghelp.invalid) {
-      Swal.fire('please fill the details');
-      this.showSpinner = false
+      Swal.fire('దయచేసి అన్ని వివరాలను పూరించండి');
+      this.showSpinner = false;
     } else {
       var data = {
         usr_id: sessionStorage.getItem('usr_id'),
-        mobile_number: sessionStorage.getItem('mobile_number'),
-        name: sessionStorage.getItem('name'),
+        mobile_number: this.addinghelp.value.mobile_number,
+        name: this.addinghelp.value.name,
+        address: this.addinghelp.value.address,
         description: this.addinghelp.value.description,
         help: this.addinghelp.value.help,
         reviewImg: this.imagesData
-      }
+      };
       this.service.posthelping(data).subscribe((res: any) => {
         if (res.status == 200) {
-          Swal.fire('విజయవంతముగా నమోదు చేయబడింది, మీ ఫోన్ నెంబర్ మరియు పాస్వర్డ్ తో లాగిన్ అవగలరు')
-          this.showSpinner = false
+          Swal.fire('సహాయ అభ్యర్థన విజయవంతముగా నమోదు చేయబడింది');
+          this.showSpinner = false;
           this.addinghelp.reset();
+          const defName = sessionStorage.getItem('name') || '';
+          const defMobile = sessionStorage.getItem('mobile_number') || '';
+          this.addinghelp.patchValue({ name: defName, mobile_number: defMobile });
           this.imagesData = [];
           this.gethelps();
         } else {
-          Swal.fire('server down')
+          Swal.fire('సర్వర్ సమస్య ఏర్పడింది');
           this.showSpinner = false;
         }
       },
         error => {
-          this.showSpinner = true
-        })
+          this.showSpinner = false;
+          Swal.fire('సర్వర్ సమస్య ఏర్పడింది');
+        });
     }
-
   }
 
   proofmodalDismis() {

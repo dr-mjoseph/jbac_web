@@ -55,117 +55,81 @@
     </div>
 
     <section class="gradient-custom">
-        <div class="container py-5 h-100">
-            <div class="row justify-content-center align-items-center h-100">
-                <div class="col-12">
-                    <div class="card shadow-sm border-0" style="border-radius: 15px;">
-                        <div class="card-body">
-                            <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
-                                <h3 class="m-0"><b>సహాయం కోరండి / Looking For Help</b></h3>
-                                <button type="button" class="default-btn user-all-btn events-filter-toggle"
-                                    (click)="showFilters = !showFilters" [attr.aria-expanded]="showFilters">
-                                    <i class="fa fa-filter me-1"></i> ఫిల్టర్ సెర్చ్ (Filter / Post)
-                                </button>
+        <div class="container py-4 h-100">
+            <div class="row">
+                <!-- Left Column: Help Request Form -->
+                <div class="col-lg-8 mb-4">
+                    <div class="card shadow-sm border-0" style="border-radius: 12px;">
+                        <div class="card-body p-4">
+                            <div class="d-flex align-items-center mb-4 pb-2 border-bottom">
+                                <h3 class="m-0 text-primary"><b>సహాయం కోరండి</b></h3>
                             </div>
-                            <form [formGroup]="addinghelp" *ngIf="showFilters">
+                            <form [formGroup]="addinghelp">
                                 <div class="row">
-                                    <div class="col-lg-3">
-                                        <label for="formFile" class="form-label"> Image Upload<span
-                                                style="color:red; -webkit-text-stroke-width:thick;">*</span>
-                                        </label>
-                                        <input class="image" type="file" id="formFile" accept="image/x-png,image/jpeg"
-                                            formControlName="image" (change)="onImageChange($event)" />
-                                        <img *ngIf="imagesData.length" src="{{imagesData[0].reviewimg}}" alt=""
-                                            height="100px" width="100px">
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label fw-bold">పేరు <span class="text-danger">*</span></label>
+                                        <input type="text" formControlName="name" class="form-control"
+                                            placeholder="మీ పూర్తి పేరు నమోదు చేయండి" />
                                     </div>
-                                    <div class="col-lg-3">
-                                        <div class="form-outline">
-                                            <label class="form-label"> Description<span
-                                                    style="color:red; -webkit-text-stroke-width:thick;">*</span></label>
-                                            <input type="text" formControlName="description" class="form-control"
-                                                placeholder="Select Description" />
-                                        </div>
-                                    </div>
-                                    <div class="col-lg-3">
-                                        <div class="form-outline">
-                                            <label class="form-label">Which Type Help <span
-                                                    style="color:red; -webkit-text-stroke-width:thick;">*</span></label>
-                                            <select class="form-control" formControlName="help">
-                                                <option value="" selected disabled>Select the Help </option>
-                                                <option value="CommunitySupport Help">Community Support Help</option>
-                                                <option value="Education Help">Education Help</option>
-                                                <option value="Financial Help">Financial Help
-                                                </option>
-                                                <option value="ForChurchConstruction Help">For Church Construction Help
-                                                </option>
-                                                <option value="Legal Help">Legal Help</option>
-                                                <option value="Medical Help">Medical Help</option>
-                                                <option value="PoliceDepartmental Help">Police Departmental Help
-                                                </option>
-                                                <option value="Political Help">Political Help</option>
 
-                                            </select>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label fw-bold">మొబైల్ నంబర్ <span class="text-danger">*</span></label>
+                                        <input type="tel" maxlength="10" formControlName="mobile_number" class="form-control"
+                                            placeholder="10 అంకెల మొబైల్ నంబర్" />
+                                    </div>
+
+                                    <div class="col-md-12 mb-3">
+                                        <label class="form-label fw-bold">చిరునామా <span class="text-danger">*</span></label>
+                                        <textarea formControlName="address" class="form-control" rows="2"
+                                            placeholder="గ్రామం/పట్టణం, మండలం, జిల్లా మొదలైన పూర్తి చిరునామా"></textarea>
+                                    </div>
+
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label fw-bold">సహాయం రకం <span class="text-danger">*</span></label>
+                                        <select class="form-control" formControlName="help">
+                                            <option value="" selected disabled>సహాయం రకాన్ని ఎంచుకోండి</option>
+                                            <option value="CommunitySupport Help">కమ్యూనిటీ సహాయం</option>
+                                            <option value="Education Help">విద్య సహాయం</option>
+                                            <option value="Financial Help">ఆర్థిక సహాయం</option>
+                                            <option value="ForChurchConstruction Help">చర్చి నిర్మాణం కొరకు సహాయం</option>
+                                            <option value="Legal Help">న్యాయ సహాయం</option>
+                                            <option value="Medical Help">వైద్య సహాయం</option>
+                                            <option value="PoliceDepartmental Help">పోలీస్ డిపార్ట్‌మెంట్ సహాయం</option>
+                                            <option value="Political Help">రాజకీయ సహాయం</option>
+                                            <option value="Other Help">ఇతర సహాయం</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="col-md-6 mb-3">
+                                        <label for="formFile" class="form-label fw-bold">చిత్రం అప్‌లోడ్ (ఐచ్ఛికం)</label>
+                                        <input class="form-control" type="file" id="formFile" accept="image/x-png,image/jpeg"
+                                            formControlName="image" (change)="onImageChange($event)" />
+                                        <div class="mt-2" *ngIf="imagesData.length">
+                                            <img [src]="imagesData[0].reviewimg" alt="Uploaded Preview" height="80px" class="rounded border">
                                         </div>
                                     </div>
-                                    <div class="col-lg-3">
-                                        <br>
-                                        <button type="submit" class="default-btn  user-all-btn" (click)="postmeetings()"
-                                            style="text-justify: auto; text-size-adjust: 5px;">Submit
+
+                                    <div class="col-md-12 mb-3">
+                                        <label class="form-label fw-bold">సహాయ వివరాలు / వివరణ <span class="text-danger">*</span></label>
+                                        <textarea formControlName="description" class="form-control" rows="3"
+                                            placeholder="మీకు అవసరమైన సహాయం గురించి వివరంగా తెలపండి"></textarea>
+                                    </div>
+
+                                    <div class="col-md-12 text-center mt-3">
+                                        <button type="button" class="default-btn user-all-btn px-5 py-2 fs-6 fw-bold"
+                                            (click)="postmeetings()">
+                                            సమర్పించండి
                                         </button>
                                     </div>
                                 </div>
-                                <br>
                             </form>
-                            <br>
                         </div>
                     </div>
                 </div>
-            </div>
-        </div>
-    </section>
-    <br>
 
-    <section class="gradient-custom">
-        <div class="container py-5 h-100">
-            <div class="row">
-                <div class="col-lg-8">
-                    <div class="row">
-                        <div class="col-lg-4" *ngFor="let item of searchevents" style="border:solid blue">
-                            <div class="flex justify-center items-center h-screen">
-                                <div class="main">
-                                    <ul class="cards">
-                                        <li class="cards_item">
-                                            <div class="card" tabindex="0">
-                                                <div class="card" style="width: 244px;">
-                                                    <div class="card-header">
-                                                        <div class="card_image">
-                                                            <img *ngIf="item.image == undefined || item.image == null || item.image == '' "
-                                                                src="../../../assets/images/no.jpg"
-                                                                style="height: 212px;width:250px;">
-                                                            <img src="{{item.image}}" style="width:212px;height:250px;"
-                                                                (click)="openimg(item.image,openmodel)" alt="image"
-                                                                alt="Church Images">
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                &nbsp;
-                                                <div class="card_content">
-                                                    <!-- <h2 class="card_title">{{item.eventname}}  &#x2022;</h2> -->
-                                                    <div class="card_text">
-                                                        <p>Description :<strong> {{item.description}}</strong></p>
-                                                        <p>Type of Help :<strong> {{item.help}}</strong></p>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-4">
-                    <div class="news-sidebar-card shadow-sm p-3">
+                <!-- Right Column: Scrolling Ads -->
+                <div class="col-lg-4 mb-4">
+                    <div class="news-sidebar-card shadow-sm p-3 bg-white" style="border-radius: 12px;">
                         <h5 class="fw-bold text-center text-primary mb-3 border-bottom pb-2">
                             <i class="fa fa-bullhorn me-1"></i> ప్రకటనలు / సమాచారం
                         </h5>

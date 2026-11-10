@@ -1760,6 +1760,7 @@ app.post(['/dashboardapi/posthelping', '/api/posthelping'], async (req, res) => 
             help: h.help || h.help_type || '',
             name: h.name || '',
             mobile_number: h.mobile_number || h.phone || '',
+            address: h.address || '',
             description: h.description || '',
             image: img,
             user_id: h.usr_id || h.user_id || null,
@@ -2711,6 +2712,8 @@ app.post(['/dashboardapi/postinsututies', '/api/postinstitutes'], async (req, re
         i.image = extractUploadedImage(i) || (typeof i.image === 'string' ? i.image : null);
         if (i.collegetype && !i.college_type)
             i.college_type = i.collegetype;
+        if (Array.isArray(i.college_type))
+            i.college_type = i.college_type.filter(Boolean).join(', ');
         if (i.courses && !i.course_offered)
             i.course_offered = i.courses;
         if (i.village_id && !i.panchayat_id)
@@ -2719,6 +2722,12 @@ app.post(['/dashboardapi/postinsututies', '/api/postinstitutes'], async (req, re
             i.posted_id = i.usr_id;
         if (i.number && !i.postedbynumber)
             i.postedbynumber = i.number;
+        if (i.phone && !i.phonenumber)
+            i.phonenumber = i.phone;
+        if (i.chairman_name && !i.owner_name)
+            i.owner_name = i.chairman_name;
+        if (i.denomination && !i.denomination_id)
+            i.denomination_id = i.denomination;
         i.d_in = 0;
         i.cts = getIndianCts();
         const result = await dynamicInsert('institutes', i);
