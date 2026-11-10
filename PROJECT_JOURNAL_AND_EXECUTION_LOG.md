@@ -3564,3 +3564,43 @@ The user requested the following enhancements across Web, Backend, Database, and
    - Synced denomination template fix in `src/pages/addinstitute/addinstitute.html`.
    - Built and validated with `npm run build` (0 errors).
    - Rebased and pushed to `https://github.com/dr-mjoseph/jbac_app.git` on branch `main` (`52865fd`).
+
+
+---
+
+## 67. Mobile App Release v0.0.53: Help Form Overhaul, Christian Educational Institutes Registration, Square Card Redesign & API Level 36 Compliance (November 10, 2026)
+
+### Context & Objectives
+The user requested full cross-platform synchronization of all recent web changes into the mobile application (`jbac_app`) and the generation of a signed Google Play release package:
+1. **Help Form ("సహాయం కోరండి")**:
+   - Modernized the form layout to clean Telugu.
+   - Added `పేరు (Name)`, `మొబైల్ నంబర్ (Mobile Number)`, and `చిరునామా (Address)` fields alongside `సహాయం రకం (Help Type)` and `వివరణ (Description)`.
+   - Made image upload optional with camera/gallery fallbacks.
+2. **Christian Educational Institutes Registration ("క్రిస్టియన్ విద్యా సంస్థల నమోదు")**:
+   - Relocated from `AccountPage` to the primary **రిజిస్ట్రేషన్ (Registrations)** menu (`FormsPage` item 12).
+   - Removed English bracketed names (`(Doctor Register)`, `(Entrepreneur Register)`, `(Investor Register)`, `(Teachers Register)`) for an unadulterated Telugu user experience.
+   - Hidden/commented out `Type of Owner` and `Type of Ministry`.
+   - Added `ఛైర్మన్ / ఓనర్ పేరు (Chairman / Owner Name)` and `ఫోన్ నంబర్ (Phone Number)` fields.
+   - Replaced single-select dropdown with 12 multi-select checkboxes for College/Institute Type.
+   - Added `డెనామినేషన్ (Denomination)` dropdown with resilient fallback mapping (`denomation_name || denomination_name || denomination`).
+   - Integrated `గూగుల్ లొకేషన్ లింక్ (Google Location Link)` with a 1-tap `📍 ప్రస్తుత లొకేషన్ (Current Location)` GPS detector.
+   - Standardized submit button to `నమోదు చేయండి (Register)`.
+3. **Institutes Directory ("క్రైస్తవ సంస్థలు")**:
+   - Redesigned cards with square corners (`border-radius: 0 !important;`) and 100% responsive width.
+   - Removed visibility of "College Type" and "Phone Number" on cards.
+   - Repositioned social media action buttons directly beneath "Courses Offered".
+   - Placed the "Read More" expander below the social buttons.
+4. **Android Build & Google Play Compliance**:
+   - Target API Level: `36` (Android 15+).
+   - Version: `0.0.53`, VersionCode: `53`.
+   - Generated signed `.apk` and `.aab` artifacts.
+
+### Build & Signing Results
+- **Script Executed**: `build_and_sign_release_v53.ps1`
+- **Signed APK**: `C:\Users\rajes\StudioProjects\jbac_app\jbacApp-0.0.53.apk` (130.64 MB, zipalign 4-byte aligned, dual v2+v3 signed).
+- **Signed AAB**: `C:\Users\rajes\StudioProjects\jbac_app\jbacApp-0.0.53.aab` (127.68 MB, jarsigner signed with `Jbac.keystore`).
+- **Google Play Bundle**: `C:\Users\rajes\StudioProjects\jbac_app\appreleasesigned.aab` (127.68 MB).
+- **AAPT Badging Verification**:
+  - `package: name='io.ionic.starterjbac' versionCode='53' versionName='0.0.53'`
+  - `targetSdkVersion: '36'`
+- **Repository**: Committed and pushed to `https://github.com/dr-mjoseph/jbac_app.git` (commit `a06564d`).

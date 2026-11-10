@@ -668,3 +668,24 @@ Implemented across backend endpoints (`/dashboardapi/getLeaderswebsiteData`, `/d
    - Packaged and deployed update to AWS Lambda `jbac-backend-api`.
    - Built production Angular bundle (`npm run build:prod`) and deployed to AWS S3 & CloudFront (Distribution `EOBBU8SU7H3BI`).
    - Synced mobile app (`jbac_app`), compiled clean, and pushed to GitHub `main` (`52865fd`).
+
+
+---
+
+## 67. Mobile App Release v0.0.53: Help Form Overhaul, Christian Educational Institutes Registration, Square Card Redesign & API Level 36 Compliance (November 10, 2026)
+
+### Highlights
+1. **Help Form Synchronization**:
+   - Replaced legacy UI in `HelpPage` with a pure Telugu form with mandatory `పేరు (Name)`, `మొబైల్ నంబర్ (Mobile Number)`, `చిరునామా (Address)`, `సహాయం రకం (Help Type)`, and `వివరణ (Description)`.
+   - Made image upload optional with camera/gallery fallbacks.
+2. **Christian Educational Institutes Registration ("క్రిస్టియన్ విద్యా సంస్థల నమోదు")**:
+   - Moved to `FormsPage` (Registrations menu) and removed English labels from all registration sub-items.
+   - Hid "Type of Owner" and "Type of Ministry".
+   - Added "Chairman / Owner Name", "Phone Number", 12 multi-select checkboxes for College Type, dynamic "Denomination" dropdown, and Google Location Link with "📍 ప్రస్తుత లొకేషన్" GPS auto-detection.
+3. **Institute Listing Redesign**:
+   - Implemented square cards (`border-radius: 0 !important;`), hid College Type and Phone Number by default, placed social media buttons under Courses Offered, and placed Read More underneath social icons.
+4. **Android Release v0.0.53 Deliverables**:
+   - **Target SDK**: `36` (Android API Level 36) | **VersionCode**: `53` | **Version**: `0.0.53`
+   - **Release APK**: `C:\Users\rajes\StudioProjects\jbac_app\jbacApp-0.0.53.apk` (dual v2+v3 signed).
+   - **Release AAB**: `C:\Users\rajes\StudioProjects\jbac_app\jbacApp-0.0.53.aab` & `appreleasesigned.aab` (Google Play production signed).
+   - Committed and pushed to `jbac_app` GitHub repository (`a06564d`).
