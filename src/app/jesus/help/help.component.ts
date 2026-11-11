@@ -15,6 +15,7 @@ export class HelpComponent {
   addinghelp: FormGroup;
   imagesData: any = [];
   showSpinner: boolean = false
+  denomation: any;
   // showSpinner: boolean = true;
   constructor(private formBuilder: FormBuilder, private service: ServiceService, private modalService: NgbModal , private router: Router) {
 
@@ -104,6 +105,14 @@ export class HelpComponent {
           Swal.fire('సర్వర్ సమస్య ఏర్పడింది');
         });
     }
+  }
+
+    getdenomations() {
+    this.service.getdenomation().subscribe(res => {
+      this.denomation = res.data;
+
+
+    })
   }
 
   proofmodalDismis() {
