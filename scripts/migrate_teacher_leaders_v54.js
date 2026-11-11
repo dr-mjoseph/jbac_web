@@ -52,3 +52,4 @@ const DB_CONFIG = {
     await conn.end();
   }
 })();
+
