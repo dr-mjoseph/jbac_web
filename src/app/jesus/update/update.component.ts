@@ -352,7 +352,8 @@ export class UpdateComponent {
     if (s === '6' || s.includes('organization') || s.includes('organisation') || s.includes('ఆర్గనైజేషన్') || s.includes('కంపెనీ')) return '6';
     if (s === '7' || s.includes('association') || s.includes('అసోసియేషన్')) return '7';
     if (s === '8' || s.includes('doctor') || s.includes('డాక్టర్') || s.includes('councellor') || s.includes('కౌన్సిలర్')) return '8';
-    if (s === '9' || s.includes('entry') || s.includes('namodu') || s.includes('నమోదు') || s.includes('ఎంట్రీ')) return '9';
+    if (s === '9' || s.includes('teacher') || s.includes('టీచర్') || s.includes('బోధన')) return '9';
+    if (s === '10' || s.includes('entry') || s.includes('namodu') || s.includes('నమోదు') || s.includes('ఎంట్రీ')) return '10';
     return s || '1';
   }
 

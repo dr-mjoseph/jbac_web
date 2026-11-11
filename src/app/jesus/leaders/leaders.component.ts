@@ -15,6 +15,7 @@ export class LeadersComponent {
   belearr: any = [];
   studentarr: any = [];
   pastorarr: any = [];
+  teacherarr: any = [];
   contituencyname: any;
   contituencynamebel: any;
   formshow: any = 1;
@@ -29,6 +30,25 @@ export class LeadersComponent {
 
   constructor(private service: ServiceService, private router: Router) {
     this.formshow = 1;
+  }
+
+  resolveLeaderHierarchyStep(u: any): number {
+    if (!u) return 0;
+    const raw = String(u.generaltype ?? '').trim();
+    const lower = raw.toLowerCase();
+    if (raw.includes('రాష్ట్ర') || lower.includes('state')) return 0;
+    if (raw.includes('జిల్లా') || lower.includes('dist')) return 1;
+    if (raw.includes('నియోజకవర్గ') || lower.includes('const')) return 2;
+    if (raw.includes('మండల') || lower.includes('mandal') || lower.includes('municip')) return 3;
+    if (raw.includes('పంచాయ') || lower.includes('panchayat') || lower.includes('village')) return 4;
+    if (raw.includes('సబ్') || lower.includes('subward')) return 6;
+    if (raw.includes('వార్డు') || lower.includes('ward')) return 5;
+
+    const num = Number(raw);
+    if (!Number.isNaN(num) && raw !== '') {
+      return num;
+    }
+    return 0;
   }
 
   ngOnInit(): void {
@@ -46,6 +66,9 @@ export class LeadersComponent {
     } else if (this.category_id === '2') {
       this.selectedUserType = 'student';
       this.formshow = 2;
+    } else if (this.category_id === '9') {
+      this.selectedUserType = 'teacher';
+      this.formshow = 4;
     } else {
       this.selectedUserType = 'believer';
       this.formshow = 1;
@@ -71,12 +94,13 @@ export class LeadersComponent {
       }
 
       this.cachedUserRes = res.data[0];
-      const userRole = res.data[0].role; // 'pastor', 'student', 'believer'
+      const userRole = res.data[0].role; // 'pastor', 'student', 'teacher', 'believer'
 
       if (forceUserType) {
         this.selectedUserType = forceUserType;
         if (forceUserType === 'pastor') this.formshow = 3;
         else if (forceUserType === 'student') this.formshow = 2;
+        else if (forceUserType === 'teacher') this.formshow = 4;
         else this.formshow = 1;
       } else {
         if (userRole === 'pastor' || storedCat === '4' || storedCat === '3') {
@@ -85,6 +109,9 @@ export class LeadersComponent {
         } else if (userRole === 'student' || storedCat === '2') {
           this.selectedUserType = 'student';
           this.formshow = 2;
+        } else if (userRole === 'teacher' || storedCat === '9') {
+          this.selectedUserType = 'teacher';
+          this.formshow = 4;
         } else {
           this.selectedUserType = 'believer';
           this.formshow = 1;
@@ -98,31 +125,32 @@ export class LeadersComponent {
   fetchSubordinateRequests() {
     if (!this.cachedUserRes) return;
     const u = this.cachedUserRes;
-    this.leaderid = u.leadertype;
-    if (u.leadertype == 1) {
+    this.leaderid = u.leadertype || (this.selectedUserType === 'teacher' ? '1' : '');
+    if (u.leadertype == 1 || (u.leadertype != 2 && this.selectedUserType === 'teacher')) {
       this.leaders = "Leader ";
     } else if (u.leadertype == 2) {
       this.leaders = "Wing ";
     }
-    this.myresdata = u.generaltype;
+    const step = this.resolveLeaderHierarchyStep(u);
+    this.myresdata = step;
 
-    if (u.leadertype == 1) {
-      if (u.generaltype == 0) {
+    if (u.leadertype == 1 || (u.leadertype != 2 && this.selectedUserType === 'teacher')) {
+      if (step == 0) {
         this.generals = "State";
         this.general = "District ";
-      } else if (u.generaltype == 1) {
+      } else if (step == 1) {
         this.generals = "District";
         this.general = "Constituency ";
-      } else if (u.generaltype == 2) {
+      } else if (step == 2) {
         this.generals = "Constituency";
         this.general = "Mandal ";
-      } else if (u.generaltype == 3) {
+      } else if (step == 3) {
         this.generals = "Mandal ";
         this.general = "Panchayat ";
-      } else if (u.generaltype == 4) {
+      } else if (step == 4) {
         this.generals = "Panchayat ";
         this.general = "Ward ";
-      } else if (u.generaltype == 5 || u.generaltype == 6) {
+      } else if (step >= 5) {
         this.generals = "Ward ";
         this.general = "";
       }
@@ -131,7 +159,7 @@ export class LeadersComponent {
         "usr_id": sessionStorage.getItem("usr_id"),
         "category_id": sessionStorage.getItem("category_id"),
         "user_type": this.selectedUserType,
-        "leadertype": u.leadertype,
+        "leadertype": u.leadertype || '1',
         "wingtypes": u.wingtypes,
         "generaltype": u.generaltype,
         state_id: u.state_id || 1,
@@ -146,20 +174,29 @@ export class LeadersComponent {
         this.contituencyname = result.data[1];
         const rawPastors = result.data[2] || [];
         const rawStudents = result.data[3] || [];
+        const rawTeachers = result.data[4] || [];
 
         // USER TYPE ISOLATION: Display ONLY selected user type; clear others
         if (this.selectedUserType === 'pastor') {
           this.pastorarr = rawPastors.filter((x: any) => Number(x?.approval_ind) !== 2);
           this.belearr = [];
           this.studentarr = [];
+          this.teacherarr = [];
         } else if (this.selectedUserType === 'student') {
           this.studentarr = rawStudents.filter((x: any) => Number(x?.approval_ind) !== 2);
           this.belearr = [];
           this.pastorarr = [];
+          this.teacherarr = [];
+        } else if (this.selectedUserType === 'teacher') {
+          this.teacherarr = rawTeachers.filter((x: any) => Number(x?.approval_ind) !== 2 && Number(x?.d_in) !== 1);
+          this.belearr = [];
+          this.pastorarr = [];
+          this.studentarr = [];
         } else {
           this.belearr = rawBelievers.filter((x: any) => Number(x?.approval_ind) !== 2);
           this.pastorarr = [];
           this.studentarr = [];
+          this.teacherarr = [];
         }
       });
     } else if (u.leadertype == 2) {
@@ -209,14 +246,17 @@ export class LeadersComponent {
           this.pastorarr = rawPastors.filter((x: any) => Number(x?.approval_ind) !== 2);
           this.belearr = [];
           this.studentarr = [];
+          this.teacherarr = [];
         } else if (this.selectedUserType === 'student') {
           this.studentarr = rawStudents.filter((x: any) => Number(x?.approval_ind) !== 2);
           this.belearr = [];
           this.pastorarr = [];
+          this.teacherarr = [];
         } else {
           this.belearr = rawBelievers.filter((x: any) => Number(x?.approval_ind) !== 2);
           this.pastorarr = [];
           this.studentarr = [];
+          this.teacherarr = [];
         }
       });
     }
@@ -228,14 +268,22 @@ export class LeadersComponent {
       this.selectedUserType = 'believer';
       this.pastorarr = [];
       this.studentarr = [];
+      this.teacherarr = [];
     } else if (id == 3) {
       this.selectedUserType = 'pastor';
       this.belearr = [];
       this.studentarr = [];
+      this.teacherarr = [];
     } else if (id == 2) {
       this.selectedUserType = 'student';
       this.belearr = [];
       this.pastorarr = [];
+      this.teacherarr = [];
+    } else if (id == 4) {
+      this.selectedUserType = 'teacher';
+      this.belearr = [];
+      this.pastorarr = [];
+      this.studentarr = [];
     }
     this.fetchSubordinateRequests();
   }
@@ -347,20 +395,22 @@ export class LeadersComponent {
 
     // 2. Check General Leadership (leadertype == '1' or generaltype or ward/subward)
     const gType = String(x.generaltype || '').trim();
+    const gLower = gType.toLowerCase();
+    const isTeacherRow = this.selectedUserType === 'teacher' || x.role === 'teacher' || String(x.table_name || '') === 'teacher_reg';
 
-    if (gType === '0' || gType.toLowerCase().includes('state')) {
+    if (gType.includes('రాష్ట్ర') || gLower.includes('state') || (isTeacherRow ? gType === '1' : gType === '0')) {
       return 'రాష్ట్ర లీడర్ (State Leader)';
     }
-    if (gType === '1' || gType.toLowerCase().includes('dist')) {
+    if (gType.includes('జిల్లా') || gLower.includes('dist') || (isTeacherRow ? gType === '2' : gType === '1')) {
       return 'జిల్లా లీడర్ (District Leader)';
     }
-    if (gType === '2' || gType.toLowerCase().includes('const')) {
+    if (gType.includes('నియోజకవర్గ') || gLower.includes('const') || (isTeacherRow ? gType === '3' : gType === '2')) {
       return 'నియోజకవర్గ లీడర్ (Constituency Leader)';
     }
-    if (gType === '3' || gType.toLowerCase().includes('mandal') || gType.toLowerCase().includes('municip')) {
+    if (gType.includes('మండల') || gLower.includes('mandal') || gLower.includes('municip') || (isTeacherRow ? gType === '4' : gType === '3')) {
       return 'మండల లీడర్ (Mandal Leader)';
     }
-    if (gType === '4' || gType.toLowerCase().includes('panchayat') || gType.toLowerCase().includes('village')) {
+    if (gType.includes('పంచాయ') || gLower.includes('panchayat') || gLower.includes('village') || (isTeacherRow ? gType === '5' : gType === '4')) {
       return 'గ్రామ / పంచాయితీ లీడర్ (Panchayat Leader)';
     }
     if (gType === 'College Level') {
@@ -375,22 +425,13 @@ export class LeadersComponent {
     if (gType === 'Section / Class Level') {
       return 'సెక్షన్ / క్లాస్ లీడర్ (Class Leader)';
     }
-    if (gType === '2') {
-      return 'నియోజకవర్గ లీడర్ (Constituency Leader)';
-    }
-    if (gType === '3') {
-      return 'మండల లీడర్ (Mandal Leader)';
-    }
-    if (gType === '4') {
-      return 'గ్రామ / పంచాయితీ లీడర్ (Panchayat Leader)';
-    }
-    if (gType === '5') {
-      const wardNum = x.wardnumber && x.wardnumber !== 'null' && String(x.wardnumber).trim() ? ` నెం. ${x.wardnumber}` : '';
-      return `వార్డు${wardNum} లీడర్ (Ward Leader)`;
-    }
-    if (gType === '6') {
+    if (gType.includes('సబ్') || gLower.includes('subward') || (!isTeacherRow && gType === '6')) {
       const sub = x.subward && x.subward !== 'null' && String(x.subward).trim() ? ` (${x.subward})` : '';
       return `సబ్ వార్డు${sub} లీడర్ (Sub-Ward Leader)`;
+    }
+    if (gType.includes('వార్డు') || gLower.includes('ward') || (isTeacherRow ? gType === '6' : gType === '5')) {
+      const wardNum = x.wardnumber && x.wardnumber !== 'null' && String(x.wardnumber).trim() ? ` నెం. ${x.wardnumber}` : '';
+      return `వార్డు${wardNum} లీడర్ (Ward Leader)`;
     }
 
     // Fallbacks if generaltype is unset but subward / wardnumber are populated
@@ -406,7 +447,7 @@ export class LeadersComponent {
 
   getLeaderBadgeStyle(x: any): { [key: string]: string } {
     const isWing = String(x?.leadertype) === '2' || (x?.wingtype && x.wingtype !== 'null' && String(x.wingtype).trim() !== '') || (x?.wingtypes && x.wingtypes !== 'null' && String(x.wingtypes).trim() !== '');
-    const gType = String(x?.generaltype || '');
+    const step = this.resolveLeaderHierarchyStep(x);
 
     if (isWing) {
       return {
@@ -415,28 +456,28 @@ export class LeadersComponent {
         'border': '1px solid #c4b5fd'
       };
     }
-    if (gType === '1' || gType === '2') {
+    if (step === 1 || step === 2) {
       return {
         'background-color': '#e0f2fe',
         'color': '#0369a1',
         'border': '1px solid #7dd3fc'
       };
     }
-    if (gType === '3') {
+    if (step === 3) {
       return {
         'background-color': '#e0f7fa',
         'color': '#00695c',
         'border': '1px solid #80deea'
       };
     }
-    if (gType === '4') {
+    if (step === 4) {
       return {
         'background-color': '#dcfce7',
         'color': '#15803d',
         'border': '1px solid #86efac'
       };
     }
-    if (gType === '5' || gType === '6') {
+    if (step >= 5) {
       return {
         'background-color': '#fef3c7',
         'color': '#b45309',

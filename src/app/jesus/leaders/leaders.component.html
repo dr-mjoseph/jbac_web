@@ -31,6 +31,11 @@
                     🎓 Students Requests (విద్యార్థులు)
                 </button>
             </div>
+            <div class="col-lg-5 col-md-6 mb-3" style="text-align: center;" *ngIf="formshow == 4">
+                <button type="button" class="btn btn-lg w-100" style="background-color: #047857; color: #fff; font-weight: 600; border: 2px solid #047857; padding: 12px 24px; border-radius: 8px; cursor: default;">
+                    👨‍🏫 Teachers Requests (ఉపాధ్యాయులు / బోధనా రంగం)
+                </button>
+            </div>
         </div>
     </div>
 
@@ -196,6 +201,77 @@
                             <tr *ngIf="!studentarr || studentarr.length == 0">
                                 <td colspan="8" style="text-align: center; padding: 30px; font-weight: 600; color: #64748b;">
                                     ℹ️ ఎటువంటి విద్యార్థి అభ్యర్థనలు లేవు / No Student Requests
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <br>
+            </div>
+        </section>
+    </div>
+
+    <!-- Teachers Requests Table -->
+    <div *ngIf="formshow == 4">
+        <section class="contact main-blog">
+            <div class="container">
+                <h3 style="text-align: center; margin-bottom: 20px; color: #047857;">
+                    {{general != '' ? general + ' Level Teacher Leaders Requests' : 'Teacher Leaders Requests'}} ({{getSubordinateSubtitle()}})
+                </h3>
+                <div class="table-responsive" style="background: #fff; box-shadow: 0 4px 12px rgba(0,0,0,0.08); border-radius: 8px; overflow: hidden;">
+                    <table class="table table-hover table-bordered mb-0" style="width: 100%; border-collapse: collapse;">
+                        <thead style="background-color: #047857; color: #fff;">
+                            <tr>
+                                <th style="padding: 12px; text-align: center; width: 60px;">S No.</th>
+                                <th style="padding: 12px;">పేరు (Name)</th>
+                                <th style="padding: 12px;">నాయకత్వ స్థాయి</th>
+                                <th style="padding: 12px;">నియోజకవర్గం</th>
+                                <th style="padding: 12px;">మండలం</th>
+                                <th style="padding: 12px;">పంచాయితీ / గ్రామం</th>
+                                <th style="padding: 12px; text-align: center;">ఫోన్ కాల్</th>
+                                <th style="padding: 12px; text-align: center; width: 140px;">నిర్ణయం</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let x of teacherarr; let i = index">
+                                <td style="text-align: center; vertical-align: middle; font-weight: 600;">{{i+1}}</td>
+                                <td style="vertical-align: middle; font-weight: 600;">
+                                    {{x.name_with_surname || x.name || 'N/A'}}
+                                    <div *ngIf="x.exact_designation || x.institute_name" style="font-size: 12px; font-weight: 400; color: #64748b;">
+                                        {{x.exact_designation}}{{x.exact_designation && x.institute_name ? ' • ' : ''}}{{x.institute_name}}
+                                    </div>
+                                </td>
+                                <td style="vertical-align: middle;">
+                                    <span style="display: inline-block; padding: 5px 12px; border-radius: 6px; font-weight: 600; font-size: 13px;"
+                                          [ngStyle]="getLeaderBadgeStyle(x)">
+                                        {{getDetailedLeaderStatus(x)}}
+                                    </span>
+                                </td>
+                                <td style="vertical-align: middle;">{{x.constituency_name || 'N/A'}}</td>
+                                <td style="vertical-align: middle;">{{x.mandal_name || 'N/A'}}</td>
+                                <td style="vertical-align: middle;">{{x.panchayat_name || x.res_address || 'N/A'}}</td>
+                                <td style="text-align: center; vertical-align: middle;">
+                                    <a *ngIf="x.mobile || x.mobile_number" href="tel:{{x.mobile || x.mobile_number}}" style="color: #047857; font-size: 18px;" title="Call {{x.mobile || x.mobile_number}}">
+                                        📞
+                                    </a>
+                                </td>
+                                <td style="text-align: center; vertical-align: middle;">
+                                    <div *ngIf="x.approval_ind == 1" style="color: #047857; font-weight: bold; font-size: 13px;">
+                                        ✓ Approved
+                                    </div>
+                                    <div *ngIf="x.approval_ind != 1" style="display: flex; flex-direction: column; gap: 6px; align-items: center;">
+                                        <button class="btn btn-sm" style="background-color: #047857; color: #fff; font-size: 12px; padding: 4px 12px; border-radius: 4px; border: none; width: 90px;" (click)="confirm(4, x.id)">
+                                            అనుమతించు
+                                        </button>
+                                        <button class="btn btn-sm" style="background-color: #8b0000; color: #fff; font-size: 12px; padding: 4px 12px; border-radius: 4px; border: none; width: 90px;" (click)="deleteAlert(4, x.id)">
+                                            తిరస్కరించు
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr *ngIf="!teacherarr || teacherarr.length == 0">
+                                <td colspan="8" style="text-align: center; padding: 30px; font-weight: 600; color: #64748b;">
+                                    ℹ️ ఎటువంటి ఉపాధ్యాయ నాయకుల అభ్యర్థనలు లేవు / No Teacher Leader Requests
                                 </td>
                             </tr>
                         </tbody>

@@ -94,6 +94,7 @@ export class LoginComponent implements OnInit, AfterContentInit {
       case '6': return 'Independent Organization';
       case '7': return 'Pastors Association';
       case '8': return 'Doctor';
+      case '9': return 'Teacher';
       default: return 'Member';
     }
   }

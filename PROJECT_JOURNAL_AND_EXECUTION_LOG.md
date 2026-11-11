@@ -3647,3 +3647,51 @@ The user requested full cross-platform synchronization of all recent web changes
   - **Signed APK**: `C:\Users\rajes\StudioProjects\jbac_app\jbacApp-0.0.54.apk` (`130,643,641` bytes, v2+v3 verified, 4-byte zipalign).
   - **Signed AAB**: `C:\Users\rajes\StudioProjects\jbac_app\jbacApp-0.0.54.aab` & `appreleasesigned.aab` (`127,679,243` bytes, jarsigner verified).
   - **AAPT Badging Check**: `package: name='io.ionic.starterjbac' versionCode='54' versionName='0.0.54'`, `targetSdkVersion:'36'`.
+
+
+---
+
+## 69. Teacher Registration Leadership Fields & Hierarchical Teacher Leaders Dashboard v0.0.54 (November 11, 2026)
+
+### Context & Objectives
+1. **Teacher Registration Leadership Options (`https://jbac.in/teacherregister` & Mobile `TeacherPage`)**:
+   - Directly after the **Upload CV / Profile** field, add **"Do you want to be a Christian Teacher Leader?"** (`YES` / `NO` radio selection) and a conditional **"Select Leadership Level you want"** dropdown populated dynamically from the existing `leaderlevel` DB table (`POST /dashboardapi/leaderlevels`).
+2. **Teacher Leaders Dashboard (`https://jbac.in/leaders` & Mobile `WingcommandPage`)**:
+   - Mirror the Believer, Pastor, and Student hierarchical leader workflows with strict **user-type isolation** (approved Teacher Leaders see **only** unapproved Teacher Leader applicants).
+   - Enforce admin approval gating (`approval_ind == 1 || d_in == 1`), **1-step-down** hierarchy filtering (`State -> District -> Constituency -> Mandal -> Panchayat -> Ward`), and strict geographic scoping (e.g., an admin-approved Hyderabad District Teacher Leader sees unapproved Constituency-level Teacher Leaders in Hyderabad District; an admin-approved Nalgonda Constituency Teacher Leader sees unapproved Mandal-level Teacher Leaders in the same Nalgonda constituency).
+   - Enable Teacher Leaders to **Approve** (`అనుమతించు`) or **Reject** (`తిరస్కరించు`) their 1-step-down subordinate teacher applicants.
+3. **Authentication, Admin Console, Documentation & Builds**:
+   - Add Teacher login / password reset category `'9'` (`బోధనా రంగ ఉద్యోగి / టీచర్ (Teacher)`), add `Teachers` management filter in `admin_db.html` / `public.html`, rebuild/deploy web & Lambda, build signed mobile `.apk` & `.aab` (`0.0.54`, `versionCode 54`, `targetSdkVersion 36`), and sync GitHub repositories.
+
+### Implementation Details
+
+#### 1. Database Schema & Migration (`teacher_reg`)
+- Created and executed `scripts/migrate_teacher_leaders_v54.js` against AWS RDS MySQL (`jbac_jbac`):
+  - Added columns to `teacher_reg`: `leadership`, `leadertype`, `generaltype`, `wingtype`, `wingtypes`, `d_in`, `password`, `is_first_login`.
+  - Backfilled default `password = mobile` for 15 existing `teacher_reg` rows and normalized `NULL` `d_in` values to `0`.
+
+#### 2. Backend API (`backend/server.ts`, `backend/server.js`)
+- Assigned Category `'9'` (`teacher_reg`) across `/passwordwebsitelogin`, `/updatefamilymemberpassword`, `/checknumberpassword`, `/upadtedpassword`, `/getuserprofilereport` (reassigned legacy `reg_form` fallback to `'10'`), `/getUserMainData`, and `/getLeaderswebsiteData`.
+- Added `getTeacherCanonicalLevel()` and `getTeacherLevelSql()` mapping Telugu `leaderlevel` values (`రాష్ట్ర`, `జిల్లా`, `నియోజకవర్గ`, `మండల`, `పంచాయ`, `వార్డు`) and numeric IDs (`1..6`) to unified hierarchy steps.
+- Updated `/getLeaderswebsiteData` to return strictly isolated Teacher Leader subordinate rows at `data[4]` (with `[believers, constituencies, pastors, students]` cleared) matching `COALESCE(approval_ind,0)=0 AND COALESCE(d_in,0)=0 AND UPPER(COALESCE(leadership,''))='YES'`, 1 step down, and matching geographic IDs via `COALESCE(NULLIF(res_*_id, 0), inst_*_id)`.
+- Extended `/updateconsis` & `/deleteboardmember` (`tableId=4`) and `/admin-district-leaders` & `/admin-update-district-leader` (`table: 'teacher_reg'`).
+- Packaged (`scripts/update_zip.ps1`) and deployed to AWS Lambda `jbac-backend-api`.
+
+#### 3. Live API & RDS End-to-End Verification
+- Executed live integration checks against `https://1a8kqxawxd.execute-api.ap-southeast-2.amazonaws.com/dashboardapi/` and RDS `jbac_jbac`:
+  - `/leaderlevels` returned all 5 active levels (`రాష్ట్ర` .. `పంచాయతి`).
+  - Unapproved Teacher returned `0` rows from `/getUserMainData`.
+  - Admin approval (`/admin-update-district-leader`), Teacher login (`category: '9'`), Hyderabad (`34`) District -> Constituency isolation, Nalgonda (`50`) Constituency -> Mandal isolation, `/updateconsis` (`tableid: 4`), and `/deleteboardmember` (`tableid: 4`) all passed and cleaned up test records afterward.
+
+#### 4. Web, Admin & Mobile App Parity (`jbac_web` & `jbac_app`)
+- Updated `TeacherregisterComponent` (web) and `TeacherPage` (mobile) with `"Do you want to be a Christian Teacher Leader?"` + `leaderlevel` dropdown right after CV upload.
+- Updated `LoginComponent`, `UpdateComponent`, `LoginPage`, `ForgotPasswordPage`, and `ServiceProvider` for Category `'9'` and `getleaderlevel()`.
+- Updated `LeadersComponent` (web) and `WingcommandPage` (mobile) with `formshow == 4` / `teacherarr` table, `resolveLeaderHierarchyStep()`, Telugu badge rendering, and Approve/Reject actions (`tableid: 4`).
+- Updated `backend/admin_db.html`, `src/public.html`, `src/assets/public.html`, and `jbac_app/src/assets/public.html` with `Teachers` filter and badge.
+
+#### 5. Production Web Deployment & Mobile Build v0.0.54 (API Level 36)
+- **Web Production Deploy**: Built `npm run build:prod` (hash `c7bef78e0decf5ec`, `main.ccbacebff65d0ab8.js`), synced to `s3://jbac-web-production-298363284024`, and created CloudFront invalidation `I7LKAK4IQP1UB45QL997GIDPXN` on distribution `EOBBU8SU7H3BI`.
+- **Signed Mobile Release v0.0.54 (`API Level 36`)**: Built & signed via `build_and_sign_release_v54.ps1`:
+  - `jbacApp-0.0.54.apk`: `130,647,737` bytes (`apksigner verify`: v2+v3 verified, 4-byte zipalign).
+  - `jbacApp-0.0.54.aab` & `appreleasesigned.aab`: `127,682,840` bytes (`jarsigner -verify`: `jar verified.`).
+  - `aapt dump badging`: `package: name='io.ionic.starterjbac' versionCode='54' versionName='0.0.54'`, `targetSdkVersion:'36'`.

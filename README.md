@@ -709,3 +709,18 @@ Implemented across backend endpoints (`/dashboardapi/getLeaderswebsiteData`, `/d
    - Built Angular production bundle (`npm run build:prod`, hash `f027a2849e74315a`) and deployed to AWS S3 & CloudFront (Distribution `EOBBU8SU7H3BI`, Invalidation `I64X7SIE7Q3KYJ639GYK67692L`).
    - Built & signed mobile app `0.0.54` (`versionCode 54`, `targetSdkVersion 36`): `jbacApp-0.0.54.apk` (`130,643,641` bytes), `jbacApp-0.0.54.aab` & `appreleasesigned.aab` (`127,679,243` bytes).
    - Created `RELEASE_NOTES_v0.0.54.md` and synced both `jbac_web` and `jbac_app` repositories on GitHub.
+
+
+---
+
+## 69. Teacher Registration Leadership Fields & Hierarchical Teacher Leaders Dashboard (November 11, 2026)
+
+### Highlights
+1. **Teacher Leadership Registration (`https://jbac.in/teacherregister` & Mobile `TeacherPage`)**:
+   - Added **"Do you want to be a Christian Teacher Leader?"** (`YES` / `NO`) and conditional **"Select Leadership Level you want"** dropdown directly after Upload CV / Profile, populated dynamically from `leaderlevel` (`POST /dashboardapi/leaderlevels`).
+2. **Teacher Leaders Dashboard (`https://jbac.in/leaders` & Mobile `WingcommandPage`)**:
+   - Added `formshow == 4` Teacher Leaders view with strict user-type isolation (showing Teacher applicants only).
+   - Enforces admin approval before leader access, 1-step-down hierarchy (`State -> District -> Constituency -> Mandal -> Panchayat -> Ward`), and strict geographic scoping (District -> same-district Constituency; Constituency -> same-constituency Mandal), with Approve (`అనుమతించు`) and Reject (`తిరస్కరించు`) actions.
+3. **Database, Auth, Admin & Deployment**:
+   - Migrated `teacher_reg` via `scripts/migrate_teacher_leaders_v54.js` (added leadership columns, `d_in`, `password`, `is_first_login` with `password = mobile` backfill).
+   - Added Login / Password Reset Category `'9'` (`బోధనా రంగ ఉద్యోగి / టీచర్ (Teacher)`), Admin Console `Teachers` filter pill & badge (`admin_db.html` / `public.html`), deployed AWS Lambda (`jbac-backend-api`), rebuilt & deployed Angular web (`npm run build:prod`, hash `c7bef78e0decf5ec`, CloudFront invalidation `I7LKAK4IQP1UB45QL997GIDPXN`), verified end-to-end against live RDS & API, and built/signed Mobile v0.0.54 (`API Level 36`, `jbacApp-0.0.54.apk` `130,647,737` bytes, `jbacApp-0.0.54.aab` / `appreleasesigned.aab` `127,682,840` bytes).

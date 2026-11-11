@@ -2860,6 +2860,7 @@ app.all(['/dashboardapi/updatefamilymemberpassword', '/api/updatefamilymemberpas
         await db.query('UPDATE pastors_associations SET password = ?, is_first_login = 0 WHERE phonenumber = ?', [newPassword, phone]).catch(() => {});
         await db.query('UPDATE ministry_signup SET password = ?, is_first_login = 0 WHERE headnmber = ?', [newPassword, phone]).catch(() => {});
         await db.query('UPDATE independentorganisation_reg SET password = ?, is_first_login = 0 WHERE contact_num = ?', [newPassword, phone]).catch(() => {});
+        await db.query('UPDATE teacher_reg SET password = ?, is_first_login = 0 WHERE mobile = ?', [newPassword, phone]).catch(() => {});
 
         res.json({
             status: 200,
@@ -2894,10 +2895,13 @@ app.all(['/dashboardapi/updateconsis', '/dashboardapi/updateconsis/:id', '/api/u
                 await db.query('UPDATE student_reg SET approval_ind = 1 WHERE id = ?', [id]);
             } else if (tableId === 3) {
                 await db.query('UPDATE pastor_reg SET approval_ind = 1 WHERE id = ?', [id]);
+            } else if (tableId === 4) {
+                await db.query("UPDATE teacher_reg SET approval_ind = 1, status = 'Approved' WHERE id = ?", [id]);
             } else {
                 await db.query('UPDATE signup_form SET approval_ind = 1 WHERE id = ?', [id]).catch(() => {});
                 await db.query('UPDATE student_reg SET approval_ind = 1 WHERE id = ?', [id]).catch(() => {});
                 await db.query('UPDATE pastor_reg SET approval_ind = 1 WHERE id = ?', [id]).catch(() => {});
+                await db.query("UPDATE teacher_reg SET approval_ind = 1, status = 'Approved' WHERE id = ?", [id]).catch(() => {});
             }
         }
         res.json({ status: 200, message: 'Leader approved successfully' });
@@ -3127,6 +3131,13 @@ app.post(['/dashboardapi/passwordwebsitelogin', '/api/login'], async (req: any, 
                 category_name: 'Doctor',
                 query: 'SELECT id, doctor_name as name, phone_number as mobile_number, email, password, is_first_login FROM family_councelling_doctors WHERE phone_number = ? AND (password = ? OR password IS NULL OR password = "") AND d_in = 0',
                 phoneQuery: 'SELECT id FROM family_councelling_doctors WHERE phone_number = ? AND d_in = 0'
+            },
+            '9': {
+                name: 'teacher_reg',
+                category_id: '9',
+                category_name: 'Teacher',
+                query: 'SELECT id, name, mobile as mobile_number, email, password, is_first_login FROM teacher_reg WHERE mobile = ? AND (password = ? OR ((password IS NULL OR password = "") AND ? = mobile)) ORDER BY COALESCE(approval_ind, 0) = 1 DESC, COALESCE(d_in, 0) DESC, id DESC',
+                phoneQuery: 'SELECT id FROM teacher_reg WHERE mobile = ?'
             }
         };
 
@@ -3363,7 +3374,8 @@ app.all(['/dashboardapi/getpersonal', '/dashboardapi/geteditdtails', '/dashboard
         else if (rawCat === '6' || rawCat.includes('organization') || rawCat.includes('organisation') || rawCat.includes('ఆర్గనైజేషన్')) cat = '6';
         else if (rawCat === '7' || rawCat.includes('association') || rawCat.includes('అసోసియేషన్')) cat = '7';
         else if (rawCat === '8' || rawCat.includes('doctor') || rawCat.includes('డాక్టర్') || rawCat.includes('councellor')) cat = '8';
-        else if (rawCat === '9' || rawCat.includes('entry') || rawCat.includes('namodu') || rawCat.includes('నమోదు')) cat = '9';
+        else if (rawCat === '9' || rawCat.includes('teacher') || rawCat.includes('టీచర్') || rawCat.includes('బోధనా')) cat = '9';
+        else if (rawCat === '10' || rawCat.includes('entry') || rawCat.includes('namodu') || rawCat.includes('నమోదు')) cat = '10';
         else if (rawCat) cat = rawCat;
 
         const configs: Record<string, { table: string; idCol: string; phoneCols: string[] }> = {
@@ -3375,7 +3387,8 @@ app.all(['/dashboardapi/getpersonal', '/dashboardapi/geteditdtails', '/dashboard
             '6': { table: 'independentorganisation_reg', idCol: 'id', phoneCols: ['contact_num', 'whatsapp'] },
             '7': { table: 'pastors_associations', idCol: 'id', phoneCols: ['phonenumber', 'whatsapp_number'] },
             '8': { table: 'family_councelling_doctors', idCol: 'id', phoneCols: ['phone_number'] },
-            '9': { table: 'reg_form', idCol: 'reg-id', phoneCols: ['phonenum', 'whatsappno'] }
+            '9': { table: 'teacher_reg', idCol: 'id', phoneCols: ['mobile', 'whatsapp'] },
+            '10': { table: 'reg_form', idCol: 'reg-id', phoneCols: ['phonenum', 'whatsappno'] }
         };
 
         let resultRow: any = null;
@@ -3634,10 +3647,13 @@ app.all(['/dashboardapi/deleteboardmember', '/api/deleteboardmember', '/api/reje
                 await db.query('UPDATE student_reg SET approval_ind = 2 WHERE id = ?', [id]);
             } else if (tableId === 3) {
                 await db.query('UPDATE pastor_reg SET approval_ind = 2 WHERE id = ?', [id]);
+            } else if (tableId === 4) {
+                await db.query("UPDATE teacher_reg SET approval_ind = 2, status = 'Rejected', d_in = 0 WHERE id = ?", [id]);
             } else {
                 await db.query('UPDATE signup_form SET approval_ind = 2 WHERE id = ?', [id]).catch(() => {});
                 await db.query('UPDATE student_reg SET approval_ind = 2 WHERE id = ?', [id]).catch(() => {});
                 await db.query('UPDATE pastor_reg SET approval_ind = 2 WHERE id = ?', [id]).catch(() => {});
+                await db.query("UPDATE teacher_reg SET approval_ind = 2, status = 'Rejected', d_in = 0 WHERE id = ?", [id]).catch(() => {});
             }
             await db.query('DELETE FROM wingleader WHERE id = ?', [id]).catch(() => {});
         }
@@ -3840,6 +3856,29 @@ function getStudentLevelSql(prefix, targetLvl) {
     return '1=0';
 }
 
+function getTeacherCanonicalLevel(val: any): number | null {
+    if (val === null || val === undefined || val === '') return null;
+    const str = String(val).trim().toLowerCase();
+    if (str === '0' || str.includes('state') || str.includes('రాష్ట్ర')) return 1;
+    if (str.includes('dist') || str.includes('జిల్లా')) return 2;
+    if (str.includes('const') || str.includes('నియోజకవర్గ')) return 3;
+    if (str.includes('mandal') || str.includes('municip') || str.includes('మండల')) return 4;
+    if (str.includes('panchayat') || str.includes('village') || str.includes('పంచాయతి') || str.includes('గ్రామ')) return 5;
+    if (str.includes('ward') || str.includes('వార్డు')) return 6;
+    const num = Number(val);
+    if (!isNaN(num) && num >= 1 && num <= 6) return Math.floor(num);
+    return null;
+}
+
+function getTeacherLevelSql(prefix: string, targetLvl: number): string {
+    if (targetLvl === 2) return `(${prefix}generaltype IN ('2', 'District Level', 'District') OR ${prefix}generaltype LIKE '%జిల్లా%')`;
+    if (targetLvl === 3) return `(${prefix}generaltype IN ('3', 'Constituency Level', 'Constituency level', 'Constituency') OR ${prefix}generaltype LIKE '%నియోజకవర్గ%')`;
+    if (targetLvl === 4) return `(${prefix}generaltype IN ('4', 'Municipality / Mandal Level', 'Muncipality / Mandal Level', 'Mandal Level', 'Mandal') OR ${prefix}generaltype LIKE '%మండల%')`;
+    if (targetLvl === 5) return `(${prefix}generaltype IN ('5', 'Ward / Panchayati Level', 'Panchayat Level', 'Panchayati Level', 'Village') OR ${prefix}generaltype LIKE '%పంచాయతి%' OR ${prefix}generaltype LIKE '%గ్రామ%')`;
+    if (targetLvl === 6) return `(${prefix}generaltype IN ('6', 'Ward', 'Sub Ward', 'Ward / Sub-Ward Level') OR ${prefix}generaltype LIKE '%వార్డు%')`;
+    return '1=0';
+}
+
 app.all(['/dashboardapi/getLeaderswebsiteData', '/dashboardapi/getLeaderswebsitewing', '/api/leaders', '/api/getLeaderswebsiteData'], async (req: any, res: any) => {
     try {
         const b = req.body || req.query || {};
@@ -3852,9 +3891,10 @@ app.all(['/dashboardapi/getLeaderswebsiteData', '/dashboardapi/getLeaderswebsite
         let isWingRequest = req.path.includes('wing') || String(b.leadertype) === '2' || Boolean(b.wingtype) || Boolean(b.wingtypes);
 
         let loggedInLeaderType = isWingRequest ? 'wing' : 'general';
-        let loggedInCanonicalLevel = null;
-        let leaderWing = null;
-        let loggedInRole = null;
+        let loggedInCanonicalLevel: any = null;
+        let leaderWing: any = null;
+        let loggedInRole: any = null;
+        let loggedInApproved: boolean = true;
 
         // 1. Session Parameter Binding: Fetch authoritative leader level & locations directly from DB
         const reqUserTypeEarly = String(b.user_type || b.selected_user_type || '').toLowerCase().trim();
@@ -3930,8 +3970,47 @@ app.all(['/dashboardapi/getLeaderswebsiteData', '/dashboardapi/getLeaderswebsite
                 return false;
             };
 
+            const checkTeacher = async (): Promise<boolean> => {
+                const [tr]: any = await db.query(
+                    `SELECT id, name, mobile, leadership, leadertype, generaltype, wingtype, wingtypes,
+                            COALESCE(NULLIF(res_state_id, 0), inst_state_id, 1) as state_id,
+                            COALESCE(NULLIF(res_district_id, 0), inst_district_id) as district_id,
+                            COALESCE(NULLIF(res_constituency_id, 0), inst_constituency_id) as constituency_id,
+                            COALESCE(NULLIF(res_mandal_id, 0), inst_mandal_id) as mandal_id,
+                            COALESCE(NULLIF(res_panchayat_id, 0), inst_panchayat_id) as panchayat_id,
+                            d_in, approval_ind
+                     FROM teacher_reg WHERE id = ?`, [currentUserId]
+                );
+                if (tr && tr[0]) {
+                    loggedInRole = 'teacher';
+                    loggedInLeaderType = 'general';
+                    isWingRequest = false;
+                    loggedInApproved = (Number(tr[0].approval_ind) === 1) || (Number(tr[0].d_in) === 1);
+                    loggedInCanonicalLevel = getTeacherCanonicalLevel(tr[0].generaltype) ?? getTeacherCanonicalLevel(tr[0].wingtype);
+                    if (tr[0].d_in == 1 && (loggedInCanonicalLevel === null || loggedInCanonicalLevel === undefined)) {
+                        loggedInCanonicalLevel = 2; // District Leader fallback
+                    }
+                    if (tr[0].district_id) districtId = tr[0].district_id;
+                    if (tr[0].constituency_id) constituencyId = tr[0].constituency_id;
+                    if (tr[0].mandal_id) mandalId = tr[0].mandal_id;
+                    if (tr[0].panchayat_id) panchayatId = tr[0].panchayat_id;
+                    if (tr[0].state_id) stateId = tr[0].state_id;
+                    return true;
+                }
+                return false;
+            };
+
             // Table priority based on requested role/category to avoid ID collision across tables
-            if (reqCatIdEarly === '2' || reqUserTypeEarly === 'student') {
+            if (reqCatIdEarly === '9' || reqUserTypeEarly === 'teacher') {
+                const ok = await checkTeacher();
+                if (!ok) {
+                    const okP = await checkPastor();
+                    if (!okP) {
+                        const okB = await checkBeliever();
+                        if (!okB) await checkStudent();
+                    }
+                }
+            } else if (reqCatIdEarly === '2' || reqUserTypeEarly === 'student') {
                 const ok = await checkStudent();
                 if (!ok) {
                     const okP = await checkPastor();
@@ -3988,10 +4067,72 @@ app.all(['/dashboardapi/getLeaderswebsiteData', '/dashboardapi/getLeaderswebsite
             targetUserType = 'student';
         } else if (reqUserType === 'believer' || reqCatId === '1') {
             targetUserType = 'believer';
+        } else if (reqUserType === 'teacher' || reqCatId === '9') {
+            targetUserType = 'teacher';
         } else if (reqUserType === 'all') {
             targetUserType = 'all';
         } else if (loggedInRole) {
             targetUserType = loggedInRole;
+        }
+
+        // Teacher Leaders isolation branch: strict 1-step-down hierarchy, same geo region, unapproved teacher subordinates only
+        if (targetUserType === 'teacher') {
+            let teachers: any[] = [];
+            if (loggedInApproved && loggedInCanonicalLevel !== null && loggedInCanonicalLevel !== undefined) {
+                const tTargetLevel = loggedInCanonicalLevel + 1;
+                const tLevelSql = getTeacherLevelSql('tr.', tTargetLevel);
+                let tGeoSql = '1=0';
+                let tParams: any[] = [];
+                const tStateExpr = 'COALESCE(NULLIF(tr.res_state_id, 0), tr.inst_state_id)';
+                const tDistExpr = 'COALESCE(NULLIF(tr.res_district_id, 0), tr.inst_district_id)';
+                const tConstExpr = 'COALESCE(NULLIF(tr.res_constituency_id, 0), tr.inst_constituency_id)';
+                const tMandalExpr = 'COALESCE(NULLIF(tr.res_mandal_id, 0), tr.inst_mandal_id)';
+                const tPanchExpr = 'COALESCE(NULLIF(tr.res_panchayat_id, 0), tr.inst_panchayat_id)';
+                if (loggedInCanonicalLevel === 1) {
+                    tGeoSql = `(${tStateExpr} = ? OR ${tStateExpr} IS NULL)`;
+                    tParams = [stateId];
+                } else if (loggedInCanonicalLevel === 2) {
+                    tGeoSql = `${tDistExpr} = ?`;
+                    tParams = [districtId];
+                } else if (loggedInCanonicalLevel === 3) {
+                    tGeoSql = `${tConstExpr} = ? AND (${tDistExpr} = ? OR ? IS NULL)`;
+                    tParams = [constituencyId, districtId, districtId];
+                } else if (loggedInCanonicalLevel === 4) {
+                    tGeoSql = `${tMandalExpr} = ? AND (${tConstExpr} = ? OR ? IS NULL)`;
+                    tParams = [mandalId, constituencyId, constituencyId];
+                } else if (loggedInCanonicalLevel === 5) {
+                    tGeoSql = `${tPanchExpr} = ? AND (${tMandalExpr} = ? OR ? IS NULL)`;
+                    tParams = [panchayatId, mandalId, mandalId];
+                }
+                const tFullWhere = `${tGeoSql} AND ${tLevelSql} AND UPPER(COALESCE(tr.leadership, '')) = 'YES' AND COALESCE(tr.approval_ind, 0) = 0 AND COALESCE(tr.d_in, 0) = 0 AND tr.id != ?`;
+                const [trRows]: any = await db.query(`
+                    SELECT tr.id, tr.name as fname, '' as lname, tr.name, tr.mobile as mobile_number, tr.whatsapp,
+                           tr.designation, tr.institute_name, tr.working_in,
+                           tr.generaltype, tr.leadership, tr.leadertype, tr.wingtype, tr.wingtypes,
+                           tr.approval_ind, tr.status, tr.d_in,
+                           COALESCE(NULLIF(tr.res_state_id, 0), tr.inst_state_id, 1) as state_id,
+                           ${tDistExpr} as district_id,
+                           ${tConstExpr} as constituency_id,
+                           ${tMandalExpr} as mandal_id,
+                           ${tPanchExpr} as panchayat_id,
+                           tr.res_address as address,
+                           COALESCE(d.distrct_nm, '') as district_name,
+                           COALESCE(c.const_nm, '') as constituency_name,
+                           COALESCE(m.mndl_nm, '') as mandal_name,
+                           COALESCE(p.pnchyt_nm, '') as panchayat_name,
+                           'Teacher Wing' as wing_name
+                    FROM teacher_reg tr
+                    LEFT JOIN dstrct d ON ${tDistExpr} = d.id
+                    LEFT JOIN const_dtl_t c ON ${tConstExpr} = c.id
+                    LEFT JOIN mndls_lst_t m ON ${tMandalExpr} = m.id
+                    LEFT JOIN pnchyt_lst_t p ON ${tPanchExpr} = p.id
+                    WHERE ${tFullWhere}
+                    ORDER BY tr.id DESC
+                `, [...tParams, currentUserId]);
+                teachers = trRows || [];
+            }
+            const [constituencies]: any = await db.query('SELECT id, const_nm FROM const_dtl_t WHERE dstrct_id = ? AND d_in = 0', [districtId || 0]);
+            return res.json({ status: 200, data: [[], constituencies || [], [], [], teachers], selected_user_type: 'teacher' });
         }
 
         // 2. UNIVERSAL SQL QUERY: Targets the immediate level below (:logged_in_level_id + 1)
@@ -4208,7 +4349,30 @@ app.all(['/dashboardapi/admin-district-leaders', '/api/admin-district-leaders'],
             ORDER BY st.id DESC
         `);
 
-        let allLeaders = [...pastors, ...believers, ...students].map((item) => {
+        // 4. Query Teachers
+        const [teachers]: any = await db.query(`
+            SELECT tr.id, tr.name, tr.mobile,
+                   COALESCE(NULLIF(tr.res_state_id, 0), tr.inst_state_id, 1) as state_id,
+                   COALESCE(NULLIF(tr.res_district_id, 0), tr.inst_district_id) as district_id,
+                   COALESCE(NULLIF(tr.res_constituency_id, 0), tr.inst_constituency_id) as constituency_id,
+                   COALESCE(NULLIF(tr.res_mandal_id, 0), tr.inst_mandal_id) as mandal_id,
+                   tr.generaltype, tr.wingtype, tr.wingtypes, tr.leadertype,
+                   tr.d_in, tr.approval_ind, tr.res_address as address, tr.cts,
+                   COALESCE(d.distrct_nm, '') as district_name,
+                   COALESCE(c.const_nm, '') as constituency_name,
+                   'Teacher Wing' as wing_name,
+                   'teacher' as category, 'teacher_reg' as table_name, 4 as tableid
+            FROM teacher_reg tr
+            LEFT JOIN dstrct d ON COALESCE(NULLIF(tr.res_district_id, 0), tr.inst_district_id) = d.id
+            LEFT JOIN const_dtl_t c ON COALESCE(NULLIF(tr.res_constituency_id, 0), tr.inst_constituency_id) = c.id
+            WHERE UPPER(COALESCE(tr.leadership, '')) = 'YES'
+               OR tr.d_in = 1
+               OR tr.approval_ind IN (1, 2)
+               OR (tr.generaltype IS NOT NULL AND tr.generaltype != '')
+            ORDER BY tr.id DESC
+        `);
+
+        let allLeaders = [...pastors, ...believers, ...students, ...teachers].map((item) => {
             let effectiveState = item.state_id || 1;
             const distId = Number(item.district_id);
             if (distId >= 31 && distId <= 63) effectiveState = 2;
@@ -4243,7 +4407,8 @@ app.all(['/dashboardapi/admin-district-leaders', '/api/admin-district-leaders'],
             rejected: allLeaders.filter((x) => x.is_rejected).length,
             pastors: allLeaders.filter((x) => x.category === 'pastor').length,
             believers: allLeaders.filter((x) => x.category === 'believer').length,
-            students: allLeaders.filter((x) => x.category === 'student').length
+            students: allLeaders.filter((x) => x.category === 'student').length,
+            teachers: allLeaders.filter((x) => x.category === 'teacher').length
         };
 
         res.json({ status: 200, data: allLeaders, summary });
@@ -4272,7 +4437,7 @@ app.all(['/dashboardapi/admin-update-district-leader', '/api/admin-update-distri
             dIn = 0;
         }
 
-        const validTables = ['pastor_reg', 'signup_form', 'student_reg'];
+        const validTables = ['pastor_reg', 'signup_form', 'student_reg', 'teacher_reg'];
         if (!validTables.includes(table)) {
             return res.status(400).json({ status: 400, error: 'Invalid leader table: ' + table });
         }
@@ -4280,7 +4445,12 @@ app.all(['/dashboardapi/admin-update-district-leader', '/api/admin-update-distri
             return res.status(400).json({ status: 400, error: 'Missing leader id' });
         }
 
-        await db.query(`UPDATE \`${table}\` SET approval_ind = ?, d_in = ? WHERE id = ?`, [approvalInd, dIn, id]);
+        if (table === 'teacher_reg') {
+            const teacherStatus = approvalInd === 1 ? 'Approved' : (approvalInd === 2 ? 'Rejected' : 'pending');
+            await db.query('UPDATE `teacher_reg` SET approval_ind = ?, d_in = ?, status = ? WHERE id = ?', [approvalInd, dIn, teacherStatus, id]);
+        } else {
+            await db.query(`UPDATE \`${table}\` SET approval_ind = ?, d_in = ? WHERE id = ?`, [approvalInd, dIn, id]);
+        }
 
         res.json({
             status: 200,
@@ -4344,6 +4514,14 @@ app.all(['/dashboardapi/checknumberpassword', '/api/checknumberpassword'], async
         const phone = String(b.mobile_number || b.number || b.phone || b.contactnumber || '').trim();
         const cat = Number(b.category) || 1;
         
+        if (cat === 9) {
+            const [trRows]: any = await db.query('SELECT id, name, mobile as mobile_number, password, is_first_login FROM teacher_reg WHERE mobile = ? ORDER BY COALESCE(approval_ind, 0) = 1 DESC, id DESC LIMIT 1', [phone]);
+            if (trRows && trRows.length > 0) {
+                return res.json({ status: 200, message: 'User found', data: trRows, members: trRows });
+            }
+            return res.json({ status: 404, message: 'User not found' });
+        }
+        
         // 1. Check reg_form for family members registered via entry form
         const [regRows]: any = await db.query('SELECT `reg-id` as id, name, phonenum as mobile_number, category, password, is_first_login FROM reg_form WHERE phonenum = ? ORDER BY `reg-id` ASC', [phone]);
         if (regRows && regRows.length > 0) {
@@ -4395,8 +4573,13 @@ app.all(['/dashboardapi/upadtedpassword', '/dashboardapi/updatedpassword', '/api
         else if (cat === 5) { table = 'pastor_reg'; phoneCol = 'number'; }
         else if (cat === 6) { table = 'pastors_associations'; phoneCol = 'number'; }
         else if (cat === 7) { table = 'ministry_signup'; phoneCol = 'headnmber'; }
+        else if (cat === 9) { table = 'teacher_reg'; phoneCol = 'mobile'; }
 
-        await db.query(`UPDATE \`${table}\` SET password = ? WHERE \`${phoneCol}\` = ? AND d_in = 0`, [newPass, phone]).catch(() => {});
+        if (cat === 9) {
+            await db.query('UPDATE `teacher_reg` SET password = ?, is_first_login = 0 WHERE `mobile` = ?', [newPass, phone]).catch(() => {});
+        } else {
+            await db.query(`UPDATE \`${table}\` SET password = ? WHERE \`${phoneCol}\` = ? AND d_in = 0`, [newPass, phone]).catch(() => {});
+        }
         // users.otp is not a password field
         await db.query('UPDATE signup_form SET password = ? WHERE mobile_number = ?', [newPass, phone]).catch(() => {});
 
@@ -4422,23 +4605,27 @@ app.all(['/dashboardapi/getUserMainData', '/dashboardapi/getUserMainData/:id', '
                 canonicalLvl = getCanonicalLevel(u.wingtype) ?? getCanonicalLevel(u.generaltype);
             } else if (role === 'student') {
                 canonicalLvl = getCanonicalLevel(u.generaltype, true) ?? getCanonicalLevel(u.wingtype, true);
+            } else if (role === 'teacher') {
+                canonicalLvl = getTeacherCanonicalLevel(u.generaltype) ?? getTeacherCanonicalLevel(u.wingtype);
             } else {
                 canonicalLvl = getCanonicalLevel(u.generaltype);
             }
 
-            if (u.d_in == 1 && (canonicalLvl === null || canonicalLvl === undefined || canonicalLvl > 4)) {
+            if (u.d_in == 1 && (canonicalLvl === null || canonicalLvl === undefined || (role !== 'teacher' && canonicalLvl > 4))) {
                 canonicalLvl = 2; // Default to District incharge
             }
 
             // An approved leader has d_in == 1 OR approval_ind == 1
             const isApproved = (u.d_in == 1) || (Number(u.approval_ind) === 1);
             if (isApproved && canonicalLvl !== null) {
-                const resolvedWing = resolveWingCategory(u.wingtypes) || resolveWingCategory(u.wingtype) || (role === 'student' ? resolveWingCategory(1) : null);
+                const resolvedWing: any = role === 'teacher'
+                    ? { telugu: 'టీచర్ వింగ్', english: 'Teacher Wing' }
+                    : (resolveWingCategory(u.wingtypes) || resolveWingCategory(u.wingtype) || (role === 'student' ? resolveWingCategory(1) : null));
                 // Return internal 0-indexed genType for client compatibility (0=State, 1=District, 2=Constituency, 3=Mandal, 4=Panchayat, 5=Ward)
                 const clientGenType = canonicalLvl === 1 ? 0 : canonicalLvl - 1;
                 return {
                     id: u.id,
-                    leadertype: (isWingLeader || resolvedWing) ? 2 : (Number(u.leadertype) || 1),
+                    leadertype: (role === 'teacher') ? (Number(u.leadertype) || 1) : ((isWingLeader || resolvedWing) ? 2 : (Number(u.leadertype) || 1)),
                     generaltype: clientGenType,
                     canonical_level: canonicalLvl,
                     wingtype: u.wingtype,
@@ -4459,6 +4646,27 @@ app.all(['/dashboardapi/getUserMainData', '/dashboardapi/getUserMainData/:id', '
             return null;
         };
 
+        const isTeacherCat = cat === '9' || cat.toLowerCase().includes('teacher') || cat.includes('టీచర్') || cat.includes('బోధనా');
+        // 0. Search in teacher_reg when Teacher category is active
+        if (isTeacherCat) {
+            const [tRows]: any = await db.query(
+                `SELECT id, name, mobile as mobile_number, leadership, leadertype, generaltype, wingtype, wingtypes,
+                        COALESCE(NULLIF(res_district_id, 0), inst_district_id) as district_id,
+                        COALESCE(NULLIF(res_constituency_id, 0), inst_constituency_id) as constituency_id,
+                        COALESCE(NULLIF(res_mandal_id, 0), inst_mandal_id) as mandal_id,
+                        COALESCE(NULLIF(res_panchayat_id, 0), inst_panchayat_id) as village_id,
+                        COALESCE(NULLIF(res_state_id, 0), inst_state_id, 1) as state_id,
+                        d_in, approval_ind
+                 FROM teacher_reg WHERE (id = ? OR mobile = ?)
+                 ORDER BY COALESCE(approval_ind, 0) = 1 DESC, COALESCE(d_in, 0) DESC, COALESCE(leadership, 'NO') = 'YES' DESC, id DESC LIMIT 1`,
+                [usrId || -1, phone || '']
+            );
+            if (tRows && tRows.length > 0) {
+                matchedLeader = resolveLeader(tRows[0], 'teacher');
+            }
+            return res.json({ status: 200, data: matchedLeader ? [matchedLeader] : [] });
+        }
+
         // 1. Search in student_reg (Student)
         if (cat === '2' || !matchedLeader) {
             const [sRows]: any = await db.query('SELECT id, studentname as name, number as mobile_number, leadership, leadertype, generaltype, wingtype, district_id, constituency_id, mandal_id, village_id, state_id, d_in, approval_ind FROM student_reg WHERE (id = ? OR number = ?) LIMIT 1', [usrId || -1, phone || '']);
@@ -4478,6 +4686,23 @@ app.all(['/dashboardapi/getUserMainData', '/dashboardapi/getUserMainData/:id', '
             const [bRows]: any = await db.query('SELECT id, CONCAT(fname, " ", COALESCE(lname, "")) as name, mobile_number, leadership, leadertype, generaltype, wingtype, wingtypes, district_id, constituency_id, mandal_id, panchayat_id as village_id, state_id, d_in, approval_ind FROM signup_form WHERE (id = ? OR mobile_number = ?) LIMIT 1', [usrId || -1, phone || '']);
             if (bRows && bRows.length > 0) {
                 matchedLeader = resolveLeader(bRows[0], 'believer');
+            }
+        }
+        // 3b. Search in teacher_reg (Teacher) when category wasn't explicitly specified
+        if (!matchedLeader && !cat) {
+            const [tRows]: any = await db.query(
+                `SELECT id, name, mobile as mobile_number, leadership, leadertype, generaltype, wingtype, wingtypes,
+                        COALESCE(NULLIF(res_district_id, 0), inst_district_id) as district_id,
+                        COALESCE(NULLIF(res_constituency_id, 0), inst_constituency_id) as constituency_id,
+                        COALESCE(NULLIF(res_mandal_id, 0), inst_mandal_id) as mandal_id,
+                        COALESCE(NULLIF(res_panchayat_id, 0), inst_panchayat_id) as village_id,
+                        COALESCE(NULLIF(res_state_id, 0), inst_state_id, 1) as state_id,
+                        d_in, approval_ind
+                 FROM teacher_reg WHERE (id = ? OR mobile = ?) LIMIT 1`,
+                [usrId || -1, phone || '']
+            );
+            if (tRows && tRows.length > 0) {
+                matchedLeader = resolveLeader(tRows[0], 'teacher');
             }
         }
         // 4. Fallback to wingleader table
@@ -6028,6 +6253,15 @@ app.all(['/dashboardapi/teacher-register', '/api/teacher-register', '/dashboarda
             }
         }
 
+        const rawLeadership = String(b.leadership || b.want_leader || 'NO').trim().toUpperCase();
+        const leadership = (rawLeadership === 'YES' || rawLeadership === 'TRUE' || rawLeadership === '1') ? 'YES' : 'NO';
+        const leadertype = b.leadertype ? String(b.leadertype).trim() : '1';
+        const rawGeneralType = b.generaltype || b.leadership_level || b.leader_level || null;
+        const generaltype = leadership === 'YES' && rawGeneralType ? String(rawGeneralType).trim() : null;
+        const wingtype = b.wingtype ? String(b.wingtype).trim() : null;
+        const wingtypes = b.wingtypes ? String(b.wingtypes).trim() : null;
+        const teacherPassword = String(b.password || mobile).trim();
+
         const [result]: any = await db.query(
             `INSERT INTO \`teacher_reg\` (
                 \`name\`, \`mobile\`, \`whatsapp\`, \`email\`, \`gender\`, \`designation\`,
@@ -6037,8 +6271,9 @@ app.all(['/dashboardapi/teacher-register', '/api/teacher-register', '/dashboarda
                 \`pastor_phone\`, \`teacher_type\`, \`working_in\`, \`institute_name\`,
                 \`inst_state_id\`, \`inst_district_id\`, \`inst_constituency_id\`, \`inst_mandal_id\`, \`inst_panchayat_id\`, \`inst_address\`,
                 \`res_state_id\`, \`res_district_id\`, \`res_constituency_id\`, \`res_mandal_id\`, \`res_panchayat_id\`, \`res_address\`,
-                \`description\`, \`about_achievements\`, \`cts\`, \`cv_profile\`, \`cv_file\`
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+                \`description\`, \`about_achievements\`, \`cts\`, \`cv_profile\`, \`cv_file\`,
+                \`leadership\`, \`leadertype\`, \`generaltype\`, \`wingtype\`, \`wingtypes\`, \`d_in\`, \`password\`, \`is_first_login\`
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?, 0)`,
             [
                 name,
                 mobile,
@@ -6076,7 +6311,13 @@ app.all(['/dashboardapi/teacher-register', '/api/teacher-register', '/dashboarda
                 b.about_achievements || b.description || null,
                 cts,
                 cvUrl,
-                cvUrl
+                cvUrl,
+                leadership,
+                leadertype,
+                generaltype,
+                wingtype,
+                wingtypes,
+                teacherPassword
             ]
         );
 

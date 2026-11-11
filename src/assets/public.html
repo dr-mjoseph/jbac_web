@@ -1877,7 +1877,7 @@
           <div>
             <h3 style="margin:0; font-size:1.25rem; font-weight:700; color:var(--text-main);">State-Wise District Leaders (All Roles)</h3>
             <p style="margin:2px 0 0; font-size:0.8rem; color:var(--text-muted);">
-              Comprehensive leadership authorization roster for Pastors, Believers & Students across Andhra Pradesh and Telangana
+              Comprehensive leadership authorization roster for Pastors, Believers, Students & Teachers across Andhra Pradesh and Telangana
             </p>
           </div>
         </div>
@@ -1906,6 +1906,7 @@
             <button class="btn btn-sm dl-cat-btn" data-cat="pastor" onclick="setDlCatFilter('pastor', this)" style="padding:4px 10px; font-size:0.78rem; border-radius:6px;">Pastors</button>
             <button class="btn btn-sm dl-cat-btn" data-cat="believer" onclick="setDlCatFilter('believer', this)" style="padding:4px 10px; font-size:0.78rem; border-radius:6px;">Believers</button>
             <button class="btn btn-sm dl-cat-btn" data-cat="student" onclick="setDlCatFilter('student', this)" style="padding:4px 10px; font-size:0.78rem; border-radius:6px;">Students</button>
+            <button class="btn btn-sm dl-cat-btn" data-cat="teacher" onclick="setDlCatFilter('teacher', this)" style="padding:4px 10px; font-size:0.78rem; border-radius:6px;">Teachers</button>
           </div>
 
           <!-- Status Filter -->
@@ -2563,9 +2564,9 @@
     if (emptyState) emptyState.style.display = 'none';
 
     tbody.innerHTML = filtered.map((item, idx) => {
-      const catBadgeColor = item.category === 'pastor' ? 'rgba(168, 85, 247, 0.2)' : (item.category === 'student' ? 'rgba(245, 158, 11, 0.2)' : 'rgba(59, 130, 246, 0.2)');
-      const catTextColor = item.category === 'pastor' ? '#c084fc' : (item.category === 'student' ? '#fbbf24' : '#60a5fa');
-      const catIcon = item.category === 'pastor' ? '✝️ Pastor' : (item.category === 'student' ? '🎓 Student' : '👥 Believer');
+      const catBadgeColor = item.category === 'pastor' ? 'rgba(168, 85, 247, 0.2)' : (item.category === 'student' ? 'rgba(245, 158, 11, 0.2)' : (item.category === 'teacher' ? 'rgba(16, 185, 129, 0.2)' : 'rgba(59, 130, 246, 0.2)'));
+      const catTextColor = item.category === 'pastor' ? '#c084fc' : (item.category === 'student' ? '#fbbf24' : (item.category === 'teacher' ? '#34d399' : '#60a5fa'));
+      const catIcon = item.category === 'pastor' ? '✝️ Pastor' : (item.category === 'student' ? '🎓 Student' : (item.category === 'teacher' ? '👨‍🏫 Teacher' : '👥 Believer'));
       
       let statusBadge = '';
       if (item.is_approved) {
@@ -2801,8 +2802,9 @@
         <td style="padding:10px 12px; text-align:center; color:var(--text-dim);">${index + 1}</td>
         <td style="padding:10px 14px;">
           <div style="font-weight:700; color:var(--text-main);">${item.name || item.name_with_surname || item.fullname || 'N/A'}</div>
-          <div style="font-size:0.78rem; color:var(--text-muted);">📱 ${item.mobile || 'N/A'} ${item.email ? ' | ✉️ ' + item.email : ''}</div>
+          <div style="font-size:0.78rem; color:var(--text-muted);">📱 ${item.mobile || 'N/A'}${item.whatsapp ? ' | 💬 WA: ' + item.whatsapp : ''} ${item.email ? ' | ✉️ ' + item.email : ''}</div>
           <div style="font-size:0.75rem; color:var(--text-dim);">⛪ Pastor: ${item.pastor_phone || 'N/A'} | ${item.faith_category || 'N/A'}</div>
+          ${item.leadership === 'YES' ? `<div style="font-size:0.74rem; color:#fbbf24; margin-top:2px; font-weight:600;">👑 Leader: ${item.generaltype || 'Requested'}</div>` : ''}
         </td>
         <td style="padding:10px 14px;">
           <div style="font-weight:600; color:#38bdf8;">${item.designation || item.exact_designation || 'N/A'}</div>
