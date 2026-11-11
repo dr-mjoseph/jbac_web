@@ -997,7 +997,7 @@ app.all(['/dashboardapi/denomations', '/api/denominations', '/denominations'], a
 });
 app.all(['/dashboardapi/leaderlevels', '/api/leaderlevels', '/leaderlevels'], async (_req, res) => {
     try {
-        const [rows] = await db.query('SELECT id, level, level as level_name, d_in FROM leaderlevel WHERE d_in = 0 ORDER BY id ASC');
+        const [rows] = await db.query("SELECT id, level, level as level_name, d_in FROM leaderlevel WHERE d_in = 0 AND level NOT LIKE '%రాష్ట్ర%' AND LOWER(level) NOT LIKE '%state%' ORDER BY id ASC");
         res.json({ status: 200, data: rows });
     }
     catch (err) {
@@ -4153,22 +4153,31 @@ function getTeacherCanonicalLevel(val) {
     if (str.includes('ward') || str.includes('వార్డు'))
         return 6;
     const num = Number(val);
-    // leaderlevel table mapping: 1=రాష్ట్ర(State), 2=జిల్లా(District), 3=నియోజకవర్గం(Constituency), 4=మండల(Mandal), 5=పంచాయతి(Panchayat)
-    if (!isNaN(num) && num >= 1 && num <= 6)
-        return Math.floor(num);
+    // Updated leaderlevel mapping (starts from District=1): 1=District, 2=Constituency, 3=Mandal, 4=Panchayat, 5=Ward, 6=Sub-Ward
+    if (!isNaN(num) && num >= 1) {
+        if (num === 1)
+            return 2;
+        if (num === 2)
+            return 3;
+        if (num === 3)
+            return 4;
+        if (num === 4)
+            return 5;
+        return 6;
+    }
     return null;
 }
 function getTeacherLevelSql(prefix, targetLvl) {
     if (targetLvl === 2)
-        return `(${prefix}generaltype IN ('2', 'District Level', 'District') OR ${prefix}generaltype LIKE '%జిల్లా%')`;
+        return `(${prefix}generaltype IN ('1', 'District Level', 'District') OR ${prefix}generaltype LIKE '%జిల్లా%')`;
     if (targetLvl === 3)
-        return `(${prefix}generaltype IN ('3', 'Constituency Level', 'Constituency level', 'Constituency') OR ${prefix}generaltype LIKE '%నియోజకవర్గ%')`;
+        return `(${prefix}generaltype IN ('2', 'Constituency Level', 'Constituency level', 'Constituency') OR ${prefix}generaltype LIKE '%నియోజకవర్గ%')`;
     if (targetLvl === 4)
-        return `(${prefix}generaltype IN ('4', 'Municipality / Mandal Level', 'Muncipality / Mandal Level', 'Mandal Level', 'Mandal') OR ${prefix}generaltype LIKE '%మండల%')`;
+        return `(${prefix}generaltype IN ('3', 'Municipality / Mandal Level', 'Muncipality / Mandal Level', 'Mandal Level', 'Mandal') OR ${prefix}generaltype LIKE '%మండల%')`;
     if (targetLvl === 5)
-        return `(${prefix}generaltype IN ('5', 'Ward / Panchayati Level', 'Panchayat Level', 'Panchayati Level', 'Village') OR ${prefix}generaltype LIKE '%పంచాయతి%' OR ${prefix}generaltype LIKE '%గ్రామ%')`;
+        return `(${prefix}generaltype IN ('4', 'Ward / Panchayati Level', 'Panchayat Level', 'Panchayati Level', 'Village') OR ${prefix}generaltype LIKE '%పంచాయతి%' OR ${prefix}generaltype LIKE '%గ్రామ%')`;
     if (targetLvl === 6)
-        return `(${prefix}generaltype IN ('6', 'Ward', 'Sub Ward', 'Ward / Sub-Ward Level') OR ${prefix}generaltype LIKE '%వార్డు%')`;
+        return `(${prefix}generaltype IN ('5', '6', 'Ward', 'Sub Ward', 'Ward / Sub-Ward Level') OR ${prefix}generaltype LIKE '%వార్డు%')`;
     return '1=0';
 }
 app.all(['/dashboardapi/getLeaderswebsiteData', '/dashboardapi/getLeaderswebsitewing', '/api/leaders', '/api/getLeaderswebsiteData'], async (req, res) => {

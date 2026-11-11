@@ -3695,3 +3695,38 @@ The user requested full cross-platform synchronization of all recent web changes
   - `jbacApp-0.0.54.apk`: `130,647,737` bytes (`apksigner verify`: v2+v3 verified, 4-byte zipalign).
   - `jbacApp-0.0.54.aab` & `appreleasesigned.aab`: `127,682,840` bytes (`jarsigner -verify`: `jar verified.`).
   - `aapt dump badging`: `package: name='io.ionic.starterjbac' versionCode='54' versionName='0.0.54'`, `targetSdkVersion:'36'`.
+
+---
+
+## 70. Numbered Leadership Level Hierarchy Starting from District (State Level Removal) Across Pastor & Teacher Registration (November 11, 2026)
+
+### Summary of Requirements
+- Remove the **State (`రాష్ట్ర నాయకుడు`)** tier from the Leadership Level hierarchy for **Pastor Register** (`pastorregister` / `PastorPage`) and **Teacher Register** (`teacherregister` / `TeacherPage`) as well as the shared `leaderlevel` / `leader_levels` source (matching **Believer Register**, which starts from District rather than State).
+- Number the hierarchy dropdown options starting from **`1.`** (`1. జిల్లా నాయకుడు` -> `2. నియోజకవర్గం నాయకుడు` -> `3. మండల నాయకుడు` -> `4. పంచాయతి నాయకుడు` -> `5. వార్డు నాయకుడు` -> `6. సబ్-వార్డు నాయకుడు`), sync across both Web and Mobile (`v0.0.54`), update RDS and documentation, and push to both GitHub repositories.
+
+### Execution & Architecture Details
+
+#### 1. RDS Database Migration (`leaderlevel` & `leader_levels`)
+- Added and ran `scripts/update_leaderlevels_hierarchy.js` against `jbac_jbac` on AWS RDS:
+  - Updated rows `id = 1..6` in both `leaderlevel` and `leader_levels` to `జిల్లా నాయకుడు`, `నియోజకవర్గం నాయకుడు`, `మండల నాయకుడు`, `పంచాయతి నాయకుడు`, `వార్డు నాయకుడు`, `సబ్-వార్డు నాయకుడు` (`d_in = 0`), and soft-deleted (`d_in = 1`) any row outside `1..6`.
+  - Keeping IDs `1..6` starting at District preserves existing `pastor_reg` ID alignment (`'1'`=District .. `'6'`=Sub-Ward, plus `onsubward` toggle `'6'`) and enables clean Panchayat -> Ward/Sub-Ward 1-step-down resolution.
+
+#### 2. Backend API (`backend/server.ts` & `backend/server.js`)
+- Filtered `%రాష్ట్ర%` and `%state%` rows out of `/leaderlevels` (`/dashboardapi/leaderlevels`, `/api/leaderlevels`, `/leaderlevels`) so live API responses always return only the 6 District-to-Sub-Ward tiers.
+- Aligned `getTeacherCanonicalLevel()` and `getTeacherLevelSql()` numeric fallbacks (`'1'`=District .. `'6'`=Sub-Ward) so Teacher and Pastor hierarchical approvals operate uniformly without off-by-1 shifts (while keeping legacy `'రాష్ట్ర'` keyword mapping solely for backwards compatibility on pre-existing rows).
+- Verified syntax via `node -c backend/server.js`, packaged `backend/backend-deploy.zip`, and deployed `jbac-backend-api` via `scripts/pack_and_deploy_lambda.js` (`arn:aws:lambda:ap-southeast-2:298363284024:function:jbac-backend-api`).
+
+#### 3. Web Frontend (`src/app/jesus/`)
+- **`dropdown_fallback_data.ts`**: Aligned `leaderlevels` fallback list to exact 6 rows `1..6` (`జిల్లా నాయకుడు` .. `సబ్-వార్డు నాయకుడు`).
+- **`pastorregister.component.ts/.html`**: Added `getDefaultLeaderLevels()` and `normalizeHierarchyLeaderLevels()` filtering `రాష్ట్ర`/`state`, initialized synchronously + after API load, and numbered both General (`generaltype`) and Wing (`wingtype`) `<option>` labels as `{{ idx + 1 }}. {{i.level}}` with `value="{{i.id}}"`.
+- **`teacherregister.component.ts/.html`**: Removed `రాష్ట్ర నాయకుడు` from `getDefaultLeaderLevels()`, added `5: వార్డు నాయకుడు` and `6: సబ్-వార్డు నాయకుడు`, filtered `రాష్ట్ర`/`state` in `loadLeaderLevels()`, and numbered `<option>` display as `{{ i + 1 }}. {{ lvl.level || lvl.level_name }}`.
+- **`believerregister.component.ts/.html`**: Filtered `రాష్ట్ర`/`state` in `getleaderlevels()` and numbered Wing `<option>`s as `{{ idx + 1 }}. {{i.level}}`.
+- **`leaders.component.ts`**: Removed the `isTeacherRow` off-by-1 numeric branch (`'2'` vs `'1'`) so Teacher and Pastor both use uniform `1=District..6=Sub-Ward` alongside Telugu keyword matching.
+- Deployed Angular production build to S3 (`jbac-web-production-298363284024`) via `aws/deploy.ps1` (Build Hash `35d417013252b4fc`, `main.d237ac01be5f1d64.js`, CloudFront invalidation `ICOLK7ISPJ9FL7L4G6PXJ8WTTQ`).
+
+#### 4. Mobile App (`jbac_app` v0.0.54, API Level 36) & Live Verification
+- **`pastor.ts/.html`**: Replaced hardcoded `<ion-option value="0">రాష్ట్ర నాయకుడు</ion-option>` (and duplicate `value="3"`) with dynamic `leaderlevel` + `getDefaultLeaderLevels()` (`1..6`), fixed `onsubward` and `onradioleadertype`, and rendered `{{ idx + 1 }}. {{ i.level || i.level_name }}` with `[value]="i.id"`.
+- **`teacher.ts/.html`**: Removed `రాష్ట్ర నాయకుడు` from `getDefaultLeaderLevels()`, added `5..6`, filtered `రాష్ట్ర`/`state` in `loadLeaderLevels()`, and rendered `{{ i + 1 }}. {{ lvl.level || lvl.level_name }}`.
+- **`profile.html` & `wingcommand.ts`**: Numbered Pastor profile `generaltype` options `1..6` and removed the `isTeacherRow` off-by-1 numeric branch in `getDetailedLeaderStatus()`.
+- Rebuilt and signed Mobile v0.0.54 (`API Level 36`) via `build_and_sign_release_v54.ps1`: `jbacApp-0.0.54.apk` (`130,647,737` bytes, `apksigner verify` v2+v3 verified, 4-byte zipalign verified, `aapt` `versionCode='54' versionName='0.0.54' targetSdkVersion:'36'`), `jbacApp-0.0.54.aab` & `appreleasesigned.aab` (`127,684,739` bytes, `jarsigner -verify`: `jar verified.`).
+- Ran live end-to-end verification against deployed API & RDS: confirmed `/leaderlevels` returns 6 items, Teacher tiers `1->2`, `2->3`, `3->4`, `4->5` (`clientGenType=1..4`) and Pastor tiers `1->2`, `2->3`, `3->4` (`clientGenType=1..3`) all resolve their 1-step-down unapproved subordinates accurately (`ALL LIVE E2E CHECKS PASSED!`).

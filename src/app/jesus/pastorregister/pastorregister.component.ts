@@ -33,7 +33,7 @@ godOptions: string[] = [
   independentchurchform: FormGroup;
   churchregsiterform: FormGroup;
   denomation: any;
-  leaderlevel: any;
+  leaderlevel: any = [];
   educationqly: any;
   pattern: any;
   states: any = [];
@@ -475,10 +475,43 @@ godOptions: string[] = [
     })
   }
 
+  getDefaultLeaderLevels(): any[] {
+    return [
+      { id: 1, level: 'జిల్లా నాయకుడు', level_name: 'జిల్లా నాయకుడు' },
+      { id: 2, level: 'నియోజకవర్గం నాయకుడు', level_name: 'నియోజకవర్గం నాయకుడు' },
+      { id: 3, level: 'మండల నాయకుడు', level_name: 'మండల నాయకుడు' },
+      { id: 4, level: 'పంచాయతి నాయకుడు', level_name: 'పంచాయతి నాయకుడు' },
+      { id: 5, level: 'వార్డు నాయకుడు', level_name: 'వార్డు నాయకుడు' },
+      { id: 6, level: 'సబ్-వార్డు నాయకుడు', level_name: 'సబ్-వార్డు నాయకుడు' }
+    ];
+  }
+
+  normalizeHierarchyLeaderLevels(list: any[]): any[] {
+    if (!Array.isArray(list) || list.length === 0) return this.getDefaultLeaderLevels();
+    const filtered = list.filter((item: any) => {
+      const label = String(item?.level || item?.level_name || '').trim();
+      const lower = label.toLowerCase();
+      return label && !label.includes('రాష్ట్ర') && !lower.includes('state');
+    });
+    if (filtered.length === 0) return this.getDefaultLeaderLevels();
+    return filtered.map((item: any, idx: number) => ({
+      ...item,
+      id: idx + 1,
+      level: String(item.level || item.level_name || '').replace(/^\d+\.\s*/, '').trim()
+    }));
+  }
+
   getleaderlevels() {
-    this.service.getleaderlevel().subscribe(res => {
-      this.leaderlevel = res.data;
-    })
+    this.leaderlevel = this.getDefaultLeaderLevels();
+    this.service.getleaderlevel().subscribe({
+      next: (res: any) => {
+        const list = (res && res.data) ? res.data : (Array.isArray(res) ? res : []);
+        this.leaderlevel = this.normalizeHierarchyLeaderLevels(list);
+      },
+      error: () => {
+        this.leaderlevel = this.getDefaultLeaderLevels();
+      }
+    });
   }
 geteducational() {
     this.service.geteducational().subscribe(res => {

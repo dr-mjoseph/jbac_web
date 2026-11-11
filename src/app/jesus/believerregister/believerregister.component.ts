@@ -362,7 +362,17 @@ export class BelieverregisterComponent {
   leaderlevel: any = [];
   getleaderlevels() {
     this.service.getleaderlevel().subscribe((res: any) => {
-      this.leaderlevel = res && res.data ? res.data : [];
+      const list = res && res.data ? res.data : [];
+      this.leaderlevel = list
+        .filter((item: any) => {
+          const label = String(item?.level || item?.level_name || '').trim();
+          return label && !label.includes('రాష్ట్ర') && !label.toLowerCase().includes('state');
+        })
+        .map((item: any, idx: number) => ({
+          ...item,
+          id: idx + 1,
+          level: String(item.level || item.level_name || '').replace(/^\d+\.\s*/, '').trim()
+        }));
     }, error => {
       this.leaderlevel = [];
     });

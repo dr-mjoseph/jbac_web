@@ -724,3 +724,13 @@ Implemented across backend endpoints (`/dashboardapi/getLeaderswebsiteData`, `/d
 3. **Database, Auth, Admin & Deployment**:
    - Migrated `teacher_reg` via `scripts/migrate_teacher_leaders_v54.js` (added leadership columns, `d_in`, `password`, `is_first_login` with `password = mobile` backfill).
    - Added Login / Password Reset Category `'9'` (`బోధనా రంగ ఉద్యోగి / టీచర్ (Teacher)`), Admin Console `Teachers` filter pill & badge (`admin_db.html` / `public.html`), deployed AWS Lambda (`jbac-backend-api`), rebuilt & deployed Angular web (`npm run build:prod`, hash `c7bef78e0decf5ec`, CloudFront invalidation `I7LKAK4IQP1UB45QL997GIDPXN`), verified end-to-end against live RDS & API, and built/signed Mobile v0.0.54 (`API Level 36`, `jbacApp-0.0.54.apk` `130,647,737` bytes, `jbacApp-0.0.54.aab` / `appreleasesigned.aab` `127,682,840` bytes).
+
+---
+
+### 70. Numbered Leadership Level Hierarchy Starting from District (State Level Removal) on Pastor & Teacher Registration (November 11, 2026)
+1. **Database & Backend Alignment (`leaderlevel` / `leader_levels`, `server.ts`, `server.js`)**:
+   - Updated both `leaderlevel` and `leader_levels` via `scripts/update_leaderlevels_hierarchy.js` so active rows `1..6` start from **District** (`1. జిల్లా నాయకుడు` -> `2. నియోజకవర్గం నాయకుడు` -> `3. మండల నాయకుడు` -> `4. పంచాయతి నాయకుడు` -> `5. వార్డు నాయకుడు` -> `6. సబ్-వార్డు నాయకుడు`), removing `రాష్ట్ర నాయకుడు` (`State`).
+   - Filtered `%రాష్ట్ర%` / `%state%` out of `/leaderlevels` endpoints, aligned `getTeacherCanonicalLevel()` / `getTeacherLevelSql()` (`'1'`=District .. `'6'`=Sub-Ward), and redeployed AWS Lambda `jbac-backend-api`.
+2. **Web (`pastorregister`, `teacherregister`, `believerregister`, `leaders`, `dropdown_fallback_data`) & Mobile (`jbac_app` v0.0.54)**:
+   - Updated Web and Mobile Pastor/Teacher dropdowns (plus Believer Wing / Pastor Profile options) to omit State and display numbered `1..6` hierarchy labels, and unified Leaders Dashboard / `WingcommandPage` 1-step-down tier resolution without off-by-1 numeric branching.
+   - Deployed Angular web (`35d417013252b4fc`, CloudFront invalidation `ICOLK7ISPJ9FL7L4G6PXJ8WTTQ`), rebuilt/signed Mobile v0.0.54 (`API Level 36`, `jbacApp-0.0.54.apk` `130,647,737` bytes, `jbacApp-0.0.54.aab` / `appreleasesigned.aab` `127,684,739` bytes), and verified live E2E `/leaderlevels` plus Teacher (`1->2..4->5`) & Pastor (`1->2..3->4`) hierarchy visibility.

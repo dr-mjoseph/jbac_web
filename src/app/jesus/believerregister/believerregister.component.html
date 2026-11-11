@@ -670,8 +670,8 @@
                                                 <select class="form-control" formControlName="wingtype"
                                                     style="height:37px;width: 273px;" (change)="onsubward($event)">
                                                     <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి</option>
-                                                    <option *ngFor="let i of leaderlevel" value="{{i.id}}">
-                                                        {{i.level}}</option>
+                                                    <option *ngFor="let i of leaderlevel; let idx = index" value="{{i.id}}">
+                                                        {{ idx + 1 }}. {{i.level}}</option>
                                                 </select>
                                             </div>
                                         </div>

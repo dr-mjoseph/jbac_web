@@ -396,21 +396,20 @@ export class LeadersComponent {
     // 2. Check General Leadership (leadertype == '1' or generaltype or ward/subward)
     const gType = String(x.generaltype || '').trim();
     const gLower = gType.toLowerCase();
-    const isTeacherRow = this.selectedUserType === 'teacher' || x.role === 'teacher' || String(x.table_name || '') === 'teacher_reg';
 
-    if (gType.includes('రాష్ట్ర') || gLower.includes('state') || (isTeacherRow ? gType === '1' : gType === '0')) {
+    if (gType.includes('రాష్ట్ర') || gLower.includes('state') || gType === '0') {
       return 'రాష్ట్ర లీడర్ (State Leader)';
     }
-    if (gType.includes('జిల్లా') || gLower.includes('dist') || (isTeacherRow ? gType === '2' : gType === '1')) {
+    if (gType.includes('జిల్లా') || gLower.includes('dist') || gType === '1') {
       return 'జిల్లా లీడర్ (District Leader)';
     }
-    if (gType.includes('నియోజకవర్గ') || gLower.includes('const') || (isTeacherRow ? gType === '3' : gType === '2')) {
+    if (gType.includes('నియోజకవర్గ') || gLower.includes('const') || gType === '2') {
       return 'నియోజకవర్గ లీడర్ (Constituency Leader)';
     }
-    if (gType.includes('మండల') || gLower.includes('mandal') || gLower.includes('municip') || (isTeacherRow ? gType === '4' : gType === '3')) {
+    if (gType.includes('మండల') || gLower.includes('mandal') || gLower.includes('municip') || gType === '3') {
       return 'మండల లీడర్ (Mandal Leader)';
     }
-    if (gType.includes('పంచాయ') || gLower.includes('panchayat') || gLower.includes('village') || (isTeacherRow ? gType === '5' : gType === '4')) {
+    if (gType.includes('పంచాయ') || gLower.includes('panchayat') || gLower.includes('village') || gType === '4') {
       return 'గ్రామ / పంచాయితీ లీడర్ (Panchayat Leader)';
     }
     if (gType === 'College Level') {
@@ -425,11 +424,11 @@ export class LeadersComponent {
     if (gType === 'Section / Class Level') {
       return 'సెక్షన్ / క్లాస్ లీడర్ (Class Leader)';
     }
-    if (gType.includes('సబ్') || gLower.includes('subward') || (!isTeacherRow && gType === '6')) {
+    if (gType.includes('సబ్') || gLower.includes('subward') || gType === '6') {
       const sub = x.subward && x.subward !== 'null' && String(x.subward).trim() ? ` (${x.subward})` : '';
       return `సబ్ వార్డు${sub} లీడర్ (Sub-Ward Leader)`;
     }
-    if (gType.includes('వార్డు') || gLower.includes('ward') || (isTeacherRow ? gType === '6' : gType === '5')) {
+    if (gType.includes('వార్డు') || gLower.includes('ward') || gType === '5') {
       const wardNum = x.wardnumber && x.wardnumber !== 'null' && String(x.wardnumber).trim() ? ` నెం. ${x.wardnumber}` : '';
       return `వార్డు${wardNum} లీడర్ (Ward Leader)`;
     }

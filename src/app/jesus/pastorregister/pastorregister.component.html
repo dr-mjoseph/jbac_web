@@ -575,8 +575,8 @@
                                                     [ngClass]="{'is-invalid': submitted && o['generaltype'].errors }">
                                                     <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి
                                                     </option>
-                                                    <option *ngFor="let i of leaderlevel" value="{{i.id}}">
-                                                        {{i.level}}</option>
+                                                    <option *ngFor="let i of leaderlevel; let idx = index" value="{{i.id}}">
+                                                        {{ idx + 1 }}. {{i.level}}</option>
                                                 </select>
                                                 <div *ngIf="submitted && o['generaltype'].errors"
                                                     class="invalid-feedback">
@@ -627,8 +627,8 @@
                                                     [ngClass]="{'is-invalid': submitted && o['wingtype'].errors }">
                                                     <option value="" selected disabled>ఇక్కడ క్లిక్ చేసి ఎంచుకోండి
                                                     </option>
-                                                    <option *ngFor="let i of leaderlevel" value="{{i.id}}">
-                                                        {{i.level}}</option>
+                                                    <option *ngFor="let i of leaderlevel; let idx = index" value="{{i.id}}">
+                                                        {{ idx + 1 }}. {{i.level}}</option>
                                                 </select>
                                                 <div *ngIf="submitted && o['wingtype'].errors" class="invalid-feedback">
                                                     <div *ngIf="o['wingtype'].errors['required']">వింగ్ లీడర్ షిప్

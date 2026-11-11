@@ -291,8 +291,8 @@
                   <select formControlName="generaltype" class="form-select form-select-lg"
                           [ngClass]="{ 'is-invalid': submitted && f['generaltype'].errors }">
                     <option value="" disabled selected>Select Leadership Level you want</option>
-                    <option *ngFor="let lvl of leaderlevels" [value]="lvl.level || lvl.level_name">
-                      {{ lvl.level || lvl.level_name }}
+                    <option *ngFor="let lvl of leaderlevels; let i = index" [value]="lvl.level || lvl.level_name">
+                      {{ i + 1 }}. {{ lvl.level || lvl.level_name }}
                     </option>
                   </select>
                   <div class="invalid-feedback" *ngIf="submitted && f['generaltype'].errors">
