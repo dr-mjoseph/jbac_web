@@ -3604,3 +3604,46 @@ The user requested full cross-platform synchronization of all recent web changes
   - `package: name='io.ionic.starterjbac' versionCode='53' versionName='0.0.53'`
   - `targetSdkVersion: '36'`
 - **Repository**: Committed and pushed to `https://github.com/dr-mjoseph/jbac_app.git` (commit `a06564d`).
+
+
+---
+
+## 68. Help Form Reset Fix, Full Name Rename, Denomination & Strict AP/TG Location Hierarchy, RDS Schema Update & Mobile Release v0.0.54 (November 11, 2026)
+
+### Context & Objectives
+1. **Fix Post-Submit Form Persistence (`https://jbac.in/help` & Mobile `HelpPage`)**:
+   - After submitting a help request, fields continued showing previously entered or session-prefilled values instead of clearing completely.
+2. **Telugu Field Rename**:
+   - Rename Name field title from `పేరు` to **`పూర్తి పేరు`** ("Full Name" in Telugu).
+3. **Add Denomination Field**:
+   - Add **`డెనామినేషన్ *`** (`denomination_id`) immediately after `మొబైల్ నంబర్ *` using the existing `churchdenomation` master table (`getdenomation()`).
+4. **Add Strict AP & TG Cascading Location Hierarchy Before Address**:
+   - Remove the `చిరునామా *` (Address) textarea from after mobile number and reposition it after a strict cascading geographic selector sequence for Andhra Pradesh and Telangana:
+     `రాష్ట్రం (State)` → `జిల్లా (District)` → `నియోజకవర్గం (Constituency)` → `మండలం (Mandal)` → `పంచాయతీ / వార్డు / సబ్-వార్డు (Panchayat/Ward/Sub-Ward)` → `చిరునామా (Address)`.
+5. **Database, API, Web Deploy, Mobile Build v0.0.54 (API 36) & GitHub Sync**.
+
+### Implementation Details
+
+#### 1. Database Migration (`helps` table)
+- Created and executed `scripts/migrate_helps_v54.js` against AWS RDS MySQL (`jbac_jbac`):
+  - Added columns: `denomination_id (INT)`, `state_id (INT)`, `state (VARCHAR(100))`, `district_id (INT)`, `constituency_id (INT)`, `mandal_id (INT)`, `panchayat_id (INT)`.
+  - Verified AP (26 districts, 175 constituencies, 836 mandals, 17,244 panchayats), TG (33 districts, 119 constituencies, 591 mandals, 6,501 panchayats), and `churchdenomation` (18 active rows where `d_in = 0`).
+
+#### 2. Backend API (`backend/server.ts`, `backend/server.js`)
+- Updated `POST /dashboardapi/posthelping` and `/api/posthelping` to persist `denomination_id`, `state_id`, `state`, `district_id`, `constituency_id`, `mandal_id`, and `panchayat_id` via `dynamicInsert('helps', ...)`.
+- Updated `ALL /dashboardapi/gethelps` and `/api/gethelps` with `LEFT JOIN` clauses resolving `denomination_name`, `district_name`, `constituency_name`, `mandal_name`, and `panchayat_name`.
+- Verified syntax (`node -c backend/server.js`), updated `backend/backend-deploy.zip` (`scripts/update_zip.ps1`), and deployed to AWS Lambda `jbac-backend-api` (`ap-southeast-2`, `LastUpdateStatus: "Successful"`).
+
+#### 3. Web Frontend (`src/app/jesus/help/help.component.ts`, `help.component.html`)
+- Removed session prefill of `name`/`mobile_number` in `ngOnInit()` and `postmeetings()`.
+- Added `resetFormCompletely()` to reset all controls to `''`, clear `submitted`, re-disable child dropdowns (`district_id`, `constituency_id`, `mandal_id`, `panchayat_id`), empty cascading option arrays, clear `imagesData`, and clear `#formFile` DOM value.
+- Updated Name label to `పూర్తి పేరు *`, added `డెనామినేషన్ *`, enforced strict parent-before-child disabling on the AP/TG cascading location dropdowns, and positioned `చిరునామా *` right below Panchayat/Ward/Sub-Ward.
+- Built production web bundle (`npm run build:prod`, hash `f027a2849e74315a`), synced to `s3://jbac-web-production-298363284024`, and completed CloudFront invalidation `I64X7SIE7Q3KYJ639GYK67692L` on distribution `EOBBU8SU7H3BI`.
+
+#### 4. Mobile App Parity & Signed Release v0.0.54 (`jbac_app`)
+- Updated `src/pages/help/help.ts` & `src/pages/help/help.html` with full parity (`పూర్తి పేరు`, `డెనామినేషన్`, strict AP/TG State → District → Constituency → Mandal → Panchayat/Ward/Sub-Ward cascade before `చిరునామా`, and `resetFormCompletely()`).
+- Bumped version to `0.0.54` (`versionCode 54`) in `config.xml`, `package.json`, `platforms/android/app/build.gradle`, and `AndroidManifest.xml`.
+- Executed `build_and_sign_release_v54.ps1` (`-PcdvTargetSdkVersion=36`):
+  - **Signed APK**: `C:\Users\rajes\StudioProjects\jbac_app\jbacApp-0.0.54.apk` (`130,643,641` bytes, v2+v3 verified, 4-byte zipalign).
+  - **Signed AAB**: `C:\Users\rajes\StudioProjects\jbac_app\jbacApp-0.0.54.aab` & `appreleasesigned.aab` (`127,679,243` bytes, jarsigner verified).
+  - **AAPT Badging Check**: `package: name='io.ionic.starterjbac' versionCode='54' versionName='0.0.54'`, `targetSdkVersion:'36'`.

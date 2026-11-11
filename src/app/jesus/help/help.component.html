@@ -64,47 +64,136 @@
                             <div class="d-flex align-items-center mb-4 pb-2 border-bottom">
                                 <h3 class="m-0 text-primary"><b>సహాయం కోరండి</b></h3>
                             </div>
-                            <form [formGroup]="addinghelp">
+                            <form [formGroup]="addinghelp" autocomplete="off">
                                 <div class="row">
+                                    <!-- 1. పూర్తి పేరు (Full Name) -->
                                     <div class="col-md-6 mb-3">
-                                        <label class="form-label fw-bold">పేరు <span class="text-danger">*</span></label>
+                                        <label class="form-label fw-bold">పూర్తి పేరు <span class="text-danger">*</span></label>
                                         <input type="text" formControlName="name" class="form-control"
+                                            [ngClass]="{'is-invalid': submitted && h['name'].errors}"
                                             placeholder="మీ పూర్తి పేరు నమోదు చేయండి" />
+                                        <div *ngIf="submitted && h['name'].errors" class="invalid-feedback">
+                                            పూర్తి పేరు తప్పనిసరి
+                                        </div>
                                     </div>
 
+                                    <!-- 2. మొబైల్ నంబర్ (Mobile Number) -->
                                     <div class="col-md-6 mb-3">
                                         <label class="form-label fw-bold">మొబైల్ నంబర్ <span class="text-danger">*</span></label>
                                         <input type="tel" maxlength="10" formControlName="mobile_number" class="form-control"
+                                            (keypress)="numericOnly($event)"
+                                            [ngClass]="{'is-invalid': submitted && h['mobile_number'].errors}"
                                             placeholder="10 అంకెల మొబైల్ నంబర్" />
-                                    </div>
-                                  <div class="col-md-6 mb-4 pb-2">
-                                            <div class="form-outline">
-                                                <label class="form-label">డెనామినేషన్ (Denomination)<span
-                                                        style="color:red; -webkit-text-stroke-width:thick;">*</span></label>
-                                                <select class="form-control" formControlName="denomination_id"
-                                                    [ngClass]="{'is-invalid': submitted && i['denomination_id'].errors }">
-                                                    <option value="" selected disabled>డెనామినేషన్ ఎంచుకోండి</option>
-                                                    <option *ngFor="let item of denomation" [value]="item.id">
-                                                        {{ item.denomation_name || item.denomination_name || item.denomination }}
-                                                    </option>
-                                                </select>
-                                                <div *ngIf="submitted && i['denomination_id'].errors"
-                                                    class="invalid-feedback">
-                                                    <div *ngIf="i['denomination_id'].errors['required']">Denomination is required
-                                                    </div>
-                                                </div>
-                                            </div>
+                                        <div *ngIf="submitted && h['mobile_number'].errors" class="invalid-feedback">
+                                            సరైన 10 అంకెల మొబైల్ నంబర్ నమోదు చేయండి
                                         </div>
+                                    </div>
 
+                                    <!-- 3. డెనామినేషన్ (Denomination) -->
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label fw-bold">డెనామినేషన్ <span class="text-danger">*</span></label>
+                                        <select class="form-control" formControlName="denomination_id"
+                                            [ngClass]="{'is-invalid': submitted && h['denomination_id'].errors}">
+                                            <option value="" selected disabled>డెనామినేషన్ ఎంచుకోండి</option>
+                                            <option *ngFor="let item of denomation" [value]="item.id">
+                                                {{ item.denomation_name || item.denomination_name || item.denomination }}
+                                            </option>
+                                        </select>
+                                        <div *ngIf="submitted && h['denomination_id'].errors" class="invalid-feedback">
+                                            డెనామినేషన్ ఎంచుకోండి
+                                        </div>
+                                    </div>
+
+                                    <!-- 4. రాష్ట్రం (State - AP & TG) -->
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label fw-bold">రాష్ట్రం <span class="text-danger">*</span></label>
+                                        <select class="form-control" formControlName="state_id" (change)="onStateChange($event)"
+                                            [ngClass]="{'is-invalid': submitted && h['state_id'].errors}">
+                                            <option value="" selected disabled>రాష్ట్రం ఎంచుకోండి</option>
+                                            <option value="1">ఆంధ్రప్రదేశ్</option>
+                                            <option value="2">తెలంగాణ</option>
+                                        </select>
+                                        <div *ngIf="submitted && h['state_id'].errors" class="invalid-feedback">
+                                            రాష్ట్రం ఎంచుకోండి
+                                        </div>
+                                    </div>
+
+                                    <!-- 5. జిల్లా (District) -->
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label fw-bold">జిల్లా <span class="text-danger">*</span></label>
+                                        <select class="form-control" formControlName="district_id" (change)="onDistrictChange($event)"
+                                            [ngClass]="{'is-invalid': submitted && h['district_id'].errors}">
+                                            <option value="" selected disabled>జిల్లాను ఎంచుకోండి</option>
+                                            <option *ngFor="let item of districts" [value]="item.id">
+                                                {{ item.distrct_nm || item.districtname || item.district_name }}
+                                            </option>
+                                        </select>
+                                        <div *ngIf="submitted && h['district_id'].errors" class="invalid-feedback">
+                                            జిల్లాను ఎంచుకోండి
+                                        </div>
+                                    </div>
+
+                                    <!-- 6. నియోజకవర్గం (Constituency) -->
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label fw-bold">నియోజకవర్గం <span class="text-danger">*</span></label>
+                                        <select class="form-control" formControlName="constituency_id" (change)="onConstituencyChange($event)"
+                                            [ngClass]="{'is-invalid': submitted && h['constituency_id'].errors}">
+                                            <option value="" selected disabled>నియోజకవర్గాన్ని ఎంచుకోండి</option>
+                                            <option *ngFor="let item of constituencies" [value]="item.id">
+                                                {{ item.const_nm || item.constituencyname || item.name }}
+                                            </option>
+                                        </select>
+                                        <div *ngIf="submitted && h['constituency_id'].errors" class="invalid-feedback">
+                                            నియోజకవర్గాన్ని ఎంచుకోండి
+                                        </div>
+                                    </div>
+
+                                    <!-- 7. మండలం (Mandal) -->
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label fw-bold">మండలం <span class="text-danger">*</span></label>
+                                        <select class="form-control" formControlName="mandal_id" (change)="onMandalChange($event)"
+                                            [ngClass]="{'is-invalid': submitted && h['mandal_id'].errors}">
+                                            <option value="" selected disabled>మండలాన్ని ఎంచుకోండి</option>
+                                            <option *ngFor="let item of mandals" [value]="item.id">
+                                                {{ item.mndl_nm || item.mandalname || item.name }}
+                                            </option>
+                                        </select>
+                                        <div *ngIf="submitted && h['mandal_id'].errors" class="invalid-feedback">
+                                            మండలాన్ని ఎంచుకోండి
+                                        </div>
+                                    </div>
+
+                                    <!-- 8. పంచాయతీ / వార్డు / సబ్-వార్డు (Panchayat/Ward/Sub-Ward) -->
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label fw-bold">పంచాయతీ / వార్డు / సబ్-వార్డు <span class="text-danger">*</span></label>
+                                        <select class="form-control" formControlName="panchayat_id"
+                                            [ngClass]="{'is-invalid': submitted && h['panchayat_id'].errors}">
+                                            <option value="" selected disabled>పంచాయతీ / వార్డును ఎంచుకోండి</option>
+                                            <option *ngFor="let item of panchayats" [value]="item.id">
+                                                {{ item.pnchyt_nm || item.panchayatname || item.name }}
+                                            </option>
+                                        </select>
+                                        <div *ngIf="submitted && h['panchayat_id'].errors" class="invalid-feedback">
+                                            పంచాయతీ / వార్డును ఎంచుకోండి
+                                        </div>
+                                    </div>
+
+                                    <!-- 9. చిరునామా (Address - Placed after Panchayat/Ward/Sub-Ward) -->
                                     <div class="col-md-12 mb-3">
                                         <label class="form-label fw-bold">చిరునామా <span class="text-danger">*</span></label>
                                         <textarea formControlName="address" class="form-control" rows="2"
-                                            placeholder="గ్రామం/పట్టణం, మండలం, జిల్లా మొదలైన పూర్తి చిరునామా"></textarea>
+                                            [ngClass]="{'is-invalid': submitted && h['address'].errors}"
+                                            placeholder="ఇంటి నంబర్, వీధి, కాలనీ / గ్రామం మొదలైన పూర్తి చిరునామా"></textarea>
+                                        <div *ngIf="submitted && h['address'].errors" class="invalid-feedback">
+                                            చిరునామా తప్పనిసరి
+                                        </div>
                                     </div>
 
+                                    <!-- 10. సహాయం రకం (Help Type) -->
                                     <div class="col-md-6 mb-3">
                                         <label class="form-label fw-bold">సహాయం రకం <span class="text-danger">*</span></label>
-                                        <select class="form-control" formControlName="help">
+                                        <select class="form-control" formControlName="help"
+                                            [ngClass]="{'is-invalid': submitted && h['help'].errors}">
                                             <option value="" selected disabled>సహాయం రకాన్ని ఎంచుకోండి</option>
                                             <option value="CommunitySupport Help">కమ్యూనిటీ సహాయం</option>
                                             <option value="Education Help">విద్య సహాయం</option>
@@ -116,8 +205,12 @@
                                             <option value="Political Help">రాజకీయ సహాయం</option>
                                             <option value="Other Help">ఇతర సహాయం</option>
                                         </select>
+                                        <div *ngIf="submitted && h['help'].errors" class="invalid-feedback">
+                                            సహాయం రకాన్ని ఎంచుకోండి
+                                        </div>
                                     </div>
 
+                                    <!-- 11. చిత్రం అప్‌లోడ్ (Optional Image Upload) -->
                                     <div class="col-md-6 mb-3">
                                         <label for="formFile" class="form-label fw-bold">చిత్రం అప్‌లోడ్ (ఐచ్ఛికం)</label>
                                         <input class="form-control" type="file" id="formFile" accept="image/x-png,image/jpeg"
@@ -127,10 +220,15 @@
                                         </div>
                                     </div>
 
+                                    <!-- 12. సహాయ వివరాలు / వివరణ (Description) -->
                                     <div class="col-md-12 mb-3">
                                         <label class="form-label fw-bold">సహాయ వివరాలు / వివరణ <span class="text-danger">*</span></label>
                                         <textarea formControlName="description" class="form-control" rows="3"
+                                            [ngClass]="{'is-invalid': submitted && h['description'].errors}"
                                             placeholder="మీకు అవసరమైన సహాయం గురించి వివరంగా తెలపండి"></textarea>
+                                        <div *ngIf="submitted && h['description'].errors" class="invalid-feedback">
+                                            సహాయ వివరాలు తప్పనిసరి
+                                        </div>
                                     </div>
 
                                     <div class="col-md-12 text-center mt-3">

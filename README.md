@@ -689,3 +689,23 @@ Implemented across backend endpoints (`/dashboardapi/getLeaderswebsiteData`, `/d
    - **Release APK**: `C:\Users\rajes\StudioProjects\jbac_app\jbacApp-0.0.53.apk` (dual v2+v3 signed).
    - **Release AAB**: `C:\Users\rajes\StudioProjects\jbac_app\jbacApp-0.0.53.aab` & `appreleasesigned.aab` (Google Play production signed).
    - Committed and pushed to `jbac_app` GitHub repository (`a06564d`).
+
+
+---
+
+## 68. Help Form Reset Fix, Full Name Rename, Denomination & AP/TG Location Hierarchy, RDS Migration & Mobile Release v0.0.54 (November 11, 2026)
+
+### Highlights
+1. **Help Form Fixes & Field Additions (`https://jbac.in/help` & Mobile `HelpPage`)**:
+   - **Post-Submit Reset Fix**: Removed session-based prefilling on submit/init and introduced `resetFormCompletely()` to clear all form inputs, file selection (`#formFile`), `imagesData`, validation flags, and cascading dropdown selections/disabled states after submission.
+   - **Telugu Name Rename**: Renamed Name field title from `పేరు *` to **`పూర్తి పేరు *`** ("Full Name").
+   - **Denomination Dropdown**: Added **`డెనామినేషన్ *`** directly after `మొబైల్ నంబర్ *` using the existing `churchdenomation` table (`getdenomation()`).
+   - **Strict AP/TG Cascading Hierarchy Before Address**: Moved `చిరునామా *` (Address) below a sequential, parent-gated geographic cascade for Andhra Pradesh & Telangana:
+     `రాష్ట్రం (State)` → `జిల్లా (District)` → `నియోజకవర్గం (Constituency)` → `మండలం (Mandal)` → `పంచాయతీ / వార్డు / సబ్-వార్డు (Panchayat/Ward/Sub-Ward)` → `చిరునామా (Address)`.
+2. **Database & Backend API Updates**:
+   - Ran `scripts/migrate_helps_v54.js` to add `denomination_id`, `state_id`, `state`, `district_id`, `constituency_id`, `mandal_id`, and `panchayat_id` columns to RDS MySQL table `helps`.
+   - Updated `POST /dashboardapi/posthelping` and `ALL /dashboardapi/gethelps` in `backend/server.ts` & `backend/server.js`, and deployed to AWS Lambda `jbac-backend-api`.
+3. **Web Production & Mobile Release v0.0.54 (API Level 36)**:
+   - Built Angular production bundle (`npm run build:prod`, hash `f027a2849e74315a`) and deployed to AWS S3 & CloudFront (Distribution `EOBBU8SU7H3BI`, Invalidation `I64X7SIE7Q3KYJ639GYK67692L`).
+   - Built & signed mobile app `0.0.54` (`versionCode 54`, `targetSdkVersion 36`): `jbacApp-0.0.54.apk` (`130,643,641` bytes), `jbacApp-0.0.54.aab` & `appreleasesigned.aab` (`127,679,243` bytes).
+   - Created `RELEASE_NOTES_v0.0.54.md` and synced both `jbac_web` and `jbac_app` repositories on GitHub.

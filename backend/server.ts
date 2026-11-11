@@ -1763,10 +1763,19 @@ app.post(['/dashboardapi/posthelping', '/api/posthelping'], async (req, res) => 
     try {
         const h = req.body || {};
         const img = extractUploadedImage(h) || (typeof h.image === 'string' ? h.image : null);
+        const stateIdNum = h.state_id ? Number(h.state_id) : null;
+        const stateName = h.state || (stateIdNum === 2 ? 'Telangana' : (stateIdNum === 1 ? 'Andhra Pradesh' : null));
         const result: any = await dynamicInsert('helps', {
             help: h.help || h.help_type || '',
-            name: h.name || '',
+            name: h.name || h.full_name || '',
             mobile_number: h.mobile_number || h.phone || '',
+            denomination_id: h.denomination_id || h.denomination || h.denomation_id || null,
+            state_id: stateIdNum,
+            state: stateName,
+            district_id: h.district_id || h.district || h.districts || null,
+            constituency_id: h.constituency_id || h.constituency || h.constituencyname || null,
+            mandal_id: h.mandal_id || h.mandal || h.mandals || null,
+            panchayat_id: h.panchayat_id || h.village_id || h.panchayati || h.panchayat || null,
             address: h.address || '',
             description: h.description || '',
             image: img,
@@ -1783,7 +1792,22 @@ app.post(['/dashboardapi/posthelping', '/api/posthelping'], async (req, res) => 
 
 app.all(['/dashboardapi/gethelps', '/api/gethelps'], async (_req, res) => {
     try {
-        const [rows] = await db.query('SELECT * FROM helps WHERE d_in = 0 ORDER BY id DESC');
+        const [rows] = await db.query(`
+            SELECT h.*,
+                cd.denomation_name AS denomination_name,
+                d.distrct_nm AS district_name,
+                c.const_nm AS constituency_name,
+                m.mndl_nm AS mandal_name,
+                p.pnchyt_nm AS panchayat_name
+            FROM helps h
+            LEFT JOIN churchdenomation cd ON h.denomination_id = cd.id
+            LEFT JOIN dstrct d ON h.district_id = d.id
+            LEFT JOIN const_dtl_t c ON h.constituency_id = c.id
+            LEFT JOIN mndls_lst_t m ON h.mandal_id = m.id
+            LEFT JOIN pnchyt_lst_t p ON h.panchayat_id = p.id
+            WHERE h.d_in = 0
+            ORDER BY h.id DESC
+        `);
         res.json({ status: 200, data: rows });
     } catch (err) {
         res.status(500).json({ status: 500, error: err.message });
